@@ -1,11 +1,17 @@
 <?php
+/**
+ * Front to the WordPress application. This file doesn't do anything, but loads
+ * wp-blog-header.php which does and tells WordPress to load the theme.
+ *
+ * @package WordPress
+ */
 
-echo $_ENV['WP_DB_HOST'] ."\n";
-echo $_ENV['WP_DB_NAME'] ."\n";
-echo $_ENV['WP_DB_PASSWORD'] ."\n";
-echo $_ENV['WP_DB_USER'] ."\n";
-echo $_ENV['WP_S3_ACCESS_KEY'] ."\n";
-echo $_ENV['WP_S3_SECRET_KEY'] ."\n";
+/**
+ * Tells WordPress to load the WordPress theme and output it.
+ *
+ * @var bool
+ */
+define( 'WP_USE_THEMES', true );
 
-phpinfo(INFO_ENVIRONMENT);
-phpinfo(INFO_VARIABLES);
+/** Loads the WordPress Environment and Template */
+require __DIR__ . '/wp-blog-header.php';

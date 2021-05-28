@@ -65,11 +65,13 @@ jobs:
           --build-arg WP_DB_PASSWORD='${{ secrets.WP_DB_PASSWORD }}' \
           --build-arg WP_DB_USER='${{ secrets.WP_DB_USER }}' \
           --build-arg WP_S3_ACCESS_KEY='${{ secrets.WP_S3_ACCESS_KEY }}' \
-          --build-arg WP_S3_SECRET_KEY='${{ secrets.WP_S3_SECRET_KEY }}' .
+          --build-arg WP_S3_SECRET_KEY='${{ secrets.WP_S3_SECRET_KEY }}' \
+          --build-arg WP_S3_SECRET_KEY='${{ secrets.WP_S3_BUCKET }}' .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-        echo "Init transform:  task-definition.json"
-        sed -i 's/ECSTASK/${{ secrets.ECS_TASK }}/' task-definition.json && sed -i 's/AWSACCID/${{ secrets.AWS_ACCOUNT_ID }}/' task-definition.json
+        echo "Init transform: task-definition.json"
+        sed -i 's/ECSTASK/${{ secrets.ECS_TASK }}/' task-definition.json
+        sed -i 's/AWSACCID/${{ secrets.AWS_ACCOUNT_ID }}/' task-definition.json
         echo "End transform: task-definition.json"
 
     - name: Fill in the new image ID in the Amazon ECS task definition
