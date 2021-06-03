@@ -62,3 +62,52 @@ function my_acf_fields_taxonomy_result( $text, $term, $field, $post_id ) {
 		return $text;
 	}
 }
+
+
+function getVideoInfo($post_id, $video_host, $video_id){
+
+	$data =  array($post_id, $video_host, $video_id);
+
+	switch ($video_host) {
+		case "Youtube":
+			$json = file_get_contents("https://api.feliz7play.com/v4/youtubeinfo?video_id=". $video_id );
+			$obj = json_decode($json);
+			
+			$time = $obj->time;
+			$size = $obj->quality;
+			$release_year = date('Y', strtotime($obj->release_date));
+
+			if ($obj) {
+				update_field( 'post_video_length', $time, $post_id );
+				update_field( 'post_video_year', $release_year, $post_id );
+			} 
+			break;
+			
+		case "Vimeo":
+			$json = file_get_contents("https://api.feliz7play.com/v4/vimeoinfo?video_id=". $video_id);
+			$obj = json_decode($json);
+
+			$time = $obj->time;
+			$release_year = date('Y', strtotime($obj->release_date));
+
+			if ($time) {
+				update_field( 'post_video_length', $time, $post_id );
+				update_field( 'post_video_year', $release_year, $post_id );
+			} 
+			break;
+	}
+}
+
+function run_my_function( $post_id ) {
+	$video_host = get_field("post_video_host", $post_id);
+	$video_id = get_field("post_video_id", $post_id);
+	$video_lenght = get_field("post_video_length", $post_id);
+	$release_year = get_field("post_video_year", $post_id);
+
+	$data = array($post_id, $video_host, $video_lenght, $release_year);
+
+	if ( !$video_lenght || !$release_year ){
+		getVideoInfo( $post_id, $video_host, $video_id );
+	}
+}
+add_action( 'acf/save_post', 'run_my_function' );

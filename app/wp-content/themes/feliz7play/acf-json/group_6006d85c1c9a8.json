@@ -268,7 +268,7 @@
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
-                "class": "",
+                "class": "disabled",
                 "id": ""
             },
             "default_value": "",
@@ -277,7 +277,8 @@
             "append": "",
             "min": "",
             "max": "",
-            "step": ""
+            "step": "",
+            "readonly": 1
         },
         {
             "key": "field_6006dba0d4d8f",
@@ -559,5 +560,5 @@
     ],
     "active": true,
     "description": "",
-    "modified": 1618856596
+    "modified": 1622636856
 }
