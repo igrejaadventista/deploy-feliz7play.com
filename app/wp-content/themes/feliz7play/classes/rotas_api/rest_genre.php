@@ -39,15 +39,33 @@ function get_genre_items($id){
 
     $items = array();
 
-   $args = array('taxonomy' => 'collection', 'meta_key' => 'collection_genre', 'meta_value' => $id);
+   $args = array(
+       'taxonomy' => 'collection', 
+       'meta_key' => 'collection_genre',
+       'meta_value' => $id
+    );
+
     $collection = get_line_collection($args);
    array_push($items, ...$collection['included']);
 
-   $args = array('post_type' => 'video', 'fields' => '', 'genre' => $term->slug, 'exclude' => $collection['exclude'], 'posts_per_page' => -1, 'post_status' => 'publish');
+
+   $args = array(
+       'post_type' => 'video',
+     //'fields' => '',
+       'genre' => $term->slug,
+     //'exclude' => $collection['exclude'],
+       'posts_per_page' => -1,
+       'post_status' => 'publish',
+       'meta_key' => 'post_video_type',
+       'meta_value' => 'Single',
+   
+    );
+
+
    $post = get_line_post($args);
+
     array_push($items, ...$post);
 
-    //echox(count($post));
     return $items;
 
 }

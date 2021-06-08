@@ -16,24 +16,29 @@
 
         $posts = get_posts($args);
         foreach ($posts as $post){
-            $id =                   $post->ID;
+
+            $id = $post->ID;
+
+            $meta = get_post_meta($id);
+
+            
             $title =                $post->post_title;
             $slug =                 $post->post_name;
-            $video_type =           get_field('post_video_type', $id);
-            $video_episode =        get_field('video_episode', $id);
-            $subtitle =             get_field('post_subtitle', $id);
-            $description =          wp_strip_all_tags(get_field('post_blurb', $id));
-            $video_host =           get_field('post_video_host', $id);
-            $video_id =             get_field('post_video_id', $id);
+            $video_type =           $meta['post_video_type'][0];
+            $video_episode =        $meta['video_episode'][0];
+            $subtitle =             $meta['post_subtitle'][0];
+            $description =          wp_strip_all_tags($meta['post_blurb'][0]);
+            $video_host =           $meta['post_video_host'][0];
+            $video_id =             $meta['post_video_id'][0];
+            $post_download_link =   $meta['post_download_link'][0];
             $collection =           get_the_terms($id, 'collection')[0];
-            $post_download_link =   get_field('post_download_link', $id);
             $genre =                get_the_terms($id, 'genre')[0];
             
-            $video_thumbnail =      !is_null(get_field('video_thumbnail', $id)['url']) ? get_field('video_thumbnail', $id)['url'] : get_field('video_image_hover', $id)['url'];
-            $video_image_hover =    !is_null(get_field('video_image_hover', $id)['url']) ? get_field('video_image_hover', $id)['url'] : false;
+           $video_thumbnail =      wp_get_attachment_image_src(!is_null($meta['video_thumbnail'][0]) ? $meta['video_thumbnail'][0] : $meta['video_image_hover'][0])[0];
+           $video_image_hover =    wp_get_attachment_image_src( !is_null($meta['video_image_hover'][0]) ? $meta['video_image_hover'][0] : null)[0];
             
-            $values = array('id' => $id,'title' => $title, 'slug' => $slug, 'video_type' => $video_type, 'video_episode' => $video_episode, 'subtitle' => $subtitle, 'description' => $description, 'genre' => $genre, 'collection' => $collection, 'video_host' => $video_host, 'video_id' => $video_id, 'post_download_link' => $post_download_link, 'video_thumbnail' => $video_thumbnail, 'video_image_hover' => $video_image_hover);
-            array_push($items, $values);
+           $values = array('id' => $id,'title' => $title, 'slug' => $slug, 'video_type' => $video_type, 'video_episode' => $video_episode, 'subtitle' => $subtitle, 'description' => $description, 'genre' => $genre, 'collection' => $collection, 'video_host' => $video_host, 'video_id' => $video_id, 'post_download_link' => $post_download_link, 'video_thumbnail' => $video_thumbnail, 'video_image_hover' => $video_image_hover);
+           array_push($items, $values);
         }
 
         return $items;
@@ -46,19 +51,27 @@
         $collections = get_terms($args);
 
         foreach($collections as $collection){
-            $id = $collection->term_id;
-            $title = $collection->name;
-            $slug = $collection->slug;
-            $video_type = $collection->taxonomy;
-            $video_thumbnail = get_field('collection_image', 'term_' . $id)['url'];
-            $video_image_hover = false;
+
+             $id = $collection->term_id;
+
+             $meta = get_term_meta($id);
+
+            // echox($meta);
+
+             $title = $collection->name;
+             $slug = $collection->slug;
+             $video_type = $collection->taxonomy;
+             $video_thumbnail = wp_get_attachment_image_src($meta['collection_image'][0])[0];
+             $video_image_hover = false;
 
             $values = array('id' => $id,'title' => $title, 'slug' => $slug, 'video_type' => $video_type, 'video_thumbnail' => $video_thumbnail, 'video_image_hover' => $video_image_hover);
+           // $values = array('id' => $id);
+
             array_push($items['included'], $values);
 
-            $args = array('post_type' => 'video', 'fields' => 'ids', 'collection' => $slug, 'numberposts' => -1);
-            $exclude = get_posts($args);
-            array_push($items['exclude'], ...$exclude);
+           // $args = array('post_type' => 'video', 'fields' => 'ids', 'collection' => $slug, 'numberposts' => -1);
+           // $exclude = get_posts($args);
+           // array_push($items['exclude'], ...$exclude);
         }
         return $items;
     }
