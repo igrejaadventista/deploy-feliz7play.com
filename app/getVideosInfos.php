@@ -25,7 +25,7 @@ function getVideoInfos() {
 
 		switch ($video_source) {
 			case "Youtube":
-				// https://www.googleapis.com/youtube/v3/videos?id=dldC2RVRBdA&key=AIzaSyCoyon44i2ksJlj1kV2jitWMeTeQcfz7lE&part=contentDetails
+				// https://www.googleapis.com/youtube/v3/videos?id=YOUTUBE_API_KEY&part=contentDetails
 
 				$json = file_get_contents("https://api.feliz7play.com/v4/youtubeinfo?video_id=". $video_id );
 				$obj = json_decode($json);
