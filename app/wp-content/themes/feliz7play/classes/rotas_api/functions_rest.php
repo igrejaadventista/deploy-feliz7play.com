@@ -34,8 +34,8 @@
             $collection =           get_the_terms($id, 'collection')[0];
             $genre =                get_the_terms($id, 'genre')[0];
             
-           $video_thumbnail =      wp_get_attachment_image_src(!is_null($meta['video_thumbnail'][0]) ? $meta['video_thumbnail'][0] : $meta['video_image_hover'][0])[0];
-           $video_image_hover =    wp_get_attachment_image_src( !is_null($meta['video_image_hover'][0]) ? $meta['video_image_hover'][0] : null)[0];
+           $video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
+           $video_image_hover =    wp_get_attachment_image_src($meta['video_image_hover'][0])[0];
             
            $values = array('id' => $id,'title' => $title, 'slug' => $slug, 'video_type' => $video_type, 'video_episode' => $video_episode, 'subtitle' => $subtitle, 'description' => $description, 'genre' => $genre, 'collection' => $collection, 'video_host' => $video_host, 'video_id' => $video_id, 'post_download_link' => $post_download_link, 'video_thumbnail' => $video_thumbnail, 'video_image_hover' => $video_image_hover);
            array_push($items, $values);
