@@ -84,6 +84,49 @@
             ]
         },
         {
+            "key": "field_60ca9d0960909",
+            "label": "Meta: Description",
+            "name": "meta_description",
+            "type": "textarea",
+            "instructions": "Default website description for SEO Meta and social sharing.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "maxlength": 155,
+            "rows": 2,
+            "new_lines": ""
+        },
+        {
+            "key": "field_60ca9ce160908",
+            "label": "Meta: Image",
+            "name": "share_image",
+            "type": "image",
+            "instructions": "Default website image for social sharing.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "preview_size": "medium",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": ""
+        },
+        {
             "key": "field_609b1f05f7f5b",
             "label": "Menus",
             "name": "",
@@ -252,25 +295,6 @@
             "mime_types": ""
         },
         {
-            "key": "field_609b201ea8614",
-            "label": "Copyright",
-            "name": "copyright",
-            "type": "text",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
-            "maxlength": ""
-        },
-        {
             "key": "field_609d35b4194d0",
             "label": "Imagem erro 404",
             "name": "imagem_erro_404",
@@ -293,6 +317,57 @@
             "max_height": 1080,
             "max_size": 1,
             "mime_types": ""
+        },
+        {
+            "key": "field_609b201ea8614",
+            "label": "Copyright",
+            "name": "copyright",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": ""
+        },
+        {
+            "key": "field_60ca9a6460906",
+            "label": "Link Feedback",
+            "name": "link_feedback",
+            "type": "url",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
+        },
+        {
+            "key": "field_60ca9c6a60907",
+            "label": "Link Privacy Policy",
+            "name": "link_privacy_policy",
+            "type": "url",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
         }
     ],
     "location": [
@@ -312,5 +387,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1620916628
+    "modified": 1623891440
 }

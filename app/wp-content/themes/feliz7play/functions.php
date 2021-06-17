@@ -55,12 +55,25 @@ function shapeSpace_disable_other_image_sizes() {
 }
 add_action('init', 'shapeSpace_disable_other_image_sizes');
 
-add_filter('acf/fields/taxonomy/result/name=to_collection', 'my_acf_fields_taxonomy_result', 10, 4);
-add_filter('acf/fields/taxonomy/result/name=to_custom_collection', 'my_acf_fields_taxonomy_result', 10, 4);
-function my_acf_fields_taxonomy_result( $text, $term, $field, $post_id ) {
-	if ( $term->parent == 0 ){
-		return $text;
-	}
+add_filter('acf/fields/taxonomy/query/name=to_collection', 'my_acf_fields_taxonomy_result', 10, 4);
+add_filter('acf/fields/taxonomy/query/name=to_custom_collection', 'my_acf_fields_taxonomy_result', 10, 4);
+function my_acf_fields_taxonomy_result( $args ) {
+	
+	$args['posts_per_page'] = 40;
+	$args['parent'] = 0;
+
+	return $args;
+}
+
+add_filter('acf/fields/post_object/query/name=to_video', 'my_acf_fields_post_result', 10, 4);
+function my_acf_fields_post_result( $args) {
+	
+	$args['posts_per_page'] = 40;
+	$args['meta_key'] = 'post_video_type';
+    $args['meta_value'] = 'Single';
+	$args['post_status'] = 'publish';
+	
+	return $args;
 }
 
 
@@ -68,19 +81,21 @@ function getVideoInfo($post_id, $video_host, $video_id){
 
 	$data =  array($post_id, $video_host, $video_id);
 
+	// SET VIDEO LENGHT BY VIEMO/YOUTUBE API
 	switch ($video_host) {
 		case "Youtube":
 			$json = file_get_contents("https://api.feliz7play.com/v4/youtubeinfo?video_id=". $video_id );
 			$obj = json_decode($json);
 			
 			$time = $obj->time;
-			$size = $obj->quality;
 			$release_year = date('Y', strtotime($obj->release_date));
 
 			if ($obj) {
 				update_field( 'post_video_length', $time, $post_id );
 				update_field( 'post_video_year', $release_year, $post_id );
 			} 
+
+			unset($json, $obj, $time, $size, $release_year);
 			break;
 			
 		case "Vimeo":
@@ -94,11 +109,19 @@ function getVideoInfo($post_id, $video_host, $video_id){
 				update_field( 'post_video_length', $time, $post_id );
 				update_field( 'post_video_year', $release_year, $post_id );
 			} 
+			
+			unset($json, $obj, $time, $release_year);
 			break;
 	}
+
+	//RESET CF CACHE
+	$json = file_get_contents("https://api.feliz7play.com/v4/clear-cf-cache?zone=feliz7play.com");
+	$obj = json_decode($json);
+
+	unset($json, $obj, $data);
 }
 
-function run_my_function( $post_id ) {
+function UpdateVideoLenght( $post_id ) {
 	$video_host = get_field("post_video_host", $post_id);
 	$video_id = get_field("post_video_id", $post_id);
 	$video_lenght = get_field("post_video_length", $post_id);
@@ -110,4 +133,4 @@ function run_my_function( $post_id ) {
 		getVideoInfo( $post_id, $video_host, $video_id );
 	}
 }
-add_action( 'acf/save_post', 'run_my_function' );
+add_action( 'acf/save_post', 'UpdateVideoLenght' );

@@ -369,6 +369,30 @@
             "mime_types": ""
         },
         {
+            "key": "field_60ca9eee900a0",
+            "label": "Video Image - Content Header",
+            "name": "image_content_header",
+            "type": "image",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "preview_size": "medium",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": ""
+        },
+        {
             "key": "field_6006db7bd4d8e",
             "label": "Video Image - Hover",
             "name": "video_image_hover",
@@ -560,5 +584,5 @@
     ],
     "active": true,
     "description": "",
-    "modified": 1622636856
+    "modified": 1623891752
 }

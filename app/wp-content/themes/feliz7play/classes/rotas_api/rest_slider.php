@@ -13,37 +13,20 @@ function get_page_option($data) {
 
 	$itens = get_field('sliders', 'option');
 
-	
-
 	foreach($itens as $item){
 
 		$item = $item['slider_object'];
 		
-
-		
 		$type = get_field('slider_type', $item->ID);
-
-		
 
 		switch ($type) {
 			case 'video':
-
-				
-
-
 				$title = $item->post_title;
 				$source = get_field('slider_source', $item->ID);
 				$logo = get_field('slider_logo', $item->ID)['url'];
-
-				
-								
-
 				$slider_desktop = get_field('slider_desktop_image', $item->ID)['url'];
 				$slider_tablet = get_field('slider_tablet_image', $item->ID)['url'];
 				$slider_mobile = get_field('slider_mobile_image', $item->ID)['url'];
-
-
-
 
 				if($source == 'video' ){
 
@@ -58,14 +41,8 @@ function get_page_option($data) {
 					$genre = get_the_terms( $target, 'genre')[0]->name;
 
 					$video_host =           get_field('post_video_host', $target);
-					$video_id =             get_field('post_video_id', $target);
-
-				
-
-					
+					$video_id =             get_field('post_video_id', $target);					
 				}else {
-
-					
 					$target = get_field('slider_collection_object', $item->ID)->term_id;
 
 					$slug = get_field('slider_collection_object', $item->ID)->slug;
@@ -79,12 +56,7 @@ function get_page_option($data) {
 					$video_host =  get_field('collection_video_host', 'term_' . $target);
 					$video_id =    get_field('collection_video_id', 'term_' . $target);
 
-				
-
-
 				}
-
-
 
 				$slider = array(
 					'id' => $item->ID,
@@ -110,20 +82,10 @@ function get_page_option($data) {
 					'slider_mobile' => $slider_mobile
 
 				);
-
-
-
-
-
-
 				array_push($sliders, $slider);
 			break;
 			
 			case 'custom':
-					
-				
-				
-
 
 				$title = $item->post_title;
 				$source = get_field('slider_collection_object', $item->ID);
@@ -135,11 +97,6 @@ function get_page_option($data) {
 				$slider_tablet = get_field('slider_tablet_image', $item->ID)['url'];
 				$slider_mobile = get_field('slider_mobile_image', $item->ID)['url'];
 				
-
-				
-
-
-
 				$slider = array(
 					'id' => $item->ID,
 					'title' => $title,
@@ -153,16 +110,7 @@ function get_page_option($data) {
 					
 				);
 
-
-
-
-
-
 				array_push($sliders, $slider);
-
-
-
-
 			break;
 			
 		}
@@ -170,10 +118,6 @@ function get_page_option($data) {
 		
 
 	}
-
-
-
-
 	return new WP_REST_Response($sliders, 200 );
 }
 

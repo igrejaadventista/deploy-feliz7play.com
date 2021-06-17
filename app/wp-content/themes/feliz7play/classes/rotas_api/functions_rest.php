@@ -111,7 +111,7 @@
 
                 case 'video':
                 
-                    $args = array('post_type' => 'video', 'fields' => '', 'include' => $item['video']->ID, 'numberposts' => 0);
+                    $args = array('post_type' => 'video', 'fields' => '', 'include' => $item['to_video']->ID, 'numberposts' => 0);
                     $post = get_line_post($args);
 
                     if($line_model == 'circle'){ $post[0]['video_thumbnail'] = $item['image']['url']; }
