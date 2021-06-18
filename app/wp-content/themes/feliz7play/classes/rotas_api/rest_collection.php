@@ -12,12 +12,16 @@ function get_rest_collection($data) {
     $id = $data['id'];
     $page = $data->get_param('page');
     $per_page = $data->get_param('per_page');
+    $order = $data->get_param('order');
+    $orderby = $data->get_param('orderby');
 
     $term = get_term($data['id'], 'collection');
 
     $args = array(  'post_type' => 'video', 
                     'posts_per_page' => $per_page, 
                     'paged' => $page,
+                    'orderby' => $orderby,
+                    'order' => $order,
                     'post_status' => 'publish',
                     'tax_query' => array(
                         array(
