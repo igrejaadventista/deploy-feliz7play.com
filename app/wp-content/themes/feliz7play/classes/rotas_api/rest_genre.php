@@ -42,7 +42,8 @@ function get_genre_items($id){
    $args = array(
        'taxonomy' => 'collection', 
        'meta_key' => 'collection_genre',
-       'meta_value' => $id
+       'meta_value' => $id,
+       'parent' => 0
     );
 
     $collection = get_line_collection($args);
