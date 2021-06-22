@@ -5,8 +5,9 @@ if( function_exists('acf_add_options_page') ) {
 	acf_add_options_sub_page(array(
 		'page_title' 	=> 'Site Settings',
 		'menu_title'	=> 'SIte Settings',
-		'parent_slug'	=> 'options-general.php',
-        'post_id'       => 'site_settings'
+		'parent_slug'	=> 'f7p-general-settings',
+        'post_id'       => 'site_settings',
+        'capability' 	=> 'add_users'
 	));
 }
 
@@ -22,6 +23,7 @@ function get_site_settings(){
 
     $variable['social_networks']['social_network'] = get_field('redes_sociais', 'site_settings');
     $variable['social_networks']['meta_description'] = get_field('meta_description', 'site_settings');
+    $variable['social_networks']['meta_keywords'] = get_field('meta_keywords', 'site_settings');
     $variable['social_networks']['share_image'] = get_field('share_image', 'site_settings');
     $variable['menus']['footer'] = get_field('footer', 'site_settings');
     $variable['menus']['sites'] = get_field('sites', 'site_settings');

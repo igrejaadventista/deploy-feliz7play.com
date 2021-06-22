@@ -3,7 +3,7 @@
 class ThemeHelper {
 
 	public function __construct(){
-		add_action( 'acf/init', [$this, 'addThemeOptions'], 0 ); 
+		add_action( 'acf/init', [$this, 'addThemeOptions'], 10 ); 
 		add_action( 'admin_init', [$this, 'remove_textarea'] );
 		add_filter( 'register_post_type_args', [$this, 'remove_default_post_type'], 0, 2);
 		add_action( 'after_setup_theme', [$this, 'createThumbs' ]);
@@ -12,9 +12,10 @@ class ThemeHelper {
 	function addThemeOptions(){
 		if( function_exists('acf_add_options_page') ) {  
 			acf_add_options_sub_page(array(
-				'page_title' 	=> 'Site Options',
-				'menu_title'	=> 'Site Options',
-				'parent_slug'	=> 'themes.php',
+				'page_title' 	=> 'Home Options',
+				'menu_title'	=> 'Home Options',
+				'parent_slug'	=> 'f7p-general-settings',
+				'capability' 	=> 'add_users',
 			));
 		}
 	}
