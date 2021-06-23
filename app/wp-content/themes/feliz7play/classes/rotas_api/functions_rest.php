@@ -289,7 +289,7 @@
     function filter_rest_video_query( $args, $request ) { 
         $params = $request->get_params(); 
         
-        if(isecondset($params['meta_key']) && isecondset($params['meta_value'])){
+        if(isset($params['meta_key']) && isset($params['meta_value'])){
             $args['meta_query'][] = array(
                 array(
                     'key'     => $params['meta_key'],
