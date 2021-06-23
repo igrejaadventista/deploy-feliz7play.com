@@ -33,11 +33,30 @@
             $post_download_link =   $meta['post_download_link'][0];
             $collection =           get_the_terms($id, 'collection')[0];
             $genre =                get_the_terms($id, 'genre')[0];
+            $video_lenght =         $meta['post_video_length'][0];
+            $video_quality =        $meta['post_video_quality'][0];
             
            $video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
            $video_image_hover =    wp_get_attachment_image_src($meta['video_image_hover'][0])[0];
             
-           $values = array('id' => $id,'title' => $title, 'slug' => $slug, 'video_type' => $video_type, 'video_episode' => $video_episode, 'subtitle' => $subtitle, 'description' => $description, 'genre' => $genre, 'collection' => $collection, 'video_host' => $video_host, 'video_id' => $video_id, 'post_download_link' => $post_download_link, 'video_thumbnail' => $video_thumbnail, 'video_image_hover' => $video_image_hover);
+           $values = array(
+               'id' => $id,
+               'title' => $title, 
+               'slug' => $slug, 
+               'video_type' => $video_type, 
+               'video_episode' => $video_episode, 
+               'subtitle' => $subtitle, 
+               'description' => $description, 
+               'genre' => $genre, 
+               'collection' => $collection, 
+               'video_host' => $video_host, 
+               'video_id' => $video_id, 
+               'post_download_link' => $post_download_link, 
+               'video_thumbnail' => $video_thumbnail, 
+               'video_image_hover' => $video_image_hover,
+               'post_video_length' => $video_lenght,
+               'post_video_quality' => $video_quality
+            );
            array_push($items, $values);
         }
 
@@ -270,7 +289,7 @@
     function filter_rest_video_query( $args, $request ) { 
         $params = $request->get_params(); 
         
-        if(isset($params['meta_key']) && isset($params['meta_value'])){
+        if(isecondset($params['meta_key']) && isecondset($params['meta_value'])){
             $args['meta_query'][] = array(
                 array(
                     'key'     => $params['meta_key'],
