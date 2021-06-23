@@ -226,6 +226,14 @@
                 'schema'            => null,
             )
         );
+        register_rest_field( 'video',
+          'taxonomies',
+            array(
+                'get_callback'      => 'taxonomy_meta_callback',
+                'update_callback'   => null,
+                'schema'            => null,
+            )
+        );
     }
 
     function video_meta_callback( $video, $field_name, $request) {
@@ -236,6 +244,16 @@
              
         return $link_sharing;
 
+    }
+
+    function taxonomy_meta_callback( $video ) {
+
+        $taxonomy = array(
+            'genre' => get_the_terms($video['id'], 'genre'),
+            'collection'=> get_the_terms($video['id'], 'collection')
+        );
+             
+        return $taxonomy;
     }
 
     function echox($item){
