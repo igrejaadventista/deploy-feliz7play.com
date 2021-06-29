@@ -71,6 +71,78 @@
         <button class="header__button-mobile">
             <i class="menu-icon"></i>
         </button>
+
+        <aside class="MenuMobile__MenuMobileStyle-rsshp5-1 gBpITg" style="display: none;">
+            <ul>
+                <li class="">
+                    <a href="/pt">
+                        <div class="icon">
+                            <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14 6.688V14c0 .898-.692 1.625-1.546 1.625H4.625a2 2 0 0 1-2-2V6.688M1 6.688l6.255-5.301a1.639 1.639 0 0 1 2.115 0l6.255 5.3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                
+                                <path d="M10.75 14.813V10.62c0-.826-.727-1.496-1.625-1.496H7.5c-.897 0-1.625.67-1.625 1.496v4.191" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </div>
+                        
+                        <span>Inicio</span>
+                    </a>
+                </li>
+                
+                <li class="">
+                    <a href="/pt/g">
+                        <div class="icon">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path clip-rule="evenodd" d="M5.835 7.324H3.786a1.49 1.49 0 0 1-1.49-1.49V3.787c0-.823.667-1.49 1.49-1.49h2.049c.823 0 1.49.667 1.49 1.49v2.049a1.49 1.49 0 0 1-1.49 1.49zM14.213 7.324h-2.048a1.49 1.49 0 0 1-1.49-1.49V3.787c0-.823.667-1.49 1.49-1.49h2.049c.822 0 1.49.667 1.49 1.49v2.049a1.49 1.49 0 0 1-1.49 1.49zM5.835 15.703H3.786a1.49 1.49 0 0 1-1.49-1.49v-2.048c0-.823.667-1.49 1.49-1.49h2.049c.823 0 1.49.667 1.49 1.49v2.049a1.49 1.49 0 0 1-1.49 1.49zM14.213 15.703h-2.048a1.49 1.49 0 0 1-1.49-1.49v-2.048c0-.823.667-1.49 1.49-1.49h2.049c.822 0 1.49.667 1.49 1.49v2.049a1.49 1.49 0 0 1-1.49 1.49z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </div>
+                        
+                        <span>Categorias</span>
+                    </a>
+                </li>
+                
+                <li class="">
+                    <a href="/pt/favoritos">
+                        <div class="icon">
+                            <svg width="16" height="15" viewBox="0 0 16 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path clip-rule="evenodd" d="M8 2.39C8.536 1.735 9.463 1 10.875 1 13.345 1 15 3.421 15 5.676 15 10.389 9.383 14 8 14s-7-3.61-7-8.324C1 3.42 2.656 1 5.125 1 6.537 1 7.465 1.735 8 2.39z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </div>
+                    
+                        <span>Favoritos</span>
+                    </a>    
+                </li>
+                
+                <li class="">
+                    <a href="/pt/busca">
+                        <div class="icon">
+                            <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path clip-rule="evenodd" d="M19.767 11.467a7.467 7.467 0 1 1-14.934 0 7.467 7.467 0 1 1 14.934 0z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                
+                                <path d="M20.834 20l-3.25-3.25" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </div>
+                        
+                        <span>Pesquisar</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="" target="_blank">
+                        <div class="icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18.364 5.636a9 9 0 0 1 0 12.728 9 9 0 1 1 0-12.728" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                
+                                <path clip-rule="evenodd" d="M12.625 15.125H8.25c-.69 0-1.25-.56-1.25-1.25v-3.75c0-.69.56-1.25 1.25-1.25h4.375c.69 0 1.25.56 1.25 1.25v3.75c0 .69-.56 1.25-1.25 1.25z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                
+                                <path d="M13.875 12.61l2.108 1.697A.625.625 0 0 0 17 13.82v-3.64a.625.625 0 0 0-1.017-.487l-2.108 1.697" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </div>
+                        
+                        <span>Cultos Ao Vivo</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
         
         <div class="right">
             <div class="header__language">
@@ -83,6 +155,36 @@
                         </svg>
                     </div>
                 </button>
+
+                <div class="dropdownLang">
+                    <button>
+                        <div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 24c6.627 0 12-5.373 12-12S18.627 0 12 0 0 5.373 0 12s5.373 12 12 12z" fill="#6DA544"></path>
+                                
+                                <path d="M12 4.696L21.913 12 12 19.305 2.087 12 12 4.696z" fill="#FFDA44"></path>
+                                
+                                <path d="M12 16.174a4.174 4.174 0 1 0 0-8.348 4.174 4.174 0 0 0 0 8.348z" fill="#F0F0F0"></path>
+                                
+                                <path d="M9.913 11.739a7.02 7.02 0 0 0-2.086.315 4.173 4.173 0 0 0 7.59 2.34 7.034 7.034 0 0 0-5.504-2.655zM16.096 12.8a4.174 4.174 0 0 0-7.932-2.447 8.607 8.607 0 0 1 7.932 2.447z" fill="#0052B4"></path>
+                            </svg>
+                            
+                            <span>PT</span>
+                        </div>
+                    </button>
+                    
+                    <button>
+                        <div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 12c0 1.468.264 2.874.746 4.174L12 17.218l11.254-1.044c.482-1.3.746-2.706.746-4.174 0-1.467-.264-2.874-.746-4.174L12 6.783.746 7.826A11.974 11.974 0 0 0 0 12z" fill="#FFDA44"></path>
+                                
+                                <path d="M23.254 7.826C21.558 3.256 17.159 0 12 0 6.84 0 2.442 3.257.746 7.826h22.508zM.746 16.174C2.442 20.744 6.84 24 12 24c5.16 0 9.558-3.256 11.254-7.826H.746z" fill="#D80027"></path>
+                            </svg>
+                            
+                            <span>ES</span>
+                        </div>
+                    </button>
+                </div>
             </div>
             
             <a class="search" href="/pt/busca">
@@ -105,6 +207,51 @@
                         </svg>
                     </span>
                 </a>
+
+                <button class="user">
+                    <div class="avatar">
+                        <img src="https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=4243138775745960&amp;height=50&amp;width=50&amp;ext=1627586724&amp;hash=AeSLCgIUa9lNnIBvg_A">
+                    </div>
+
+                    <span>Tiago Papile</span>
+                    
+                    <div style="transform: rotate(180deg);">
+                        <svg width="11" height="8" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.834 0h-8a1 1 0 0 0-.8 1.6l4 5.333a1 1 0 0 0 1.6 0l4-5.333a1 1 0 0 0-.8-1.6z" fill="#F16723"></path>
+                        </svg>
+                    </div>
+                </button>
+                
+                <div class="drop-user">
+                    <a href="">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2.997 12H14M11 8.999L14 12l-3 3.001" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            
+                            <path d="M5.998 9.136V7.398a2 2 0 0 1 1.608-1.96L18.611 3.03a2.147 2.147 0 0 1 2.393 2.167v13.806a2.001 2.001 0 0 1-2.34 1.973L7.659 19.083a2 2 0 0 1-1.661-1.973v-2.138" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        
+                        <span>Log out</span>
+                    </a>
+                    
+                    <a href="">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path clip-rule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M9.65 14.346c2.184 2.184 4.95 3.576 6.595 1.938l.399-.399a1.201 1.201 0 0 0-.16-1.84c-.39-.271-.807-.562-1.27-.887a1.213 1.213 0 0 0-1.547.128l-.451.448a9.67 9.67 0 0 1-1.626-1.322l-.002-.002a9.63 9.63 0 0 1-1.322-1.626l.448-.451c.412-.414.463-1.07.128-1.548-.326-.462-.617-.88-.887-1.269a1.203 1.203 0 0 0-1.84-.16l-.4.399C6.08 9.4 7.47 12.164 9.654 14.349" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        
+                        <span>Contato</span>
+                    </a>
+                    
+                    <a href="">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path clip-rule="evenodd" d="M18.414 6.414l-2.828-2.828A2 2 0 0 0 14.172 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7.828a2 2 0 0 0-.586-1.414z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            
+                            <path d="M19 8h-4a1 1 0 0 1-1-1V3M9.5 17h5M14 11.5L11.5 14 10 12.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        
+                        <span>Termos e uso</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
