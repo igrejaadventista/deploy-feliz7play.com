@@ -148,6 +148,7 @@ if( function_exists('acf_add_options_page') ) {
 }
 
 function enqueueStyles() {
+	wp_enqueue_style('fonts', '//fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap', false, null);
     wp_enqueue_style('main', get_template_directory_uri() . '/dist/styles/main.css', false, null);
 }
-add_action('get_footer', 'enqueueStyles');
+add_action('get_header', 'enqueueStyles');

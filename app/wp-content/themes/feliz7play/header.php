@@ -1,6 +1,6 @@
 <?php get_template_part('head') ?>
 
-<header class="Header__HeaderStyle-sc-1f2ii6t-0 MSrA">
+<header class="header">
     <div class="container-fluid">
         <div class="left">
             <a href="/pt">
@@ -68,12 +68,12 @@
             </ul>
         </div>
         
-        <button class="MenuMobile__ButtonMobileStyle-rsshp5-0 jXEEMj">
+        <button class="header__button-mobile">
             <i class="menu-icon"></i>
         </button>
         
         <div class="right">
-            <div class="Header__LanguageStyle-sc-1f2ii6t-1 fXuQyc">
+            <div class="header__language">
                 <button class="selected">
                     <span>PT</span>
                     
@@ -93,7 +93,7 @@
                 </svg>
             </a>
             
-            <div class="Header__UserStyle-sc-1f2ii6t-2 enjViY">
+            <div class="header__user">
                 <a href="" class="header-not-login">
                     <span class="my-account">Minha Conta</span>
                     

@@ -1,1 +1,6 @@
+/** Import everything from autoload */
+@import "./autoload/**/*";
+
+/** Import theme styles */
+@import "./common/**/**.scss";
 @import "./layouts/header";
