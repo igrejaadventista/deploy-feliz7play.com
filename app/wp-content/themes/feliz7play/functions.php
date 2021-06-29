@@ -146,3 +146,8 @@ if( function_exists('acf_add_options_page') ) {
 	));
 	
 }
+
+function enqueueStyles() {
+    wp_enqueue_style('main', get_template_directory_uri() . '/dist/styles/main.css', false, null);
+}
+add_action('get_footer', 'enqueueStyles');

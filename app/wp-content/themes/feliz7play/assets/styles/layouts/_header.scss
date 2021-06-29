@@ -1,0 +1,274 @@
+@keyframes fadeUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  padding: 2.375rem 0;
+  background: transparent;
+  transition: all 0.3s ease;
+
+  &.black {
+    background-color: black;
+    padding: 1rem 0;
+  }
+
+  .container-fluid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 57.1875rem;
+
+    ul {
+      display: flex;
+      align-items: center;
+
+      li {
+        margin-left: 5rem;
+
+        &:first-child {
+          margin-left: 0;
+        }
+
+        &.active {
+          a {
+            svg {
+              path {
+                stroke: #f16723;
+              }
+            }
+
+            span {
+              color: #f16723;
+            }
+          }
+        }
+
+        a {
+          display: flex;
+          align-items: center;
+
+          svg {
+            path {
+              transition: stroke 0.3s ease;
+            }
+          }
+
+          span {
+            margin-left: 0.5625rem;
+            transition: color 0.3s ease;
+          }
+
+          &:hover {
+            svg {
+              path {
+                stroke: #f16723;
+              }
+            }
+
+            span {
+              color: #f16723;
+            }
+          }
+        }
+      }
+    }
+
+    svg {
+      position: relative;
+      z-index: 5;
+    }
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+
+    .search {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      margin-right: 2rem;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: #f16723;
+      }
+    }
+  }
+
+  @media (max-width: 1440px) {
+    .left {
+      max-width: 65rem;
+    }
+  }
+
+  @media (max-width: 1300px) {
+    padding: 1.5rem 0;
+
+    .left {
+      max-width: 58rem;
+
+      ul {
+        li {
+          margin-left: 3rem;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .left {
+      max-width: 56rem;
+    }
+  }
+
+  @media (max-width: 1150px) {
+    .left {
+      max-width: 54rem;
+    }
+  }
+
+  @media (max-width: 1050px) {
+    .left {
+      ul {
+        display: none;
+      }
+    }
+
+    .right {
+      .search {
+        display: none;
+        margin-right: 0;
+        position: absolute;
+        right: 65px;
+        width: 34px;
+        height: 34px;
+        background-color: rgba(44, 44, 45, 0.6);
+
+        svg {
+          width: 18px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 560px) {
+    .left {
+      svg {
+        width: 140px;
+      }
+    }
+  }
+
+  &__language {
+    position: relative;
+
+    .selected {
+      display: flex;
+      align-items: center;
+      margin-right: 1.875rem;
+      background: transparent;
+      border: none;
+
+      svg {
+        transition: transform 0.3s;
+      }
+
+      span {
+        font-weight: 500;
+        font-size: 1rem;
+        color: #fff;
+        margin-right: 0.3125rem;
+      }
+    }
+
+    .dropdownLang {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      background: #010101;
+      border-radius: 8px;
+      width: 160px;
+      padding: 33px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-left: -83px;
+      animation: fadeUp 0.3s forwards;
+
+      &::before {
+        content: "";
+        // background: url(${beforeDropdown}) no-repeat center center;
+        width: 32px;
+        height: 32px;
+        position: absolute;
+        top: -16px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      button {
+        margin-bottom: 30px;
+        background: transparent;
+        border: none;
+
+        & > div {
+          display: flex;
+          align-items: center;
+
+          span {
+            font-size: 1rem;
+            color: #fff;
+            margin-left: 0.75rem;
+          }
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    @media (max-width: 1050px) {
+      position: absolute;
+      right: 175px;
+
+      .selected {
+        margin-right: 0;
+      }
+    }
+
+    @media (max-width: 560px) {
+      right: 147px;
+
+      .dropdownLang {
+        width: 100px;
+        margin-left: -50px;
+      }
+    }
+  }
+}
