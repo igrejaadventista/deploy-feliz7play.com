@@ -152,3 +152,8 @@ function enqueueStyles() {
     wp_enqueue_style('main', get_template_directory_uri() . '/dist/styles/main.css', false, null);
 }
 add_action('get_header', 'enqueueStyles');
+
+function enqueueScripts() {
+    wp_enqueue_script('main', get_template_directory_uri() . '/dist/scripts/main.js', [], null, true);
+}
+add_action('wp_enqueue_scripts', 'enqueueScripts', 100);

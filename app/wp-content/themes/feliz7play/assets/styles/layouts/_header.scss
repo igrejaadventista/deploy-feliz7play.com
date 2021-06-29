@@ -204,6 +204,20 @@
         color: #fff;
         margin-right: 0.3125rem;
       }
+
+      & + .dropdownLang {
+        display: none;
+      }
+
+      &.active {
+        & > div {
+          transform: rotate(180deg);
+        }
+
+        & + .dropdownLang {
+          display: flex;
+        }
+      }
     }
 
     .dropdownLang {
@@ -214,7 +228,6 @@
       border-radius: 8px;
       width: 160px;
       padding: 33px 0;
-      display: flex;
       flex-direction: column;
       align-items: center;
       margin-left: -83px;
@@ -307,6 +320,20 @@
       svg {
         transition: transform 0.3s;
       }
+
+      & + .drop-user {
+        display: none;
+      }
+
+      &.active {
+        & .arrow {
+          transform: rotate(180deg);
+        }
+
+        & + .drop-user {
+          display: block;
+        }
+      }
     }
 
     .drop-user {
@@ -322,7 +349,7 @@
 
       &::before {
         content: "";
-        // background: url(${beforeDropdown}) no-repeat center center;
+        background: url("../images/before-dropdown.png") no-repeat center center;
         width: 32px;
         height: 32px;
         position: absolute;

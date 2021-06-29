@@ -1,6 +1,6 @@
 <?php get_template_part('head') ?>
 
-<header class="header">
+<header id="header" class="header">
     <div class="container-fluid">
         <div class="left">
             <a href="/pt">
@@ -146,10 +146,10 @@
         
         <div class="right">
             <div class="header__language">
-                <button class="selected">
+                <button id="button-language" class="selected">
                     <span>PT</span>
                     
-                    <div style="transform:rotate(0deg)">
+                    <div>
                         <svg width="11" height="8" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M9.834 0h-8a1 1 0 0 0-.8 1.6l4 5.333a1 1 0 0 0 1.6 0l4-5.333a1 1 0 0 0-.8-1.6z" fill="#F16723"></path>
                         </svg>
@@ -208,14 +208,14 @@
                     </span>
                 </a>
 
-                <button class="user">
+                <button id="button-user" class="user">
                     <div class="avatar">
                         <img src="https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=4243138775745960&amp;height=50&amp;width=50&amp;ext=1627586724&amp;hash=AeSLCgIUa9lNnIBvg_A">
                     </div>
 
                     <span>Tiago Papile</span>
                     
-                    <div style="transform: rotate(180deg);">
+                    <div class="arrow">
                         <svg width="11" height="8" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M9.834 0h-8a1 1 0 0 0-.8 1.6l4 5.333a1 1 0 0 0 1.6 0l4-5.333a1 1 0 0 0-.8-1.6z" fill="#F16723"></path>
                         </svg>
