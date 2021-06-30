@@ -68,11 +68,11 @@
             </ul>
         </div>
         
-        <button class="header__button-mobile">
+        <button id="button-menu-mobile" class="header__button-mobile">
             <i class="menu-icon"></i>
         </button>
 
-        <aside class="MenuMobile__MenuMobileStyle-rsshp5-1 gBpITg" style="display: none;">
+        <aside class="header__menu-mobile">
             <ul>
                 <li class="">
                     <a href="/pt">
