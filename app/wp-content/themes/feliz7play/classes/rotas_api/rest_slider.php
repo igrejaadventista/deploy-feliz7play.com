@@ -45,16 +45,16 @@ function get_page_option($data) {
 
 				}else {
 
-					$target = get_field('slider_collection_object', $item->ID)->term_id;
+					$target = get_field('to_collection', $item->ID)->term_id;
 
-					$slug = get_field('slider_collection_object', $item->ID)->slug;
+					$slug = get_field('to_collection', $item->ID)->slug;
 					$post_video_lenght = false;
 					$video_quality = false;
 					$season = '1 temporada';
 					$video_year = get_field('year', 'term_' . $target);
 					$rating = get_field('Rating', 'term_' . $target);
 					$genre = get_field('collection_genre', 'term_' . $target)->name;
-					$collection_father = get_field('slider_collection_object', $item->ID)->parent ? get_term(get_field('slider_collection_object', $item->ID)->parent)->slug : false;
+					$collection_father = get_field('to_collection', $item->ID)->parent ? get_term(get_field('to_collection', $item->ID)->parent)->slug : false;
 					$video_host =  get_field('collection_video_host', 'term_' . $target);
 					$video_id =    get_field('collection_video_id', 'term_' . $target);
 
@@ -91,7 +91,7 @@ function get_page_option($data) {
 			case 'custom':
 
 				$title = $item->post_title;
-				$source = get_field('slider_collection_object', $item->ID);
+				$source = get_field('to_collection', $item->ID);
 				$description = get_field('slider_description', $item->ID);
 				$slider_mobile = get_field('slider_button', $item->ID);
 				$slider_text_button = get_field('slider_button', $item->ID);

@@ -73,7 +73,7 @@
         {
             "key": "field_6013f4ee74f3f",
             "label": "Collection Object",
-            "name": "slider_collection_object",
+            "name": "to_collection",
             "type": "taxonomy",
             "instructions": "",
             "required": 0,
@@ -356,5 +356,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1625065595
+    "modified": 1625078864
 }
