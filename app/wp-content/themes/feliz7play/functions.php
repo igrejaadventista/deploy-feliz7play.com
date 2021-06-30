@@ -147,16 +147,13 @@ if( function_exists('acf_add_options_page') ) {
 	
 }
 
-function enqueueStyles() {
+function enqueueAssets() {
 	wp_enqueue_style('fonts', '//fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap', false, null);
     wp_enqueue_style('main', get_template_directory_uri() . '/dist/styles/main.css', false, null);
-}
-add_action('get_header', 'enqueueStyles');
 
-function enqueueScripts() {
-    wp_enqueue_script('main', get_template_directory_uri() . '/dist/scripts/main.js', [], null, true);
+	wp_enqueue_script('main', get_template_directory_uri() . '/dist/scripts/main.js', [], null, true);
 }
-add_action('wp_enqueue_scripts', 'enqueueScripts', 100);
+add_action('wp_enqueue_scripts', 'enqueueAssets');
 
 function getUser() {
 	return [

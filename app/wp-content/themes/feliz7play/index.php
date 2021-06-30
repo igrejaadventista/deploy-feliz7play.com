@@ -1,10 +1,16 @@
 <?php get_template_part('head') ?>
-<?php get_header(); ?>
+<?php 
+    if(!isset($_GET['content']))
+        get_header(); 
+?>
 
-<main>
+<main class="<?= isset($_GET['content']) ? 'content' : 'full' ?>">
     <div class="container-fluid">
         <?= the_content() ?>
     </div>
 </main>
 
-<?php get_footer(); ?>
+<?php 
+    if(!isset($_GET['content']))
+        get_footer(); 
+?>
