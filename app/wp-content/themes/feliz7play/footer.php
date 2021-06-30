@@ -1,82 +1,68 @@
         <div style="height: 60vh;"></div>
+        <?php 
+            $logo = get_field('logo_footer', 'site_settings');
+            $menu = get_field('footer', 'site_settings');
+            $copyright = get_field('copyright', 'site_settings');
+            $sites = get_field('sites', 'site_settings');
+            $social_networks = get_field('redes_sociais', 'site_settings');
+        ?>
+
         <footer class="footer">
             <div class="main">
                 <div class="container-fluid">
                     <div class="left">
-                        <img src="https://files.adventistas.org/feliz7play/v2/sites/2/2021/06/logo-white.svg" alt="">
-                        
-                        <nav>
-                            <ul>
-                                <li>
-                                    <a href="https://quemsomos.com">
-                                        <span>Quem somos</span>
-                                    </a>
-                                </li>
-                                
-                                <li>
-                                    <a href="https://envieseuvideo.com">
-                                        <span>Envie seu video</span>
-                                    </a>
-                                </li>
-                                
-                                <li>
-                                    <a href="https://contato.com">
-                                        <span>Contato</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+                        <?php if(!empty($logo)): ?>
+                            <img src="<?= $logo['url'] ?>" alt="Logo" />
+                        <?php endif; ?>
+                    
+                        <?php if(!empty($menu)): ?>
+                            <nav>
+                                <ul>
+                                    <?php foreach($menu as $item): ?>
+                                        <li>
+                                            <a href="<?= $item['link']['url'] ?>" target="<?= !empty($item['link']['target']) ? $item['link']['target'] : '_self' ?>">
+                                                <span><?= $item['link']['title'] ?></span>
+                                            </a>
+                                        </li>
+                                    <?php endforeach; ?> 
+                                </ul>
+                            </nav>
+                        <?php endif; ?>
                     </div>
                     
-                    <div class="socials">
-                        <span>Nossas redes sociais:</span>
-                        
-                        <ul>
-                            <li>
-                                <a href="https://facebook.com" target="_blank" class="f7-icon" rel="noreferrer">
-                                    <i class="icon-facebook"></i>
-                                </a>
-                            </li>
+                    <?php if(!empty($social_networks)): ?>
+                        <div class="socials">
+                            <span>Nossas redes sociais:</span>
                             
-                            <li>
-                                <a href="https://youtube.com" target="_blank" class="f7-icon" rel="noreferrer">
-                                    <i class="icon-youtube"></i>
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="https://twitter.com" target="_blank" class="f7-icon" rel="noreferrer">
-                                    <i class="icon-twitter"></i>
-                                </a>
-                            </li>
-                            
-                            <li>
-                                <a href="" target="_blank" class="f7-icon" rel="noreferrer">
-                                    <i class="icon-facebook"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                            <ul>
+                                <?php foreach($social_networks as $item): ?>
+                                    <li>
+                                        <a href="<?= $item['url'] ?>" target="_blank" class="f7-icon" rel="noreferrer">
+                                            <i class="icon-<?= $item['rede_social'] ?>"></i>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>    
+                            </ul>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
             
             <div class="copy">
                 <div class="container-fluid">
-                    <p>Copyright © 2012-2021 Igreja Adventista. Todos os direitos reservados.</p>
+                    <?php if(!empty($copyright)): ?>
+                        <p><?= $copyright ?></p>
+                    <?php endif; ?>
                     
-                    <ul>
-                        <li>
-                            <a href="https://biblia.com.br" target="_blank" rel="noreferrer">Biblia.com.br</a>
-                        </li>
-                        
-                        <li>
-                            <a href="https://adventistas.org" target="_blank" rel="noreferrer">Adventistas.org</a>
-                        </li>
-                        
-                        <li>
-                            <a href="https://novotempo.com" target="_blank" rel="noreferrer">Novotempo.com</a>
-                        </li>
-                    </ul>
+                    <?php if(!empty($sites)): ?>
+                        <ul>
+                            <?php foreach($sites as $item): ?>
+                                <li>
+                                    <a href="<?= $item['link']['url'] ?>" target="<?= !empty($item['link']['target']) ? $item['link']['target'] : '_blank' ?>" rel="noreferrer"><?= $item['link']['title'] ?></a>
+                                </li>
+                            <?php endforeach; ?> 
+                        </ul>
+                    <?php endif; ?>
                 </div>
             </div>
         </footer>
