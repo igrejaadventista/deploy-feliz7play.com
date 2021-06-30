@@ -5,13 +5,15 @@ document.addEventListener('DOMContentLoaded', () => {
           $buttonMenuMobile = document.getElementById('button-menu-mobile');
 
     $buttonLanguage.addEventListener('click', () => $buttonLanguage.classList.toggle('active'));
-    $buttonUser.addEventListener('click', () => $buttonUser.classList.toggle('active'));
     $buttonMenuMobile.addEventListener('click', () => $buttonMenuMobile.classList.toggle('active'));
+
+    if($buttonUser)
+        $buttonUser.addEventListener('click', () => $buttonUser.classList.toggle('active'));
 
     document.addEventListener('click', (event) => {
         if(!event.target.closest('#button-language'))
             $buttonLanguage.classList.remove('active');
-        if(!event.target.closest('#button-user'))
+        if(!event.target.closest('#button-user') && $buttonUser)
             $buttonUser.classList.remove('active');
         if(!event.target.closest('#button-menu-mobile'))
             $buttonMenuMobile.classList.remove('active');

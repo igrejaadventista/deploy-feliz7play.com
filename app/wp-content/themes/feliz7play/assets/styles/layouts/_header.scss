@@ -193,6 +193,7 @@
       margin-right: 1.875rem;
       background: transparent;
       border: none;
+      text-transform: uppercase;
 
       svg {
         transition: transform 0.3s;
@@ -249,7 +250,7 @@
         background: transparent;
         border: none;
 
-        & > div {
+        a {
           display: flex;
           align-items: center;
 
