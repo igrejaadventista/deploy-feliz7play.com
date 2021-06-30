@@ -1,4 +1,3 @@
-        <div style="height: 60vh;"></div>
         <?php 
             $logo = get_field('logo_footer', 'site_settings');
             $menu = get_field('footer', 'site_settings');
