@@ -2,19 +2,10 @@
 
 echo "Ajuste nas permissões da pasta uploads"
 
-
-echo "Yarn install - INIT"
-apt-get update -y && apt-get install yarn -y
-echo "Yarn install - END"
-
 #rm -rf /var/www/html/wp-content
 find /var/www/html -type d -exec chmod 755 {} \;
 find /var/www/html -type f -exec chmod 644 {} \;
 chmod 755 /var/www/html
-
-cd /var/www/html/wp-content/theme/feliz7play/
-yarn
-yarn build:production   
 
 echo "Fim do script"
 exec "$@"
