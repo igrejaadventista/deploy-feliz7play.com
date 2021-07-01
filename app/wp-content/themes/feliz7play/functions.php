@@ -146,3 +146,25 @@ if( function_exists('acf_add_options_page') ) {
 	));
 	
 }
+
+function enqueueAssets() {
+	wp_enqueue_style('fonts', '//fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap', false, null);
+    wp_enqueue_style('main', get_template_directory_uri() . '/dist/styles/main.css', false, null);
+
+	wp_enqueue_script('main', get_template_directory_uri() . '/dist/scripts/main.js', [], null, true);
+}
+add_action('wp_enqueue_scripts', 'enqueueAssets');
+
+function getUser() {
+	return [
+		'name' => isset($_COOKIE['feliz7playName']) ? $_COOKIE['feliz7playName'] : '',
+		'avatar' => isset($_COOKIE['feliz7playAvatar']) ? $_COOKIE['feliz7playAvatar'] : '',
+	];
+}
+
+function getLanguage() {
+	$lang = wp_parse_url(home_url())['path'];
+    $lang = explode('/', $lang);
+
+    return !empty($lang) ? $lang[1] : '';
+}
