@@ -1,7 +1,4 @@
 mysql
-dump.sql
-docker-compose.yml
 dist
 node_modules
 .cache-loader
-app/wp-config.php
