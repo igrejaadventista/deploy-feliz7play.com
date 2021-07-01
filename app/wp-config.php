@@ -22,16 +22,16 @@ $is_dev = $_SERVER['SERVER_NAME'] == 'localhost';
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'f7p_new');
+define( 'DB_NAME', $is_dev ? 'feliz7play' : $_ENV['WP_DB_NAME']);
 
 /** MySQL database username */
-define( 'DB_USER', 'root');
+define( 'DB_USER', $is_dev ? 'root' : $_ENV['WP_DB_USER']);
 
 /** MySQL database password */
-define( 'DB_PASSWORD', 'root');
+define( 'DB_PASSWORD', $is_dev ? 'root' : $_ENV['WP_DB_PASSWORD']);
 
 /** MySQL hostname */
-define( 'DB_HOST', 'localhost');
+define( 'DB_HOST', $is_dev ? 'feliz7play_db' : $_ENV['WP_DB_HOST']);
 
 /** Database Charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8mb4' );
