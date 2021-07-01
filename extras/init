@@ -1,8 +1,11 @@
 #!/bin/bash
 
-echo  "Ajuste nas permissões da pasta uploads"
+echo "Ajuste nas permissões da pasta uploads"
 
-apt-get update && apt-get install yarn
+
+echo "Yarn install - INIT"
+apt-get update -y && apt-get install yarn -y
+echo "Yarn install - END"
 
 #rm -rf /var/www/html/wp-content
 find /var/www/html -type d -exec chmod 755 {} \;
