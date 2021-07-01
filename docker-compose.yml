@@ -1,0 +1,37 @@
+version: '3.3'
+services:
+
+  feliz7play_db:
+    image: 'mariadb:10.5.9'
+    container_name: feliz7play_db
+    volumes:
+      - './mysql:/var/lib/mysql'
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_USER: 'root'
+      MYSQL_DATABASE: 'feliz7play'
+      MYSQL_ROOT_PASSWORD: 'root'
+
+  feliz7play_web:
+    image: wordpress
+    container_name: feliz7play_web
+    ports:
+      - '80:80'
+    links:
+      - feliz7play_db
+    volumes:
+      - './app:/var/www/html'
+    environment:
+      WEB_DOCUMENT_ROOT: /var/www/html
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: feliz7play_phpmyadmin
+    environment:
+      PMA_HOST: feliz7play_db
+    ports:
+      - 8080:80
+    depends_on:
+      - feliz7play_db
+    restart: always
