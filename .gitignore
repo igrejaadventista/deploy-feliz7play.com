@@ -1,0 +1,4 @@
+mysql
+dist
+node_modules
+.cache-loader

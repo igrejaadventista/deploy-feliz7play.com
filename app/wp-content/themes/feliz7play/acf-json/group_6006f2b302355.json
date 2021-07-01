@@ -73,7 +73,7 @@
         {
             "key": "field_6013f4ee74f3f",
             "label": "Collection Object",
-            "name": "slider_collection_object",
+            "name": "to_collection",
             "type": "taxonomy",
             "instructions": "",
             "required": 0,
@@ -108,7 +108,7 @@
         {
             "key": "field_6007129c50b53",
             "label": "Video Object",
-            "name": "slider_video_object",
+            "name": "to_video",
             "type": "post_object",
             "instructions": "",
             "required": 0,
@@ -356,5 +356,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1611934183
+    "modified": 1625078864
 }
