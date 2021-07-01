@@ -25,6 +25,7 @@ function get_site_settings(){
     $variable['social_networks']['meta_description'] = get_field('meta_description', 'site_settings');
     $variable['social_networks']['meta_keywords'] = get_field('meta_keywords', 'site_settings');
     $variable['social_networks']['share_image'] = get_field('share_image', 'site_settings');
+    $variable['menus']['header'] = get_field('header', 'site_settings');
     $variable['menus']['footer'] = get_field('footer', 'site_settings');
     $variable['menus']['sites'] = get_field('sites', 'site_settings');
     $variable['options']['logo'] = get_field('logo_footer', 'site_settings');
