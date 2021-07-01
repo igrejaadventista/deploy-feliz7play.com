@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo  "Ajuste nas permissões da pasta uploads"
+echo "Ajuste nas permissões da pasta uploads"
 
 #rm -rf /var/www/html/wp-content
 find /var/www/html -type d -exec chmod 755 {} \;
