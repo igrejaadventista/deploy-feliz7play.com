@@ -4,10 +4,8 @@
         get_header(); 
 ?>
 
-<main class="<?= isset($_GET['content']) ? 'content' : 'full' ?>">
-    <div class="container-fluid">
-        <?= the_content() ?>
-    </div>
+<main>
+    <?= the_content() ?>
 </main>
 
 <?php 
