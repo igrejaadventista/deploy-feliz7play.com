@@ -13,8 +13,11 @@ function get_rest_genre($data) {
     $id = $data['id'];
     $page = $data->get_param('page');
     $per_page = $data->get_param('per_page');
+    $id_exclude = $data->get_param('id_exclude');
+    $type_exclude = $data->get_param('type_exclude');
 
-    $items = get_genre_items($id);
+
+    $items = get_genre_items($id, $id_exclude, $type_exclude);
     
     if($per_page > -1){ 
        
@@ -33,7 +36,7 @@ function get_rest_genre($data) {
 
 }
 
-function get_genre_items($id){
+function get_genre_items($id, $id_exclude, $type_exclude){
 
     $term = get_term($id, 'genre');
 
@@ -43,22 +46,26 @@ function get_genre_items($id){
        'taxonomy' => 'collection', 
        'meta_key' => 'collection_genre',
        'meta_value' => $id,
-       'parent' => 0
+       'parent' => 0,
+       'exclude' => ($type_exclude == 'collection' ? $id_exclude : null)
+
     );
 
     $collection = get_line_collection($args);
    array_push($items, ...$collection['included']);
 
+ 
 
    $args = array(
        'post_type' => 'video',
      //'fields' => '',
-       'genre' => $term->slug,
-     //'exclude' => $collection['exclude'],
-       'posts_per_page' => -1,
-       'post_status' => 'publish',
-       'meta_key' => 'post_video_type',
-       'meta_value' => 'Single',
+        'genre' => $term->slug,
+        'exclude' => ($type_exclude == 'single' ? $id_exclude : null),
+        'posts_per_page' => -1,
+        'post_status' => 'publish',
+        'meta_key' => 'post_video_type',
+        'meta_value' => 'Single',
+       
    
     );
 
