@@ -188,7 +188,7 @@
                         <?php endif; ?>
                         
                         <?php if(!empty($privacy_policy['url'])): ?>
-                            <a href="$privacy_policy['url']" target="<?= !empty($privacy_policy['target']) ? $privacy_policy['target'] : '_self' ?>">
+                            <a href="<?= $privacy_policy['url'] ?>" target="<?= !empty($privacy_policy['target']) ? $privacy_policy['target'] : '_self' ?>">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path clip-rule="evenodd" d="M18.414 6.414l-2.828-2.828A2 2 0 0 0 14.172 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7.828a2 2 0 0 0-.586-1.414z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
                                     
