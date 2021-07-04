@@ -30,7 +30,14 @@
             $description =          wp_strip_all_tags($meta['post_blurb'][0]);
             $video_host =           $meta['post_video_host'][0];
             $video_id =             $meta['post_video_id'][0];
-            $post_download_link =   $meta['post_download_link'][0];
+            
+            $post_download_link =   $meta['link_download_app'][0];
+            $download =             $meta['download'][0];
+            $post_year =            $meta['post_year'][0];
+            $post_video_rating =    $meta['post_video_rating'][0];
+            $redes =                get_field('redes', $id);
+            $production =           get_field('production', $id);
+
             $collection =           get_the_terms($id, 'collection')[0];
             $genre =                get_the_terms($id, 'genre')[0];
             $video_lenght =         $meta['post_video_length'][0];
@@ -47,15 +54,20 @@
                'video_episode' => $video_episode, 
                'subtitle' => $subtitle, 
                'description' => $description, 
-               'genre' => $genre, 
+               'genre' => $genre,
                'collection' => $collection, 
                'video_host' => $video_host, 
                'video_id' => $video_id, 
                'post_download_link' => $post_download_link, 
+               'download' => $download,
+               'year' => $post_year,
+               'video_rating' => $post_video_rating,
                'video_thumbnail' => $video_thumbnail, 
                'video_image_hover' => $video_image_hover,
                'post_video_length' => $video_lenght,
-               'post_video_quality' => $video_quality
+               'post_video_quality' => $video_quality,
+               'redes' => $redes,
+               'production' => $production
             );
            array_push($items, $values);
         }
