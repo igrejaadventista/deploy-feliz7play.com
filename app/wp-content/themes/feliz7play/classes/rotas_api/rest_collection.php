@@ -14,6 +14,7 @@ function get_rest_collection($data) {
     $per_page = $data->get_param('per_page');
     $order = $data->get_param('order');
     $orderby = $data->get_param('orderby');
+    $meta_key = $data->get_param('meta_key');
 
     $term = get_term($data['id'], 'collection');
 
@@ -23,6 +24,7 @@ function get_rest_collection($data) {
                     'orderby' => $orderby,
                     'order' => $order,
                     'post_status' => 'publish',
+                    'meta_key' => $meta_key,
                     'tax_query' => array(
                         array(
                           'taxonomy' => 'collection',
