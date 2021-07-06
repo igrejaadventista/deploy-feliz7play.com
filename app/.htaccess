@@ -17,3 +17,13 @@ RewriteRule ^([_0-9a-zA-Z-]+/)?(.*\.php)$ $2 [L]
 RewriteRule . index.php [L]
 
 # END WordPress
+
+<IfModule mod_rewrite.c>
+
+RewriteEngine On
+RewriteCond !{HTTPS} off
+RewriteRule ^(.*)$ https://v5.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteCond %{HTTP_HOST} !^v5\.
+RewriteRule ^(.*)$ https://v5.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+</IfModule>
