@@ -142,5 +142,12 @@ textarea {
 }
 
 main.full {
-  padding: 5rem 0;
+  padding: 7rem 0;
+}
+
+main.content {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 5vh 0;
 }
