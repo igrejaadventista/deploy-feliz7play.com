@@ -1,4 +1,4 @@
-<?php $lang = get_locale(); ?>
+<?php  ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?> >
     <head>    
@@ -8,7 +8,13 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
         
-        <?php wp_head(); ?>
+        <?php wp_head(); 
+            $lang = get_locale();
+            $body_class = array(
+                $lang,
+                isset($_GET['content']) ? 'app-content' : 'app-full'
+            );
+        ?>
     </head>
     
-    <body <?php body_class($lang); ?>>
+    <body <?php body_class( $body_class ); ?>>
