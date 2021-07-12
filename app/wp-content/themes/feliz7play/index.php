@@ -1,7 +1,6 @@
 <?php get_template_part('head') ?>
 <?php 
-    if(!isset($_GET['content']))
-        get_header(); 
+    get_header(); 
 ?>
 
 <main class="<?= isset($_GET['content']) ? 'content' : 'full' ?>">
@@ -11,6 +10,5 @@
 </main>
 
 <?php 
-    if(!isset($_GET['content']))
-        get_footer(); 
+    get_footer(); 
 ?>

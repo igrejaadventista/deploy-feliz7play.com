@@ -145,9 +145,19 @@ main.full {
   padding: 7rem 0;
 }
 
-main.content {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding: 5vh 0;
+.app-content {
+  main.content {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 5vh 0;
+  }
+
+  header {
+    display: none;
+  }
+
+  footer {
+    display: none;
+  }
 }
