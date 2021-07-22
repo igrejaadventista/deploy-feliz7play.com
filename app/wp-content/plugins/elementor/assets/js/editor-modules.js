@@ -1,4 +1,4 @@
-/*! elementor - v3.2.5 - 16-06-2021 */
+/*! elementor - v3.3.1 - 20-07-2021 */
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -334,6 +334,86 @@ function _createClass(Constructor, protoProps, staticProps) {
 }
 
 module.exports = _createClass;
+
+/***/ }),
+
+/***/ "../node_modules/@babel/runtime-corejs2/helpers/createForOfIteratorHelper.js":
+/*!***********************************************************************************!*\
+  !*** ../node_modules/@babel/runtime-corejs2/helpers/createForOfIteratorHelper.js ***!
+  \***********************************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 68:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var _getIterator = __webpack_require__(/*! @babel/runtime-corejs2/core-js/get-iterator */ "../node_modules/@babel/runtime-corejs2/core-js/get-iterator.js");
+
+var _Array$isArray = __webpack_require__(/*! @babel/runtime-corejs2/core-js/array/is-array */ "../node_modules/@babel/runtime-corejs2/core-js/array/is-array.js");
+
+var _Symbol$iterator = __webpack_require__(/*! @babel/runtime-corejs2/core-js/symbol/iterator */ "../node_modules/@babel/runtime-corejs2/core-js/symbol/iterator.js");
+
+var _Symbol = __webpack_require__(/*! @babel/runtime-corejs2/core-js/symbol */ "../node_modules/@babel/runtime-corejs2/core-js/symbol.js");
+
+var unsupportedIterableToArray = __webpack_require__(/*! ./unsupportedIterableToArray */ "../node_modules/@babel/runtime-corejs2/helpers/unsupportedIterableToArray.js");
+
+function _createForOfIteratorHelper(o, allowArrayLike) {
+  var it;
+
+  if (typeof _Symbol === "undefined" || o[_Symbol$iterator] == null) {
+    if (_Array$isArray(o) || (it = unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+      if (it) o = it;
+      var i = 0;
+
+      var F = function F() {};
+
+      return {
+        s: F,
+        n: function n() {
+          if (i >= o.length) return {
+            done: true
+          };
+          return {
+            done: false,
+            value: o[i++]
+          };
+        },
+        e: function e(_e) {
+          throw _e;
+        },
+        f: F
+      };
+    }
+
+    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+
+  var normalCompletion = true,
+      didErr = false,
+      err;
+  return {
+    s: function s() {
+      it = _getIterator(o);
+    },
+    n: function n() {
+      var step = it.next();
+      normalCompletion = step.done;
+      return step;
+    },
+    e: function e(_e2) {
+      didErr = true;
+      err = _e2;
+    },
+    f: function f() {
+      try {
+        if (!normalCompletion && it["return"] != null) it["return"]();
+      } finally {
+        if (didErr) throw err;
+      }
+    }
+  };
+}
+
+module.exports = _createForOfIteratorHelper;
 
 /***/ }),
 
@@ -3521,6 +3601,10 @@ _Object$defineProperty2(exports, "__esModule", {
 
 exports.default = void 0;
 
+__webpack_require__(/*! core-js/modules/es6.regexp.replace.js */ "../node_modules/core-js/modules/es6.regexp.replace.js");
+
+var _createForOfIteratorHelper2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/createForOfIteratorHelper */ "../node_modules/@babel/runtime-corejs2/helpers/createForOfIteratorHelper.js"));
+
 var _defineProperty2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/core-js/object/define-property */ "../node_modules/@babel/runtime-corejs2/core-js/object/define-property.js"));
 
 __webpack_require__(/*! core-js/modules/es7.array.includes.js */ "../node_modules/core-js/modules/es7.array.includes.js");
@@ -3567,6 +3651,8 @@ var Container = /*#__PURE__*/function (_ArgsObject) {
   (0, _inherits2.default)(Container, _ArgsObject);
 
   var _super = (0, _createSuper2.default)(Container);
+
+  // TODO: Swap those backwards compatibility is required.
 
   /**
    * Container type.
@@ -3718,12 +3804,23 @@ var Container = /*#__PURE__*/function (_ArgsObject) {
     _this.globals = new Backbone.Model(_this.settings.get('__globals__'));
     _this.panel = new _panel.default((0, _assertThisInitialized2.default)(_this));
 
-    _this.handleRepeaterChildren();
+    _this.initialize();
 
     return _this;
   }
 
   (0, _createClass2.default)(Container, [{
+    key: "initialize",
+    value: function initialize() {
+      if (this.view) {
+        this.addToParent();
+        this.handleChildrenRecursive();
+        this.view.on('destroy', this.removeFromParent.bind(this));
+      }
+
+      this.handleRepeaterChildren();
+    }
+  }, {
     key: "validateArgs",
     value: function validateArgs(args) {
       this.requireArgumentType('type', 'string', args);
@@ -3768,9 +3865,56 @@ var Container = /*#__PURE__*/function (_ArgsObject) {
       return result;
     }
   }, {
+    key: "handleChildrenRecursive",
+    value: function handleChildrenRecursive() {
+      var _this$view$children;
+
+      if ((_this$view$children = this.view.children) !== null && _this$view$children !== void 0 && _this$view$children.length) {
+        (0, _values.default)(this.view.children._views).forEach(function (view) {
+          if (!view.container) {
+            return;
+          }
+
+          var container = view.container; // Since the way 'global-widget' rendered, it does not have parent sometimes.
+
+          if (container.parent.children) {
+            container.parent.children[view._index] = container;
+          }
+
+          container.handleChildrenRecursive();
+        });
+      } else {
+        this.children = [];
+      }
+    }
+  }, {
+    key: "addToParent",
+    value: function addToParent() {
+      if (!this.parent.children || this.isRepeaterItem()) {
+        return;
+      } // On create container tell the parent where it was created.
+
+
+      this.parent.children.splice(this.view._index, 0, this);
+    }
+  }, {
+    key: "removeFromParent",
+    value: function removeFromParent() {
+      var _this3 = this;
+
+      if (!this.parent.children || this.isRepeater()) {
+        return;
+      } // When delete container its should notify its parent, that his children is dead.
+
+
+      this.parent.children = this.parent.children.filter(function (filtered) {
+        return filtered.id !== _this3.id;
+      });
+    }
+  }, {
     key: "handleRepeaterChildren",
     value: function handleRepeaterChildren() {
-      var _this3 = this;
+      var _this4 = this;
 
       (0, _values.default)(this.controls).forEach(function (control) {
         if (!control.is_repeater) {
@@ -3780,21 +3924,20 @@ var Container = /*#__PURE__*/function (_ArgsObject) {
         var model = new Backbone.Model({
           name: control.name
         });
-        _this3.repeaters[control.name] = new elementorModules.editor.Container({
-          // TODO: replace to `repeater`, and the item should by `repeater-item`.
-          type: 'repeater-control',
+        _this4.repeaters[control.name] = new elementorModules.editor.Container({
+          type: Container.TYPE_REPEATER,
           id: control.name,
           model: model,
           settings: model,
-          view: _this3.view,
-          parent: _this3,
+          view: _this4.view,
+          parent: _this4,
           label: control.label || control.name,
           controls: {},
-          renderer: _this3.renderer
+          renderer: _this4.renderer
         });
 
-        _this3.settings.get(control.name).forEach(function (rowModel, index) {
-          _this3.addRepeaterItem(control.name, rowModel, index);
+        _this4.settings.get(control.name).forEach(function (rowModel, index) {
+          _this4.addRepeaterItem(control.name, rowModel, index);
         });
       }); // Backwards Compatibility: if there is only one repeater (type=repeater), set it's children as current children.
       // Since 3.0.0.
@@ -3814,6 +3957,18 @@ var Container = /*#__PURE__*/function (_ArgsObject) {
         }
       }
     }
+    /**
+     * Function addRepeaterItem().
+     *
+     * The method add repeater item, find the repeater control by it name, and create new container for the item.
+     *
+     * @param {string} repeaterName
+     * @param {Backbone.Model} rowSettingsModel
+     * @param {number} index
+     *
+     * @returns {Container}
+     */
+
   }, {
     key: "addRepeaterItem",
     value: function addRepeaterItem(repeaterName, rowSettingsModel, index) {
@@ -3825,7 +3980,7 @@ var Container = /*#__PURE__*/function (_ArgsObject) {
       }
 
       this.repeaters[repeaterName].children.splice(index, 0, new elementorModules.editor.Container({
-        type: 'repeater',
+        type: Container.TYPE_REPEATER_ITEM,
         id: rowSettingsModel.get('_id'),
         model: new Backbone.Model({
           name: repeaterName
@@ -3837,6 +3992,7 @@ var Container = /*#__PURE__*/function (_ArgsObject) {
         controls: rowSettingsModel.options.controls,
         renderer: this.renderer
       }));
+      return this.repeaters[repeaterName];
     }
     /**
      * Function lookup().
@@ -3865,7 +4021,7 @@ var Container = /*#__PURE__*/function (_ArgsObject) {
 
       if (undefined === this.view || !this.view.lookup || !this.view.isDisconnected()) {
         // Hack For repeater item the result is the parent container.
-        if ('repeater' === this.type) {
+        if (Container.TYPE_REPEATER_ITEM === this.type) {
           this.settings = this.parent.parent.settings.get(this.model.get('name')).findWhere({
             _id: this.id
           });
@@ -3879,15 +4035,92 @@ var Container = /*#__PURE__*/function (_ArgsObject) {
       if (lookup) {
         result = lookup.getContainer(); // Hack For repeater item the result is the parent container.
 
-        if ('repeater' === this.type) {
+        if (Container.REPEATER === this.type) {
           this.settings = result.settings.get(this.model.get('name')).findWhere({
             _id: this.id
           });
           return this;
+        } // If lookup were done, new container were created and parent does not know about it.
+
+
+        if (result.parent.children) {
+          result.parent.children[result.view._index] = result;
         }
       }
 
       return result;
+    }
+    /**
+     * Function findChildrenRecursive().
+     *
+     * Will run over children recursively and pass the children to the callback till the callback returns positive value.
+     *
+     * @param {function(container:Container)} callback
+     *
+     * @returns {false|Container}
+     */
+
+  }, {
+    key: "findChildrenRecursive",
+    value: function findChildrenRecursive(callback) {
+      if (callback(this)) {
+        return this;
+      }
+
+      if (this.children.length) {
+        var _iterator = (0, _createForOfIteratorHelper2.default)(this.children),
+            _step;
+
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var container = _step.value;
+            var foundChildren = container.findChildrenRecursive(callback);
+
+            if (foundChildren) {
+              return foundChildren;
+            }
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+      }
+
+      return false;
+    }
+    /**
+     * Function forEachChildrenRecursive().
+     *
+     * Will run over children recursively.
+     *
+     * @param {function(container:Container)} callback
+     *
+     * @returns {false|Container}
+     */
+
+  }, {
+    key: "forEachChildrenRecursive",
+    value: function forEachChildrenRecursive(callback) {
+      callback(this);
+
+      if (this.children.length) {
+        var _iterator2 = (0, _createForOfIteratorHelper2.default)(this.children),
+            _step2;
+
+        try {
+          for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+            var container = _step2.value;
+            container.forEachChildrenRecursive(callback);
+          }
+        } catch (err) {
+          _iterator2.e(err);
+        } finally {
+          _iterator2.f();
+        }
+      }
+
+      return false;
     }
     /**
      * Function render().
@@ -3927,11 +4160,126 @@ var Container = /*#__PURE__*/function (_ArgsObject) {
     value: function isDesignable() {
       return elementor.userCan('design') && this.isEditable();
     }
+  }, {
+    key: "isRepeater",
+    value: function isRepeater() {
+      return Container.TYPE_REPEATER === this.type;
+    }
+  }, {
+    key: "isRepeaterItem",
+    value: function isRepeaterItem() {
+      return Container.TYPE_REPEATER_ITEM === this.type;
+    }
+  }, {
+    key: "getSetting",
+    value: function getSetting(name) {
+      var localOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      var localValue = this.settings.get(name);
+
+      if (localOnly) {
+        return localValue;
+      } // Try to get the value in the order: Global, Local, Global default.
+
+
+      var globalValue;
+
+      if (this.getGlobalKey(name)) {
+        globalValue = this.getGlobalValue(name);
+      }
+
+      return globalValue || localValue || this.getGlobalDefault(name);
+    }
+  }, {
+    key: "getGlobalKey",
+    value: function getGlobalKey(name) {
+      return this.globals.get(name);
+    }
+  }, {
+    key: "getGlobalValue",
+    value: function getGlobalValue(name) {
+      var control = this.controls[name],
+          globalKey = this.getGlobalKey(name),
+          globalArgs = $e.data.commandExtractArgs(globalKey),
+          data = $e.data.getCache($e.components.get('globals'), globalArgs.command, globalArgs.args.query);
+
+      if (!(data !== null && data !== void 0 && data.value)) {
+        return;
+      }
+
+      var id = data.id;
+      var value; // it's a global settings with additional controls in group.
+
+      if (control.groupType) {
+        var propertyName = control.name.replace(control.groupPrefix, '').replace(/(_tablet|_mobile)$/, '');
+
+        if (!data.value[elementor.config.kit_config.typography_prefix + propertyName]) {
+          return;
+        }
+
+        propertyName = propertyName.replace('_', '-');
+        value = "var( --e-global-".concat(control.groupType, "-").concat(id, "-").concat(propertyName, " )");
+
+        if (elementor.config.ui.defaultGenericFonts && control.groupPrefix + 'font_family' === control.name) {
+          value += ", ".concat(elementor.config.ui.defaultGenericFonts);
+        }
+      } else {
+        value = "var( --e-global-".concat(control.type, "-").concat(id, " )");
+      }
+
+      return value;
+    }
+    /**
+     * Determine if a control's global value is applied.
+     * It actually checks if the local value is different than the global value.
+     *
+     * @param {string} controlName - Control name
+     * @returns {boolean}
+     */
+
+  }, {
+    key: "isGlobalApplied",
+    value: function isGlobalApplied(controlName) {
+      return this.getSetting(controlName) !== this.settings.get(controlName);
+    }
+  }, {
+    key: "getGlobalDefault",
+    value: function getGlobalDefault(controlName) {
+      var _this$controls$contro;
+
+      var controlGlobalArgs = (_this$controls$contro = this.controls[controlName]) === null || _this$controls$contro === void 0 ? void 0 : _this$controls$contro.global;
+
+      if (controlGlobalArgs !== null && controlGlobalArgs !== void 0 && controlGlobalArgs.default) {
+        // Temp fix.
+        var controlType = this.controls[controlName].type;
+
+        if ('color' === controlType) {
+          controlType = 'colors';
+        } // End temp fix
+        // If the control is a color/typography control and default colors/typography are disabled, don't return the global value.
+
+
+        if (!elementor.config.globals.defaults_enabled[controlType]) {
+          return '';
+        }
+
+        var _$e$data$commandExtra = $e.data.commandExtractArgs(controlGlobalArgs.default),
+            command = _$e$data$commandExtra.command,
+            args = _$e$data$commandExtra.args,
+            result = $e.data.getCache($e.components.get('globals'), command, args.query);
+
+        return result === null || result === void 0 ? void 0 : result.value;
+      } // No global default.
+
+
+      return '';
+    }
   }]);
   return Container;
 }(_argsObject.default);
 
 exports.default = Container;
+(0, _defineProperty3.default)(Container, "TYPE_REPEATER", 'repeater-control');
+(0, _defineProperty3.default)(Container, "TYPE_REPEATER_ITEM", 'repeater');
 
 /***/ }),
 
@@ -5342,6 +5690,28 @@ module.exports = function (key) {
 
 /***/ }),
 
+/***/ "../node_modules/core-js/modules/_advance-string-index.js":
+/*!****************************************************************!*\
+  !*** ../node_modules/core-js/modules/_advance-string-index.js ***!
+  \****************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 6:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+var at = __webpack_require__(/*! ./_string-at */ "../node_modules/core-js/modules/_string-at.js")(true);
+
+ // `AdvanceStringIndex` abstract operation
+// https://tc39.github.io/ecma262/#sec-advancestringindex
+module.exports = function (S, index, unicode) {
+  return index + (unicode ? at(S, index).length : 1);
+};
+
+
+/***/ }),
+
 /***/ "../node_modules/core-js/modules/_an-object.js":
 /*!*****************************************************!*\
   !*** ../node_modules/core-js/modules/_an-object.js ***!
@@ -5770,6 +6140,116 @@ module.exports = function (exec) {
     return !!exec();
   } catch (e) {
     return true;
+  }
+};
+
+
+/***/ }),
+
+/***/ "../node_modules/core-js/modules/_fix-re-wks.js":
+/*!******************************************************!*\
+  !*** ../node_modules/core-js/modules/_fix-re-wks.js ***!
+  \******************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 34:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+__webpack_require__(/*! ./es6.regexp.exec */ "../node_modules/core-js/modules/es6.regexp.exec.js");
+var redefine = __webpack_require__(/*! ./_redefine */ "../node_modules/core-js/modules/_redefine.js");
+var hide = __webpack_require__(/*! ./_hide */ "../node_modules/core-js/modules/_hide.js");
+var fails = __webpack_require__(/*! ./_fails */ "../node_modules/core-js/modules/_fails.js");
+var defined = __webpack_require__(/*! ./_defined */ "../node_modules/core-js/modules/_defined.js");
+var wks = __webpack_require__(/*! ./_wks */ "../node_modules/core-js/modules/_wks.js");
+var regexpExec = __webpack_require__(/*! ./_regexp-exec */ "../node_modules/core-js/modules/_regexp-exec.js");
+
+var SPECIES = wks('species');
+
+var REPLACE_SUPPORTS_NAMED_GROUPS = !fails(function () {
+  // #replace needs built-in support for named groups.
+  // #match works fine because it just return the exec results, even if it has
+  // a "grops" property.
+  var re = /./;
+  re.exec = function () {
+    var result = [];
+    result.groups = { a: '7' };
+    return result;
+  };
+  return ''.replace(re, '$<a>') !== '7';
+});
+
+var SPLIT_WORKS_WITH_OVERWRITTEN_EXEC = (function () {
+  // Chrome 51 has a buggy "split" implementation when RegExp#exec !== nativeExec
+  var re = /(?:)/;
+  var originalExec = re.exec;
+  re.exec = function () { return originalExec.apply(this, arguments); };
+  var result = 'ab'.split(re);
+  return result.length === 2 && result[0] === 'a' && result[1] === 'b';
+})();
+
+module.exports = function (KEY, length, exec) {
+  var SYMBOL = wks(KEY);
+
+  var DELEGATES_TO_SYMBOL = !fails(function () {
+    // String methods call symbol-named RegEp methods
+    var O = {};
+    O[SYMBOL] = function () { return 7; };
+    return ''[KEY](O) != 7;
+  });
+
+  var DELEGATES_TO_EXEC = DELEGATES_TO_SYMBOL ? !fails(function () {
+    // Symbol-named RegExp methods call .exec
+    var execCalled = false;
+    var re = /a/;
+    re.exec = function () { execCalled = true; return null; };
+    if (KEY === 'split') {
+      // RegExp[@@split] doesn't call the regex's exec method, but first creates
+      // a new one. We need to return the patched regex when creating the new one.
+      re.constructor = {};
+      re.constructor[SPECIES] = function () { return re; };
+    }
+    re[SYMBOL]('');
+    return !execCalled;
+  }) : undefined;
+
+  if (
+    !DELEGATES_TO_SYMBOL ||
+    !DELEGATES_TO_EXEC ||
+    (KEY === 'replace' && !REPLACE_SUPPORTS_NAMED_GROUPS) ||
+    (KEY === 'split' && !SPLIT_WORKS_WITH_OVERWRITTEN_EXEC)
+  ) {
+    var nativeRegExpMethod = /./[SYMBOL];
+    var fns = exec(
+      defined,
+      SYMBOL,
+      ''[KEY],
+      function maybeCallNative(nativeMethod, regexp, str, arg2, forceStringMethod) {
+        if (regexp.exec === regexpExec) {
+          if (DELEGATES_TO_SYMBOL && !forceStringMethod) {
+            // The native String method already delegates to @@method (this
+            // polyfilled function), leasing to infinite recursion.
+            // We avoid it by directly calling the native @@method method.
+            return { done: true, value: nativeRegExpMethod.call(regexp, str, arg2) };
+          }
+          return { done: true, value: nativeMethod.call(str, regexp, arg2) };
+        }
+        return { done: false };
+      }
+    );
+    var strfn = fns[0];
+    var rxfn = fns[1];
+
+    redefine(String.prototype, KEY, strfn);
+    hide(RegExp.prototype, SYMBOL, length == 2
+      // 21.2.5.8 RegExp.prototype[@@replace](string, replaceValue)
+      // 21.2.5.11 RegExp.prototype[@@split](string, limit)
+      ? function (string, arg) { return rxfn.call(string, this, arg); }
+      // 21.2.5.6 RegExp.prototype[@@match](string)
+      // 21.2.5.9 RegExp.prototype[@@search](string)
+      : function (string) { return rxfn.call(string, this); }
+    );
   }
 };
 
@@ -6384,6 +6864,113 @@ __webpack_require__(/*! ./_core */ "../node_modules/core-js/modules/_core.js").i
 
 /***/ }),
 
+/***/ "../node_modules/core-js/modules/_regexp-exec-abstract.js":
+/*!****************************************************************!*\
+  !*** ../node_modules/core-js/modules/_regexp-exec-abstract.js ***!
+  \****************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 8:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var classof = __webpack_require__(/*! ./_classof */ "../node_modules/core-js/modules/_classof.js");
+var builtinExec = RegExp.prototype.exec;
+
+ // `RegExpExec` abstract operation
+// https://tc39.github.io/ecma262/#sec-regexpexec
+module.exports = function (R, S) {
+  var exec = R.exec;
+  if (typeof exec === 'function') {
+    var result = exec.call(R, S);
+    if (typeof result !== 'object') {
+      throw new TypeError('RegExp exec method returned something other than an Object or null');
+    }
+    return result;
+  }
+  if (classof(R) !== 'RegExp') {
+    throw new TypeError('RegExp#exec called on incompatible receiver');
+  }
+  return builtinExec.call(R, S);
+};
+
+
+/***/ }),
+
+/***/ "../node_modules/core-js/modules/_regexp-exec.js":
+/*!*******************************************************!*\
+  !*** ../node_modules/core-js/modules/_regexp-exec.js ***!
+  \*******************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 58:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var regexpFlags = __webpack_require__(/*! ./_flags */ "../node_modules/core-js/modules/_flags.js");
+
+var nativeExec = RegExp.prototype.exec;
+// This always refers to the native implementation, because the
+// String#replace polyfill uses ./fix-regexp-well-known-symbol-logic.js,
+// which loads this file before patching the method.
+var nativeReplace = String.prototype.replace;
+
+var patchedExec = nativeExec;
+
+var LAST_INDEX = 'lastIndex';
+
+var UPDATES_LAST_INDEX_WRONG = (function () {
+  var re1 = /a/,
+      re2 = /b*/g;
+  nativeExec.call(re1, 'a');
+  nativeExec.call(re2, 'a');
+  return re1[LAST_INDEX] !== 0 || re2[LAST_INDEX] !== 0;
+})();
+
+// nonparticipating capturing group, copied from es5-shim's String#split patch.
+var NPCG_INCLUDED = /()??/.exec('')[1] !== undefined;
+
+var PATCH = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED;
+
+if (PATCH) {
+  patchedExec = function exec(str) {
+    var re = this;
+    var lastIndex, reCopy, match, i;
+
+    if (NPCG_INCLUDED) {
+      reCopy = new RegExp('^' + re.source + '$(?!\\s)', regexpFlags.call(re));
+    }
+    if (UPDATES_LAST_INDEX_WRONG) lastIndex = re[LAST_INDEX];
+
+    match = nativeExec.call(re, str);
+
+    if (UPDATES_LAST_INDEX_WRONG && match) {
+      re[LAST_INDEX] = re.global ? match.index + match[0].length : lastIndex;
+    }
+    if (NPCG_INCLUDED && match && match.length > 1) {
+      // Fix browsers whose `exec` methods don't consistently return `undefined`
+      // for NPCG, like IE8. NOTE: This doesn' work for /(.?)?/
+      // eslint-disable-next-line no-loop-func
+      nativeReplace.call(match[0], reCopy, function () {
+        for (i = 1; i < arguments.length - 2; i++) {
+          if (arguments[i] === undefined) match[i] = undefined;
+        }
+      });
+    }
+
+    return match;
+  };
+}
+
+module.exports = patchedExec;
+
+
+/***/ }),
+
 /***/ "../node_modules/core-js/modules/_set-to-string-tag.js":
 /*!*************************************************************!*\
   !*** ../node_modules/core-js/modules/_set-to-string-tag.js ***!
@@ -6443,6 +7030,36 @@ var store = global[SHARED] || (global[SHARED] = {});
   mode: __webpack_require__(/*! ./_library */ "../node_modules/core-js/modules/_library.js") ? 'pure' : 'global',
   copyright: '© 2020 Denis Pushkarev (zloirock.ru)'
 });
+
+
+/***/ }),
+
+/***/ "../node_modules/core-js/modules/_string-at.js":
+/*!*****************************************************!*\
+  !*** ../node_modules/core-js/modules/_string-at.js ***!
+  \*****************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: module, __webpack_require__ */
+/*! CommonJS bailout: module.exports is used directly at 5:0-14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var toInteger = __webpack_require__(/*! ./_to-integer */ "../node_modules/core-js/modules/_to-integer.js");
+var defined = __webpack_require__(/*! ./_defined */ "../node_modules/core-js/modules/_defined.js");
+// true  -> String#at
+// false -> String#codePointAt
+module.exports = function (TO_STRING) {
+  return function (that, pos) {
+    var s = String(defined(that));
+    var i = toInteger(pos);
+    var l = s.length;
+    var a, b;
+    if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
+    a = s.charCodeAt(i);
+    return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
+      ? TO_STRING ? s.charAt(i) : a
+      : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+  };
+};
 
 
 /***/ }),
@@ -6756,6 +7373,28 @@ if (test + '' != '[object z]') {
 
 /***/ }),
 
+/***/ "../node_modules/core-js/modules/es6.regexp.exec.js":
+/*!**********************************************************!*\
+  !*** ../node_modules/core-js/modules/es6.regexp.exec.js ***!
+  \**********************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: __webpack_require__ */
+/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+var regexpExec = __webpack_require__(/*! ./_regexp-exec */ "../node_modules/core-js/modules/_regexp-exec.js");
+__webpack_require__(/*! ./_export */ "../node_modules/core-js/modules/_export.js")({
+  target: 'RegExp',
+  proto: true,
+  forced: regexpExec !== /./.exec
+}, {
+  exec: regexpExec
+});
+
+
+/***/ }),
+
 /***/ "../node_modules/core-js/modules/es6.regexp.flags.js":
 /*!***********************************************************!*\
   !*** ../node_modules/core-js/modules/es6.regexp.flags.js ***!
@@ -6768,6 +7407,137 @@ if (test + '' != '[object z]') {
 if (__webpack_require__(/*! ./_descriptors */ "../node_modules/core-js/modules/_descriptors.js") && /./g.flags != 'g') __webpack_require__(/*! ./_object-dp */ "../node_modules/core-js/modules/_object-dp.js").f(RegExp.prototype, 'flags', {
   configurable: true,
   get: __webpack_require__(/*! ./_flags */ "../node_modules/core-js/modules/_flags.js")
+});
+
+
+/***/ }),
+
+/***/ "../node_modules/core-js/modules/es6.regexp.replace.js":
+/*!*************************************************************!*\
+  !*** ../node_modules/core-js/modules/es6.regexp.replace.js ***!
+  \*************************************************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: __webpack_require__ */
+/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var anObject = __webpack_require__(/*! ./_an-object */ "../node_modules/core-js/modules/_an-object.js");
+var toObject = __webpack_require__(/*! ./_to-object */ "../node_modules/core-js/modules/_to-object.js");
+var toLength = __webpack_require__(/*! ./_to-length */ "../node_modules/core-js/modules/_to-length.js");
+var toInteger = __webpack_require__(/*! ./_to-integer */ "../node_modules/core-js/modules/_to-integer.js");
+var advanceStringIndex = __webpack_require__(/*! ./_advance-string-index */ "../node_modules/core-js/modules/_advance-string-index.js");
+var regExpExec = __webpack_require__(/*! ./_regexp-exec-abstract */ "../node_modules/core-js/modules/_regexp-exec-abstract.js");
+var max = Math.max;
+var min = Math.min;
+var floor = Math.floor;
+var SUBSTITUTION_SYMBOLS = /\$([$&`']|\d\d?|<[^>]*>)/g;
+var SUBSTITUTION_SYMBOLS_NO_NAMED = /\$([$&`']|\d\d?)/g;
+
+var maybeToString = function (it) {
+  return it === undefined ? it : String(it);
+};
+
+// @@replace logic
+__webpack_require__(/*! ./_fix-re-wks */ "../node_modules/core-js/modules/_fix-re-wks.js")('replace', 2, function (defined, REPLACE, $replace, maybeCallNative) {
+  return [
+    // `String.prototype.replace` method
+    // https://tc39.github.io/ecma262/#sec-string.prototype.replace
+    function replace(searchValue, replaceValue) {
+      var O = defined(this);
+      var fn = searchValue == undefined ? undefined : searchValue[REPLACE];
+      return fn !== undefined
+        ? fn.call(searchValue, O, replaceValue)
+        : $replace.call(String(O), searchValue, replaceValue);
+    },
+    // `RegExp.prototype[@@replace]` method
+    // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@replace
+    function (regexp, replaceValue) {
+      var res = maybeCallNative($replace, regexp, this, replaceValue);
+      if (res.done) return res.value;
+
+      var rx = anObject(regexp);
+      var S = String(this);
+      var functionalReplace = typeof replaceValue === 'function';
+      if (!functionalReplace) replaceValue = String(replaceValue);
+      var global = rx.global;
+      if (global) {
+        var fullUnicode = rx.unicode;
+        rx.lastIndex = 0;
+      }
+      var results = [];
+      while (true) {
+        var result = regExpExec(rx, S);
+        if (result === null) break;
+        results.push(result);
+        if (!global) break;
+        var matchStr = String(result[0]);
+        if (matchStr === '') rx.lastIndex = advanceStringIndex(S, toLength(rx.lastIndex), fullUnicode);
+      }
+      var accumulatedResult = '';
+      var nextSourcePosition = 0;
+      for (var i = 0; i < results.length; i++) {
+        result = results[i];
+        var matched = String(result[0]);
+        var position = max(min(toInteger(result.index), S.length), 0);
+        var captures = [];
+        // NOTE: This is equivalent to
+        //   captures = result.slice(1).map(maybeToString)
+        // but for some reason `nativeSlice.call(result, 1, result.length)` (called in
+        // the slice polyfill when slicing native arrays) "doesn't work" in safari 9 and
+        // causes a crash (https://pastebin.com/N21QzeQA) when trying to debug it.
+        for (var j = 1; j < result.length; j++) captures.push(maybeToString(result[j]));
+        var namedCaptures = result.groups;
+        if (functionalReplace) {
+          var replacerArgs = [matched].concat(captures, position, S);
+          if (namedCaptures !== undefined) replacerArgs.push(namedCaptures);
+          var replacement = String(replaceValue.apply(undefined, replacerArgs));
+        } else {
+          replacement = getSubstitution(matched, S, position, captures, namedCaptures, replaceValue);
+        }
+        if (position >= nextSourcePosition) {
+          accumulatedResult += S.slice(nextSourcePosition, position) + replacement;
+          nextSourcePosition = position + matched.length;
+        }
+      }
+      return accumulatedResult + S.slice(nextSourcePosition);
+    }
+  ];
+
+    // https://tc39.github.io/ecma262/#sec-getsubstitution
+  function getSubstitution(matched, str, position, captures, namedCaptures, replacement) {
+    var tailPos = position + matched.length;
+    var m = captures.length;
+    var symbols = SUBSTITUTION_SYMBOLS_NO_NAMED;
+    if (namedCaptures !== undefined) {
+      namedCaptures = toObject(namedCaptures);
+      symbols = SUBSTITUTION_SYMBOLS;
+    }
+    return $replace.call(replacement, symbols, function (match, ch) {
+      var capture;
+      switch (ch.charAt(0)) {
+        case '$': return '$';
+        case '&': return matched;
+        case '`': return str.slice(0, position);
+        case "'": return str.slice(tailPos);
+        case '<':
+          capture = namedCaptures[ch.slice(1, -1)];
+          break;
+        default: // \d\d?
+          var n = +ch;
+          if (n === 0) return match;
+          if (n > m) {
+            var f = floor(n / 10);
+            if (f === 0) return match;
+            if (f <= m) return captures[f - 1] === undefined ? ch.charAt(1) : captures[f - 1] + ch.charAt(1);
+            return match;
+          }
+          capture = captures[n - 1];
+      }
+      return capture === undefined ? '' : capture;
+    });
+  }
 });
 
 

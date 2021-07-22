@@ -1,4 +1,4 @@
-/*! elementor - v3.2.5 - 16-06-2021 */
+/*! elementor - v3.3.1 - 20-07-2021 */
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -5793,6 +5793,26 @@ var _environment = _interopRequireDefault(__webpack_require__(/*! ../../../../co
           $thisButton.removeClass('loading').addClass('success');
         });
       });
+      $('#elementor-recreate-kit-button').on('click', function (event) {
+        event.preventDefault();
+        var $thisButton = $(this);
+        $thisButton.removeClass('success error').addClass('loading').next('.e-recreate-kit-error-message').remove();
+        $.post(ajaxurl, {
+          action: 'elementor_recreate_kit',
+          _nonce: $thisButton.data('nonce')
+        }).done(function () {
+          $thisButton.removeClass('loading').addClass('success');
+        }).fail(function (_ref) {
+          var _responseJSON$data;
+
+          var responseJSON = _ref.responseJSON;
+          $thisButton.removeClass('loading').addClass('error');
+
+          if ((_responseJSON$data = responseJSON.data) !== null && _responseJSON$data !== void 0 && _responseJSON$data.message) {
+            $thisButton.after("<div class=\"e-recreate-kit-error-message\">".concat(responseJSON.data.message, "</div>"));
+          }
+        });
+      });
       $('#elementor-replace-url-button').on('click', function (event) {
         event.preventDefault();
         var $this = $(this),
@@ -5931,10 +5951,10 @@ var _environment = _interopRequireDefault(__webpack_require__(/*! ../../../../co
     },
     addUserAgentClasses: function addUserAgentClasses() {
       var body = document.querySelector('body');
-      (0, _entries.default)(_environment.default).forEach(function (_ref) {
-        var _ref2 = (0, _slicedToArray2.default)(_ref, 2),
-            key = _ref2[0],
-            value = _ref2[1];
+      (0, _entries.default)(_environment.default).forEach(function (_ref2) {
+        var _ref3 = (0, _slicedToArray2.default)(_ref2, 2),
+            key = _ref3[0],
+            value = _ref3[1];
 
         if (!value) {
           return;
@@ -5954,7 +5974,7 @@ var _environment = _interopRequireDefault(__webpack_require__(/*! ../../../../co
       var self = this,
           $importButton = self.elements.$importButton,
           $importArea = self.elements.$importArea;
-      self.elements.$formAnchor = $('h1');
+      self.elements.$formAnchor = $('.wp-header-end');
       $('#wpbody-content').find('.page-title-action').last().after($importButton);
       self.elements.$formAnchor.after($importArea);
       $importButton.on('click', function () {
