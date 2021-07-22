@@ -3,8 +3,7 @@
 add_action( 'rest_api_init', function(){
 	register_rest_route( 'wp/v3', '/genre/(?P<id>\d+)', array(
 	'methods' => 'GET',
-    'callback' => 'get_rest_genre',
-    
+    'callback' => 'get_rest_genre'
 	));
 });
 

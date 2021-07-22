@@ -18,6 +18,7 @@ require_once (dirname(__FILE__) . '/classes/rotas_api/rest_collection.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_genre.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_timestamp.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_suggestion.php');
+require_once (dirname(__FILE__) . '/classes/rotas_api/rest_recent.php');
 
 function curl_error_60_workaround( $handle, $r, $url ) {
 
