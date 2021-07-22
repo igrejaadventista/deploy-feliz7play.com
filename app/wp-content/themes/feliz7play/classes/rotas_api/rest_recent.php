@@ -15,9 +15,11 @@ function get_recent($data) {
    
     $args = array(
         'post_type'         => 'video',
-        'posts_per_page'    => -1,
+        'posts_per_page'    => 50,
         'post_status'       => 'publish',
     );
+
+    //$itens_recent = get_line_post($args);
   
     $itens_recent = get_line_post($args, $limited);
     
