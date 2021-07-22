@@ -10,9 +10,11 @@
         return;
     }
 
-    function get_line_post($args){
+    function get_line_post($args, $limited = false){
 
         $items = array();
+        $controle = array();
+        $cont = 0;
 
         $posts = get_posts($args);
         foreach ($posts as $post){
@@ -20,7 +22,6 @@
             $id = $post->ID;
 
             $meta = get_post_meta($id);
-
             
             $title =                $post->post_title;
             $slug =                 $post->post_name;
@@ -43,10 +44,10 @@
             $video_lenght =         $meta['post_video_length'][0];
             $video_quality =        $meta['post_video_quality'][0];
             
-           $video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
-           $video_image_hover =    wp_get_attachment_image_src($meta['video_image_hover'][0])[0];
+            $video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
+            $video_image_hover =    wp_get_attachment_image_src($meta['video_image_hover'][0])[0];
             
-           $values = array(
+            $values = array(
                'id' => $id,
                'title' => $title, 
                'slug' => $slug, 
@@ -67,9 +68,30 @@
                'post_video_length' => $video_lenght,
                'post_video_quality' => $video_quality,
                'redes' => $redes,
-               'production' => $production
+               'production' => $production,
+               'link' => get_link_site($slug, $video_type, $collection)
             );
-           array_push($items, $values);
+
+            if($limited){
+
+                $id_check = ($video_type == 'Single') ? $id : $collection->term_id;
+
+                if(!in_array($id_check , $controle)){
+                    array_push($controle, $id_check);
+                    array_push($items, $values);
+
+                    $cont++;
+
+                    if($limited == $cont){
+                        break;
+                    }
+                }
+
+            }else{
+                array_push($items, $values);
+            }
+
+            
         }
 
         return $items;
@@ -290,7 +312,38 @@
     function echox($item){
         echo(json_encode($item));
         die;
-    }   
+    }  
+    
+    function get_link_site($slug, $video_type, $collection){
+
+        $videos = get_field('video_suggestion', 'option');
+
+        switch ($video_type) {
+
+            
+            case 'Single':
+                $link = "https://next.feliz7play.com/pt/" . "/" . $slug;
+                break;
+            
+            case 'Episode':
+
+                if($collection->parent){
+                    $parent = get_term($collection->parent, 'collection');
+                    $link = "https://next.feliz7play.com/pt" . "/c/" . $parent->slug . "/" . $collection->slug . '?target='. $slug;
+                }else{
+                    $link = "https://next.feliz7play.com/pt" . "/c/" . $collection->slug . '?target='. $slug;
+                }
+
+                break;
+
+            default:
+                $link = site_url();
+                break;
+        }
+
+        return $link;
+
+    }
 
     // Adiciona filtro p/ metas na saida rest
     // parametros:
