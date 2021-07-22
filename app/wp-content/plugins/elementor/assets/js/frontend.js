@@ -1,4 +1,4 @@
-/*! elementor - v3.2.5 - 16-06-2021 */
+/*! elementor - v3.3.1 - 20-07-2021 */
 (self["webpackChunkelementor"] = self["webpackChunkelementor"] || []).push([["frontend"],{
 
 /***/ "../node_modules/@babel/runtime-corejs2/core-js/array/from.js":
@@ -1506,7 +1506,9 @@ module.exports = function ($) {
   };
 
   var isClassHandler = function isClassHandler(Handler) {
-    return Handler.prototype.getUniqueHandlerID;
+    var _Handler$prototype;
+
+    return (_Handler$prototype = Handler.prototype) === null || _Handler$prototype === void 0 ? void 0 : _Handler$prototype.getUniqueHandlerID;
   };
 
   var addHandlerWithHook = function addHandlerWithHook(elementName, Handler) {
@@ -1657,6 +1659,8 @@ var _slicedToArray2 = _interopRequireDefault(__webpack_require__(/*! @babel/runt
 var _entries = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/core-js/object/entries */ "../node_modules/@babel/runtime-corejs2/core-js/object/entries.js"));
 
 __webpack_require__(/*! core-js/modules/es6.array.find.js */ "../node_modules/core-js/modules/es6.array.find.js");
+
+var _keys = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/core-js/object/keys */ "../node_modules/@babel/runtime-corejs2/core-js/object/keys.js"));
 
 __webpack_require__(/*! core-js/modules/es6.regexp.replace.js */ "../node_modules/core-js/modules/es6.regexp.replace.js");
 
@@ -1809,7 +1813,14 @@ var Frontend = /*#__PURE__*/function (_elementorModules$Vie) {
   }, {
     key: "getDeviceSetting",
     value: function getDeviceSetting(deviceMode, settings, settingKey) {
-      var devices = ['desktop', 'tablet', 'mobile'];
+      // Add specific handling for widescreen since it is larger than desktop.
+      if ('widescreen' === deviceMode) {
+        return this.getWidescreenSetting(settings, settingKey);
+      }
+
+      var devices = (0, _keys.default)(this.config.responsive.activeBreakpoints).reverse(); // Manually add 'desktop' to the devices array to support the 'desktop' value in the deviceMode parameter.
+
+      devices.unshift('desktop');
       var deviceIndex = devices.indexOf(deviceMode);
 
       while (deviceIndex > 0) {
@@ -1825,6 +1836,22 @@ var Frontend = /*#__PURE__*/function (_elementorModules$Vie) {
       }
 
       return settings[settingKey];
+    }
+  }, {
+    key: "getWidescreenSetting",
+    value: function getWidescreenSetting(settings, settingKey) {
+      var deviceMode = 'widescreen',
+          widescreenSettingKey = settingKey + '_' + deviceMode;
+      var settingToReturn; // If the device mode is 'widescreen', and the setting exists - return it.
+
+      if (settings[widescreenSettingKey]) {
+        settingToReturn = settings[widescreenSettingKey];
+      } else {
+        // Otherwise, return the desktop setting
+        settingToReturn = settings[settingKey];
+      }
+
+      return settingToReturn;
     }
   }, {
     key: "getCurrentDeviceSetting",
@@ -3538,6 +3565,8 @@ var _promise = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-cor
 
 var _regenerator = _interopRequireDefault(__webpack_require__(/*! @babel/runtime/regenerator */ "../node_modules/@babel/runtime/regenerator/index.js"));
 
+__webpack_require__(/*! core-js/modules/es6.array.find.js */ "../node_modules/core-js/modules/es6.array.find.js");
+
 __webpack_require__(/*! regenerator-runtime/runtime.js */ "../node_modules/regenerator-runtime/runtime.js");
 
 var _asyncToGenerator2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/asyncToGenerator */ "../node_modules/@babel/runtime-corejs2/helpers/asyncToGenerator.js"));
@@ -3584,7 +3613,7 @@ var LightboxManager = /*#__PURE__*/function (_elementorModules$Vie) {
     key: "isLightboxLink",
     value: function isLightboxLink(element) {
       // Check for lowercase `a` to make sure it works also for links inside SVGs.
-      if ('a' === element.tagName.toLowerCase() && (element.hasAttribute('download') || !/^[^?]+\.(png|jpe?g|gif|svg|webp)(\?.*)?$/i.test(element.href))) {
+      if ('a' === element.tagName.toLowerCase() && (element.hasAttribute('download') || !/^[^?]+\.(png|jpe?g|gif|svg|webp)(\?.*)?$/i.test(element.href)) && !element.dataset.elementorLightboxVideo) {
         return false;
       }
 
@@ -3596,12 +3625,12 @@ var LightboxManager = /*#__PURE__*/function (_elementorModules$Vie) {
     key: "onLinkClick",
     value: function () {
       var _onLinkClick = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee(event) {
-        var element, $target, editMode, isClickInsideElementor, lightbox;
+        var element, $target, editMode, isColorPickingMode, isClickInsideElementor, lightbox;
         return _regenerator.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                element = event.currentTarget, $target = jQuery(event.target), editMode = elementorFrontend.isEditMode(), isClickInsideElementor = !!$target.closest('.elementor-edit-area').length;
+                element = event.currentTarget, $target = jQuery(event.target), editMode = elementorFrontend.isEditMode(), isColorPickingMode = editMode && elementor.$previewContents.find('body').hasClass('elementor-editor__ui-state__color-picker'), isClickInsideElementor = !!$target.closest('.elementor-edit-area').length;
 
                 if (this.isLightboxLink(element)) {
                   _context.next = 4;
@@ -3625,27 +3654,35 @@ var LightboxManager = /*#__PURE__*/function (_elementorModules$Vie) {
                 return _context.abrupt("return");
 
               case 7:
-                if (!this.isOptimizedAssetsLoading()) {
-                  _context.next = 13;
+                if (!isColorPickingMode) {
+                  _context.next = 9;
                   break;
                 }
 
-                _context.next = 10;
+                return _context.abrupt("return");
+
+              case 9:
+                if (!this.isOptimizedAssetsLoading()) {
+                  _context.next = 15;
+                  break;
+                }
+
+                _context.next = 12;
                 return LightboxManager.getLightbox();
 
-              case 10:
+              case 12:
                 _context.t0 = _context.sent;
-                _context.next = 14;
+                _context.next = 16;
                 break;
 
-              case 13:
+              case 15:
                 _context.t0 = elementorFrontend.utils.lightbox;
 
-              case 14:
+              case 16:
                 lightbox = _context.t0;
                 lightbox.createLightbox(element);
 
-              case 16:
+              case 18:
               case "end":
                 return _context.stop();
             }

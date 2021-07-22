@@ -1,4 +1,4 @@
-/*! elementor - v3.2.5 - 16-06-2021 */
+/*! elementor - v3.3.1 - 20-07-2021 */
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -13558,19 +13558,21 @@ var _default = /*#__PURE__*/function (_elementorModules$Vie) {
             elementor.notifications.showToast({
               message: __('Unable to connect', 'elementor')
             });
+          },
+          UTM: function UTM() {
+            var prevLibraryRoute = $e.routes.getHistory('library').reverse()[0].route,
+                tabName = prevLibraryRoute.split('/')[2];
+            return "&utm_source=editor-panel&utm_medium=wp-dash&utm_campaign=insert_".concat(tabName);
           }
         }, options);
         this.each(function () {
           counter++;
           var $this = jQuery(this),
-              callbackId = 'cb' + counter,
-              prevLibraryRoute = $e.routes.getHistory('library').reverse()[0].route,
-              tabName = prevLibraryRoute.split('/')[2],
-              UTMSource = "utm_source=editor-panel&utm_medium=wp-dash&utm_campaign=insert_".concat(tabName);
+              callbackId = 'cb' + counter;
           $this.attr({
             target: '_blank',
             rel: 'opener',
-            href: $this.attr('href') + '&mode=popup&callback_id=' + callbackId + '&' + UTMSource
+            href: $this.attr('href') + '&mode=popup&callback_id=' + callbackId + settings.UTM()
           });
           elementorCommon.elements.$window.on('elementor/connect/success/' + callbackId, settings.success).on('elementor/connect/error/' + callbackId, settings.error);
         });
