@@ -14,7 +14,6 @@
 
         $items = array();
         $controle = array();
-        $cont = 0;
 
         $posts = get_posts($args);
         foreach ($posts as $post){
@@ -80,9 +79,7 @@
                     array_push($controle, $id_check);
                     array_push($items, $values);
 
-                    $cont++;
-
-                    if($limited == $cont){
+                    if($limited == count($controle)){
                         break;
                     }
                 }
@@ -156,7 +153,8 @@
                     $args = array('taxonomy' => 'collection',  'number' => 0, 'include' => $item['to_custom_collection']->term_id);
                     $collection = get_line_collection($args);
                     
-                    if($line_model == 'circle' or $line_model == 'vertical'){ $collection['included'][0]['video_thumbnail'] = $item['image']['url']; }
+                    if($line_model == 'circle'){ $collection['included'][0]['video_thumbnail_circle'] = $item['image']['url']; }
+                    if($line_model == 'vertical'){ $collection['included'][0]['video_thumbnail_vertical'] = $item['image']['url']; }
                     
                     array_push($line['items'], ...$collection['included']);
                     
@@ -167,7 +165,8 @@
                     $args = array('post_type' => 'video', 'fields' => '', 'include' => $item['to_video']->ID, 'numberposts' => 0);
                     $post = get_line_post($args);
 
-                    if($line_model == 'circle'){ $post[0]['video_thumbnail'] = $item['image']['url']; }
+                    if($line_model == 'circle'){ $post[0]['video_thumbnail_circle'] = $item['image']['url']; }
+                    if($line_model == 'vertical'){ $post[0]['video_thumbnail_vertical'] = $item['image']['url']; }
 
                     array_push($line['items'], ...$post);                    
                     
