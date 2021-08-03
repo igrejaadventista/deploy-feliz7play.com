@@ -45,6 +45,8 @@
             
             $video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
             $video_image_hover =    wp_get_attachment_image_src($meta['video_image_hover'][0])[0];
+
+            $link =                 get_link_site_next($slug, $video_type, $collection);
             
             $values = array(
                'id' => $id,
@@ -68,7 +70,7 @@
                'post_video_quality' => $video_quality,
                'redes' => $redes,
                'production' => $production,
-               'link' => get_link_site($slug, $video_type, $collection)
+               'link' => $link
             );
 
             if($limited){
@@ -313,7 +315,7 @@
         die;
     }  
     
-    function get_link_site($slug, $video_type, $collection){
+    function get_link_site_next($slug, $video_type, $collection){
 
         $videos = get_field('video_suggestion', 'option');
 
@@ -321,7 +323,7 @@
 
             
             case 'Single':
-                $link = "https://next.feliz7play.com/pt/" . "/" . $slug;
+                $link = "https://next.feliz7play.com/pt/" . $slug;
                 break;
             
             case 'Episode':
