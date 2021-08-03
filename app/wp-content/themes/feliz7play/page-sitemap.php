@@ -44,7 +44,7 @@ if ( !empty($genres) ) :
 endif;
 
 
-// GENRES
+// COLLECTION
 $collections = get_terms( array(
     'taxonomy' => 'collection',
     'hide_empty' => true
