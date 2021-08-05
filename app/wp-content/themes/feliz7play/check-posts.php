@@ -70,6 +70,9 @@ th{
 
     <?php
 
+    $site = get_site();
+
+    
       // POSTS
       $args = array(
         'post_type'   => 'video',
@@ -92,8 +95,8 @@ th{
           $description = get_field('post_blurb', $id);
           $thumbnail = get_field('video_thumbnail', $id);
           $image_hover = get_field('video_image_hover', $id);
-          $link_wp = "https://v2.feliz7play.com/pt/wp-admin/post.php?post=" . $id . "&action=edit";
-          $link_nx = "https://next.feliz7play.com/pt/" . $slug;
+          $link_wp = "https://v2.feliz7play.com" . $site->path . "wp-admin/post.php?post=" . $id . "&action=edit";
+          $link_nx = "https://next.feliz7play.com" . $site->path . $slug;
 
 
 ?>
@@ -154,13 +157,13 @@ th{
           $thumbnail = get_field('collection_image',  $term->taxonomy . '_' . $id);
           $image_header = get_field('collection_image_header', $term->taxonomy . '_' . $id);
 
-          $link_wp = "https://v2.feliz7play.com/pt/wp-admin/term.php?taxonomy=collection&tag_ID=" . $id . "&post_type=video&wp_http_referer=%2Fpt%2Fwp-admin%2Fedit-tags.php%3Ftaxonomy%3Dcollection%26post_type%3Dvideo";
+          $link_wp = "https://v2.feliz7play.com". $site->path . "wp-admin/term.php?taxonomy=collection&tag_ID=" . $id . "&post_type=video&wp_http_referer=%2Fpt%2Fwp-admin%2Fedit-tags.php%3Ftaxonomy%3Dcollection%26post_type%3Dvideo";
 
           if($term->parent){
             $parent = get_term($term->parent, 'collection'); 
-            $link_nx = "https://next.feliz7play.com/pt" . "/c/" . $parent->slug . "/" . $term->slug;
+            $link_nx = "https://next.feliz7play.com" . $site->path . "c/" . $parent->slug . "/" . $term->slug;
           }else{
-            $link_nx = "https://next.feliz7play.com/pt" . "/c/" . $term->slug;
+            $link_nx = "https://next.feliz7play.com" . $site->path . "c/" . $term->slug;
           }
 
 
@@ -224,13 +227,13 @@ th{
           $genre = get_the_terms($id, 'genre')[0]->name;
           $collection = get_the_terms($id, 'collection')[0];
           $image_hover = get_field('video_image_hover', $id);
-          $link_wp = "https://v2.feliz7play.com/pt/wp-admin/post.php?post=" . $id . "&action=edit";
+          $link_wp = "https://v2.feliz7play.com/". $site->path . "wp-admin/post.php?post=" . $id . "&action=edit";
           
           if($collection->parent){
             $parent = get_term($collection->parent, 'collection'); 
-            $link_nx = "https://next.feliz7play.com/pt" . "/c/" . $parent->slug . "/" . $collection->slug . '?target='. $slug;
+            $link_nx = "https://next.feliz7play.com" . $site->path . "c/" . $parent->slug . "/" . $collection->slug . '?target='. $slug;
           }else{
-            $link_nx = "https://next.feliz7play.com/pt" . "/c/" . $collection->slug . '?target='. $slug;
+            $link_nx = "https://next.feliz7play.com" . $site->path . "c/" . $collection->slug . '?target='. $slug;
           }
 
 
@@ -287,8 +290,8 @@ th{
           $cont = $term->count;
           $thumbnail = get_field('image',  $term->taxonomy . '_' . $id);
           
-          $link_wp = "https://v2.feliz7play.com/pt/wp-admin/term.php?taxonomy=genre&tag_ID=" . $id . "&post_type=video&wp_http_referer=%2Fpt%2Fwp-admin%2Fedit-tags.php%3Ftaxonomy%3Dgenre%26post_type%3Dvideo";
-          $link_nx = "https://next.feliz7play.com/pt/g/" . $slug;
+          $link_wp = "https://v2.feliz7play.com". $site->path . "wp-admin/term.php?taxonomy=genre&tag_ID=" . $id . "&post_type=video&wp_http_referer=%2Fpt%2Fwp-admin%2Fedit-tags.php%3Ftaxonomy%3Dgenre%26post_type%3Dvideo";
+          $link_nx = "https://next.feliz7play.com". $site->path . "g/" . $slug;
 
 
 ?>
