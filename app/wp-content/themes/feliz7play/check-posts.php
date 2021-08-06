@@ -59,7 +59,7 @@ th{
       <th>Slug</th>
       <th> - </th>
       <th>Genre</th>
-      <th>Collection</th>
+      <th>Descrição</th>
       <th>Thumbnail</th>
       <th>Image hover</th>
     </tr>
