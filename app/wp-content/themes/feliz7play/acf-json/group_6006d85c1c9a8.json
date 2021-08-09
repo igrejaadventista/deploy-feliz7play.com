@@ -244,7 +244,15 @@
             "type": "number",
             "instructions": "",
             "required": 0,
-            "conditional_logic": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_6006d8d2d4d85",
+                        "operator": "==",
+                        "value": "Single"
+                    }
+                ]
+            ],
             "wrapper": {
                 "width": "",
                 "class": "",
@@ -308,7 +316,15 @@
             "type": "select",
             "instructions": "",
             "required": 0,
-            "conditional_logic": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_6006d8d2d4d85",
+                        "operator": "==",
+                        "value": "Single"
+                    }
+                ]
+            ],
             "wrapper": {
                 "width": "",
                 "class": "",
@@ -349,7 +365,7 @@
             "label": "Video Image - Thumbnail",
             "name": "video_thumbnail",
             "type": "image",
-            "instructions": "",
+            "instructions": "jpg - 1280px - 720px - Max 800kb",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -360,22 +376,30 @@
             "return_format": "array",
             "preview_size": "medium",
             "library": "all",
-            "min_width": "",
-            "min_height": "",
+            "min_width": 1280,
+            "min_height": 720,
             "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": ""
+            "max_width": 1280,
+            "max_height": 720,
+            "max_size": "0.8",
+            "mime_types": "jpg"
         },
         {
             "key": "field_60ca9eee900a0",
             "label": "Video Image - Content Header",
             "name": "image_content_header",
             "type": "image",
-            "instructions": "",
+            "instructions": "jpg - 2000px - 790px - Max 1Mb",
             "required": 0,
-            "conditional_logic": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_6006d8d2d4d85",
+                        "operator": "==",
+                        "value": "Single"
+                    }
+                ]
+            ],
             "wrapper": {
                 "width": "",
                 "class": "",
@@ -384,20 +408,20 @@
             "return_format": "array",
             "preview_size": "medium",
             "library": "all",
-            "min_width": "",
-            "min_height": "",
+            "min_width": 2000,
+            "min_height": 790,
             "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": ""
+            "max_width": 2000,
+            "max_height": 790,
+            "max_size": 1,
+            "mime_types": "jpg"
         },
         {
             "key": "field_6006db7bd4d8e",
             "label": "Video Image - Hover",
             "name": "video_image_hover",
             "type": "image",
-            "instructions": "",
+            "instructions": "jpg - 1280px - 720px - Max 800kb",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -408,13 +432,13 @@
             "return_format": "array",
             "preview_size": "medium",
             "library": "all",
-            "min_width": "",
-            "min_height": "",
+            "min_width": 1280,
+            "min_height": 720,
             "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": ""
+            "max_width": 1280,
+            "max_height": 720,
+            "max_size": "0.8",
+            "mime_types": "jpg"
         },
         {
             "key": "field_602acfa6a26dd",
@@ -584,5 +608,5 @@
     ],
     "active": true,
     "description": "",
-    "modified": 1623891752
+    "modified": 1628532687
 }
