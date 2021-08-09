@@ -7,7 +7,7 @@
             "label": "Image defalt",
             "name": "image",
             "type": "image",
-            "instructions": "",
+            "instructions": "svg - 165px - 60px - Max 0.1Mb",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -18,13 +18,13 @@
             "return_format": "array",
             "preview_size": "medium",
             "library": "all",
-            "min_width": "",
-            "min_height": "",
-            "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": ""
+            "min_width": 165,
+            "min_height": 60,
+            "min_size": "0.1",
+            "max_width": 165,
+            "max_height": 60,
+            "max_size": "0.1",
+            "mime_types": "svg"
         }
     ],
     "location": [
@@ -44,5 +44,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1612893938
+    "modified": 1628528787
 }

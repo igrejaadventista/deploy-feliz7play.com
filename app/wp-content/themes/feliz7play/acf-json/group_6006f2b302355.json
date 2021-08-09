@@ -108,7 +108,7 @@
         {
             "key": "field_6007129c50b53",
             "label": "Video Object",
-            "name": "to_video",
+            "name": "slider_video_object",
             "type": "post_object",
             "instructions": "",
             "required": 0,
@@ -145,7 +145,7 @@
             "label": "Logo",
             "name": "slider_logo",
             "type": "image",
-            "instructions": "",
+            "instructions": "png - 440px - 440px - Max 800kb",
             "required": 0,
             "conditional_logic": [
                 [
@@ -164,13 +164,13 @@
             "return_format": "array",
             "preview_size": "medium",
             "library": "all",
-            "min_width": "",
-            "min_height": "",
-            "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": ""
+            "min_width": 440,
+            "min_height": 440,
+            "min_size": "0.8",
+            "max_width": 440,
+            "max_height": 440,
+            "max_size": "0.8",
+            "mime_types": "png"
         },
         {
             "key": "field_600712f10f7f9",
@@ -271,7 +271,7 @@
             "label": "Desktop",
             "name": "slider_desktop_image",
             "type": "image",
-            "instructions": "",
+            "instructions": "jpg - 1920px - 970px - Max 1Mb",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -282,20 +282,20 @@
             "return_format": "array",
             "preview_size": "medium",
             "library": "all",
-            "min_width": "",
-            "min_height": "",
-            "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": ""
+            "min_width": 1920,
+            "min_height": 970,
+            "min_size": 0,
+            "max_width": 1920,
+            "max_height": 970,
+            "max_size": 1,
+            "mime_types": "jpg"
         },
         {
             "key": "field_600713c325094",
             "label": "Table",
             "name": "slider_tablet_image",
             "type": "image",
-            "instructions": "",
+            "instructions": "jpg - 1536px - 1194px - Max 800kb",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -306,20 +306,20 @@
             "return_format": "array",
             "preview_size": "medium",
             "library": "all",
-            "min_width": "",
-            "min_height": "",
-            "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": ""
+            "min_width": 1536,
+            "min_height": 1194,
+            "min_size": 0,
+            "max_width": 1536,
+            "max_height": 1194,
+            "max_size": "0.8",
+            "mime_types": "jpg"
         },
         {
             "key": "field_600713e625095",
             "label": "Mobile",
             "name": "slider_mobile_image",
             "type": "image",
-            "instructions": "",
+            "instructions": "jpg - 1125px - 1620px - Max 800kb",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -330,13 +330,13 @@
             "return_format": "array",
             "preview_size": "medium",
             "library": "all",
-            "min_width": "",
-            "min_height": "",
-            "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": ""
+            "min_width": 1125,
+            "min_height": 1620,
+            "min_size": 0,
+            "max_width": 1125,
+            "max_height": 1620,
+            "max_size": "0.8",
+            "mime_types": "jpg"
         }
     ],
     "location": [
@@ -356,5 +356,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1625078864
+    "modified": 1628531155
 }

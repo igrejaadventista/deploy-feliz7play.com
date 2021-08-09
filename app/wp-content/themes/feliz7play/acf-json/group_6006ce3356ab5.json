@@ -66,7 +66,7 @@
             "label": "Image",
             "name": "collection_image",
             "type": "image",
-            "instructions": "",
+            "instructions": "jpg - 1280px - 720px - Max 800kb",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -77,20 +77,20 @@
             "return_format": "array",
             "preview_size": "medium",
             "library": "all",
-            "min_width": "",
-            "min_height": "",
-            "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": ""
+            "min_width": 1280,
+            "min_height": 720,
+            "min_size": "0.8",
+            "max_width": 1280,
+            "max_height": 720,
+            "max_size": "0.8",
+            "mime_types": "jpg"
         },
         {
             "key": "field_60cb41b866028",
             "label": "Image Header",
             "name": "collection_image_header",
             "type": "image",
-            "instructions": "",
+            "instructions": "jpg - 2000px - 790px - Max 1Mb",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -101,13 +101,13 @@
             "return_format": "array",
             "preview_size": "medium",
             "library": "all",
-            "min_width": "",
-            "min_height": "",
-            "min_size": "",
-            "max_width": "",
-            "max_height": "",
-            "max_size": "",
-            "mime_types": ""
+            "min_width": 2000,
+            "min_height": 790,
+            "min_size": 1,
+            "max_width": 2000,
+            "max_height": 790,
+            "max_size": 1,
+            "mime_types": "jpg"
         },
         {
             "key": "field_6006cf18cafa4",
@@ -329,5 +329,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1623933445
+    "modified": 1628528165
 }
