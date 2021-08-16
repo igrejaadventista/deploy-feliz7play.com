@@ -1,4 +1,4 @@
-/*! elementor - v3.3.1 - 20-07-2021 */
+/*! elementor - v3.4.0 - 15-08-2021 */
 .dialog-widget-content {
   background-color: #fff;
   position: absolute;
@@ -979,6 +979,108 @@ ul.elementor-icon-list-items.elementor-inline-items {
     grid-template-columns: repeat(11, 1fr); }
   .elementor-grid-12 .elementor-grid {
     grid-template-columns: repeat(12, 1fr); }
+  @media (min-width: -1px) {
+    .elementor-grid-widescreen-0 .elementor-grid {
+      display: inline-block;
+      width: 100%;
+      word-spacing: var(--grid-column-gap);
+      margin-bottom: calc(-1 * var(--grid-row-gap)); }
+      .elementor-grid-widescreen-0 .elementor-grid .elementor-grid-item {
+        display: inline-block;
+        margin-bottom: var(--grid-row-gap);
+        word-break: break-word; }
+    .elementor-grid-widescreen-1 .elementor-grid {
+      grid-template-columns: repeat(1, 1fr); }
+    .elementor-grid-widescreen-2 .elementor-grid {
+      grid-template-columns: repeat(2, 1fr); }
+    .elementor-grid-widescreen-3 .elementor-grid {
+      grid-template-columns: repeat(3, 1fr); }
+    .elementor-grid-widescreen-4 .elementor-grid {
+      grid-template-columns: repeat(4, 1fr); }
+    .elementor-grid-widescreen-5 .elementor-grid {
+      grid-template-columns: repeat(5, 1fr); }
+    .elementor-grid-widescreen-6 .elementor-grid {
+      grid-template-columns: repeat(6, 1fr); }
+    .elementor-grid-widescreen-7 .elementor-grid {
+      grid-template-columns: repeat(7, 1fr); }
+    .elementor-grid-widescreen-8 .elementor-grid {
+      grid-template-columns: repeat(8, 1fr); }
+    .elementor-grid-widescreen-9 .elementor-grid {
+      grid-template-columns: repeat(9, 1fr); }
+    .elementor-grid-widescreen-10 .elementor-grid {
+      grid-template-columns: repeat(10, 1fr); }
+    .elementor-grid-widescreen-11 .elementor-grid {
+      grid-template-columns: repeat(11, 1fr); }
+    .elementor-grid-widescreen-12 .elementor-grid {
+      grid-template-columns: repeat(12, 1fr); } }
+  @media (max-width: -1px) {
+    .elementor-grid-laptop-0 .elementor-grid {
+      display: inline-block;
+      width: 100%;
+      word-spacing: var(--grid-column-gap);
+      margin-bottom: calc(-1 * var(--grid-row-gap)); }
+      .elementor-grid-laptop-0 .elementor-grid .elementor-grid-item {
+        display: inline-block;
+        margin-bottom: var(--grid-row-gap);
+        word-break: break-word; }
+    .elementor-grid-laptop-1 .elementor-grid {
+      grid-template-columns: repeat(1, 1fr); }
+    .elementor-grid-laptop-2 .elementor-grid {
+      grid-template-columns: repeat(2, 1fr); }
+    .elementor-grid-laptop-3 .elementor-grid {
+      grid-template-columns: repeat(3, 1fr); }
+    .elementor-grid-laptop-4 .elementor-grid {
+      grid-template-columns: repeat(4, 1fr); }
+    .elementor-grid-laptop-5 .elementor-grid {
+      grid-template-columns: repeat(5, 1fr); }
+    .elementor-grid-laptop-6 .elementor-grid {
+      grid-template-columns: repeat(6, 1fr); }
+    .elementor-grid-laptop-7 .elementor-grid {
+      grid-template-columns: repeat(7, 1fr); }
+    .elementor-grid-laptop-8 .elementor-grid {
+      grid-template-columns: repeat(8, 1fr); }
+    .elementor-grid-laptop-9 .elementor-grid {
+      grid-template-columns: repeat(9, 1fr); }
+    .elementor-grid-laptop-10 .elementor-grid {
+      grid-template-columns: repeat(10, 1fr); }
+    .elementor-grid-laptop-11 .elementor-grid {
+      grid-template-columns: repeat(11, 1fr); }
+    .elementor-grid-laptop-12 .elementor-grid {
+      grid-template-columns: repeat(12, 1fr); } }
+  @media (max-width: -1px) {
+    .elementor-grid-tablet_extra-0 .elementor-grid {
+      display: inline-block;
+      width: 100%;
+      word-spacing: var(--grid-column-gap);
+      margin-bottom: calc(-1 * var(--grid-row-gap)); }
+      .elementor-grid-tablet_extra-0 .elementor-grid .elementor-grid-item {
+        display: inline-block;
+        margin-bottom: var(--grid-row-gap);
+        word-break: break-word; }
+    .elementor-grid-tablet_extra-1 .elementor-grid {
+      grid-template-columns: repeat(1, 1fr); }
+    .elementor-grid-tablet_extra-2 .elementor-grid {
+      grid-template-columns: repeat(2, 1fr); }
+    .elementor-grid-tablet_extra-3 .elementor-grid {
+      grid-template-columns: repeat(3, 1fr); }
+    .elementor-grid-tablet_extra-4 .elementor-grid {
+      grid-template-columns: repeat(4, 1fr); }
+    .elementor-grid-tablet_extra-5 .elementor-grid {
+      grid-template-columns: repeat(5, 1fr); }
+    .elementor-grid-tablet_extra-6 .elementor-grid {
+      grid-template-columns: repeat(6, 1fr); }
+    .elementor-grid-tablet_extra-7 .elementor-grid {
+      grid-template-columns: repeat(7, 1fr); }
+    .elementor-grid-tablet_extra-8 .elementor-grid {
+      grid-template-columns: repeat(8, 1fr); }
+    .elementor-grid-tablet_extra-9 .elementor-grid {
+      grid-template-columns: repeat(9, 1fr); }
+    .elementor-grid-tablet_extra-10 .elementor-grid {
+      grid-template-columns: repeat(10, 1fr); }
+    .elementor-grid-tablet_extra-11 .elementor-grid {
+      grid-template-columns: repeat(11, 1fr); }
+    .elementor-grid-tablet_extra-12 .elementor-grid {
+      grid-template-columns: repeat(12, 1fr); } }
   @media (max-width: 1024px) {
     .elementor-grid-tablet-0 .elementor-grid {
       display: inline-block;
@@ -1012,6 +1114,40 @@ ul.elementor-icon-list-items.elementor-inline-items {
     .elementor-grid-tablet-11 .elementor-grid {
       grid-template-columns: repeat(11, 1fr); }
     .elementor-grid-tablet-12 .elementor-grid {
+      grid-template-columns: repeat(12, 1fr); } }
+  @media (max-width: -1px) {
+    .elementor-grid-mobile_extra-0 .elementor-grid {
+      display: inline-block;
+      width: 100%;
+      word-spacing: var(--grid-column-gap);
+      margin-bottom: calc(-1 * var(--grid-row-gap)); }
+      .elementor-grid-mobile_extra-0 .elementor-grid .elementor-grid-item {
+        display: inline-block;
+        margin-bottom: var(--grid-row-gap);
+        word-break: break-word; }
+    .elementor-grid-mobile_extra-1 .elementor-grid {
+      grid-template-columns: repeat(1, 1fr); }
+    .elementor-grid-mobile_extra-2 .elementor-grid {
+      grid-template-columns: repeat(2, 1fr); }
+    .elementor-grid-mobile_extra-3 .elementor-grid {
+      grid-template-columns: repeat(3, 1fr); }
+    .elementor-grid-mobile_extra-4 .elementor-grid {
+      grid-template-columns: repeat(4, 1fr); }
+    .elementor-grid-mobile_extra-5 .elementor-grid {
+      grid-template-columns: repeat(5, 1fr); }
+    .elementor-grid-mobile_extra-6 .elementor-grid {
+      grid-template-columns: repeat(6, 1fr); }
+    .elementor-grid-mobile_extra-7 .elementor-grid {
+      grid-template-columns: repeat(7, 1fr); }
+    .elementor-grid-mobile_extra-8 .elementor-grid {
+      grid-template-columns: repeat(8, 1fr); }
+    .elementor-grid-mobile_extra-9 .elementor-grid {
+      grid-template-columns: repeat(9, 1fr); }
+    .elementor-grid-mobile_extra-10 .elementor-grid {
+      grid-template-columns: repeat(10, 1fr); }
+    .elementor-grid-mobile_extra-11 .elementor-grid {
+      grid-template-columns: repeat(11, 1fr); }
+    .elementor-grid-mobile_extra-12 .elementor-grid {
       grid-template-columns: repeat(12, 1fr); } }
   @media (max-width: 767px) {
     .elementor-grid-mobile-0 .elementor-grid {
@@ -1052,9 +1188,25 @@ ul.elementor-icon-list-items.elementor-inline-items {
   #elementor-device-mode:after {
     content: 'desktop'; } }
 
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: -1px) {
+  #elementor-device-mode:after {
+    content: 'widescreen'; } }
+
+@media (max-width: -1px) {
+  #elementor-device-mode:after {
+    content: 'laptop'; } }
+
+@media (max-width: -1px) {
+  #elementor-device-mode:after {
+    content: 'tablet_extra'; } }
+
+@media (max-width: 1024px) {
   #elementor-device-mode:after {
     content: 'tablet'; } }
+
+@media (max-width: -1px) {
+  #elementor-device-mode:after {
+    content: 'mobile_extra'; } }
 
 @media (max-width: 767px) {
   #elementor-device-mode:after {
@@ -1512,7 +1664,10 @@ ul.elementor-icon-list-items.elementor-inline-items {
         -ms-flex-order: 5;
             order: 5; }
     .elementor-button-icon svg {
-      width: 1em; }
+      width: 1em;
+      height: auto; }
+    .elementor-button-icon .e-font-icon-svg {
+      height: 1em; }
   .elementor-button-text {
     -webkit-box-flex: 1;
         -ms-flex-positive: 1;
@@ -2842,15 +2997,33 @@ button.swiper-pagination-bullet {
       margin-right: 0; } }
 
 @media (max-width: 767px) {
+  .elementor .elementor-hidden-mobile {
+    display: none; }
   .elementor .elementor-hidden-phone {
+    display: none; } }
+
+@media (min-width: -1px) and (max-width: -1px) {
+  .elementor .elementor-hidden-mobile_extra {
     display: none; } }
 
 @media (min-width: 768px) and (max-width: 1024px) {
   .elementor .elementor-hidden-tablet {
     display: none; } }
 
-@media (min-width: 1025px) {
+@media (min-width: -1px) and (max-width: -1px) {
+  .elementor .elementor-hidden-tablet_extra {
+    display: none; } }
+
+@media (min-width: -1px) and (max-width: -1px) {
+  .elementor .elementor-hidden-laptop {
+    display: none; } }
+
+@media (min-width: 1025px) and (max-width: 99999px) {
   .elementor .elementor-hidden-desktop {
+    display: none; } }
+
+@media (min-width: -1px) {
+  .elementor .elementor-hidden-widescreen {
     display: none; } }
 
 .elementor-widget-text-path {
@@ -2886,5 +3059,7 @@ button.swiper-pagination-bullet {
       -o-transition: var(--transition) stroke, var(--transition) stroke-width, var(--transition) fill;
       transition: var(--transition) stroke, var(--transition) stroke-width, var(--transition) fill; }
       .elementor-widget-text-path svg text:hover {
-        --text-color: var( --text-color-hover ); }
+        --color: var( --text-color-hover, var( --text-color ) );
+        --fill: var( --color );
+        color: var(--color); }
 /*# sourceMappingURL=frontend-lite.css.map */

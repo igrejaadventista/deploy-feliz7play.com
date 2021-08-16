@@ -76,7 +76,7 @@ $generated_i18n_strings = array(
 	// Reference: src/modules/setup-wizard/components/steps/WizardStepLicense.vue:78
 	__( 'Skip this Step', 'wp-mail-smtp' ),
 
-	// Reference: src/modules/setup-wizard/components/steps/WizardStepConfigureMailer.vue:51
+	// Reference: src/modules/setup-wizard/components/steps/WizardStepLicense.vue:79
 	__( 'Previous Step', 'wp-mail-smtp' ),
 
 	// Reference: src/modules/setup-wizard/components/steps/WizardStepImport.vue:54
@@ -121,9 +121,11 @@ $generated_i18n_strings = array(
 	__( '%1$sFollow this link%2$s to get a Sender Name for SMTP.com.', 'wp-mail-smtp' ),
 
 	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Sendinblue.vue:41
+	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Zoho.vue:41
 	__( 'From Name', 'wp-mail-smtp' ),
 
 	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Sendinblue.vue:42
+	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Zoho.vue:42
 	__( 'Force From Name', 'wp-mail-smtp' ),
 
 	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Sendinblue.vue:43
@@ -133,12 +135,14 @@ $generated_i18n_strings = array(
 	__( 'Force From Email', 'wp-mail-smtp' ),
 
 	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Sendinblue.vue:45
+	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Zoho.vue:43
 	__( 'If enabled, the From Name setting above will be used for all emails, ignoring values set by other plugins.', 'wp-mail-smtp' ),
 
 	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Sendinblue.vue:46
 	__( 'If enabled, the From Email setting above will be used for all emails, ignoring values set by other plugins.', 'wp-mail-smtp' ),
 
 	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Sendinblue.vue:47
+	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Zoho.vue:44
 	__( 'The name that emails are sent from.', 'wp-mail-smtp' ),
 
 	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Sendinblue.vue:48
@@ -247,7 +251,7 @@ $generated_i18n_strings = array(
 	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Sendgrid.vue:46
 	__( 'Read how to set up Sendgrid', 'wp-mail-smtp' ),
 
-	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Mailgun.vue:33
+	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Zoho.vue:35
 	__( 'Region', 'wp-mail-smtp' ),
 
 	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Zoho.vue:36
@@ -259,10 +263,10 @@ $generated_i18n_strings = array(
 	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Zoho.vue:38
 	__( 'Client Secret', 'wp-mail-smtp' ),
 
-	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Zoho.vue:39
+	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Outlook.vue:30
 	__( 'Redirect URI', 'wp-mail-smtp' ),
 
-	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Zoho.vue:40
+	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Outlook.vue:31
 	__( 'Authorization', 'wp-mail-smtp' ),
 
 	// Reference: src/modules/setup-wizard/components/steps/configure-mailer/Zoho.vue:45
@@ -374,7 +378,8 @@ $generated_i18n_strings = array(
 	/* Translators: Link to the SMTP Mailer docs page. */
 	__( 'Which mailer would you like to use to send emails? Not sure which mailer to choose? Check out our %1$scomplete mailer guide%2$s for details on each option.', 'wp-mail-smtp' ),
 
-	// Reference: src/modules/setup-wizard/components/steps/WizardStepConfigureMailer.vue:50
+	// Reference: src/modules/setup-wizard/components/steps/WizardStepChooseMailer.vue:53
+	// Reference: src/modules/setup-wizard/components/steps/WizardStepHelpImprove.vue:47
 	__( 'Save and Continue', 'wp-mail-smtp' ),
 
 	// Reference: src/modules/setup-wizard/components/steps/WizardStepChooseMailer.vue:55
@@ -631,13 +636,13 @@ $generated_i18n_strings = array(
 	// Reference: src/modules/setup-wizard/components/steps/WizardStepPluginFeatures.vue:61
 	__( 'Create beautiful contact forms with just a few clicks.', 'wp-mail-smtp' ),
 
-	// Reference: src/modules/setup-wizard/components/steps/WizardStepPluginFeatures.vue:63
+	// Reference: src/modules/setup-wizard/components/steps/WizardStepLicense.vue:92
 	__( 'Keep records of every email that\'s sent out from your website.', 'wp-mail-smtp' ),
 
-	// Reference: src/modules/setup-wizard/components/steps/WizardStepPluginFeatures.vue:67
+	// Reference: src/modules/setup-wizard/components/steps/WizardStepLicense.vue:93
 	__( 'Control which email notifications your WordPress site sends.', 'wp-mail-smtp' ),
 
-	// Reference: src/modules/setup-wizard/components/steps/WizardStepPluginFeatures.vue:69
+	// Reference: src/modules/setup-wizard/components/steps/WizardStepLicense.vue:94
 	__( 'Save time with powerful WordPress Multisite controls.', 'wp-mail-smtp' ),
 
 	// Reference: src/modules/setup-wizard/components/steps/WizardStepConfigureMailer.vue:48
