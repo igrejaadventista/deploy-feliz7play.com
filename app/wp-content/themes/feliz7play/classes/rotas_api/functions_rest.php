@@ -37,8 +37,10 @@
             $post_video_rating =    $meta['post_video_rating'][0];
             $redes =                get_field('redes', $id);
             $production =           get_field('production', $id);
-
             $collection =           get_the_terms($id, 'collection')[0];
+
+            $collection->parent_slug = get_term($collection->parent, 'collection')->slug;
+
             $genre =                get_the_terms($id, 'genre')[0];
             $video_lenght =         $meta['post_video_length'][0];
             $video_quality =        $meta['post_video_quality'][0];
