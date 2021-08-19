@@ -42,7 +42,7 @@ function suggestion1(){
     global $lines;
     global $total;
 
-    $genres = get_field('genre_suggestion', 'option');
+    $genres = get_field('to_genre_suggestion', 'option');
     foreach ($genres as $key => $item) {
 
         $image = get_field('image', 'term_' . $item->term_id)['url'];
