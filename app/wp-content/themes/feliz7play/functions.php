@@ -66,6 +66,14 @@ function my_acf_fields_taxonomy_result( $args ) {
 	return $args;
 }
 
+add_filter('acf/fields/taxonomy/query/name=to_genre_suggestion', 'my_acf_fields_genre_result', 10, 4);
+function my_acf_fields_genre_result( $args) {
+	
+    $args['hide_empty'] = true;
+	
+	return $args;
+}
+
 add_filter('acf/fields/post_object/query/name=to_video', 'my_acf_fields_post_result', 10, 4);
 function my_acf_fields_post_result( $args) {
 	
