@@ -395,7 +395,7 @@
         {
             "key": "field_604785e2dcf48",
             "label": "Genre suggestion",
-            "name": "genre_suggestion",
+            "name": "to_genre_suggestion",
             "type": "taxonomy",
             "instructions": "",
             "required": 0,
@@ -454,5 +454,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1624378327
+    "modified": 1629374687
 }
