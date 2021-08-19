@@ -1,4 +1,4 @@
-/*! elementor - v3.4.0 - 15-08-2021 */
+/*! elementor - v3.4.1 - 18-08-2021 */
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -16395,7 +16395,7 @@ module.exports = wp.i18n;
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames not based on template
 /******/ 			if (chunkId === "vendors-node_modules_babel_runtime-corejs2_core-js_object_values_js-node_modules_babel_runtim-dcce77") return "e304e36749de7c8a2673.bundle.js";
-/******/ 			if (chunkId === "kit-library") return "" + chunkId + ".192658d419d728def980.bundle.js";
+/******/ 			if (chunkId === "kit-library") return "" + chunkId + ".4391d962692aeecda55f.bundle.js";
 /******/ 			// return url for filenames based on template
 /******/ 			return undefined;
 /******/ 		};

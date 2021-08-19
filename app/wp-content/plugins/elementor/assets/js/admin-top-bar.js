@@ -1,4 +1,4 @@
-/*! elementor - v3.4.0 - 15-08-2021 */
+/*! elementor - v3.4.1 - 18-08-2021 */
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -637,7 +637,7 @@ function ConnectionButton(props) {
 
     jQuery(buttonRef.current).elementorConnect({
       UTM: function UTM() {
-        return '&utm_source=admin-top-bar&utm_medium=wp-dash&utm_campaign=admin-top-bar';
+        return '&utm_source=admin-top-bar&utm_medium=wp-dash&utm_campaign=admin-top-bar&source=generic';
       }
     });
   }, []);
