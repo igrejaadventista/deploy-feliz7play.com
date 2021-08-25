@@ -1,4 +1,4 @@
-/*! elementor - v3.4.1 - 18-08-2021 */
+/*! elementor - v3.4.2 - 19-08-2021 */
 (self["webpackChunkelementor"] = self["webpackChunkelementor"] || []).push([["frontend-modules"],{
 
 /***/ "../node_modules/@babel/runtime/helpers/interopRequireDefault.js":

@@ -20,7 +20,7 @@
             "library": "all",
             "min_width": 165,
             "min_height": 60,
-            "min_size": "0.1",
+            "min_size": 0,
             "max_width": 165,
             "max_height": 60,
             "max_size": "0.1",
@@ -44,5 +44,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1628528787
+    "modified": 1629921478
 }

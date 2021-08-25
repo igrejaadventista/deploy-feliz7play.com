@@ -1,4 +1,4 @@
-/*! elementor - v3.4.1 - 18-08-2021 */
+/*! elementor - v3.4.2 - 19-08-2021 */
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -21836,6 +21836,10 @@ exports.default = ColorPicker;
 "use strict";
 
 
+var _interopRequireDefault = __webpack_require__(/*! @babel/runtime-corejs2/helpers/interopRequireDefault */ "../node_modules/@babel/runtime-corejs2/helpers/interopRequireDefault.js");
+
+var _typeof2 = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/helpers/typeof */ "../node_modules/@babel/runtime-corejs2/helpers/typeof.js"));
+
 __webpack_require__(/*! core-js/modules/es6.regexp.match.js */ "../node_modules/core-js/modules/es6.regexp.match.js");
 
 __webpack_require__(/*! core-js/modules/es6.function.name.js */ "../node_modules/core-js/modules/es6.function.name.js");
@@ -21903,7 +21907,7 @@ Conditions = function Conditions() {
         // A term consists of a control name to be examined, and a sub key if needed. For example, a term
         // can look like 'image_overlay[url]' (the 'url' is the sub key). Here we want to isolate the
         // condition name and the sub key, so later it can be retrieved and examined.
-        var parsedName = term.name.match(/(^[a-z0-9-_]+)(?:\[(\w+)])?/),
+        var parsedName = term.name.match(/([\w-]+)(?:\[([\w-]+)])?/),
             conditionRealName = parsedName[1],
             conditionSubKey = parsedName[2],
             // We use null-safe operator since we're trying to get the current element, which is not always
@@ -21917,7 +21921,7 @@ Conditions = function Conditions() {
           value = comparisonObject.__dynamic__[conditionRealName];
         }
 
-        if (value && conditionSubKey) {
+        if ('object' === (0, _typeof2.default)(value) && conditionSubKey) {
           value = value[conditionSubKey];
         }
 
@@ -23164,7 +23168,7 @@ module.exports = {
         // Here we want to convert the 'condition' format to a 'conditions' format. The first step is to
         // isolate the term from the negative operator if exists. For example, a condition format can look
         // like 'selected_icon[value]!', so we examine this term with a negative connotation.
-        var conditionNameParts = conditionName.match(/(^[a-z0-9-_\[\]]+)(!?)$/i),
+        var conditionNameParts = conditionName.match(/([\w-]+(?:\[[\w-]+])?)?(!?)$/i),
             conditionRealName = conditionNameParts[1],
             isNegativeCondition = !!conditionNameParts[2],
             controlValue = values[conditionRealName];
