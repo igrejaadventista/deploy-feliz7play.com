@@ -54,6 +54,8 @@ th{
   $target = $_GET["target"];
   cconsole($target);
 
+  $site = get_site();
+
   if(!$_GET["target"]){
     ?>
 
@@ -99,7 +101,7 @@ th{
 
             <?php
 
-            $site = get_site();
+            
 
             
               // POSTS
@@ -255,7 +257,7 @@ th{
             $genre = get_the_terms($id, 'genre')[0]->name;
             $collection = get_the_terms($id, 'collection')[0];
             $image_hover = get_field('video_image_hover', $id);
-            $link_wp = "https://v2.feliz7play.com/". $site->path . "wp-admin/post.php?post=" . $id . "&action=edit";
+            $link_wp = "https://v2.feliz7play.com". $site->path . "wp-admin/post.php?post=" . $id . "&action=edit";
             
             if($collection->parent){
               $parent = get_term($collection->parent, 'collection'); 

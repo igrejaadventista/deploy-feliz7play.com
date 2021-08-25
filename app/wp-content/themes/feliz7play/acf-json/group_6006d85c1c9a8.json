@@ -378,7 +378,7 @@
             "library": "all",
             "min_width": 1280,
             "min_height": 720,
-            "min_size": "",
+            "min_size": 0,
             "max_width": 1280,
             "max_height": 720,
             "max_size": "0.8",
@@ -410,7 +410,7 @@
             "library": "all",
             "min_width": 2000,
             "min_height": 790,
-            "min_size": "",
+            "min_size": 0,
             "max_width": 2000,
             "max_height": 790,
             "max_size": 1,
@@ -434,7 +434,7 @@
             "library": "all",
             "min_width": 1280,
             "min_height": 720,
-            "min_size": "",
+            "min_size": 0,
             "max_width": 1280,
             "max_height": 720,
             "max_size": "0.8",
@@ -608,5 +608,5 @@
     ],
     "active": true,
     "description": "",
-    "modified": 1628532687
+    "modified": 1629921608
 }
