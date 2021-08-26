@@ -205,7 +205,7 @@ th{
 
             <tr>
               <td                                                               ><a href="<?= $link_wp ?>" target="_blank"><?= $id ?></a></td>
-              <td class="<?= $name ? '' : 'erro' ?>"                            ><a href="<?= $link_nx ?>" target="_blank"><?= $name ?></a></td>
+              <td class="<?= $name ? '' : 'erro' ?>"                            ><?= $term->parent ? '⏤ ' : ' ' ?><a href="<?= $link_nx ?>" target="_blank"><?= $name ?></a></td>
               <td                                                               ><?= $slug ?></td>
               <td class="<?= ($term->parent && !$cont) ? 'erro' : '' ?>"         ><?= $cont ?: '' ?></td>
               <td class="<?= ($genre || $term->parent) ? '' : 'erro' ?>"        ><?= $genre ?></td>
@@ -241,6 +241,8 @@ th{
 
         <?php
 
+
+        $duplicados = array();
         // Episode
         $args = array(
           'post_type'   => 'video',
@@ -274,6 +276,12 @@ th{
               $link_nx = "https://next.feliz7play.com" . $site->path . "c/" . $collection->slug . '?target='. $slug;
             }
 
+            if(get_field('post_video_host', $id) == 'Youtube'){
+              $link_video = "https://www.youtube.com/watch?v=" . $cod;
+            }else {
+              $link_video = "https://vimeo.com/" . $cod;
+            }
+
 
             ?>
 
@@ -281,7 +289,7 @@ th{
             <td                                             ><a href="<?= $link_wp ?>" target="_blank"><?= $id ?></a></td>
             <td class="<?= $name ? '' : 'erro' ?>"          ><a href="<?= $link_nx ?>" target="_blank"><?= $name ?></a></td>
             <td                                             ><?= $slug ?></td>
-            <td class="<?= $cod != $cod_2 ? '' : 'erro' ?>" ><?= $cod ?></td>
+            <td class="<?= $cod != $cod_2 ? '' : 'erro' ?>" ><a href="<?= $link_video ?>" target="_blank"><?= $cod ?></a></td>
             <td class=""                                    ><?= $genre ?></td>
             <td class="<?= $collection ? '' : 'erro' ?>"    ><?= $collection->name ?></td>
             <td                                             ><?= $thumbnail ? 'OK' : 'OFF' ?></td>
@@ -290,9 +298,17 @@ th{
         
             <?php
 
+            if($cod == $cod_2){
+              array_push($duplicados, max($id, $id_2));
+            }
+
             $cod_2 = $cod;
+            $id_2 = $id;
 
           endforeach;
+
+          pconsole($duplicados);
+
           wp_reset_postdata();
         }
 
