@@ -88,7 +88,7 @@ th{
               <th>ID</th>
               <th>Name</th>
               <th>Slug</th>
-              <th> - </th>
+              <th>Video ID</th>
               <th>Genre</th>
               <th>Descrição</th>
               <th>Thumbnail</th>
@@ -111,6 +111,8 @@ th{
                 'post_status' => 'publish',
                 'meta_key' => 'post_video_type',
                 'meta_value' => 'Single',
+                'orderby' => 'title',
+                'order'   => 'ASC',
               );
 
               $posts = get_posts($args);
@@ -122,6 +124,7 @@ th{
                   $id = $post->ID;
                   $name = $post->post_title;
                   $slug = $post->post_name;
+                  $cod = get_field('post_video_id', $id);
                   $genre = get_the_terms($id, 'genre')[0]->name;
                   $description = get_field('post_blurb', $id);
                   $thumbnail = get_field('video_thumbnail', $id);
@@ -132,17 +135,19 @@ th{
                   ?>
 
                     <tr>
-                      <td                                          ><a href="<?= $link_wp ?>" target="_blank"><?= $id ?></a></td>
-                      <td class="<?= $name ? '' : 'erro' ?>"       ><a href="<?= $link_nx ?>" target="_blank"><?= $name ?></a></td>
-                      <td                                          ><?= $slug ?></td>
-                      <td></td>
-                      <td class="<?= $genre ? '' : 'erro' ?>"      ><?= $genre ?></td>
-                      <td class="<?= $description ? '' : 'erro' ?>"><?= $description ? 'OK' : 'OFF' ?></td>
-                      <td class="<?= $thumbnail ? '' : 'erro' ?>"  ><?= $thumbnail ? 'OK' : 'OFF' ?></td>
-                      <td class="<?= $image_hover ? '' : 'erro' ?>"><?= $image_hover ? 'OK' : 'OFF' ?></td>
+                      <td                                             ><a href="<?= $link_wp ?>" target="_blank"><?= $id ?></a></td>
+                      <td class="<?= $name ? '' : 'erro' ?>"          ><a href="<?= $link_nx ?>" target="_blank"><?= $name ?></a></td>
+                      <td                                             ><?= $slug ?></td>
+                      <td class="<?= $cod != $cod_2 ? '' : 'erro' ?>" ><?= $cod ?></td>
+                      <td class="<?= $genre ? '' : 'erro' ?>"         ><?= $genre ?></td>
+                      <td class="<?= $description ? '' : 'erro' ?>"   ><?= $description ? 'OK' : 'OFF' ?></td>
+                      <td class="<?= $thumbnail ? '' : 'erro' ?>"     ><?= $thumbnail ? 'OK' : 'OFF' ?></td>
+                      <td class="<?= $image_hover ? '' : 'erro' ?>"   ><?= $image_hover ? 'OK' : 'OFF' ?></td>
                     </tr>
 
                   <?php
+
+                  $cod_2 = $cod;
       
                 endforeach;
                 wp_reset_postdata();
@@ -227,7 +232,7 @@ th{
           <th>ID</th>
           <th>Name</th>
           <th>Slug</th>
-          <th> - </th>
+          <th>Video ID</th>
           <th>Genre</th>
           <th>Collection</th>
           <th>Thumbnail</th>
@@ -243,6 +248,8 @@ th{
           'post_status' => 'publish',
           'meta_key' => 'post_video_type',
           'meta_value' => 'Episode',
+          'orderby' => 'title',
+          'order'   => 'ASC',
         );
 
         $posts = get_posts($args);
@@ -254,6 +261,7 @@ th{
             $id = $post->ID;
             $name = $post->post_title;
             $slug = $post->post_name;
+            $cod = get_field('post_video_id', $id);
             $genre = get_the_terms($id, 'genre')[0]->name;
             $collection = get_the_terms($id, 'collection')[0];
             $image_hover = get_field('video_image_hover', $id);
@@ -270,17 +278,19 @@ th{
             ?>
 
           <tr>
-            <td                                           ><a href="<?= $link_wp ?>" target="_blank"><?= $id ?></a></td>
-            <td class="<?= $name ? '' : 'erro' ?>"        ><a href="<?= $link_nx ?>" target="_blank"><?= $name ?></a></td>
-            <td                                           ><?= $slug ?></td>
-            <td></td>
-            <td class=""                                  ><?= $genre ?></td>
-            <td class="<?= $collection ? '' : 'erro' ?>"  ><?= $collection->name ?></td>
-            <td                                           ><?= $thumbnail ? 'OK' : 'OFF' ?></td>
-            <td class="<?= $image_hover ? '' : 'erro' ?>" ><?= $image_hover ? 'OK' : 'OFF' ?></td>
+            <td                                             ><a href="<?= $link_wp ?>" target="_blank"><?= $id ?></a></td>
+            <td class="<?= $name ? '' : 'erro' ?>"          ><a href="<?= $link_nx ?>" target="_blank"><?= $name ?></a></td>
+            <td                                             ><?= $slug ?></td>
+            <td class="<?= $cod != $cod_2 ? '' : 'erro' ?>" ><?= $cod ?></td>
+            <td class=""                                    ><?= $genre ?></td>
+            <td class="<?= $collection ? '' : 'erro' ?>"    ><?= $collection->name ?></td>
+            <td                                             ><?= $thumbnail ? 'OK' : 'OFF' ?></td>
+            <td class="<?= $image_hover ? '' : 'erro' ?>"   ><?= $image_hover ? 'OK' : 'OFF' ?></td>
           </tr>
         
             <?php
+
+            $cod_2 = $cod;
 
           endforeach;
           wp_reset_postdata();
