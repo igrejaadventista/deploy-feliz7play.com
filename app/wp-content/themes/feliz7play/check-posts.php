@@ -132,13 +132,20 @@ th{
                   $link_wp = "https://v2.feliz7play.com" . $site->path . "wp-admin/post.php?post=" . $id . "&action=edit";
                   $link_nx = "https://next.feliz7play.com" . $site->path . $slug;
 
+                  if(get_field('post_video_host', $id) == 'Youtube'){
+                    $link_video = "https://www.youtube.com/watch?v=" . $cod;
+                  }else {
+                    $link_video = "https://vimeo.com/" . $cod;
+                  }
+      
+
                   ?>
 
                     <tr>
                       <td                                             ><a href="<?= $link_wp ?>" target="_blank"><?= $id ?></a></td>
                       <td class="<?= $name ? '' : 'erro' ?>"          ><a href="<?= $link_nx ?>" target="_blank"><?= $name ?></a></td>
                       <td                                             ><?= $slug ?></td>
-                      <td class="<?= $cod != $cod_2 ? '' : 'erro' ?>" ><?= $cod ?></td>
+                      <td class="<?= $cod != $cod_2 ? '' : 'erro' ?>" ><a href="<?= $link_video ?>" target="_blank"><?= $cod ?></a></td>
                       <td class="<?= $genre ? '' : 'erro' ?>"         ><?= $genre ?></td>
                       <td class="<?= $description ? '' : 'erro' ?>"   ><?= $description ? 'OK' : 'OFF' ?></td>
                       <td class="<?= $thumbnail ? '' : 'erro' ?>"     ><?= $thumbnail ? 'OK' : 'OFF' ?></td>
