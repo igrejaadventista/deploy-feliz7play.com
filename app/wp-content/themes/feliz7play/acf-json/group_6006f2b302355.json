@@ -166,10 +166,10 @@
             "library": "all",
             "min_width": 440,
             "min_height": 440,
-            "min_size": "0.8",
+            "min_size": 0,
             "max_width": 440,
             "max_height": 440,
-            "max_size": "0.8",
+            "max_size": "",
             "mime_types": "png"
         },
         {
@@ -287,7 +287,7 @@
             "min_size": 0,
             "max_width": 1920,
             "max_height": 970,
-            "max_size": 1,
+            "max_size": "",
             "mime_types": "jpg"
         },
         {
@@ -311,7 +311,7 @@
             "min_size": 0,
             "max_width": 1536,
             "max_height": 1194,
-            "max_size": "0.8",
+            "max_size": "",
             "mime_types": "jpg"
         },
         {
@@ -335,7 +335,7 @@
             "min_size": 0,
             "max_width": 1125,
             "max_height": 1620,
-            "max_size": "0.8",
+            "max_size": "",
             "mime_types": "jpg"
         }
     ],
@@ -356,5 +356,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1628531155
+    "modified": 1630070169
 }
