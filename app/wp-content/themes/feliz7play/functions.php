@@ -150,7 +150,7 @@ if( function_exists('acf_add_options_page') ) {
 	acf_add_options_page(array(
 		'page_title' 	=> 'F7P - Settings',
 		'menu_slug' 	=> 'f7p-general-settings',
-		'capability' 	=> 'add_users',
+		// 'capability' 	=> 'add_users',
 		'icon_url' 		=> 'dashicons-admin-tools',
 	));
 	
