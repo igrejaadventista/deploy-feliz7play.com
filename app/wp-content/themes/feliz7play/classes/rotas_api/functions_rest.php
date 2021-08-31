@@ -318,8 +318,9 @@
         $page = is_null($page) ? 1 : $page;
         $per_page = is_null($per_page) ? 5 : $per_page;
 
+        
         if($per_page == -1){ 
-            return $items; 
+            return array('paged' => $items, 'totalPages' => 1);
         }
     
         $total = count($items);      
