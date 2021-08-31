@@ -156,8 +156,6 @@
         $id = $collection->term_id;
         $meta = get_term_meta($id);
 
-        return $collection;
-
         return array(
             'id' => $id,
             'title' => $collection->name,
