@@ -16,25 +16,37 @@ function get_rest_collection($data) {
     $orderby = $data->get_param('orderby');
     $meta_key = $data->get_param('meta_key');
 
-    $term = get_term($data['id'], 'collection');
+    $args = array(  
+      'post_type' => 'video',               
+      'posts_per_page' => $per_page,               
+      'paged' => $page,   
+      'orderby' => $orderby,  
+      'order' => $order,
+      'post_status' => 'publish',
+      'tax_query' => array(
+          array(
+            'taxonomy' => 'collection',
+            'field' => 'term_id',
+            'terms' => $id,
+            'include_children' => false
+          )
+        ),
+        'meta_query' => array(
+          'relation' => 'OR',
+          array( 
+              'key'=> $meta_key,
+              'compare' => 'EXISTS'           
+          ),
+          array( 
+              'key'=> $meta_key,
+              'compare' => 'NOT EXISTS'           
+          )
+        ),
+      );
 
-    $args = array(  'post_type' => 'video', 
-                    'posts_per_page' => $per_page, 
-                    'paged' => $page,
-                    'orderby' => $orderby,
-                    'order' => $order,
-                    'post_status' => 'publish',
-                    'meta_key' => $meta_key,
-                    'tax_query' => array(
-                        array(
-                          'taxonomy' => 'collection',
-                          'field' => 'slug',
-                          'terms' => $term->slug,
-                          'include_children' => false
-                        )
-                      )
-                    );
     $posts = get_line_post($args);
+
+    
 
 	return new WP_REST_Response($posts, 200 );
 }
