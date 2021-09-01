@@ -20,7 +20,7 @@ function get_rest_collection($data) {
       'post_type' => 'video',               
       'posts_per_page' => $per_page,               
       'paged' => $page,   
-      'orderby' => $orderby,  
+      'orderby' => array($orderby, 'date' => 'ASC'),  
       'order' => $order,
       'post_status' => 'publish',
       'tax_query' => array(
