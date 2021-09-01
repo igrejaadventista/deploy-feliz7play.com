@@ -123,11 +123,7 @@ function getVideoInfo($post_id, $video_host, $video_id){
 			break;
 	}
 
-	//RESET CF CACHE
-	$json = file_get_contents("https://api.feliz7play.com/v4/clear-cf-cache?zone=feliz7play.com");
-	$obj = json_decode($json);
-
-	unset($json, $obj, $data);
+	
 }
 
 function UpdateVideoLenght( $post_id ) {
@@ -141,6 +137,12 @@ function UpdateVideoLenght( $post_id ) {
 	if ( !$video_lenght || !$release_year ){
 		getVideoInfo( $post_id, $video_host, $video_id );
 	}
+
+	//RESET CF CACHE
+	$json = file_get_contents("https://api.feliz7play.com/v4/clear-cf-cache?zone=feliz7play.com");
+	$obj = json_decode($json);
+
+	unset($json, $obj, $data);
 }
 add_action( 'acf/save_post', 'UpdateVideoLenght' );
 
