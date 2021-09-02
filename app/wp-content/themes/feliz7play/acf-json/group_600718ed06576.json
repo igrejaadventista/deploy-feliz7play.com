@@ -370,6 +370,56 @@
                     ],
                     "min": "",
                     "max": ""
+                },
+                "layout_6130bef6fc565": {
+                    "key": "layout_6130bef6fc565",
+                    "name": "recentes_option",
+                    "label": "Recentes",
+                    "display": "table",
+                    "sub_fields": [
+                        {
+                            "key": "field_6131046bd80e5",
+                            "label": "Número de itens",
+                            "name": "n_itens",
+                            "type": "number",
+                            "instructions": "Número de itens recentes que serão listados",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "20",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": 10,
+                            "placeholder": 10,
+                            "prepend": "",
+                            "append": "",
+                            "min": 1,
+                            "max": 20,
+                            "step": ""
+                        },
+                        {
+                            "key": "field_6130bef6fc566",
+                            "label": "Title",
+                            "name": "recentes_title",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "maxlength": ""
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
                 }
             },
             "button_label": "Adicionar Linha",
@@ -454,5 +504,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1629374687
+    "modified": 1630602521
 }
