@@ -3,9 +3,9 @@
     "title": "Collection",
     "fields": [
         {
-            "key": "field_60212a484349f",
-            "label": "Seasons",
-            "name": "seasons",
+            "key": "field_6130ce664f6c9",
+            "label": "Enable",
+            "name": "collection_enable",
             "type": "true_false",
             "instructions": "",
             "required": 0,
@@ -16,10 +16,48 @@
                 "id": ""
             },
             "message": "",
-            "default_value": 0,
-            "ui": 0,
+            "default_value": 1,
+            "ui": 1,
             "ui_on_text": "",
             "ui_off_text": ""
+        },
+        {
+            "key": "field_60212a484349f",
+            "label": "Seasons",
+            "name": "seasons",
+            "type": "true_false",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "25",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0,
+            "ui": 1,
+            "ui_on_text": "",
+            "ui_off_text": ""
+        },
+        {
+            "key": "field_6130cd1c4f6c8",
+            "label": "Season Label",
+            "name": "collection_season_label",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "75",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": ""
         },
         {
             "key": "field_601024d8784a5",
@@ -329,5 +367,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1629921513
+    "modified": 1630602497
 }
