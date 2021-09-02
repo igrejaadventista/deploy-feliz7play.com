@@ -1,4 +1,4 @@
-/*! elementor - v3.4.2 - 19-08-2021 */
+/*! elementor - v3.4.3 - 30-08-2021 */
 .dialog-widget-content {
   background-color: #fff;
   position: absolute;
@@ -3537,12 +3537,15 @@ button.swiper-pagination-bullet {
   display: flex; }
   .elementor-widget .elementor-icon-list-icon svg {
     width: var(--e-icon-list-icon-size, 1em);
-    height: var(--e-icon-list-icon-size, 1em);
-    -webkit-margin-end: calc(var(--e-icon-list-icon-size, 1em) * 0.25);
-            margin-inline-end: calc(var(--e-icon-list-icon-size, 1em) * 0.25); }
+    height: var(--e-icon-list-icon-size, 1em); }
   .elementor-widget .elementor-icon-list-icon i {
     width: 1.25em;
     font-size: var(--e-icon-list-icon-size); }
+
+.elementor-widget.elementor-widget-icon-list .elementor-icon-list-icon {
+  text-align: var(--e-icon-list-icon-align); }
+  .elementor-widget.elementor-widget-icon-list .elementor-icon-list-icon svg {
+    margin: var(--e-icon-list-icon-margin, 0 calc(var(--e-icon-list-icon-size, 1em) * 0.25) 0 0); }
 
 .elementor-widget.elementor-list-item-link-full_width a {
   width: 100%; }

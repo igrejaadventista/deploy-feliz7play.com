@@ -1,4 +1,4 @@
-/*! elementor - v3.4.2 - 19-08-2021 */
+/*! elementor - v3.4.3 - 30-08-2021 */
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -13746,7 +13746,8 @@ var EditorBase = /*#__PURE__*/function (_Marionette$Applicati) {
               controlArgs.default = controlArgs[device + '_default'];
             }
           } else if (deleteControlDefault) {
-            delete controlArgs.default;
+            // In the Editor, controls without default values should have an empty string as the default value.
+            controlArgs.default = '';
           } // If the control belongs to a group control with a popover, and this control is the last one, add the
           // popover.end = true value to it to make sure it closes the popover.
 

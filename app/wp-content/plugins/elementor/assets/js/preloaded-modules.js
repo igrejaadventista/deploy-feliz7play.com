@@ -1,4 +1,4 @@
-/*! elementor - v3.4.2 - 19-08-2021 */
+/*! elementor - v3.4.3 - 30-08-2021 */
 (self["webpackChunkelementor"] = self["webpackChunkelementor"] || []).push([["preloaded-modules"],{
 
 /***/ "../assets/dev/js/frontend/handlers/accordion.js":
@@ -814,15 +814,7 @@ class Video extends elementorModules.frontend.handlers.Base {
       $videoIframe.attr('src', lazyLoad);
     }
 
-    const newSourceUrl = $videoIframe[0].src.replace('&autoplay=0', '');
-    $videoIframe[0].src = newSourceUrl + '&autoplay=1';
-
-    if ($videoIframe[0].src.includes('vimeo.com')) {
-      const videoSrc = $videoIframe[0].src,
-            timeMatch = /#t=[^&]*/.exec(videoSrc); // Param '#t=' must be last in the URL
-
-      $videoIframe[0].src = videoSrc.slice(0, timeMatch.index) + videoSrc.slice(timeMatch.index + timeMatch[0].length) + timeMatch[0];
-    }
+    $videoIframe[0].src = this.apiProvider.getAutoplayURL($videoIframe[0].src);
   }
 
   async animateVideo() {
@@ -887,12 +879,17 @@ class Video extends elementorModules.frontend.handlers.Base {
     super.onInit();
     const elementSettings = this.getElementSettings();
 
+    if (elementorFrontend.utils[elementSettings.video_type]) {
+      this.apiProvider = elementorFrontend.utils[elementSettings.video_type];
+    } else {
+      this.apiProvider = elementorFrontend.utils.baseVideoLoader;
+    }
+
     if ('youtube' !== elementSettings.video_type) {
       // Currently the only API integration in the Video widget is for the YT API
       return;
     }
 
-    this.apiProvider = elementorFrontend.utils.youtube;
     this.videoID = this.apiProvider.getVideoIDFromURL(elementSettings.youtube_url); // If there is an image overlay, the YouTube video prep method will be triggered on click
 
     if (!this.videoID) {
@@ -1231,9 +1228,16 @@ module.exports = elementorModules.ViewModule.extend({
       }, options.videoParams);
       $videoElement = $('<video>', videoParams);
     } else {
-      const videoURL = options.url.replace('&autoplay=0', '') + '&autoplay=1';
+      let apiProvider = elementorFrontend.utils.baseVideoLoader;
+
+      if (-1 !== options.url.indexOf('vimeo.com')) {
+        apiProvider = elementorFrontend.utils.vimeo;
+      } else if (options.url.match(/^(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtu\.be\/|youtube\.com)/)) {
+        apiProvider = elementorFrontend.utils.youtube;
+      }
+
       $videoElement = $('<iframe>', {
-        src: videoURL,
+        src: apiProvider.getAutoplayURL(options.url),
         allowfullscreen: 1
       });
     }
