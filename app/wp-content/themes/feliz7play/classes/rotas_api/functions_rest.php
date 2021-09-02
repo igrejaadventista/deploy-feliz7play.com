@@ -313,6 +313,55 @@
         return;
     }
 
+    function get_recentes(){
+
+        $line_name = get_sub_field('recentes_title');
+        $limited = get_sub_field('n_itens');
+
+        $line = array('id' => 0, 'line_name'=> $line_name, 'line_slug' => false,  'source' => 'custom', 'model' => 'default',  'items' => []);
+
+        $args = array(
+            'post_type'         => 'video',
+            'posts_per_page'    => -1,
+            'post_status'       => 'publish',
+        );
+
+        $controle = array();
+
+        $posts = get_posts($args);
+        foreach ($posts as $post){
+
+            $id = $post->ID;
+            $meta = get_post_meta($id);
+
+            $video_type = $meta['post_video_type'][0];
+
+            $collection = return_parent_collection(get_the_terms($id, 'collection')[0]);
+            $id_check = ($video_type == 'Single') ? $id : $collection->term_id;
+
+            if(!in_array($id_check , $controle)){
+
+                array_push($controle, $id_check);
+
+                $values = ($video_type == 'Single') ? get_post_infos($post) : get_collection_infos($collection);
+
+                array_push($line['items'], $values);
+
+                if($limited > 0){
+                    if($limited == count($controle)){
+                        break;
+                    }
+                }
+            }
+        }
+               
+        
+        global $lines;
+        array_push($lines, $line);
+
+        return;
+    }
+
     function pagination_array($items = array(), $page, $per_page){
 
         $page = is_null($page) ? 1 : $page;
@@ -425,7 +474,7 @@
     function video_meta_callback( $video, $field_name, $request) {
 
         $genre = get_term($video['genre'][0], 'genre');
-        $link = 'genre/' . $genre->slug . '/' . $video['slug'] . '?v=' . $video['id'];
+        $link = 'g/' . $genre->slug . '/' . $video['slug'] . '?v=' . $video['id'];
         $link_sharing =    get_site_url(null, $link);
              
         return $link_sharing;
