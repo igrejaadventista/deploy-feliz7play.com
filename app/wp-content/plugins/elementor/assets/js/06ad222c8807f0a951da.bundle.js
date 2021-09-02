@@ -1,5 +1,5 @@
-/*! elementor - v3.4.2 - 19-08-2021 */
-(self["webpackChunkelementor"] = self["webpackChunkelementor"] || []).push([["vendors-node_modules_babel_runtime-corejs2_core-js_object_values_js-node_modules_babel_runtim-dcce77"],{
+/*! elementor - v3.4.3 - 30-08-2021 */
+(self["webpackChunkelementor"] = self["webpackChunkelementor"] || []).push([["vendors-node_modules_babel_runtime-corejs2_core-js_object_values_js-node_modules_babel_runtim-2f5074"],{
 
 /***/ "../node_modules/@babel/runtime-corejs2/core-js/object/values.js":
 /*!***********************************************************************!*\
@@ -817,63 +817,6 @@ $export($export.S, 'Promise', { 'try': function (callbackfn) {
   (result.e ? promiseCapability.reject : promiseCapability.resolve)(result.v);
   return promiseCapability.promise;
 } });
-
-
-/***/ }),
-
-/***/ "../node_modules/core-js/modules/_same-value.js":
-/*!******************************************************!*\
-  !*** ../node_modules/core-js/modules/_same-value.js ***!
-  \******************************************************/
-/***/ ((module) => {
-
-// 7.2.9 SameValue(x, y)
-module.exports = Object.is || function is(x, y) {
-  // eslint-disable-next-line no-self-compare
-  return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
-};
-
-
-/***/ }),
-
-/***/ "../node_modules/core-js/modules/es6.regexp.search.js":
-/*!************************************************************!*\
-  !*** ../node_modules/core-js/modules/es6.regexp.search.js ***!
-  \************************************************************/
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var anObject = __webpack_require__(/*! ./_an-object */ "../node_modules/core-js/modules/_an-object.js");
-var sameValue = __webpack_require__(/*! ./_same-value */ "../node_modules/core-js/modules/_same-value.js");
-var regExpExec = __webpack_require__(/*! ./_regexp-exec-abstract */ "../node_modules/core-js/modules/_regexp-exec-abstract.js");
-
-// @@search logic
-__webpack_require__(/*! ./_fix-re-wks */ "../node_modules/core-js/modules/_fix-re-wks.js")('search', 1, function (defined, SEARCH, $search, maybeCallNative) {
-  return [
-    // `String.prototype.search` method
-    // https://tc39.github.io/ecma262/#sec-string.prototype.search
-    function search(regexp) {
-      var O = defined(this);
-      var fn = regexp == undefined ? undefined : regexp[SEARCH];
-      return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[SEARCH](String(O));
-    },
-    // `RegExp.prototype[@@search]` method
-    // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@search
-    function (regexp) {
-      var res = maybeCallNative($search, regexp, this);
-      if (res.done) return res.value;
-      var rx = anObject(regexp);
-      var S = String(this);
-      var previousLastIndex = rx.lastIndex;
-      if (!sameValue(previousLastIndex, 0)) rx.lastIndex = 0;
-      var result = regExpExec(rx, S);
-      if (!sameValue(rx.lastIndex, previousLastIndex)) rx.lastIndex = previousLastIndex;
-      return result === null ? -1 : result.index;
-    }
-  ];
-});
 
 
 /***/ }),
@@ -7314,4 +7257,4 @@ module.exports.remove = removeAccents;
 /***/ })
 
 }]);
-//# sourceMappingURL=e304e36749de7c8a2673.bundle.js.map
+//# sourceMappingURL=06ad222c8807f0a951da.bundle.js.map
