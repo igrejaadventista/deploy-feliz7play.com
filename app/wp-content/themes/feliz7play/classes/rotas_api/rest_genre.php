@@ -19,7 +19,7 @@ function get_rest_genre($data) {
         'post_type'         => 'video',
         'posts_per_page'    => -1,
         'post_status'       => 'publish',
-        'post__not_in'      => $id_exclude,
+        'exclude'           => $id_exclude,
         'tax_query' => array(
             array(
                 'taxonomy' => 'genre',
