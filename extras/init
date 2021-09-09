@@ -1,7 +1,18 @@
 #!/bin/bash
 
 echo "Instala integração com o NewRelic"
-curl -Ls https://raw.githubusercontent.com/newrelic/newrelic-cli/master/scripts/install.sh | bash && sudo NEW_RELIC_API_KEY=NRAK-NRXHP5ZCJRXBWSP37GOY37KBH3L NEW_RELIC_ACCOUNT_ID=3282075 NEW_RELIC_APP_NAME=Feliz7Play-WP /usr/local/bin/newrelic install
+apt-get update
+apt-get -y install sudo wget gnupg
+echo 'deb http://apt.newrelic.com/debian/ newrelic non-free' | sudo tee /etc/apt/sources.list.d/newrelic.list
+wget -O- https://download.newrelic.com/548C16BF.gpg | sudo apt-key add -
+sudo apt-get update
+sudo apt-get -y install newrelic-php5
+sudo NR_INSTALL_SILENT=1 newrelic-install install
+sed -i -e "s/REPLACE_WITH_REAL_KEY/b6f030da5a41174e78ff6cc1b2cd2687c596NRAL/" \
+  -e "s/newrelic.appname[[:space:]]=[[:space:]].*/newrelic.appname=\"Feliz7Play-WP\"/" \
+  -e '$anewrelic.distributed_tracing_enabled=true' \
+  -e '$anewrelic.framework.wordpress.hooks=true' \
+  $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
 echo "Fim da instalação da extensão"
 
 echo "Ajuste nas permissões da pasta uploads"
