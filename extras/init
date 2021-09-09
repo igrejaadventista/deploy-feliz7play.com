@@ -1,7 +1,10 @@
 #!/bin/bash
 
-echo "Ajuste nas permissões da pasta uploads"
+echo "Instala integração com o NewRelic"
+curl -Ls https://raw.githubusercontent.com/newrelic/newrelic-cli/master/scripts/install.sh | bash && sudo NEW_RELIC_API_KEY=NRAK-NRXHP5ZCJRXBWSP37GOY37KBH3L NEW_RELIC_ACCOUNT_ID=3282075 NEW_RELIC_APP_NAME=Feliz7Play-WP /usr/local/bin/newrelic install
+echo "Fim da instalação da extensão"
 
+echo "Ajuste nas permissões da pasta uploads"
 #rm -rf /var/www/html/wp-content
 find /var/www/html -type d -exec chmod 755 {} \;
 find /var/www/html -type f -exec chmod 644 {} \;
