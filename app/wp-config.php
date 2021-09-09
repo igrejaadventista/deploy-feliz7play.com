@@ -18,20 +18,20 @@
  * @package WordPress
  */
 
-$is_dev = $_SERVER['SERVER_NAME'] == 'v2.feliz7play.com';
+$is_dev = $_SERVER['SERVER_NAME'] == 'localhost';
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'f7p_new');
+define( 'DB_NAME', $is_dev ? 'feliz7play' : $_ENV['WP_DB_NAME']);
 
 /** MySQL database username */
-define( 'DB_USER', 'root');
+define( 'DB_USER', $is_dev ? 'root' : $_ENV['WP_DB_USER']);
 
 /** MySQL database password */
-define( 'DB_PASSWORD', 'root');
+define( 'DB_PASSWORD', $is_dev ? 'root' : $_ENV['WP_DB_PASSWORD']);
 
 /** MySQL hostname */
-define( 'DB_HOST', 'localhost');
+define( 'DB_HOST', $is_dev ? 'feliz7play_db' : $_ENV['WP_DB_HOST']);
 
 /** Database Charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8mb4' );
@@ -43,15 +43,16 @@ define( 'DISALLOW_FILE_EDIT', true );
 
 define( 'AS3CF_SETTINGS', serialize( array(
     'provider' => 'aws',
-    'access-key-id' => 'AKIAWRJWC2TSMMMKO47B',
-    'secret-access-key' => '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',
-	'bucket' => 'files.adventistas.org'
+    'access-key-id' => $_ENV['WP_S3_ACCESS_KEY'],
+    'secret-access-key' => $_ENV['WP_S3_SECRET_KEY'],
+	'bucket' => $_ENV['WP_S3_BUCKET']
 ) ) );
 
-
-define( 'FORCE_SSL', true );
-define( 'FORCE_SSL_ADMIN',true );
-$_SERVER['HTTPS']='on';
+if(!$is_dev):
+    define( 'FORCE_SSL', true );
+    define( 'FORCE_SSL_ADMIN',true );
+    $_SERVER['HTTPS']='on';
+endif;
 
 define('WP_ALLOW_MULTISITE', true);
 
