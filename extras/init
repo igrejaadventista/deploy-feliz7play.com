@@ -8,8 +8,8 @@ wget -O- https://download.newrelic.com/548C16BF.gpg | sudo apt-key add -
 sudo apt-get update
 sudo apt-get -y install newrelic-php5
 sudo NR_INSTALL_SILENT=1 newrelic-install install
-sed -i -e "s/REPLACE_WITH_REAL_KEY/b6f030da5a41174e78ff6cc1b2cd2687c596NRAL/" \
-  -e "s/newrelic.appname[[:space:]]=[[:space:]].*/newrelic.appname=\"Feliz7Play-WP\"/" \
+sed -i -e "s/REPLACE_WITH_REAL_KEY/$NEWRELIC_KEY/" \
+  -e "s/newrelic.appname[[:space:]]=[[:space:]].*/newrelic.appname=\"$NEWRELIC_APP_NAME\"/" \
   -e '$anewrelic.distributed_tracing_enabled=true' \
   -e '$anewrelic.framework.wordpress.hooks=true' \
   $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
