@@ -505,16 +505,16 @@
 
             
             case 'Single':
-                $link = "https://next.feliz7play.com/pt/" . $slug;
+                $link = "https://feliz7play.com/pt/" . $slug;
                 break;
             
             case 'Episode':
 
                 if($collection->parent){
                     $parent = get_term($collection->parent, 'collection');
-                    $link = "https://next.feliz7play.com/pt" . "/c/" . $parent->slug . "/" . $collection->slug . '?target='. $slug;
+                    $link = "https://feliz7play.com/pt" . "/c/" . $parent->slug . "/" . $collection->slug . '?target='. $slug;
                 }else{
-                    $link = "https://next.feliz7play.com/pt" . "/c/" . $collection->slug . '?target='. $slug;
+                    $link = "https://feliz7play.com/pt" . "/c/" . $collection->slug . '?target='. $slug;
                 }
 
                 break;

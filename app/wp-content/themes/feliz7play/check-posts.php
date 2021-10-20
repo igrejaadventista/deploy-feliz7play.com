@@ -129,8 +129,8 @@ th{
                   $description = get_field('post_blurb', $id);
                   $thumbnail = get_field('video_thumbnail', $id);
                   $image_hover = get_field('video_image_hover', $id);
-                  $link_wp = "https://v2.feliz7play.com" . $site->path . "wp-admin/post.php?post=" . $id . "&action=edit";
-                  $link_nx = "https://next.feliz7play.com" . $site->path . $slug;
+                  $link_wp = "https://feliz7play.com" . $site->path . "wp-admin/post.php?post=" . $id . "&action=edit";
+                  $link_nx = "https://feliz7play.com" . $site->path . $slug;
 
                   if(get_field('post_video_host', $id) == 'Youtube'){
                     $link_video = "https://www.youtube.com/watch?v=" . $cod;
@@ -202,9 +202,9 @@ th{
 
             if($term->parent){
               $parent = get_term($term->parent, 'collection'); 
-              $link_nx = "https://next.feliz7play.com" . $site->path . "c/" . $parent->slug . "/" . $term->slug;
+              $link_nx = "https://feliz7play.com" . $site->path . "c/" . $parent->slug . "/" . $term->slug;
             }else{
-              $link_nx = "https://next.feliz7play.com" . $site->path . "c/" . $term->slug;
+              $link_nx = "https://feliz7play.com" . $site->path . "c/" . $term->slug;
             }
 
 
@@ -278,9 +278,9 @@ th{
             
             if($collection->parent){
               $parent = get_term($collection->parent, 'collection'); 
-              $link_nx = "https://next.feliz7play.com" . $site->path . "c/" . $parent->slug . "/" . $collection->slug . '?target='. $slug;
+              $link_nx = "https://feliz7play.com" . $site->path . "c/" . $parent->slug . "/" . $collection->slug . '?target='. $slug;
             }else{
-              $link_nx = "https://next.feliz7play.com" . $site->path . "c/" . $collection->slug . '?target='. $slug;
+              $link_nx = "https://feliz7play.com" . $site->path . "c/" . $collection->slug . '?target='. $slug;
             }
 
             if(get_field('post_video_host', $id) == 'Youtube'){
@@ -357,7 +357,7 @@ th{
             $thumbnail = get_field('image',  $term->taxonomy . '_' . $id);
             
             $link_wp = "https://v2.feliz7play.com". $site->path . "wp-admin/term.php?taxonomy=genre&tag_ID=" . $id . "&post_type=video&wp_http_referer=%2Fpt%2Fwp-admin%2Fedit-tags.php%3Ftaxonomy%3Dgenre%26post_type%3Dvideo";
-            $link_nx = "https://next.feliz7play.com". $site->path . "g/" . $slug;
+            $link_nx = "https://feliz7play.com". $site->path . "g/" . $slug;
 
 
           ?>
