@@ -26,6 +26,7 @@
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 name: Deploy to Amazon ECS
 
