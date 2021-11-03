@@ -120,7 +120,19 @@
             
 
             $collection = return_parent_collection(get_the_terms($id, 'collection')[0]);
-            $id_check = ($video_type == 'Single') ? $id : $collection->term_id;
+
+            if($video_type == 'Single'){
+                $id_check =  $id;
+            } else {
+
+                $meta = get_term_meta($collection->term_id);
+
+                if($meta['collection_enable'][0]){
+                    $id_check =  $collection->term_id;
+                } else {
+                    continue;
+                }
+            }
 
             if(!in_array($id_check , $controle)){
 
