@@ -30,9 +30,9 @@ function get_page_option($data) {
 
 				if($source == 'video'){
 
-					$target = get_field('to_video', $item->ID)->ID;		
+					$target = get_field('slider_video_object', $item->ID)->ID;	
 
-					$slug = get_post_field('post_name', get_field('to_video', $item->ID));
+					$slug = get_post_field('post_name', get_field('slider_video_object', $item->ID));
 					$post_video_lenght = get_field('post_video_lenght', $target);
 					$video_quality = get_field('post_video_quality', $target);
 					$season = false;
@@ -40,8 +40,10 @@ function get_page_option($data) {
 					$rating = get_field('Rating', $target);
 					$genre = get_the_terms( $target, 'genre')[0]->name;
 
-					$video_host =           get_field('post_video_host', $target);
-					$video_id =             get_field('post_video_id', $target);	
+					$video_host =           get_field('post_video_host', $target);
+					$video_id =             get_field('post_video_id', $target);	
+
+					
 
 				}else {
 
@@ -55,8 +57,8 @@ function get_page_option($data) {
 					$rating = get_field('Rating', 'term_' . $target);
 					$genre = get_field('collection_genre', 'term_' . $target)->name;
 					$collection_father = get_field('to_collection', $item->ID)->parent ? get_term(get_field('to_collection', $item->ID)->parent)->slug : false;
-					$video_host =  get_field('collection_video_host', 'term_' . $target);
-					$video_id =    get_field('collection_video_id', 'term_' . $target);
+					$video_host =  get_field('collection_video_host', 'term_' . $target);
+					$video_id =    get_field('collection_video_id', 'term_' . $target);
 
 				}
 
@@ -85,6 +87,7 @@ function get_page_option($data) {
 					'slider_mobile' => $slider_mobile
 
 				);
+				
 				array_push($sliders, $slider);
 			break;
 			

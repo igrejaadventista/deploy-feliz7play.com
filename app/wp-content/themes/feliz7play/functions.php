@@ -74,7 +74,7 @@ function my_acf_fields_genre_result( $args) {
 	return $args;
 }
 
-add_filter('acf/fields/post_object/query/name=to_video', 'my_acf_fields_post_result', 10, 4);
+add_filter('acf/fields/post_object/query/name=slider_video_object', 'my_acf_fields_post_result', 10, 4);
 function my_acf_fields_post_result( $args) {
 	
 	$args['posts_per_page'] = 40;

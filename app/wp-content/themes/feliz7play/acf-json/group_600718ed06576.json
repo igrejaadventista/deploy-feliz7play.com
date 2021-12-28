@@ -300,7 +300,7 @@
                                         {
                                             "key": "field_601c0f7d33a7c",
                                             "label": "Video",
-                                            "name": "to_video",
+                                            "name": "slider_video_object",
                                             "type": "post_object",
                                             "instructions": "",
                                             "required": 0,

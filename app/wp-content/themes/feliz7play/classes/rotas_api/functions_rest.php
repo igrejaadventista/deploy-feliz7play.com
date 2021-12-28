@@ -225,7 +225,7 @@
             'collection' => $collection, 
             'video_host' => $video_host, 
             'video_id' => $video_id, 
-            'post_download_link' => $post_download_link, 
+            'post_download_link' => $post_download_link,
             'download' => $download,
             'year' => $post_year,
             'video_rating' => $post_video_rating,
@@ -307,7 +307,7 @@
 
                 case 'video':
                 
-                    $args = array('post_type' => 'video', 'fields' => '', 'include' => $item['to_video']->ID, 'numberposts' => 0);
+                    $args = array('post_type' => 'video', 'fields' => '', 'include' => $item['slider_video_object']->ID, 'numberposts' => 0);
                     $post = get_line_post($args);
 
                     if($line_model == 'circle'){ $post[0]['video_thumbnail_circle'] = $item['image']['url']; }
