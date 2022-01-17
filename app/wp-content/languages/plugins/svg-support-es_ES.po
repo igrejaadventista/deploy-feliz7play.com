@@ -2,12 +2,12 @@
 # This file is distributed under the same license as the Plugins - SVG Support - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2020-04-05 05:38:59+0000\n"
+"PO-Revision-Date: 2021-09-28 10:00:34+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: GlotPress/2.4.0-alpha\n"
+"X-Generator: GlotPress/3.0.0-alpha.2\n"
 "Language: es\n"
 "Project-Id-Version: Plugins - SVG Support - Stable (latest release)\n"
 
@@ -41,7 +41,7 @@ msgstr "¿Cargar el CSS de la portada?"
 
 #. Description of the plugin
 msgid "Upload SVG files to the Media Library and render SVG files inline for direct styling/animation of an SVG's internal elements using CSS/JS."
-msgstr "Sube archivos SVG a la librería de medios y los muestra en línea para el estilo/animación directa de los elementos internos utilizando CSS/JS."
+msgstr "Sube archivos SVG a la biblioteca de medios y los muestra integrados para el estilo/animación directa de los elementos internos utilizando CSS/JS."
 
 #: admin/svgs-settings-page.php:291
 msgid "Thanks for your support, please consider donating."
@@ -173,15 +173,15 @@ msgstr "Añade tu SVG destacado como lo harías con cualquier formato de imagen 
 
 #: admin/svgs-settings-page-help.php:101
 msgid "Make sure \"Advanced Mode\" is enabled."
-msgstr "Asegúrate de que el \"Modo Avanzado\" está activado."
+msgstr "Asegúrate de que el «Modo Avanzado» está activado."
 
 #: admin/svgs-settings-page-help.php:99
 msgid "To render your featured SVG inline:"
-msgstr "Para renderizar tu SVG destacado en línea:"
+msgstr "Para procesar tu SVG destacado integrado:"
 
 #: admin/svgs-settings-page-help.php:97
 msgid "You can use SVG files as featured images just like any other image format, with the addition of being able to render your featured SVG inline on a per-post basis."
-msgstr "Puedes utilizar archivos SVG como imágenes destacadas como cualquier otro formato de imagen, con la adición de poder elegir si renderizar tus archivos SVG destacados en línea por cada entrada."
+msgstr "Puedes utilizar archivos SVG como imágenes destacadas como cualquier otro formato de imagen, con la adición de poder elegir si procesar tus archivos SVG destacados integrados por cada entrada."
 
 #: admin/svgs-settings-page-help.php:95 admin/svgs-settings-page-help.php:106
 msgid "Featured Images"
@@ -189,7 +189,7 @@ msgstr "Imágenes destacadas"
 
 #: admin/svgs-settings-page-help.php:82
 msgid "Your uploaded image needs to be an SVG file for this plugin to replace the img tag with the inline SVG code. It will not create SVG files for you."
-msgstr "Tu imagen subida necesita ser un archivo SVG para que este plugin pueda reemplazar la etiqueta img por el código SVG en línea. No creará archivos SVG para ti."
+msgstr "Tu imagen subida necesita ser un archivo SVG para que este plugin pueda reemplazar la etiqueta img por el código SVG integrado. No creará archivos SVG para ti."
 
 #: admin/svgs-settings-page-help.php:82
 msgid "You will likely need to set your own height and width in your CSS for SVG files to display correctly."
@@ -201,7 +201,7 @@ msgstr "Puedes incrustar tu imagen SVG como cualquier imagen estándar con la ad
 
 #: admin/svgs-settings-page-help.php:74 admin/svgs-settings-page-help.php:87
 msgid "Render SVG Inline"
-msgstr "Mostrar SVG en línea"
+msgstr "Mostrar SVG integrado"
 
 #: admin/svgs-settings-page-help.php:59 admin/svgs-settings-page-help.php:66
 msgid "Standard Usage"
@@ -209,15 +209,15 @@ msgstr "Uso estándar"
 
 #: admin/svgs-settings-page-help.php:46
 msgid "This feature is to force all SVG files that are found in your site to be rendered inline. This can help if you aren't able to set a custom class on your IMG tags for some reason, usually when used in theme options or page builder elements."
-msgstr "Esta característica es para forzar que todos los archivos SVG que se encuentran en el sitio sean renderizados en línea. Esto puede ayudar si no puedes establecer una clase personalizada en tus etiquetas IMG por alguna razón, normalmente cuando se utiliza en las opciones de tema o en los elementos de generadores de páginas."
+msgstr "Esta característica es para forzar que todos los archivos SVG que se encuentran en el sitio sean procesados integrados. Esto puede ayudar si no puedes establecer una clase personalizada en tus etiquetas IMG por alguna razón, normalmente cuando se utiliza en las opciones de tema o en los elementos de generadores de páginas."
 
 #: admin/svgs-settings-page-help.php:46
 msgid "Force Inline SVG:"
-msgstr "Forzar SVG en línea:"
+msgstr "Forzar SVG integrado:"
 
 #: admin/svgs-settings-page-help.php:44
 msgid "When this is checked, you won't have to add the class to your SVG files during the embed process in the editor. When you pick your SVG, it will be placed in the editor with just the SVG Support class and others stripped. It does not change existing code, it's only a helper to allow you to quickly embed your SVG files and have them render inline without having to fiddle with the classes."
-msgstr "Cuando esta opción está seleccionada, no tendrás que añadir la clase a sus archivos SVG durante el proceso de incrustación en el editor. Cuando elijas tu SVG, se colocará en el editor sólo con la clase de compatibilidad con SVG y se le quitarán las demás. No cambia el código existente, es sólo una ayuda que te permite incrustar rápidamente tus archivos SVG y hacer que se rendericen en línea sin tener que jugar con las clases."
+msgstr "Cuando esta opción está seleccionada, no tendrás que añadir la clase a sus archivos SVG durante el proceso de incrustación en el editor. Cuando elijas tu SVG, se colocará en el editor sólo con la clase de compatibilidad con SVG y se le quitarán las demás. No cambia el código existente, es sólo una ayuda que te permite incrustar rápidamente tus archivos SVG y hacer que se procesen integrados sin tener que jugar con las clases."
 
 #: admin/svgs-settings-page-help.php:44
 msgid "Automatically Insert Class:"
@@ -225,7 +225,7 @@ msgstr "Insertar automáticamente la clase:"
 
 #: admin/svgs-settings-page-help.php:42
 msgid "This allows you to set your own custom class that you will use in your SVG source IMG tags that you would like rendered inline. For example, it might be easier for you to remember to add the class \"inline-svg\" or something, in which case you would use your desired class name in this field to be used across your site."
-msgstr "Esto te permite establecer tu propia clase personalizada que utilizará en las etiquetas IMG con SVG que te gustaría que se renderizaran en línea. Por ejemplo, podría ser más fácil para ti recordar añadir la clase \"inline-svg\" o algo así, en cuyo caso usarías el nombre de clase que quieras en este campo para ser usado en todo el sitio."
+msgstr "Esto te permite establecer tu propia clase personalizada que utilizará en las etiquetas IMG con SVG que te gustaría que se procesarán integrados. Por ejemplo, podría ser más fácil para ti recordar añadir la clase «inline-svg» o algo así, en cuyo caso usarías el nombre de clase que quieras en este campo para ser usado en todo el sitio."
 
 #: admin/svgs-settings-page-help.php:42
 msgid "CSS Class To Target:"
@@ -249,7 +249,7 @@ msgstr "Salida JS en pie de página:"
 
 #: admin/svgs-settings-page-help.php:36
 msgid "Enabling \"Advanced Mode\" displays options to give you more control over how you use SVG files on your site. It also includes extra JS on the front end, so leave this disabled unless you're actually using any of the advanced features."
-msgstr "Al activar el \"Modo Avanzado\" se muestran las opciones para darte más control sobre el uso de los archivos SVG en tu sitio. También incluye JS extra en la parte pública de la web, así que déjalo desactivado a menos que estés usando alguna de las funciones avanzadas."
+msgstr "Al activar el «Modo avanzado» se muestran las opciones para darte más control sobre el uso de los archivos SVG en tu sitio. También incluye JS extra en la parte pública de la web, así que déjalo desactivado a menos que estés usando alguna de las funciones avanzadas."
 
 #: admin/svgs-settings-page-help.php:36
 msgid "When using SVG files like regular images just isn't enough ;)"
@@ -277,7 +277,7 @@ msgstr "¡Así que vamos a entrar en más detalles! Simplemente haz clic en las 
 
 #: admin/svgs-settings-page-help.php:19
 msgid "SVG Support features an \"Advanced Mode\" which toggles extra features, allowing you to take more control of how your SVG files are used. By rendering SVG files inline, it opens up a huge number of possibilities including animations, embedded links within the SVG, odd shaped link areas, custom CSS targeting elements within the SVG and  whole lot more!"
-msgstr "SVG Support incluye un \"Modo Avanzado\" que activa las funciones adicionales que te permiten tener más control sobre cómo se utilizan tus archivos SVG. Al renderizar archivos SVG en línea, se abren un gran número de posibilidades, incluyendo animaciones, enlaces incrustados dentro del SVG, áreas de enlaces con formas extrañas, apuntar con CSS a elementos personalizados dentro del SVG ¡y mucho más!"
+msgstr "SVG Support incluye un «Modo avanzado» que activa las funciones adicionales que te permiten tener más control sobre cómo se utilizan tus archivos SVG. Al procesar archivos SVG integrados, se abren un gran número de posibilidades, incluyendo animaciones, enlaces incrustados dentro del SVG, áreas de enlaces con formas extrañas, apuntar con CSS a elementos personalizados dentro del SVG ¡y mucho más!"
 
 #: admin/svgs-settings-page-help.php:19
 msgid "Even this most basic of usage is very powerful for modern websites, however, there's lots of cool stuff you can do with SVG files!"
@@ -293,7 +293,7 @@ msgstr "Resumen"
 
 #: admin/svgs-settings-page.php:280
 msgid "Force all SVG files to be rendered inline"
-msgstr "Forzar que todos los archivos SVG se rendericen en línea"
+msgstr "Forzar que todos los archivos SVG se procesen integrados"
 
 #: admin/svgs-settings-page.php:236
 msgid "An online tool to optimize your SVG files."
@@ -309,11 +309,11 @@ msgstr "Anima y optimiza tus archivos SVG utilizando estos proyectos de código 
 
 #: admin/svgs-settings-page.php:165
 msgid " <strong>Use with caution!</strong> Checking this will automatically add the SVG class to ALL image tags containing SVG file sources in the rendered HTML via javascript and will therefore render all of your SVG files inline.<br /><em>Use case scenario: When using a visual builder such as in the Divi Theme or The Divi Builder, the class is not automatically added with the \"Automatically insert class?\" option selected or the builder module doesn't give you the option to manually add a CSS class directly to your image.</em>"
-msgstr " <strong>¡USAR CON CUIDADO!</strong> Si se marca esto, se añadirá automáticamente la clase SVG a TODAS las etiquetas de imagen que contengan archivos SVG en el HTML renderizado a través de javascript y, por lo tanto, se renderizarán todos los archivos SVG en línea.<br /><em>Ejemplo de uso: Cuando se utiliza un constructor visual como en Divi Theme o The Divi Builder, la clase no se añade automáticamente con la opción \"Insertar clase automáticamente\" seleccionada o el módulo constructor no te da la opción de añadir manualmente una clase CSS directamente a tu imagen.</em>"
+msgstr " <strong>¡USAR CON CUIDADO!</strong> Si se marca esto, se añadirá automáticamente la clase SVG a TODAS las etiquetas de imagen que contengan archivos SVG en el HTML procesado a través de javascript y, por lo tanto, se procesarán todos los archivos SVG integrados.<br /><em>Ejemplo de uso: Cuando se utiliza un constructor visual como en el tema Divi o el constructor de Divi, la clase no se añade automáticamente con la opción «Insertar clase automáticamente» seleccionada o el módulo constructor no te da la opción de añadir manualmente una clase CSS directamente a tu imagen.</em>"
 
 #: admin/svgs-settings-page.php:160
 msgid "Force Inline SVG?"
-msgstr "¿Forzar SVG en línea?"
+msgstr "¿Forzar SVG integrados?"
 
 #: admin/svgs-settings-page.php:131
 msgid " Checking this will use the expanded JS file instead of the minified JS file. Useful if you want to minify this externally using a caching plugin or similar."
@@ -369,11 +369,11 @@ msgstr " Mancando esto te aseguras de que la clase por defecto o la personalizad
 
 #: functions/featured-image.php:23
 msgid "Render this SVG inline (advanced)"
-msgstr "Renderizar este SVG en línea (avanzado)"
+msgstr "Procesar este SVG integrado (avanzado)"
 
 #: admin/svgs-settings-page.php:279
 msgid "Inline SVG featured image support"
-msgstr "Compatibilidad con imágenes SVG en línea"
+msgstr "Compatibilidad con imágenes SVG integrados"
 
 #: admin/svgs-settings-page.php:278
 msgid "Use odd shapes as links"
@@ -401,7 +401,7 @@ msgstr "Uso básico"
 
 #: admin/svgs-settings-page-help.php:61 admin/svgs-settings-page.php:199
 msgid "You can simply upload SVG files to your media library like any other image. Make sure to select \"Restrict to Administrators\" if you only want to allow admins to upload SVG files."
-msgstr "Puedes subir archivos SVG a tu biblioteca de medios como cualquier otra imagen. Asegúrate de seleccionar \"Restringir a administradores\" si sólo quieres permitir a los administradores subir archivos SVG."
+msgstr "Puedes subir archivos SVG a tu biblioteca de medios como cualquier otra imagen. Asegúrate de seleccionar «Restringir a administradores» si sólo quieres permitir a los administradores subir archivos SVG."
 
 #: admin/svgs-settings-page.php:191
 msgid "Advanced Usage"
@@ -409,7 +409,7 @@ msgstr "Uso avanzado"
 
 #: admin/svgs-settings-page.php:97
 msgid " You don't need to enable this to simply use SVG files as images. Enabling this will trigger advanced options and SVG functionality such as inline rendering."
-msgstr " No es necesario activar esta opción para utilizar archivos SVG como imágenes. Activar esto activará opciones avanzadas y funcionalidad SVG como el renderizado en línea."
+msgstr " No es necesario activar esta opción para utilizar archivos SVG como imágenes. Activar esto activará opciones avanzadas y funcionalidad SVG como el procesado integrado."
 
 #: admin/svgs-settings-page.php:92
 msgid "Enable Advanced Mode?"
@@ -421,9 +421,9 @@ msgstr "Activar el modo avanzado"
 
 #: admin/admin-notice.php:21
 msgid "If you updated SVG Support from any version prior to 2.3 and you use the inline SVG features, please "
-msgstr "Si ha actualizado SVG Support desde cualquier versión anterior a la 2.3 y utilizas las funciones SVG en línea, por favor "
+msgstr "Si ha actualizado SVG Support desde cualquier versión anterior a la 2.3 y utilizas las funciones SVG integrado, por favor "
 
-#: admin/admin-init.php:157
+#: admin/admin-init.php:174
 msgid "If you like <strong>SVG Support</strong> please leave a %s&#9733;&#9733;&#9733;&#9733;&#9733;%s rating. A huge thanks in advance!"
 msgstr "Si te gusta <strong>SVG Support</strong>, por favor, deja una valoración de %s&#9733;&#9733;&#9733;&#9733;&#9733;&#9733;&#9733;%s. ¡Muchas gracias de antemano!"
 
@@ -518,7 +518,7 @@ msgstr " Normalmente, los scripts se colocan en el <code>head</code> del documen
 
 #: admin/svgs-settings-page.php:114
 msgid "Output JS in Footer?"
-msgstr "¿Sacar JS en el pie de página?"
+msgstr "¿Poner JS en el pie de página?"
 
 #: admin/svgs-settings-page.php:73
 msgid " Restricts SVG upload privileges to Administrators."
@@ -555,7 +555,7 @@ msgstr "Al usar imágenes SVG en un sitio de WordPress es complicado darle forma
 msgid "Introduction"
 msgstr "Introducción"
 
-#: admin/svgs-settings-page.php:4 admin/admin-init.php:15
+#: admin/admin-init.php:15 admin/svgs-settings-page.php:4
 msgid "SVG Support Settings and Usage"
 msgstr "Ajustes y uso de SVG Support"
 
