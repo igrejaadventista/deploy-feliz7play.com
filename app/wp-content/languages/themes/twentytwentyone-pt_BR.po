@@ -28,45 +28,45 @@ msgstr "<span class=\"nav-short\">Posts</span> mais antigos"
 msgid "Newer <span class=\"nav-short\">posts</span>"
 msgstr "<span class=\"nav-short\">Posts</span> mais recentes"
 
-#: classes/class-twenty-twenty-one-dark-mode.php:189
-#: classes/class-twenty-twenty-one-customize-notice-control.php:42
+#: classes/class-twenty-twenty-one-customize-notice-control.php:40
+#: classes/class-twenty-twenty-one-dark-mode.php:178
 msgid "https://wordpress.org/support/article/twenty-twenty-one/#dark-mode-support"
 msgstr "https://wordpress.org/support/article/twenty-twenty-one/#dark-mode-support"
 
 #. translators: %s: Twenty Twenty-One support article URL.
-#: classes/class-twenty-twenty-one-dark-mode.php:188
+#: classes/class-twenty-twenty-one-dark-mode.php:177
 msgid "Dark Mode is a device setting. If a visitor to your site requests it, your site will be shown with a dark background and light text. <a href=\"%s\">Learn more about Dark Mode.</a>"
 msgstr "O modo escuro é uma configuração do dispositivo. Se um visitante do seu site solicitar isso, seu site será exibido com um fundo escuro e um texto claro. <a href=\"%s\">Saiba mais sobre o modo escuro.</a>"
 
-#: classes/class-twenty-twenty-one-dark-mode.php:192
+#: classes/class-twenty-twenty-one-dark-mode.php:181
 msgid "Dark Mode can also be turned on and off with a button that you can find in the bottom right corner of the page."
 msgstr "O modo escuro também pode ser ativado ou desativado com um botão que você pode encontrar no canto inferior direito da página."
 
-#: classes/class-twenty-twenty-one-dark-mode.php:408
+#: classes/class-twenty-twenty-one-dark-mode.php:380
 msgid "This website uses LocalStorage to save the setting when Dark Mode support is turned on or off.<br> LocalStorage is necessary for the setting to work and is only used when a user clicks on the Dark Mode button.<br> No data is saved in the database or transferred."
 msgstr "Este site usa o LocalStorage para salvar a configuração quando o suporte ao modo escuro é ligado ou desligado.<br>O LocalStorage é necessário para que a configuração funcione e só é usado quando o usuário clica no botão Modo escuro.<br>Nenhum dado é salvo no banco de dados ou transferido."
 
-#: classes/class-twenty-twenty-one-dark-mode.php:407
+#: classes/class-twenty-twenty-one-dark-mode.php:379
 msgid "Suggested text:"
 msgstr "Texto sugerido:"
 
-#: classes/class-twenty-twenty-one-dark-mode.php:406
+#: classes/class-twenty-twenty-one-dark-mode.php:378
 msgid "Twenty Twenty-One uses LocalStorage when Dark Mode support is enabled."
 msgstr "Twenty Twenty-One utiliza o LocalStorage quando o suporte do modo escuro está ativo."
 
-#: classes/class-twenty-twenty-one-dark-mode.php:199
+#: classes/class-twenty-twenty-one-dark-mode.php:188
 msgid "Dark Mode support"
 msgstr "Suporte ao modo escuro"
 
-#: classes/class-twenty-twenty-one-customize-notice-control.php:43
+#: classes/class-twenty-twenty-one-customize-notice-control.php:41
 msgid "Learn more about Dark Mode."
 msgstr "Saiba mais sobre o Modo escuro."
 
-#: classes/class-twenty-twenty-one-customize-notice-control.php:41
+#: classes/class-twenty-twenty-one-customize-notice-control.php:39
 msgid "To access the Dark Mode settings, select a light background color."
 msgstr "Para acessar as configurações do modo escuro, selecione uma cor de fundo clara."
 
-#: classes/class-twenty-twenty-one-dark-mode.php:145
+#: classes/class-twenty-twenty-one-dark-mode.php:134
 msgid "Colors & Dark Mode"
 msgstr "Cores e modo escuro"
 
@@ -75,17 +75,17 @@ msgctxt "Label for sticky posts"
 msgid "Featured post"
 msgstr "Post em destaque"
 
-#: inc/template-functions.php:399
+#: inc/template-functions.php:424
 msgctxt "Post password form"
 msgid "Submit"
 msgstr "Enviar"
 
-#: inc/template-functions.php:399
+#: inc/template-functions.php:424
 msgctxt "Post password form"
 msgid "Password"
 msgstr "Senha"
 
-#: inc/template-functions.php:174
+#: inc/template-functions.php:183
 msgctxt "Added to posts and pages that are missing titles"
 msgid "Untitled"
 msgstr "Sem título"
@@ -110,20 +110,25 @@ msgctxt "Block pattern sample content"
 msgid "example@example.com"
 msgstr "exemplo@exemplo.com.br"
 
-#: classes/class-twenty-twenty-one-customize.php:143
+#: classes/class-twenty-twenty-one-customize.php:138
 msgctxt "Customizer control"
 msgid "Background color"
 msgstr "Cor de fundo"
 
+#. translators: %s: WordPress Version.
+#. translators: %s: WordPress Version.
 #. translators: %s: WordPress Version.
 #: inc/back-compat.php:42 inc/back-compat.php:61 inc/back-compat.php:86
 msgid "This theme requires WordPress 5.3 or newer. You are running version %s. Please upgrade."
 msgstr "Este tema requer o WordPress 5.3 ou mais recente. Você está executando a versão %s, é necessário atualizar."
 
 #. translators: %: Page number.
+#. translators: %: Page number.
+#. translators: %: Page number.
+#. translators: %: Page number.
+#: image.php:48 template-parts/content/content-page.php:36
+#: template-parts/content/content-single.php:30
 #: template-parts/content/content.php:36
-#: template-parts/content/content-page.php:36
-#: template-parts/content/content-single.php:30 image.php:46
 msgid "Page %"
 msgstr "Página %"
 
@@ -178,24 +183,24 @@ msgstr[1] "%s comentários"
 msgid "1 comment"
 msgstr "1 comentário"
 
-#: classes/class-twenty-twenty-one-dark-mode.php:358
+#: classes/class-twenty-twenty-one-dark-mode.php:334
 msgid "On"
 msgstr "Ligado"
 
-#: classes/class-twenty-twenty-one-dark-mode.php:355
+#: classes/class-twenty-twenty-one-dark-mode.php:331
 msgid "Off"
 msgstr "Desligado"
 
 #. translators: %s: On/Off
-#: classes/class-twenty-twenty-one-dark-mode.php:345
+#: classes/class-twenty-twenty-one-dark-mode.php:321
 msgid "Dark Mode: %s"
 msgstr "Modo escuro: %s"
 
-#: inc/template-functions.php:397
+#: inc/template-functions.php:422
 msgid "This content is password protected. Please enter a password to view."
 msgstr "Este conteúdo é protegido por senha. Digite a senha para ver."
 
-#: inc/menu-functions.php:35
+#: inc/menu-functions.php:34
 msgid "Open menu"
 msgstr "Abrir menu"
 
@@ -216,7 +221,7 @@ msgstr "&#8220;Daffodils&#8221; de Berthe Morisot"
 msgid "&#8220;Roses Trémières&#8221; by Berthe Morisot"
 msgstr "&#8220;Roses Trémières&#8221; por Berthe Morisot"
 
-#: inc/template-functions.php:399
+#: inc/template-functions.php:424
 msgctxt "Post password form"
 msgid "Enter"
 msgstr "Entrar"
@@ -330,15 +335,15 @@ msgid "&#8220;Playing in the Sand&#8221; by Berthe Morisot"
 msgstr "&#8220;Brincando na areia&#8221; de Berthe Morisot"
 
 #. translators: %s: Parent post.
-#: image.php:59
+#: image.php:61
 msgid "Published in %s"
 msgstr "Publicado em %s"
 
-#: classes/class-twenty-twenty-one-customize.php:113
+#: classes/class-twenty-twenty-one-customize.php:108
 msgid "Summary"
 msgstr "Resumo"
 
-#: classes/class-twenty-twenty-one-customize.php:90
+#: classes/class-twenty-twenty-one-customize.php:85
 msgid "Excerpt Settings"
 msgstr "Configurações do resumo"
 
@@ -346,7 +351,7 @@ msgstr "Configurações do resumo"
 msgid "Thick"
 msgstr "Grosso"
 
-#: classes/class-twenty-twenty-one-customize.php:111
+#: classes/class-twenty-twenty-one-customize.php:106
 msgid "On Archive Pages, posts show:"
 msgstr "Nas páginas de arquivo, os posts mostram:"
 
@@ -356,7 +361,8 @@ msgid "View all of %s's posts."
 msgstr "Ver todos os posts de %s."
 
 #. translators: %s: Author name.
-#: template-parts/post/author-bio.php:19 inc/template-tags.php:49
+#. translators: %s: Author name.
+#: inc/template-tags.php:49 template-parts/post/author-bio.php:19
 msgid "By %s"
 msgstr "Por %s"
 
@@ -403,20 +409,26 @@ msgstr[0] "Foi encontrado %d resultado para a sua pesquisa."
 msgstr[1] "Foi encontrados %d resultados para a sua pesquisa."
 
 #. translators: %s: Search term.
-#: template-parts/content/content-none.php:22 search.php:21
+#. translators: %s: Search term.
+#: search.php:21 template-parts/content/content-none.php:22
 msgid "Results for \"%s\""
 msgstr "Resultados para \"%s\""
 
+#. translators: %s: List of tags.
 #. translators: %s: List of tags.
 #: inc/template-tags.php:118 inc/template-tags.php:162
 msgid "Tagged %s"
 msgstr "Marcado com %s"
 
 #. translators: %s: List of categories.
+#. translators: %s: List of categories.
 #: inc/template-tags.php:108 inc/template-tags.php:152
 msgid "Categorized as %s"
 msgstr "Categorizado como %s"
 
+#. translators: Used between list items, there is a space after the comma.
+#. translators: Used between list items, there is a space after the comma.
+#. translators: Used between list items, there is a space after the comma.
 #. translators: Used between list items, there is a space after the comma.
 #: inc/template-tags.php:104 inc/template-tags.php:114
 #: inc/template-tags.php:148 inc/template-tags.php:158
@@ -424,13 +436,17 @@ msgid ", "
 msgstr ", "
 
 #. translators: %s: Name of current post. Only visible to screen readers.
-#: template-parts/content/content-page.php:48 image.php:68 image.php:93
-#: inc/template-tags.php:92 inc/template-tags.php:135
+#. translators: %s: Name of current post. Only visible to screen readers.
+#. translators: %s: Name of current post. Only visible to screen readers.
+#. translators: %s: Name of current post. Only visible to screen readers.
+#. translators: %s: Name of current post. Only visible to screen readers.
+#: image.php:70 image.php:95 inc/template-tags.php:92 inc/template-tags.php:135
+#: template-parts/content/content-page.php:48
 msgid "Edit %s"
 msgstr "Editar %s"
 
 #. translators: %s: Name of current post.
-#: inc/template-functions.php:132
+#: inc/template-functions.php:138
 msgid "Continue reading %s"
 msgstr "Continuar lendo %s"
 
@@ -542,7 +558,7 @@ msgstr "Um novo tema padrão de portfólio para WordPress"
 msgid "Large text"
 msgstr "Texto longo"
 
-#: image.php:81
+#: image.php:83
 msgctxt "Used before full size attachment link."
 msgid "Full size"
 msgstr "Tamanho completo"
@@ -552,10 +568,10 @@ msgstr "Tamanho completo"
 msgid "Published %s"
 msgstr "%s publicado"
 
-#: template-parts/content/content.php:33
+#: comments.php:62 image.php:45 inc/template-tags.php:228
 #: template-parts/content/content-page.php:33
-#: template-parts/content/content-single.php:27 comments.php:62 image.php:43
-#: inc/template-tags.php:228
+#: template-parts/content/content-single.php:27
+#: template-parts/content/content.php:33
 msgid "Page"
 msgstr "Página"
 
@@ -567,8 +583,8 @@ msgstr "Fechar"
 msgid "Menu"
 msgstr "Menu"
 
-#: template-parts/header/site-nav.php:13 functions.php:76
-#: inc/starter-content.php:154
+#: functions.php:76 inc/starter-content.php:154
+#: template-parts/header/site-nav.php:13
 msgid "Primary menu"
 msgstr "Menu primário"
 
@@ -689,7 +705,7 @@ msgstr "Extra pequeno"
 msgid "Proudly powered by %s."
 msgstr "Orgulhosamente desenvolvido com %s."
 
-#: functions.php:77 inc/starter-content.php:165 footer.php:24
+#: footer.php:24 functions.php:77 inc/starter-content.php:165
 msgid "Secondary menu"
 msgstr "Menu secundário"
 
@@ -705,11 +721,11 @@ msgstr "Comentários mais recentes"
 msgid "Older comments"
 msgstr "Comentários mais antigos"
 
-#: classes/class-twenty-twenty-one-customize.php:114
+#: classes/class-twenty-twenty-one-customize.php:109
 msgid "Full text"
 msgstr "Texto completo"
 
-#: classes/class-twenty-twenty-one-customize.php:80
+#: classes/class-twenty-twenty-one-customize.php:75
 msgid "Display Site Title & Tagline"
 msgstr "Exibir o título do site e descrição"
 
@@ -717,7 +733,7 @@ msgstr "Exibir o título do site e descrição"
 msgid "It looks like nothing was found at this location. Maybe try a search?"
 msgstr "Parece que nada foi encontrado neste local. Que tal tentar uma pesquisa?"
 
-#: template-parts/content/content-none.php:30 404.php:16
+#: 404.php:16 template-parts/content/content-none.php:30
 msgid "Nothing here"
 msgstr "Nada aqui"
 
