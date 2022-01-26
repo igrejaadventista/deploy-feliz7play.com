@@ -436,13 +436,22 @@
        
         switch ($field_name) {
             case 'seasons':
-                $items = get_terms( 'collection', array('hide_empty' => 0, 'parent' => $id));
+                $items = get_terms( 'collection', 
+                    array(
+                        'hide_empty' => 0,
+                        'parent' => $id,
+                        'meta_key'       => 'collection_enable',
+                        'meta_value'     => true,
+                        'meta_compare'   => '='
+                        )
+                    );
 
                 foreach ($items as $key => $item) {
                     $link = 'collection/' . $collection['slug'] . '/' . $item->slug . '?s=' . $item->term_id; 
                     $items[$key]->link_sharing = get_site_url(null, $link);
                     $items[$key]->collection_image = get_field('collection_image', 'collection_' . $item->term_id)['url'];
                     $items[$key]->collection_season_label = get_field('collection_season_label', 'collection_' . $item->term_id);
+                    $items[$key]->enable = get_field('collection_enable', 'collection_' . $item->term_id);
                 }
 
                 return $items;
