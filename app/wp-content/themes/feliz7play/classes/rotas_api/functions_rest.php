@@ -452,7 +452,7 @@
                     $items[$key]->collection_image = get_field('collection_image', 'collection_' . $item->term_id)['url'];
                     $items[$key]->enable = get_field('collection_enable', 'collection_' . $item->term_id);
                     $season_label = get_field('collection_season_label', 'collection_' . $item->term_id);
-                    $items[$key]->season_label = $season_label != "" && !is_null($season_label) ? $season_label : false;
+                    $items[$key]->season_label = $season_label != "" && !is_null($season_label) ? $season_label : $item->name;
                 }
 
                 return $items;
