@@ -427,6 +427,17 @@
                 'schema'            => null,
             )
         );
+
+        register_rest_field( 'collection',
+          'name',
+            array(
+                'get_callback'      => 'collection_meta_callback',
+                'update_callback'   => null,
+                'schema'            => null,
+            )
+        );
+
+
     }
 
     function collection_meta_callback( $collection, $field_name, $request) {
@@ -468,6 +479,13 @@
             case 'link_sharing':                
                 $link = 'collection/' . $collection['slug'] . '?c=' . $id;
                 $values =    get_site_url(null, $link);
+
+            break;
+
+            case 'name': 
+                
+                $season_label = get_field('collection_season_label', 'collection_' . $id);
+                $values = $season_label != "" && !is_null($season_label) ? $season_label : $collection['name'];
 
             break;
         }
