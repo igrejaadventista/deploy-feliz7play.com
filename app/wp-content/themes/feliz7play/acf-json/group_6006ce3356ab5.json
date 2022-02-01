@@ -26,7 +26,7 @@
             "label": "Seasons",
             "name": "seasons",
             "type": "true_false",
-            "instructions": "",
+            "instructions": "Esse campo deve ser ativado SOMENTE caso esta collection seja PAI de outras collection. NÃO deve ser marcado quando esta collection fot FILHA de outra collection.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -45,7 +45,7 @@
             "label": "Season Label",
             "name": "collection_season_label",
             "type": "text",
-            "instructions": "",
+            "instructions": "Essa campo serve para especificar um nome para essa collection exemplo: Temporada 1, Adoradores 3 Provai e vede 2022, etc",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -367,5 +367,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1630602497
+    "modified": 1643729429
 }
