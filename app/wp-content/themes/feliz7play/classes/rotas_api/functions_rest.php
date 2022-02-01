@@ -429,7 +429,7 @@
         );
 
         register_rest_field( 'collection',
-          'name',
+          'season_label',
             array(
                 'get_callback'      => 'collection_meta_callback',
                 'update_callback'   => null,
@@ -482,7 +482,7 @@
 
             break;
 
-            case 'name': 
+            case 'season_label': 
                 
                 $season_label = get_field('collection_season_label', 'collection_' . $id);
                 $values = $season_label != "" && !is_null($season_label) ? $season_label : $collection['name'];
