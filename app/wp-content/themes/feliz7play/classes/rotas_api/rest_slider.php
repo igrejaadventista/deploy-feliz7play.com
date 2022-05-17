@@ -1,22 +1,23 @@
 <?php
-  
-add_action( 'rest_api_init', function(){
-	register_rest_route( 'wp/v3', '/slider', array(
-	'methods' => 'GET',
-	'callback' => 'get_page_option',
+
+add_action('rest_api_init', function () {
+	register_rest_route('wp/v3', '/slider', array(
+		'methods' => 'GET',
+		'callback' => 'get_page_option',
 	));
 });
 
-function get_page_option($data) {
-	
+function get_page_option($data)
+{
+
 	$sliders = array();
 
 	$itens = get_field('sliders', 'option');
 
-	foreach($itens as $item){
+	foreach ($itens as $item) {
 
 		$item = $item['slider_object'];
-		
+
 		$type = get_field('slider_type', $item->ID);
 
 		switch ($type) {
@@ -28,27 +29,24 @@ function get_page_option($data) {
 				$slider_tablet = get_field('slider_tablet_image', $item->ID)['url'];
 				$slider_mobile = get_field('slider_mobile_image', $item->ID)['url'];
 
-				if($source == 'video'){
+				if ($source == 'video') {
 
-					$target = get_field('slider_video_object', $item->ID)->ID;	
-
+					$target = get_field('slider_video_object', $item->ID)->ID;
+					$description = get_field('post_blurb',  $target);
 					$slug = get_post_field('post_name', get_field('slider_video_object', $item->ID));
 					$post_video_lenght = get_field('post_video_lenght', $target);
 					$video_quality = get_field('post_video_quality', $target);
 					$season = false;
 					$video_year = get_field('post_year', $target);
 					$rating = get_field('Rating', $target);
-					$genre = get_the_terms( $target, 'genre')[0]->name;
+					$genre = get_the_terms($target, 'genre')[0]->name;
 
 					$video_host =           get_field('post_video_host', $target);
-					$video_id =             get_field('post_video_id', $target);	
-
-					
-
-				}else {
+					$video_id =             get_field('post_video_id', $target);
+				} else {
 
 					$target = get_field('to_collection', $item->ID)->term_id;
-
+					$description = term_description($target);
 					$slug = get_field('to_collection', $item->ID)->slug;
 					$post_video_lenght = false;
 					$video_quality = false;
@@ -59,8 +57,9 @@ function get_page_option($data) {
 					$collection_father = get_field('to_collection', $item->ID)->parent ? get_term(get_field('to_collection', $item->ID)->parent)->slug : false;
 					$video_host =  get_field('collection_video_host', 'term_' . $target);
 					$video_id =    get_field('collection_video_id', 'term_' . $target);
-
 				}
+
+
 
 				$slider = array(
 					'id' => $item->ID,
@@ -70,12 +69,12 @@ function get_page_option($data) {
 					'source' => $source,
 					'target' => $target,
 					'logo' => $logo,
-
+					'description' => $description,
 					'target' => $target,
 					'video_lenght' => $post_video_lenght,
 					'rating' => $rating,
-					'video_quality'=> $video_quality,
-					'video_year'=> $video_year,
+					'video_quality' => $video_quality,
+					'video_year' => $video_year,
 					'video_host' => $video_host,
 					'video_id' => $video_id,
 					'genre' => $genre,
@@ -87,10 +86,10 @@ function get_page_option($data) {
 					'slider_mobile' => $slider_mobile
 
 				);
-				
+
 				array_push($sliders, $slider);
-			break;
-			
+				break;
+
 			case 'custom':
 
 				$title = $item->post_title;
@@ -102,7 +101,7 @@ function get_page_option($data) {
 				$slider_desktop = get_field('slider_desktop_image', $item->ID)['url'];
 				$slider_tablet = get_field('slider_tablet_image', $item->ID)['url'];
 				$slider_mobile = get_field('slider_mobile_image', $item->ID)['url'];
-				
+
 				$slider = array(
 					'id' => $item->ID,
 					'title' => $title,
@@ -113,17 +112,12 @@ function get_page_option($data) {
 					'slider_desktop' =>	$slider_desktop,
 					'slider_tablet'	=> $slider_tablet,
 					'slider_mobile' => $slider_mobile
-					
+
 				);
 
 				array_push($sliders, $slider);
-			break;
-			
+				break;
 		}
-
-		
-
 	}
-	return new WP_REST_Response($sliders, 200 );
+	return new WP_REST_Response($sliders, 200);
 }
-
