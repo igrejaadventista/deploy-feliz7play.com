@@ -8,7 +8,7 @@
  *
  * Este arquivo contém as seguintes configurações:
  *
- * * Configurações do MySQL
+ * * Configurações do banco de dados
  * * Chaves secretas
  * * Prefixo do banco de dados
  * * ABSPATH
@@ -18,7 +18,7 @@
  * @package WordPress
  */
 
-// ** Configurações do MySQL - Você pode pegar estas informações com o serviço de hospedagem ** //
+// ** Configurações do banco de dados - Você pode pegar estas informações com o serviço de hospedagem ** //
 /** O nome do banco de dados do WordPress */
 define( 'DB_NAME', 'nome_do_banco_de_dados_aqui' );
 
@@ -83,6 +83,10 @@ $table_prefix = 'wp_';
  * @link https://wordpress.org/support/article/debugging-in-wordpress/
  */
 define( 'WP_DEBUG', false );
+
+/* Adicione valores personalizados entre esta linha até "Isto é tudo". */
+
+
 
 /* Isto é tudo, pode parar de editar! :) */
 
