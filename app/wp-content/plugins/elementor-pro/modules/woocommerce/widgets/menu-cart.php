@@ -58,7 +58,8 @@ class Menu_Cart extends Base_Widget {
 					'bag-solid' => esc_html__( 'Bag', 'elementor-pro' ) . ' ' . esc_html__( 'Solid', 'elementor-pro' ),
 				],
 				'default' => 'cart-medium',
-				'prefix_class' => 'toggle-icon--',
+				'prefix_class' => 'toggle-icon--', // Prefix class not used anymore, but kept for BC reasons.
+				'render_type' => 'template',
 			]
 		);
 
@@ -1407,6 +1408,34 @@ class Menu_Cart extends Base_Widget {
 		$this->end_controls_tabs();
 
 		$this->add_control(
+			'heading_product_variations_style',
+			[
+				'type' => Controls_Manager::HEADING,
+				'label' => esc_html__( 'Variations', 'elementor-pro' ),
+				'separator' => 'before',
+			]
+		);
+
+		$this->add_control(
+			'product_variations_color',
+			[
+				'label' => esc_html__( 'Color', 'elementor-pro' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}}' => '--product-variations-color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			[
+				'name' => 'product_variations_typography',
+				'selector' => '{{WRAPPER}} .elementor-menu-cart__product .variation',
+			]
+		);
+
+		$this->add_control(
 			'heading_product_price_style',
 			[
 				'type' => Controls_Manager::HEADING,
@@ -1583,8 +1612,8 @@ class Menu_Cart extends Base_Widget {
 					'{{WRAPPER}}' => '{{VALUE}}',
 				],
 				'selectors_dictionary' => [
-					'inline' => '--cart-footer-layout: 1fr 1fr;',
-					'stacked' => '--cart-footer-layout: 1fr;',
+					'inline' => '--cart-footer-layout: 1fr 1fr; --products-max-height-sidecart: calc(100vh - 240px); --products-max-height-minicart: calc(100vh - 385px)',
+					'stacked' => '--cart-footer-layout: 1fr; --products-max-height-sidecart: calc(100vh - 300px); --products-max-height-minicart: calc(100vh - 450px)',
 				],
 			]
 		);
@@ -2075,9 +2104,15 @@ class Menu_Cart extends Base_Widget {
 	}
 
 	protected function render() {
+		$settings = $this->get_settings_for_display();
+
 		$this->maybe_use_mini_cart_template();
-		Module::render_menu_cart();
+		Module::render_menu_cart( $settings );
 	}
 
 	public function render_plain_content() {}
+
+	public function get_group_name() {
+		return 'woocommerce';
+	}
 }

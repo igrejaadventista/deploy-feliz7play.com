@@ -50,7 +50,7 @@ class Notice_Bar extends Base_Notice_Bar {
 				'message' => esc_html__( 'Renew Elementor Pro and enjoy updates, support and Pro templates for another year.', 'elementor-pro' ),
 				'action_title' => esc_html__( 'Renew Now', 'elementor-pro' ),
 				'action_url' => 'https://go.elementor.com/editor-notice-bar-renew/',
-				'muted_period' => 30,
+				'muted_period' => 0,
 			];
 		}
 
@@ -62,6 +62,11 @@ class Notice_Bar extends Base_Notice_Bar {
 				'action_url' => $license_admin->get_connect_url( [
 					'mode' => 'popup',
 					'callback_id' => 'editor-pro-activate',
+
+					// UTM
+					'utm_source' => 'editor-notice-bar',
+					'utm_medium' => 'wp-dash',
+					'utm_campaign' => 'connect-and-activate-license',
 				] ),
 				'muted_period' => 0,
 			];
@@ -82,7 +87,7 @@ class Notice_Bar extends Base_Notice_Bar {
 			'message' => $message,
 			'action_title' => esc_html__( 'Renew Now', 'elementor-pro' ),
 			'action_url' => 'https://go.elementor.com/editor-notice-bar-renew/',
-			'muted_period' => 10,
+			'muted_period' => 1,
 		];
 	}
 }

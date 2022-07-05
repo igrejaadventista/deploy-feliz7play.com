@@ -19,6 +19,7 @@ final class Modules_Manager {
 			'query-control',
 			'custom-attributes',
 			'custom-css',
+			'page-transitions',
 			// role-manager Must be before Global Widget
 			'role-manager',
 			'global-widget',
@@ -29,6 +30,7 @@ final class Modules_Manager {
 			'screenshots',
 			'compatibility-tag',
 			'admin-top-bar',
+			'notes',
 
 			// Modules with Widgets.
 			'theme-builder',
@@ -48,6 +50,7 @@ final class Modules_Manager {
 			'share-buttons',
 			'theme-elements',
 			'blockquote',
+			'custom-code',
 			'woocommerce',
 			'social',
 			'library',
@@ -57,7 +60,6 @@ final class Modules_Manager {
 			'wp-cli',
 			'lottie',
 			'code-highlight',
-			'custom-code',
 			'video-playlist',
 			'payments',
 			'progress-tracker',

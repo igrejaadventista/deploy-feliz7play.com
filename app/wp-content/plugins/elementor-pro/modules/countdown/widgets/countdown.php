@@ -6,6 +6,7 @@ use Elementor\Core\Kits\Documents\Tabs\Global_Colors;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Typography;
+use Elementor\Group_Control_Text_Stroke;
 use Elementor\Utils;
 use ElementorPro\Base\Base_Widget;
 use ElementorPro\Plugin;
@@ -77,6 +78,9 @@ class Countdown extends Base_Widget {
 				'condition' => [
 					'countdown_type' => 'evergreen',
 				],
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
@@ -89,6 +93,9 @@ class Countdown extends Base_Widget {
 				'placeholder' => esc_html__( 'Minutes', 'elementor-pro' ),
 				'condition' => [
 					'countdown_type' => 'evergreen',
+				],
+				'dynamic' => [
+					'active' => true,
 				],
 			]
 		);
@@ -186,6 +193,9 @@ class Countdown extends Base_Widget {
 					'custom_labels!' => '',
 					'show_days' => 'yes',
 				],
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
@@ -200,6 +210,9 @@ class Countdown extends Base_Widget {
 					'show_labels!' => '',
 					'custom_labels!' => '',
 					'show_hours' => 'yes',
+				],
+				'dynamic' => [
+					'active' => true,
 				],
 			]
 		);
@@ -216,6 +229,9 @@ class Countdown extends Base_Widget {
 					'custom_labels!' => '',
 					'show_minutes' => 'yes',
 				],
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
@@ -230,6 +246,9 @@ class Countdown extends Base_Widget {
 					'show_labels!' => '',
 					'custom_labels!' => '',
 					'show_seconds' => 'yes',
+				],
+				'dynamic' => [
+					'active' => true,
 				],
 			]
 		);
@@ -462,6 +481,14 @@ class Countdown extends Base_Widget {
 				'global' => [
 					'default' => Global_Typography::TYPOGRAPHY_SECONDARY,
 				],
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Text_Stroke::get_type(),
+			[
+				'name' => 'text_stroke',
+				'selector' => '{{WRAPPER}} .elementor-countdown-label',
 			]
 		);
 

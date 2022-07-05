@@ -199,6 +199,9 @@ class Post_Info extends Base {
 				'condition' => [
 					'type!' => 'custom',
 				],
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
@@ -1023,5 +1026,9 @@ class Post_Info extends Base {
 			<?php echo $items_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</ul>
 		<?php
+	}
+
+	public function get_group_name() {
+		return 'theme-elements';
 	}
 }
