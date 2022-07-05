@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Admin extends App {
+	const USAGE_PARAM_INSTALL_TIME = 'install_time_pro';
 
 	/**
 	 * Get module name.
@@ -57,7 +58,7 @@ class Admin extends App {
 			'elementor-pro-admin',
 			ELEMENTOR_PRO_URL . 'assets/js/admin' . $suffix . '.js',
 			[
-				'elementor-common',
+				'elementor-admin',
 			],
 			ELEMENTOR_PRO_VERSION,
 			true
@@ -66,9 +67,13 @@ class Admin extends App {
 		$locale_settings = [];
 
 		/**
-		 * Localize admin settings.
+		 * Localized admin settings.
 		 *
-		 * Filters the admin localized settings.
+		 * Filters the localized settings used in the admin as JavaScript variables.
+		 *
+		 * By default Elementor Pro passes some admin settings to be consumed as JavaScript
+		 * variables. This hook allows developers to add extra settings values to be consumed
+		 * using JavaScript in WordPress admin.
 		 *
 		 * @since 1.0.0
 		 *
@@ -109,6 +114,18 @@ class Admin extends App {
 				$lowercase_version = strtolower( $version );
 				$is_valid_rollback_version = ! preg_match( '/(trunk|beta|rc|dev)/i', $lowercase_version );
 
+				/**
+				 * Is valid rollback version.
+				 *
+				 * Filters whether the version of the rollback is valid or not.
+				 *
+				 * By default Elementor doesn't allow to rollback for trunk/beta/rc/dev versions.
+				 * This hook allows developers to enable a rollback for thise kind of versions by
+				 * returning `true`.
+				 *
+				 * @param bool  $is_valid_rollback_version Whether a rollback version is valid.
+				 * @param array $lowercase_version         A list of previous versions.
+				 */
 				$is_valid_rollback_version = apply_filters(
 					'elementor-pro/settings/tools/rollback/is_valid_rollback_version',
 					$is_valid_rollback_version,
@@ -221,6 +238,14 @@ class Admin extends App {
 
 	public function change_tracker_params( $params ) {
 		unset( $params['is_first_time'] );
+
+		if ( ! isset( $params['events'] ) ) {
+			$params['events'] = [];
+		}
+
+		$params['events'] = array_merge( $params['events'], [
+			self::USAGE_PARAM_INSTALL_TIME => gmdate( 'Y-m-d H:i:s', Plugin::instance()->license_admin->get_installed_time() ),
+		] );
 
 		return $params;
 	}

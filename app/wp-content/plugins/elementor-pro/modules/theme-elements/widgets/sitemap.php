@@ -229,6 +229,9 @@ class Sitemap extends Base {
 			[
 				'label' => esc_html__( 'Title', 'elementor-pro' ),
 				'type' => Controls_Manager::TEXT,
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
@@ -717,6 +720,10 @@ class Sitemap extends Base {
 		}
 
 		return str_replace( $source, $replace, $str );
+	}
+
+	public function get_group_name() {
+		return 'theme-elements';
 	}
 }
 

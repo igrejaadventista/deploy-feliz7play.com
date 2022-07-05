@@ -267,6 +267,16 @@ abstract class Base extends Base_Widget {
 			]
 		);
 
+		$this->add_control(
+			'lazyload',
+			[
+				'label' => esc_html__( 'Lazyload', 'elementor-pro' ),
+				'type' => Controls_Manager::SWITCHER,
+				'separator' => 'before',
+				'frontend_available' => true,
+			]
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -475,9 +485,24 @@ abstract class Base extends Base_Widget {
 		);
 
 		$this->add_control(
-			'pagination_color',
+			'pagination_color_inactive',
 			[
 				'label' => esc_html__( 'Color', 'elementor-pro' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					// The opacity property will override the default inactive dot color which is opacity 0.2.
+					'{{WRAPPER}} .swiper-pagination-bullet:not(.swiper-pagination-bullet-active)' => 'background-color: {{VALUE}}; opacity: 1;',
+				],
+				'condition' => [
+					'pagination!' => '',
+				],
+			]
+		);
+
+		$this->add_control(
+			'pagination_color',
+			[
+				'label' => esc_html__( 'Active Color', 'elementor-pro' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .swiper-pagination-bullet-active, {{WRAPPER}} .swiper-pagination-progressbar-fill' => 'background-color: {{VALUE}}',
@@ -546,6 +571,18 @@ abstract class Base extends Base_Widget {
 		}
 
 		return $image_url;
+	}
+
+	protected function get_slide_image_alt_attribute( $slide ) {
+		if ( ! empty( $slide['name'] ) ) {
+			return $slide['name'];
+		}
+
+		if ( ! empty( $slide['image']['alt'] ) ) {
+			return $slide['image']['alt'];
+		}
+
+		return '';
 	}
 
 	private function render_swiper_button( $type ) {

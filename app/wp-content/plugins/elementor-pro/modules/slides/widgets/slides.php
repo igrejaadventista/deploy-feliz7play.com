@@ -233,6 +233,9 @@ class Slides extends Base_Widget {
 				'type' => Controls_Manager::TEXT,
 				'default' => esc_html__( 'Slide Heading', 'elementor-pro' ),
 				'label_block' => true,
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
@@ -243,6 +246,9 @@ class Slides extends Base_Widget {
 				'type' => Controls_Manager::TEXTAREA,
 				'default' => esc_html__( 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.', 'elementor-pro' ),
 				'show_label' => false,
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
@@ -252,6 +258,9 @@ class Slides extends Base_Widget {
 				'label' => esc_html__( 'Button Text', 'elementor-pro' ),
 				'type' => Controls_Manager::TEXT,
 				'default' => esc_html__( 'Click Here', 'elementor-pro' ),
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
@@ -261,6 +270,9 @@ class Slides extends Base_Widget {
 				'label' => esc_html__( 'Link', 'elementor-pro' ),
 				'type' => Controls_Manager::URL,
 				'placeholder' => esc_html__( 'https://your-link.com', 'elementor-pro' ),
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
@@ -635,6 +647,22 @@ class Slides extends Base_Widget {
 					'fadeInRight' => esc_html__( 'Right', 'elementor-pro' ),
 					'fadeInLeft' => esc_html__( 'Left', 'elementor-pro' ),
 					'zoomIn' => esc_html__( 'Zoom', 'elementor-pro' ),
+				],
+				'assets' => [
+					'styles' => [
+						[
+							'name' => 'e-animations',
+							'conditions' => [
+								'terms' => [
+									[
+										'name' => 'content_animation',
+										'operator' => '!==',
+										'value' => '',
+									],
+								],
+							],
+						],
+					],
 				],
 			]
 		);
@@ -1106,7 +1134,7 @@ class Slides extends Base_Widget {
 		$this->add_control(
 			'heading_style_dots',
 			[
-				'label' => esc_html__( 'Dots', 'elementor-pro' ),
+				'label' => esc_html__( 'Pagination', 'elementor-pro' ),
 				'type' => Controls_Manager::HEADING,
 				'separator' => 'before',
 				'condition' => [
@@ -1118,7 +1146,7 @@ class Slides extends Base_Widget {
 		$this->add_control(
 			'dots_position',
 			[
-				'label' => esc_html__( 'Dots Position', 'elementor-pro' ),
+				'label' => esc_html__( 'Position', 'elementor-pro' ),
 				'type' => Controls_Manager::SELECT,
 				'default' => 'inside',
 				'options' => [
@@ -1135,7 +1163,7 @@ class Slides extends Base_Widget {
 		$this->add_control(
 			'dots_size',
 			[
-				'label' => esc_html__( 'Dots Size', 'elementor-pro' ),
+				'label' => esc_html__( 'Size', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
 				'range' => [
 					'px' => [
@@ -1155,9 +1183,24 @@ class Slides extends Base_Widget {
 		);
 
 		$this->add_control(
+			'dots_color_inactive',
+			[
+				'label' => esc_html__( 'Color', 'elementor-pro' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					// The opacity property will override the default inactive dot color which is opacity 0.2.
+					'{{WRAPPER}} .swiper-pagination-bullet:not(.swiper-pagination-bullet-active)' => 'background-color: {{VALUE}}; opacity: 1;',
+				],
+				'condition' => [
+					'navigation' => [ 'dots', 'both' ],
+				],
+			]
+		);
+
+		$this->add_control(
 			'dots_color',
 			[
-				'label' => esc_html__( 'Dots Color', 'elementor-pro' ),
+				'label' => esc_html__( 'Active Color', 'elementor-pro' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .swiper-pagination-bullet-active' => 'background-color: {{VALUE}};',
@@ -1172,7 +1215,7 @@ class Slides extends Base_Widget {
 	}
 
 	protected function render() {
-		$settings = $this->get_settings();
+		$settings = $this->get_settings_for_display();
 
 		if ( empty( $settings['slides'] ) ) {
 			return;
@@ -1248,7 +1291,7 @@ class Slides extends Base_Widget {
 		$slides_count = count( $settings['slides'] );
 		?>
 		<div class="elementor-swiper">
-			<div class="elementor-slides-wrapper elementor-main-swiper swiper-container" dir="<?php Utils::print_unescaped_internal_string( $direction ); ?>" data-animation="<?php $this->print_render_attribute_string( $settings['content_animation'] ); ?>">
+			<div class="elementor-slides-wrapper elementor-main-swiper swiper-container" dir="<?php Utils::print_unescaped_internal_string( $direction ); ?>" data-animation="<?php echo esc_attr( $settings['content_animation'] ); ?>">
 				<div class="swiper-wrapper elementor-slides">
 					<?php // PHPCS - Slides for each is safe. ?>
 					<?php echo implode( '', $slides ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

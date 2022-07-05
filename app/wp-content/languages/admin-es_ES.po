@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the WordPress - 5.8.x - Administration package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2021-12-06 11:27:32+0000\n"
+"PO-Revision-Date: 2022-02-22 09:13:50+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2639,7 +2639,7 @@ msgstr "Ten en cuenta que, incluso cuando está establecido que se disuada a los
 
 #: wp-admin/options-reading.php:44
 msgid "You can choose whether or not your site will be crawled by robots, ping services, and spiders. If you want those services to ignore your site, click the checkbox next to &#8220;Discourage search engines from indexing this site&#8221; and click the Save Changes button at the bottom of the screen."
-msgstr "Puedes elegir si tu sitio será rastreado o no por robots, servicios de ping y arañas. Si quieres que esos servicios ignoren tu sitio, marca la casilla de verificación junto a «Disuadir a los motores de búsqueda de indexar este sitio» y haz clic en el botón «Guardar cambios» en la parte inferior de la pantalla."
+msgstr "Puedes elegir si tu sitio será rastreado o no por robots, servicios de ping y arañas. Si quieres que esos servicios ignoren tu sitio, marca la casilla de verificación junto a «Pedir a los motores de búsqueda que no indexen este sitio» y haz clic en el botón «Guardar cambios» en la parte inferior de la pantalla."
 
 #: wp-admin/options-reading.php:34 wp-admin/options-reading.php:171
 msgid "https://wordpress.org/support/article/wordpress-feeds/"
@@ -4240,7 +4240,7 @@ msgstr "Nota: ninguna de estas opciones bloquea el acceso a tu sitio &mdash; dep
 #: wp-admin/install.php:192 wp-admin/install.php:200
 #: wp-admin/options-reading.php:185 wp-admin/options-reading.php:205
 msgid "Discourage search engines from indexing this site"
-msgstr "Disuadir a los motores de búsqueda de indexar este sitio"
+msgstr "Pedir a los motores de búsqueda que no indexen este sitio"
 
 #: wp-admin/install.php:190 wp-admin/options-reading.php:183
 msgid "Allow search engines to index this site"

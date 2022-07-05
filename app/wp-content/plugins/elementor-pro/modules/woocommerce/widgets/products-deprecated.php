@@ -11,6 +11,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+/**
+ * Class Products_Deprecated
+ *
+ * @deprecated 2.4.1 use Products
+ */
 class Products_Deprecated extends Products_Base {
 
 	/**
@@ -266,4 +271,8 @@ class Products_Deprecated extends Products_Base {
 	}
 
 	public function render_plain_content() {}
+
+	public function get_group_name() {
+		return 'woocommerce';
+	}
 }
