@@ -18,20 +18,20 @@
  * @package WordPress
  */
 
-$is_dev = $_SERVER['SERVER_NAME'] == 'localhost';
+//$is_dev = false;
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', $is_dev ? 'feliz7play' : $_ENV['WP_DB_NAME']);
+define( 'DB_NAME', $_ENV['WP_DB_NAME']);
 
 /** MySQL database username */
-define( 'DB_USER', $is_dev ? 'root' : $_ENV['WP_DB_USER']);
+define( 'DB_USER', $_ENV['WP_DB_USER']);
 
 /** MySQL database password */
-define( 'DB_PASSWORD', $is_dev ? 'root' : $_ENV['WP_DB_PASSWORD']);
+define( 'DB_PASSWORD', $_ENV['WP_DB_PASSWORD']);
 
 /** MySQL hostname */
-define( 'DB_HOST', $is_dev ? 'feliz7play_db' : $_ENV['WP_DB_HOST']);
+define( 'DB_HOST', $_ENV['WP_DB_HOST'] . ':3306');
 
 /** Database Charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8mb4' );
