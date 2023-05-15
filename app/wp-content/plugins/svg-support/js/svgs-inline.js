@@ -1,94 +1,64 @@
-// wait for document to be ready
-document.addEventListener("DOMContentLoaded", function(event) {
+jQuery(document).ready(function ($) {
 
 	let bodhisvgsReplacements = 0;
 
 	function bodhisvgsReplace(img) {
 
-		// must be an image
-		if( img.nodeName !== 'IMG' ){
+		var imgID = img.attr('id');
+		var imgClass = img.attr('class');
+		var imgURL = img.attr('src');
+
+		// Set svg size to the original img size
+		// var imgWidth = $img.attr('width');
+		// var imgHeight = $img.attr('height');
+
+		if (!imgURL.endsWith('svg')) {
 			return;
 		}
 
-		var imgID = img.id;
-		var imgClass = img.classList;
-		var imgURL = img.src;
+		$.get(imgURL, function(data) {
 
-		// must be svg
-		if( !imgURL.endsWith('svg') ){
-			return;
-		}
+			// Get the SVG tag, ignore the rest
+			var $svg = $(data).find('svg');
 
-		var xmlHttp = new XMLHttpRequest();
-		xmlHttp.onreadystatechange = function() {
+			var svgID = $svg.attr('id');
 
-			if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
-
-				data = xmlHttp.responseText;
-
-				let parser = new DOMParser();
-				const doc = parser.parseFromString(data, 'text/html');
-
-				// get svg now
-				var svg = doc.getElementsByTagName('svg')[0];
-
-				var svgID = svg.id;
-
-				// Add replaced image's ID to the new SVG if necessary
-				if( typeof imgID === 'undefined' ){
-					if( typeof svgID === 'undefined' ) {
-						imgID = 'svg-replaced-'+bodhisvgsReplacements;
-						svg.setAttribute('id', imgID);
-					} else {
-						imgID = svgID;
-					}
+			// Add replaced image's ID to the new SVG if necessary
+			if(typeof imgID === 'undefined') {
+				if(typeof svgID === 'undefined') {
+					imgID = 'svg-replaced-'+bodhisvgsReplacements;
+					$svg = $svg.attr('id', imgID);
 				} else {
-					svg.setAttribute('id', imgID);
+					imgID = svgID;
 				}
-
-				// Add replaced image's classes to the new SVG
-				if(typeof imgClass !== 'undefined') {
-					svg.setAttribute('class', imgClass+' replaced-svg svg-replaced-'+bodhisvgsReplacements);
-				}
-
-				// Remove any invalid XML tags as per http://validator.w3.org
-				svg.removeAttribute('xmlns:a');
-
-				// Replace image with new SVG
-				img.replaceWith(svg);
-
-				bodhisvgsReplacements++;
-
+			} else {
+				$svg = $svg.attr('id', imgID);
 			}
 
-		}
-
-		xmlHttp.open("GET", imgURL, false);
-		xmlHttp.send(null);
-
-	}
-
-	function bodhisvgsIterator(node) {
-
-		if( node.childNodes.length > 0 ){
-
-			for (var i = 0; i < node.childNodes.length; i++) {
-
-				if( node.childNodes[i].nodeName == 'IMG' ){
-
-					// its an image... replace it too
-					var img = node.childNodes[i];
-					bodhisvgsReplace(img);
-
-				}else{
-
-					// go to another level
-					bodhisvgsIterator(node.childNodes[i]);
-
-				}
+			// Add replaced image's classes to the new SVG
+			if(typeof imgClass !== 'undefined') {
+				$svg = $svg.attr('class', imgClass+' replaced-svg svg-replaced-'+bodhisvgsReplacements);
 			}
 
-		}
+			// Remove any invalid XML tags as per http://validator.w3.org
+			$svg = $svg.removeAttr('xmlns:a');
+			
+			if(frontSanitizationEnabled == 'on' && $svg[0]['outerHTML'] != "") { // Is sanitization enabled?
+                $svg = DOMPurify.sanitize($svg[0]['outerHTML']); // Sanitize SVG code via DOMPurify library
+			}
+			
+			// Add size attributes
+			// $svg = $svg.attr('width', imgWidth);
+			// $svg = $svg.attr('height', imgHeight);
+
+			// Replace image with new SVG
+			img.replaceWith($svg);
+
+			$(document).trigger('svg.loaded', [imgID]);
+
+			bodhisvgsReplacements++;
+
+		}, 'xml');
 
 	}
 
@@ -98,31 +68,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		// If force inline SVG option is active then add class
 		if ( ForceInlineSVGActive === 'true' ) {
 
-			var allImages = document.getElementsByTagName('img');	// find all images on page
+			// Find all SVG inside img and add class if it hasn't got it
+			jQuery('img').each(function() {
 
-			// loop on images
-			for(var i = 0; i < allImages.length ; i++) {
+				// Check if the SRC attribute is present at all
+				if ( typeof jQuery(this).attr('src') !== typeof undefined && jQuery(this).attr('src') !== false) {
 
-				if( typeof allImages[i].src !== 'undefined' ){
+					// Pick only those with the extension we want
+					if ( jQuery(this).attr('src').match(/\.(svg)/) ) {
 
-					// check if it has svg
-					if( allImages[i].src.match(/\.(svg)/) ){
-
-						// add our class - if not already added
-						if( !allImages[i].classList.contains(cssTarget.ForceInlineSVG) ){
-
-							// add class now
-							allImages[i].classList.add(cssTarget.ForceInlineSVG);
-
+						// Add our class name
+						if ( !jQuery(this).hasClass(cssTarget.ForceInlineSVG) ) {
+							jQuery(this).addClass(cssTarget.ForceInlineSVG);
 						}
-
 					}
-
 				}
-
-
-			}
-
+			});
 		}
 
 		// Polyfill to support all ye old browsers
@@ -148,30 +109,33 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		// Check to see if user set alternate class
 		if ( ForceInlineSVGActive === 'true' ) {
-			var target  = ( cssTarget.Bodhi !== 'img.' ? cssTarget.ForceInlineSVG : 'style-svg' );
+			var target  = ( cssTarget.Bodhi !== 'img.' ? cssTarget.Bodhi : '.style-svg' );
 		} else {
-			var target  = ( cssTarget !== 'img.' ? cssTarget : 'style-svg' );
+			var target  = ( cssTarget !== 'img.' ? cssTarget : '.style-svg' );
 		}
 
-		// remove .img from class
-		target = target.replace("img.","");
+		target = target.replace("img","");
 
-		var allImages = document.getElementsByClassName(target);	// find all images with force svg class
-
-		for(var i = 0; i < allImages.length ; i++) {
-
-			if( typeof allImages[i].src == 'undefined'  ){	// not an image
-
-				bodhisvgsIterator(allImages[i]);
-
+		$(target).each(function(index){
+			
+			// if image then send for replacement
+			if ( typeof $(this).attr('src') !== typeof undefined && $(this).attr('src') !== false) {
+				bodhisvgsReplace($(this));
 			}else{
 
-				var img = allImages[i];
-				bodhisvgsReplace(img);
+				// look for svg children and send for replacement
+				$(this).find("img").each(function(i){
+
+					if( typeof $(this).attr('src') !== typeof undefined && $(this).attr('src') !== false ){
+						bodhisvgsReplace($(this));
+					}
+
+				});
 
 			}
 
-		}
+
+		});
 
 	})(); // Execute immediately
 

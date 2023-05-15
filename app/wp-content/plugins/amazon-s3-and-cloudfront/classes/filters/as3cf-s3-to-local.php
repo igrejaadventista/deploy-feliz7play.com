@@ -3,11 +3,12 @@
 use DeliciousBrains\WP_Offload_Media\Items\Item;
 
 class AS3CF_S3_To_Local extends AS3CF_Filter {
-
 	/**
-	 * Init.
+	 * @inheritDoc
 	 */
-	protected function init() {
+	public function setup() {
+		parent::setup();
+
 		// EDD
 		add_filter( 'edd_metabox_save_edd_download_files', array( $this, 'filter_edd_download_files' ) );
 		// Customizer
@@ -45,7 +46,6 @@ class AS3CF_S3_To_Local extends AS3CF_Filter {
 	 * @param array $instance
 	 *
 	 * @return array
-	 *
 	 */
 	public function filter_widget_save( $instance ) {
 		return $this->handle_widget( $instance );
@@ -247,7 +247,10 @@ class AS3CF_S3_To_Local extends AS3CF_Filter {
 	 * @return string
 	 */
 	protected function post_process_content( $content ) {
-		return $this->remove_aws_query_strings( $content );
+		$content = $this->remove_aws_query_strings( $content );
+		$content = AS3CF_Utils::maybe_fix_serialized_string( $content );
+
+		return $content;
 	}
 
 	/**

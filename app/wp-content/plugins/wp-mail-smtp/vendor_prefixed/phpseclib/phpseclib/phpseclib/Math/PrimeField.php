@@ -7,8 +7,6 @@
  *
  * PHP version 5 and 7
  *
- * @category  Math
- * @package   BigInteger
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2017 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -21,9 +19,7 @@ use WPMailSMTP\Vendor\phpseclib3\Math\PrimeField\Integer;
 /**
  * Prime Finite Fields
  *
- * @package Math
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
 class PrimeField extends \WPMailSMTP\Vendor\phpseclib3\Math\Common\FiniteField
 {
@@ -44,10 +40,9 @@ class PrimeField extends \WPMailSMTP\Vendor\phpseclib3\Math\Common\FiniteField
      */
     public function __construct(\WPMailSMTP\Vendor\phpseclib3\Math\BigInteger $modulo)
     {
-        //if (!$modulo->isPrime()) {
-        //    throw new \UnexpectedValueException('PrimeField requires a prime number be passed to the constructor');
-        //}
-        $this->modulo = $modulo;
+        if (!$modulo->isPrime()) {
+            throw new \UnexpectedValueException('PrimeField requires a prime number be passed to the constructor');
+        }
         $this->instanceID = self::$instanceCounter++;
         \WPMailSMTP\Vendor\phpseclib3\Math\PrimeField\Integer::setModulo($this->instanceID, $modulo);
         \WPMailSMTP\Vendor\phpseclib3\Math\PrimeField\Integer::setRecurringModuloFunction($this->instanceID, $modulo->createRecurringModuloFunction());

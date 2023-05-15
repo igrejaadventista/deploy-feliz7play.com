@@ -15,8 +15,6 @@
  * is specific to private keys it's basically creating a DER-encoded wrapper
  * for keys. This just extends that same concept to public keys (much like ssh-keygen)
  *
- * @category  Crypt
- * @package   EC
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -24,7 +22,6 @@
  */
 namespace WPMailSMTP\Vendor\phpseclib3\Crypt\EC\Formats\Keys;
 
-use WPMailSMTP\Vendor\phpseclib3\Common\Functions\Strings;
 use WPMailSMTP\Vendor\phpseclib3\Crypt\Common\Formats\Keys\PKCS8 as Progenitor;
 use WPMailSMTP\Vendor\phpseclib3\Crypt\EC\BaseCurves\Base as BaseCurve;
 use WPMailSMTP\Vendor\phpseclib3\Crypt\EC\BaseCurves\Montgomery as MontgomeryCurve;
@@ -38,9 +35,7 @@ use WPMailSMTP\Vendor\phpseclib3\Math\BigInteger;
 /**
  * PKCS#8 Formatted EC Key Handler
  *
- * @package EC
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
 abstract class PKCS8 extends \WPMailSMTP\Vendor\phpseclib3\Crypt\Common\Formats\Keys\PKCS8
 {
@@ -49,20 +44,17 @@ abstract class PKCS8 extends \WPMailSMTP\Vendor\phpseclib3\Crypt\Common\Formats\
      * OID Name
      *
      * @var array
-     * @access private
      */
     const OID_NAME = ['id-ecPublicKey', 'id-Ed25519', 'id-Ed448'];
     /**
      * OID Value
      *
      * @var string
-     * @access private
      */
     const OID_VALUE = ['1.2.840.10045.2.1', '1.3.101.112', '1.3.101.113'];
     /**
      * Break a public or private key down into its constituent components
      *
-     * @access public
      * @param string $key
      * @param string $password optional
      * @return array
@@ -75,35 +67,31 @@ abstract class PKCS8 extends \WPMailSMTP\Vendor\phpseclib3\Crypt\Common\Formats\
         // in the parent class as needed and in the context of the parent it's the parent
         // one that's called
         self::initialize_static_variables();
-        if (!\WPMailSMTP\Vendor\phpseclib3\Common\Functions\Strings::is_stringable($key)) {
-            throw new \UnexpectedValueException('Key should be a string - not a ' . \gettype($key));
-        }
-        $isPublic = \strpos($key, 'PUBLIC') !== \false;
         $key = parent::load($key, $password);
         $type = isset($key['privateKey']) ? 'privateKey' : 'publicKey';
-        switch (\true) {
-            case !$isPublic && $type == 'publicKey':
-                throw new \UnexpectedValueException('Human readable string claims non-public key but DER encoded string claims public key');
-            case $isPublic && $type == 'privateKey':
-                throw new \UnexpectedValueException('Human readable string claims public key but DER encoded string claims private key');
-        }
         switch ($key[$type . 'Algorithm']['algorithm']) {
             case 'id-Ed25519':
             case 'id-Ed448':
                 return self::loadEdDSA($key);
         }
         $decoded = \WPMailSMTP\Vendor\phpseclib3\File\ASN1::decodeBER($key[$type . 'Algorithm']['parameters']->element);
+        if (!$decoded) {
+            throw new \RuntimeException('Unable to decode BER');
+        }
         $params = \WPMailSMTP\Vendor\phpseclib3\File\ASN1::asn1map($decoded[0], \WPMailSMTP\Vendor\phpseclib3\File\ASN1\Maps\ECParameters::MAP);
         if (!$params) {
             throw new \RuntimeException('WPMailSMTP\\Vendor\\Unable to decode the parameters using Maps\\ECParameters');
         }
         $components = [];
         $components['curve'] = self::loadCurveByParam($params);
-        if ($isPublic) {
+        if ($type == 'publicKey') {
             $components['QA'] = self::extractPoint("\0" . $key['publicKey'], $components['curve']);
             return $components;
         }
         $decoded = \WPMailSMTP\Vendor\phpseclib3\File\ASN1::decodeBER($key['privateKey']);
+        if (!$decoded) {
+            throw new \RuntimeException('Unable to decode BER');
+        }
         $key = \WPMailSMTP\Vendor\phpseclib3\File\ASN1::asn1map($decoded[0], \WPMailSMTP\Vendor\phpseclib3\File\ASN1\Maps\ECPrivateKey::MAP);
         if (isset($key['parameters']) && $params != $key['parameters']) {
             throw new \RuntimeException('The PKCS8 parameter field does not match the private key parameter field');
@@ -128,7 +116,9 @@ abstract class PKCS8 extends \WPMailSMTP\Vendor\phpseclib3\Crypt\Common\Formats\
             if (\substr($key['privateKey'], 0, 2) != "\4 ") {
                 throw new \RuntimeException('The first two bytes of the private key field should be 0x0420');
             }
-            $components['dA'] = $components['curve']->extractSecret(\substr($key['privateKey'], 2));
+            $arr = $components['curve']->extractSecret(\substr($key['privateKey'], 2));
+            $components['dA'] = $arr['dA'];
+            $components['secret'] = $arr['secret'];
         }
         if (isset($key['publicKey'])) {
             if (!isset($components['curve'])) {
@@ -144,7 +134,6 @@ abstract class PKCS8 extends \WPMailSMTP\Vendor\phpseclib3\Crypt\Common\Formats\
     /**
      * Convert an EC public key to the appropriate format
      *
-     * @access public
      * @param \phpseclib3\Crypt\EC\BaseCurves\Base $curve
      * @param \phpseclib3\Math\Common\FiniteField\Integer[] $publicKey
      * @param array $options optional
@@ -166,22 +155,22 @@ abstract class PKCS8 extends \WPMailSMTP\Vendor\phpseclib3\Crypt\Common\Formats\
     /**
      * Convert a private key to the appropriate format.
      *
-     * @access public
      * @param \phpseclib3\Math\BigInteger $privateKey
      * @param \phpseclib3\Crypt\EC\BaseCurves\Base $curve
      * @param \phpseclib3\Math\Common\FiniteField\Integer[] $publicKey
+     * @param string $secret optional
      * @param string $password optional
      * @param array $options optional
      * @return string
      */
-    public static function savePrivateKey(\WPMailSMTP\Vendor\phpseclib3\Math\BigInteger $privateKey, \WPMailSMTP\Vendor\phpseclib3\Crypt\EC\BaseCurves\Base $curve, array $publicKey, $password = '', array $options = [])
+    public static function savePrivateKey(\WPMailSMTP\Vendor\phpseclib3\Math\BigInteger $privateKey, \WPMailSMTP\Vendor\phpseclib3\Crypt\EC\BaseCurves\Base $curve, array $publicKey, $secret = null, $password = '', array $options = [])
     {
         self::initialize_static_variables();
         if ($curve instanceof \WPMailSMTP\Vendor\phpseclib3\Crypt\EC\BaseCurves\Montgomery) {
             throw new \WPMailSMTP\Vendor\phpseclib3\Exception\UnsupportedCurveException('Montgomery Curves are not supported');
         }
         if ($curve instanceof \WPMailSMTP\Vendor\phpseclib3\Crypt\EC\BaseCurves\TwistedEdwards) {
-            return self::wrapPrivateKey("\4 " . $privateKey->secret, [], null, $password, $curve instanceof \WPMailSMTP\Vendor\phpseclib3\Crypt\EC\Curves\Ed25519 ? 'id-Ed25519' : 'id-Ed448');
+            return self::wrapPrivateKey("\4 " . $secret, [], null, $password, $curve instanceof \WPMailSMTP\Vendor\phpseclib3\Crypt\EC\Curves\Ed25519 ? 'id-Ed25519' : 'id-Ed448');
         }
         $publicKey = "\4" . $publicKey[0]->toBytes() . $publicKey[1]->toBytes();
         $params = new \WPMailSMTP\Vendor\phpseclib3\File\ASN1\Element(self::encodeParameters($curve, \false, $options));

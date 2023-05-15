@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: GlotPress/4.0.0-alpha.1\n"
+"X-Generator: GlotPress/4.0.0-alpha.4\n"
 "Language: pt_BR\n"
 "Project-Id-Version: Themes - Twenty Twenty-Two\n"
 
@@ -348,18 +348,6 @@ msgstr "Cabeçalho com título, navegação e links de redes sociais"
 msgid "Title and button header"
 msgstr "Cabeçalho com título e botão"
 
-#: inc/patterns/header-text-only-with-tagline-black-background.php:6
-msgid "Text-only header with tagline and black background"
-msgstr "Cabeçalho com fundo preto e descrição (apenas texto)"
-
-#: inc/patterns/header-text-only-salmon-background.php:6
-msgid "Text-only header with salmon background"
-msgstr "Cabeçalho com apenas texto e fundo salmão"
-
-#: inc/patterns/header-text-only-green-background.php:6
-msgid "Text-only header with green background"
-msgstr "Cabeçalho com apenas texto e fundo verde"
-
 #: inc/patterns/header-stacked.php:6
 msgid "Logo and navigation header"
 msgstr "Cabeçalho com logo e navegação"
@@ -368,17 +356,9 @@ msgstr "Cabeçalho com logo e navegação"
 msgid "Small header with dark background"
 msgstr "Cabeçalho pequeno com fundo escuro"
 
-#: inc/patterns/header-logo-navigation-social-black-background.php:6
-msgid "Logo, navigation, and social links header with black background"
-msgstr "Cabeçalho com fundo preto, contendo logo, navegação e links de redes sociais"
-
 #: inc/patterns/header-logo-navigation-offset-tagline.php:6
 msgid "Logo, navigation, and offset tagline Header"
 msgstr "Cabeçalho com logo, navegação e descrição deslocada"
-
-#: inc/patterns/header-logo-navigation-gray-background.php:6
-msgid "Logo and navigation header with gray background"
-msgstr "Cabeçalho com fundo cinza contendo logo e navegação"
 
 #: inc/patterns/header-large-dark.php:6
 msgid "Large header with dark background"
@@ -396,17 +376,9 @@ msgstr "Cabeçalho com uma imagem de fundo e sobreposição"
 msgid "Default header"
 msgstr "Cabeçalho padrão"
 
-#: inc/patterns/header-centered-title-navigation-social.php:6
-msgid "Centered header with navigation, social links, and salmon background"
-msgstr "Cabeçalho centralizado com navegação, links para redes sociais e fundo salmão"
-
 #: inc/patterns/header-centered-logo.php:6
 msgid "Header with centered logo"
 msgstr "Cabeçalho com logo centralizado"
-
-#: inc/patterns/header-centered-logo-black-background.php:6
-msgid "Header with centered logo and black background"
-msgstr "Cabeçalho com logo centralizado e fundo preto"
 
 #: inc/patterns/general-wide-image-intro-buttons.php:31
 msgid "Learn More"

@@ -36,8 +36,25 @@ class Review {
 	 */
 	public function hooks() {
 
-		add_action( 'admin_notices', array( $this, 'review_request' ) );
+		add_action( 'admin_init', [ $this, 'admin_notices' ] );
 		add_action( 'wp_ajax_wp_mail_smtp_review_dismiss', array( $this, 'review_dismiss' ) );
+	}
+
+	/**
+	 * Display notices only in Network Admin if in Multisite.
+	 * Otherwise, display in Admin Dashboard.
+	 *
+	 * @since 3.8.0
+	 *
+	 * @return void
+	 */
+	public function admin_notices() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
+
+		if ( is_multisite() ) {
+			add_action( 'network_admin_notices', [ $this, 'review_request' ] );
+		} else {
+			add_action( 'admin_notices', [ $this, 'review_request' ] );
+		}
 	}
 
 	/**
@@ -126,9 +143,15 @@ class Review {
 			<div class="wp-mail-smtp-review-step wp-mail-smtp-review-step-2" style="display: none">
 				<p><?php esc_html_e( 'We\'re sorry to hear you aren\'t enjoying WP Mail SMTP. We would love a chance to improve. Could you take a minute and let us know what we can do better?', 'wp-mail-smtp' ); ?></p>
 				<p>
-					<a href="https://wpmailsmtp.com/plugin-feedback/" class="wp-mail-smtp-dismiss-review-notice wp-mail-smtp-review-out" target="_blank" rel="noopener noreferrer">
-						<?php esc_html_e( 'Give Feedback', 'wp-mail-smtp' ); ?>
-					</a><br>
+					<?php
+					printf(
+						'<a href="%1$s" class="wp-mail-smtp-dismiss-review-notice wp-mail-smtp-review-out" target="_blank" rel="noopener noreferrer">%2$s</a>',
+						// phpcs:ignore WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound
+						esc_url( wp_mail_smtp()->get_utm_url( 'https://wpmailsmtp.com/plugin-feedback/', [ 'medium' => 'review-notice', 'content' => 'Give Feedback' ] ) ),
+						esc_html__( 'Give Feedback', 'wp-mail-smtp' )
+					);
+					?>
+					<br>
 					<a href="#" class="wp-mail-smtp-dismiss-review-notice" target="_blank" rel="noopener noreferrer">
 						<?php esc_html_e( 'No thanks', 'wp-mail-smtp' ); ?>
 					</a>

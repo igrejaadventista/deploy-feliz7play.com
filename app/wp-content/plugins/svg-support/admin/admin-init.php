@@ -51,9 +51,30 @@ function bodhi_svg_support_settings_page() {
  */
 
 function bodhi_sanitize_fields( $value ) {
+    
+	global $bodhi_svgs_options;
+    $bodhi_plugin_version_stored = get_option( 'bodhi_svgs_plugin_version' );
+
+    if( !isset($value['sanitize_svg']) ) {
+        $value['sanitize_svg'] = "none";
+    }
+
+    if( !isset($value['sanitize_on_upload_roles']) ) {
+        $value['sanitize_on_upload_roles'] = array("none");
+    }
+
+    if( !isset($value['restrict']) ) {
+        $value['restrict'] = array("none");
+    }
 
 	$value['css_target'] = esc_attr( sanitize_text_field( $value['css_target'] ) );
 
+	if( $value['sanitize_svg_front_end'] !== 'on' ) {
+	    
+	    $value['sanitize_svg_front_end'] = false;
+    
+	}
+    
 	return $value;
 
 }

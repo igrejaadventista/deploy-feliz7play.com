@@ -3,8 +3,6 @@
 /**
  * DH Parameters
  *
- * @category  Crypt
- * @package   DH
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -16,11 +14,9 @@ use WPMailSMTP\Vendor\phpseclib3\Crypt\DH;
 /**
  * DH Parameters
  *
- * @package DH
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
-class Parameters extends \WPMailSMTP\Vendor\phpseclib3\Crypt\DH
+final class Parameters extends \WPMailSMTP\Vendor\phpseclib3\Crypt\DH
 {
     /**
      * Returns the parameters

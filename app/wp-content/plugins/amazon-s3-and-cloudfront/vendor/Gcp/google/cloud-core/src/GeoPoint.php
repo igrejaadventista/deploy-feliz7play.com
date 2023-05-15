@@ -32,7 +32,7 @@ use InvalidArgumentException;
  * $point = new GeoPoint(37.423147, -122.085015);
  * ```
  */
-class GeoPoint
+class GeoPoint implements \JsonSerializable
 {
     /**
      * @var float
@@ -60,7 +60,7 @@ class GeoPoint
      *        outside the client. **Defaults to** `false`.
      * @throws InvalidArgumentException
      */
-    public function __construct($latitude, $longitude, $allowNull = false)
+    public function __construct($latitude, $longitude, $allowNull = \false)
     {
         $this->latitude = $this->validateValue($latitude, 'latitude', $allowNull);
         $this->longitude = $this->validateValue($longitude, 'longitude', $allowNull);
@@ -77,7 +77,7 @@ class GeoPoint
      */
     public function latitude()
     {
-        $this->checkContext('latitude', func_get_args());
+        $this->checkContext('latitude', \func_get_args());
         return $this->latitude;
     }
     /**
@@ -111,7 +111,7 @@ class GeoPoint
      */
     public function longitude()
     {
-        $this->checkContext('longitude', func_get_args());
+        $this->checkContext('longitude', \func_get_args());
         return $this->longitude;
     }
     /**
@@ -157,8 +157,8 @@ class GeoPoint
      */
     private function checkContext($method, array $args)
     {
-        if (count($args) > 0) {
-            throw new \InvalidArgumentException(sprintf('Calling method %s with arguments is unsupported.', $method));
+        if (\count($args) > 0) {
+            throw new InvalidArgumentException(\sprintf('Calling method %s with arguments is unsupported.', $method));
         }
     }
     /**
@@ -173,11 +173,29 @@ class GeoPoint
      *        **Defaults to** `false`.
      * @return float|null
      */
-    private function validateValue($value, $type, $allowNull = false)
+    private function validateValue($value, $type, $allowNull = \false)
     {
-        if (!is_numeric($value) && (!$allowNull || $allowNull && $value !== null)) {
-            throw new \InvalidArgumentException(sprintf('Given %s must be a numeric value.', $type));
+        if (!\is_numeric($value) && (!$allowNull || $allowNull && $value !== null)) {
+            throw new InvalidArgumentException(\sprintf('Given %s must be a numeric value.', $type));
         }
-        return $allowNull && $value === null ? $value : (double) $value;
+        return $allowNull && $value === null ? $value : (float) $value;
+    }
+    /**
+     * Implement JsonSerializable by representing GeoPoint as a JSON-object:
+     *
+     * ```
+     * {
+     *   latitude: 31.778333
+     *   longitude: 35.229722
+     * }
+     * ```
+     *
+     * @return object
+     * @access private
+     */
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
+    {
+        return (object) $this->point();
     }
 }
