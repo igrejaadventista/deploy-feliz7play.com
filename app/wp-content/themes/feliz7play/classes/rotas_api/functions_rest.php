@@ -68,7 +68,7 @@
                'collection' => $collection, 
                'video_host' => $video_host, 
                'video_id' => $video_id, 
-               'post_download_link' => $post_download_link, 
+               'post_download_link' => $post_download_link, 
                'download' => $download,
                'year' => $post_year,
                'video_rating' => $post_video_rating,
