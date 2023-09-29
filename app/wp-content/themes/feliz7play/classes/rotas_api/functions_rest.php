@@ -570,7 +570,7 @@ function get_link_site_next($slug, $video_type, $collection)
 
 
         case 'Single':
-            $link = get_site_url() . $slug;
+            $link = get_site_url() . "/" . $slug;
             break;
 
         case 'Episode':
