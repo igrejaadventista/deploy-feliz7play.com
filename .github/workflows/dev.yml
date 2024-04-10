@@ -8,6 +8,7 @@ jobs:
   web-deploy:
     name: 🎉 Deploy
     runs-on: ubuntu-latest
+    environment: dev
     steps:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
@@ -15,7 +16,7 @@ jobs:
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
-        server: 195.35.41.246
-        username: u919907044.devf7p
-        password: ${{ secrets.FTP_PWD }}
+        server: ${{ env.FTP_HOST }}
+        username: ${{ env.FTP_USER }}
+        password: ${{ env.FTP_PWD }}
         dry-run: true
