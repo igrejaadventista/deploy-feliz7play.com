@@ -20,3 +20,4 @@ jobs:
         username: ${{ secrets.FTP_USER }}
         password: ${{ secrets.FTP_PWD }}
         local-dir: ./app/
+        protocol: ftps
