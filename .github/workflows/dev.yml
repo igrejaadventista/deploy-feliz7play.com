@@ -19,4 +19,3 @@ jobs:
         server: ${{ secrets.FTP_HOST }}
         username: ${{ secrets.FTP_USER }}
         password: ${{ secrets.FTP_PWD }}
-        dry-run: true
