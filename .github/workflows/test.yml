@@ -1,9 +1,9 @@
 on:
     push:
-      branches: [dev]
+      branches: [test]
     workflow_dispatch:
 
-name: Deploy website - DEV
+name: Deploy website - TEST
 jobs:
   web-deploy:
     name: 🎉 Deploy
