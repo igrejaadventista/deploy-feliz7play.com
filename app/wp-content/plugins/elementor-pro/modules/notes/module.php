@@ -3,7 +3,6 @@ namespace ElementorPro\Modules\Notes;
 
 use Elementor\Core\Base\App;
 use ElementorPro\License\API;
-use Elementor\Core\Experiments\Manager;
 use Elementor\TemplateLibrary\Source_Local;
 use ElementorPro\Modules\Notes\Data\Controller;
 use ElementorPro\Modules\Notes\User\Delete_User;
@@ -26,28 +25,6 @@ class Module extends App {
 	// Module-related tables.
 	const TABLE_NOTES = 'e_notes';
 	const TABLE_NOTES_USERS_RELATIONS = 'e_notes_users_relations';
-
-	/**
-	 * Add to the experiments
-	 *
-	 * @return array
-	 */
-	public static function get_experimental_data() {
-		return [
-			'name' => static::NAME,
-			'title' => esc_html__( 'Notes', 'elementor-pro' ),
-			'description' => esc_html__( 'Creates a dedicated workspace for your team and other stakeholders to leave comments and replies on your website while it\'s in progress. Notifications for mentions, replies, etc. are sent by email, and all notes are stored in your site\'s database.', 'elementor-pro' ),
-			'release_status' => Manager::RELEASE_STATUS_STABLE,
-			'default' => Manager::STATE_ACTIVE,
-		];
-	}
-
-	/**
-	 * @return bool
-	 */
-	public static function is_active() {
-		return API::is_license_active() && API::is_licence_has_feature( static::LICENSE_FEATURE_NAME );
-	}
 
 	/**
 	 * @return string
@@ -135,7 +112,8 @@ class Module extends App {
 
 		$route = [
 			'title' => Utils::get_clean_document_title(),
-			'url' => Utils::clean_url( $_SERVER['REQUEST_URI'] ),
+			// PHPCS - The url cleaned inside the clear_url method.
+			'url' => Utils::clean_url( $_SERVER['REQUEST_URI'] ?? '' ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 			'note_url_pattern' => Note::generate_url(),
 			'post_id' => null,
 			'is_elementor_library' => false,
@@ -154,11 +132,14 @@ class Module extends App {
 		$this->set_settings( 'current_user_can', [
 			'create' => current_user_can( Capabilities::CREATE_NOTES ),
 			'create_users' => current_user_can( 'create_users' ),
+			'edit_users' => current_user_can( 'edit_users' ),
 		] );
 
 		$this->set_settings( 'urls', [
 			'admin_url_create_user' => get_admin_url( null, 'user-new.php' ),
+			'admin_url_edit_user' => get_admin_url( null, 'user-edit.php' ),
 			'avatar_defaults' => User::generate_avatars_urls( 0 ),
+			'help_notes_features' => 'https://go.elementor.com/app-notes',
 		] );
 	}
 
@@ -181,11 +162,12 @@ class Module extends App {
 		}
 	}
 
-	/**
-	 * Component constructor.
-	 */
-	public function __construct() {
-		parent::__construct();
+	private function on_elementor_pro_init() {
+		$has_license = API::is_license_active() && API::is_licence_has_feature( static::LICENSE_FEATURE_NAME );
+
+		if ( ! $has_license ) {
+			return;
+		}
 
 		// Things that should be happened if the feature is active (not depends on the current user)
 		$this->define_tables();
@@ -228,6 +210,20 @@ class Module extends App {
 			add_action( 'elementor/editor/before_enqueue_scripts', function () {
 				$this->enqueue_main_scripts();
 			} );
+
+			add_filter( 'elementor-pro/editor/v2/packages', function ( $packages ) {
+				$packages[] = 'editor-notes';
+
+				return $packages;
+			} );
 		}
+	}
+
+	public function __construct() {
+		parent::__construct();
+
+		add_action( 'elementor_pro/init', function() {
+			$this->on_elementor_pro_init();
+		} );
 	}
 }

@@ -32,6 +32,13 @@ class Template extends Base_Widget {
 		return false;
 	}
 
+	/**
+	 * @since 3.6.0
+	 *
+	 * @deprecated 3.8.0
+	 * On_Import_Trait::on_import_update_dynamic_content() should be used instead.
+	 * Remove in the future.
+	 */
 	public static function on_import_replace_dynamic_content( $config, $map_old_new_post_ids ) {
 		if ( isset( $config['settings']['template_id'] ) ) {
 			$config['settings']['template_id'] = $map_old_new_post_ids[ $config['settings']['template_id'] ];
@@ -78,6 +85,10 @@ class Template extends Base_Widget {
 
 	protected function render() {
 		$template_id = $this->get_settings( 'template_id' );
+
+		if ( empty( $template_id ) ) {
+			return;
+		}
 
 		if ( 'publish' !== get_post_status( $template_id ) ) {
 			return;

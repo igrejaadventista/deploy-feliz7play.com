@@ -2,6 +2,7 @@
 namespace ElementorPro\Modules\Forms\Classes;
 
 use ElementorPro\Core\Utils;
+use ElementorPro\Modules\Forms\Fields\Upload;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -176,21 +177,21 @@ class Form_Record {
 				case 'page_url':
 					$result['page_url'] = [
 						'title' => esc_html__( 'Page URL', 'elementor-pro' ),
-						'value' => esc_url_raw( $_POST['referrer'] ), // phpcs:ignore WordPress.Security.NonceVerification.Missing
+						'value' => isset( $_POST['referrer'] ) ? esc_url_raw( wp_unslash( $_POST['referrer'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Missing
 					];
 					break;
 
 				case 'page_title':
 					$result['page_title'] = [
 						'title' => esc_html__( 'Page Title', 'elementor-pro' ),
-						'value' => sanitize_text_field( $_POST['referer_title'] ), // phpcs:ignore WordPress.Security.NonceVerification.Missing
+						'value' => isset( $_POST['referer_title'] ) ? sanitize_text_field( wp_unslash( $_POST['referer_title'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Missing
 					];
 					break;
 
 				case 'user_agent':
 					$result['user_agent'] = [
 						'title' => esc_html__( 'User Agent', 'elementor-pro' ),
-						'value' => sanitize_textarea_field( $_SERVER['HTTP_USER_AGENT'] ),
+						'value' => isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_textarea_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '',
 					];
 					break;
 
@@ -234,9 +235,10 @@ class Form_Record {
 			];
 
 			if ( 'upload' === $field['type'] ) {
-				$field['file_sizes'] = isset( $form_field['file_sizes'] ) ? $form_field['file_sizes'] : '';
-				$field['file_types'] = isset( $form_field['file_types'] ) ? $form_field['file_types'] : '';
-				$field['max_files'] = isset( $form_field['max_files'] ) ? $form_field['max_files'] : '';
+				$field['file_sizes'] = $form_field['file_sizes'] ?? '';
+				$field['file_types'] = $form_field['file_types'] ?? '';
+				$field['max_files'] = $form_field['max_files'] ?? '';
+				$field['attachment_type'] = $form_field['attachment_type'] ?? '';
 			}
 
 			if ( isset( $this->sent_data[ $form_field['custom_id'] ] ) ) {
@@ -318,7 +320,9 @@ class Form_Record {
 				'path' => [],
 			];
 		}
-		$this->files[ $id ]['url'][ $index ] = $filename['url'];
+
+		$attachment_type = $this->fields[ $id ]['attachment_type'];
+		$this->files[ $id ]['url'][ $index ] = Upload::MODE_ATTACH === $attachment_type ? 'attached' : $filename['url'];
 		$this->files[ $id ]['path'][ $index ] = $filename['path'];
 	}
 

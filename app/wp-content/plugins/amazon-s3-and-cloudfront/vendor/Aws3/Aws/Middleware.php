@@ -5,7 +5,11 @@ namespace DeliciousBrains\WP_Offload_Media\Aws3\Aws;
 use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Api\Service;
 use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Api\Validator;
 use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Credentials\CredentialsInterface;
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\EndpointV2\EndpointProviderV2;
 use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Exception\AwsException;
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Signature\S3ExpressSignature;
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Token\TokenAuthorization;
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Token\TokenInterface;
 use DeliciousBrains\WP_Offload_Media\Aws3\GuzzleHttp\Promise;
 use DeliciousBrains\WP_Offload_Media\Aws3\GuzzleHttp\Psr7;
 use DeliciousBrains\WP_Offload_Media\Aws3\GuzzleHttp\Psr7\LazyOpenStream;
@@ -48,6 +52,9 @@ final class Middleware
         $validator = $validator ?: new Validator();
         return function (callable $handler) use($api, $validator) {
             return function (CommandInterface $command, RequestInterface $request = null) use($api, $validator, $handler) {
+                if ($api->isModifiedModel()) {
+                    $api = new Service($api->getDefinition(), $api->getProvider());
+                }
                 $operation = $api->getOperation($command->getName());
                 $validator->validate($command->getName(), $operation->getInput(), $command->toArray());
                 return $handler($command, $request);
@@ -59,13 +66,15 @@ final class Middleware
      *
      * @param callable $serializer Function used to serialize a request for a
      *                             command.
+     * @param EndpointProviderV2 | null $endpointProvider
+     * @param array $providerArgs
      * @return callable
      */
-    public static function requestBuilder(callable $serializer)
+    public static function requestBuilder($serializer)
     {
         return function (callable $handler) use($serializer) {
-            return function (CommandInterface $command) use($serializer, $handler) {
-                return $handler($command, $serializer($command));
+            return function (CommandInterface $command, $endpoint = null) use($serializer, $handler) {
+                return $handler($command, $serializer($command, $endpoint));
             };
         };
     }
@@ -81,12 +90,22 @@ final class Middleware
      *
      * @return callable
      */
-    public static function signer(callable $credProvider, callable $signatureFunction)
+    public static function signer(callable $credProvider, callable $signatureFunction, $tokenProvider = null, $config = [])
     {
-        return function (callable $handler) use($signatureFunction, $credProvider) {
-            return function (CommandInterface $command, RequestInterface $request) use($handler, $signatureFunction, $credProvider) {
+        return function (callable $handler) use($signatureFunction, $credProvider, $tokenProvider, $config) {
+            return function (CommandInterface $command, RequestInterface $request) use($handler, $signatureFunction, $credProvider, $tokenProvider, $config) {
                 $signer = $signatureFunction($command);
-                return $credProvider()->then(function (CredentialsInterface $creds) use($handler, $command, $signer, $request) {
+                if ($signer instanceof TokenAuthorization) {
+                    return $tokenProvider()->then(function (TokenInterface $token) use($handler, $command, $signer, $request) {
+                        return $handler($command, $signer->authorizeRequest($request, $token));
+                    });
+                }
+                if ($signer instanceof S3ExpressSignature) {
+                    $credentialPromise = $config['s3_express_identity_provider']($command);
+                } else {
+                    $credentialPromise = $credProvider();
+                }
+                return $credentialPromise->then(function (CredentialsInterface $creds) use($handler, $command, $signer, $request) {
                     return $handler($command, $signer->signRequest($request, $creds));
                 });
             };

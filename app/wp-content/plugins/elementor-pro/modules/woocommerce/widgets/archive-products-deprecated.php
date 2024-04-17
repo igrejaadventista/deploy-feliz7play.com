@@ -13,7 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class Archive_Products_Deprecated
- * @deprecated 2.4.1 use Archive_Products
+ *
+ * @deprecated 2.4.1 Use `Archive_Products` instead.
  */
 class Archive_Products_Deprecated extends Products {
 
@@ -49,9 +50,10 @@ class Archive_Products_Deprecated extends Products {
 		$this->add_control(
 			'wc_notice_do_not_use_customizer',
 			[
-				'type' => Controls_Manager::RAW_HTML,
-				'raw' => esc_html__( 'Note that these layout settings will override settings made in Appearance > Customize', 'elementor-pro' ),
-				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				// TODO: Remove define() with the release of Elementor 3.22
+				'type' => defined( 'Controls_Manager::ALERT' ) ? Controls_Manager::ALERT : 'alert',
+				'alert_type' => 'info',
+				'content' => esc_html__( 'Note that these layout settings will override settings made in Appearance > Customize', 'elementor-pro' ),
 			]
 		);
 

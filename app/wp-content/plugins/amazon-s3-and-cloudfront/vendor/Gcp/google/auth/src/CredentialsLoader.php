@@ -17,6 +17,7 @@
  */
 namespace DeliciousBrains\WP_Offload_Media\Gcp\Google\Auth;
 
+use DeliciousBrains\WP_Offload_Media\Gcp\Google\Auth\Credentials\ImpersonatedServiceAccountCredentials;
 use DeliciousBrains\WP_Offload_Media\Gcp\Google\Auth\Credentials\InsecureCredentials;
 use DeliciousBrains\WP_Offload_Media\Gcp\Google\Auth\Credentials\ServiceAccountCredentials;
 use DeliciousBrains\WP_Offload_Media\Gcp\Google\Auth\Credentials\UserRefreshCredentials;
@@ -30,6 +31,7 @@ abstract class CredentialsLoader implements FetchAuthTokenInterface, UpdateMetad
 {
     const TOKEN_CREDENTIAL_URI = 'https://oauth2.googleapis.com/token';
     const ENV_VAR = 'GOOGLE_APPLICATION_CREDENTIALS';
+    const QUOTA_PROJECT_ENV_VAR = 'GOOGLE_CLOUD_QUOTA_PROJECT';
     const WELL_KNOWN_PATH = 'gcloud/application_default_credentials.json';
     const NON_WINDOWS_WELL_KNOWN_PATH_BASE = '.config';
     const MTLS_WELL_KNOWN_PATH = '.secureConnect/context_aware_metadata.json';
@@ -111,7 +113,7 @@ abstract class CredentialsLoader implements FetchAuthTokenInterface, UpdateMetad
      *   user-defined scopes exist, expressed either as an Array or as a
      *   space-delimited string.
      *
-     * @return ServiceAccountCredentials|UserRefreshCredentials
+     * @return ServiceAccountCredentials|UserRefreshCredentials|ImpersonatedServiceAccountCredentials
      */
     public static function makeCredentials($scope, array $jsonKey, $defaultScope = null)
     {
@@ -125,6 +127,10 @@ abstract class CredentialsLoader implements FetchAuthTokenInterface, UpdateMetad
         if ($jsonKey['type'] == 'authorized_user') {
             $anyScope = $scope ?: $defaultScope;
             return new UserRefreshCredentials($anyScope, $jsonKey);
+        }
+        if ($jsonKey['type'] == 'impersonated_service_account') {
+            $anyScope = $scope ?: $defaultScope;
+            return new ImpersonatedServiceAccountCredentials($anyScope, $jsonKey);
         }
         throw new \InvalidArgumentException('invalid value in the type field');
     }
@@ -185,6 +191,17 @@ abstract class CredentialsLoader implements FetchAuthTokenInterface, UpdateMetad
             $metadata_copy[self::AUTH_METADATA_KEY] = ['Bearer ' . $result['id_token']];
         }
         return $metadata_copy;
+    }
+    /**
+     * Fetch a quota project from the environment variable
+     * GOOGLE_CLOUD_QUOTA_PROJECT. Return null if
+     * GOOGLE_CLOUD_QUOTA_PROJECT is not specified.
+     *
+     * @return string|null
+     */
+    public static function quotaProjectFromEnv()
+    {
+        return \getenv(self::QUOTA_PROJECT_ENV_VAR) ?: null;
     }
     /**
      * Gets a callable which returns the default device certification.

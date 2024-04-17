@@ -12,7 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class Group_Control_Posts
- * @deprecated since 2.5.0, use class Group_Control_Query and Elementor_Post_Query
+ *
+ * @deprecated 2.5.0 Use `Group_Control_Query` and `Elementor_Post_Query` classes instead.
  */
 class Group_Control_Posts extends Group_Control_Base {
 
@@ -25,7 +26,7 @@ class Group_Control_Posts extends Group_Control_Base {
 	}
 
 	/**
-	 * @deprecated since 2.4.0 using Control's settings 'export' = false
+	 * @deprecated 2.4.0 Use Control's settings `export=false` instead.
 	 *
 	 * @param $element
 	 * @param $control_id
@@ -254,8 +255,10 @@ class Group_Control_Posts extends Group_Control_Base {
 		$post__not_in = [];
 		if ( ! empty( $settings['exclude'] ) ) {
 			if ( in_array( 'current_post', $settings['exclude'], true ) ) {
-				if ( wp_doing_ajax() && ! empty( $_REQUEST['post_id'] ) ) {
-					$post__not_in[] = $_REQUEST['post_id'];
+				$post_id = Utils::_unstable_get_super_global_value( $_REQUEST, 'post_id' );
+
+				if ( wp_doing_ajax() && $post_id ) {
+					$post__not_in[] = $post_id;
 				} elseif ( is_singular() ) {
 					$post__not_in[] = get_queried_object_id();
 				}

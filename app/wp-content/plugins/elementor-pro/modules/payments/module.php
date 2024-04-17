@@ -3,8 +3,10 @@ namespace ElementorPro\Modules\Payments;
 
 use Elementor\Settings;
 use ElementorPro\Base\Module_Base;
+use ElementorPro\Core\Utils;
 use ElementorPro\Plugin;
 use ElementorPro\Modules\Payments\Classes\Stripe_Handler;
+use ElementorPro\License\API;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -18,15 +20,18 @@ class Module extends Module_Base {
 	const STRIPE_TAX_ENDPOINT_URL = 'tax_rates';
 	const WP_DASH_STRIPE_API_KEYS_LINK = 'https://go.elementor.com/wp-dash-stripe-api-keys/';
 	const STRIPE_TRANSACTIONS_LINK = 'https://go.elementor.com/stripe-transaction/';
+	const STRIPE_LICENCE_FEATURE_NAME = 'stripe-button';
+
+	const WIDGET_NAME_CLASS_NAME_MAP = [
+		'paypal-button' => 'Paypal_Button',
+		self::STRIPE_LICENCE_FEATURE_NAME => 'Stripe_Button',
+	];
 
 	public $secret_key = '';
 	private $stripe_handler;
 
 	public function get_widgets() {
-		return [
-			'Paypal_Button',
-			'Stripe_Button',
-		];
+		return API::filter_active_features( static::WIDGET_NAME_CLASS_NAME_MAP );
 	}
 
 	/**
@@ -82,17 +87,24 @@ class Module extends Module_Base {
 	 */
 	public function ajax_validate_secret_key() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$nonce_action = ( ! strpos( $_POST['action'], 'test' ) ? self::STRIPE_LIVE_SECRET_KEY : self::STRIPE_TEST_SECRET_KEY );
+		$action = Utils::_unstable_get_super_global_value( $_POST, 'action' );
+		$nonce_action = ( ! strpos( $action, 'test' ) ? self::STRIPE_LIVE_SECRET_KEY : self::STRIPE_TEST_SECRET_KEY );
 
-		if ( ! isset( $_POST['_nonce'] ) || ! wp_verify_nonce( $_POST['_nonce'], $nonce_action ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$nonce = Utils::_unstable_get_super_global_value( $_POST, '_nonce' );
+		if ( ! $nonce || ! wp_verify_nonce( $nonce, $nonce_action ) ) {
 			$this->error_handler( 403, esc_html__( 'Something went wrong, please refresh the page.', 'elementor-pro' ) );
 			die();
 		}
 
-		if ( empty( $_POST['secret_key'] ) ) {
+		if ( ! Utils::_unstable_get_super_global_value( $_POST, 'secret_key' ) ) {
 			wp_send_json_error();
 		} else {
-			$this->secret_key = $_POST['secret_key'];
+			$this->secret_key = Utils::_unstable_get_super_global_value( $_POST, 'secret_key' );
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'Permission denied' );
 		}
 
 		$stripe_handler = new Stripe_handler();
@@ -126,14 +138,17 @@ class Module extends Module_Base {
 	 * from here the tax rates array is implemented in
 	 * tax rates select control
 	 *
-	 * @since 3.7.0
-	 *
 	 * @param array $data
 	 *
 	 * @return array - returns to js ajax function.
 	 *
+	 * @throws \Exception
+	 * @since 3.7.0
+	 *
 	 */
 	public function get_stripe_tax_rates( array $data ) {
+		Utils::_unstable_check_document_permissions( $data['editor_post_id'] );
+
 		$tax_rates_lists = [];
 		$tax_rates_lists['live_api_key'] = $this->get_tax_rates( $this->get_global_stripe_live_secret_key() );
 		$tax_rates_lists['test_api_key'] = $this->get_tax_rates( $this->get_global_stripe_test_secret_key() );
@@ -272,16 +287,18 @@ class Module extends Module_Base {
 	 * @since 3.7.0
 	 */
 	public function submit_stripe_form() {
-		if ( ! isset( $_POST['data']['nonce'] ) || ! wp_verify_nonce( $_POST['data']['nonce'], 'stripe_form_submit' ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$data = Utils::_unstable_get_super_global_value( $_POST, 'data' );
+		if ( ! isset( $data['nonce'] ) || ! wp_verify_nonce( $data['nonce'], 'stripe_form_submit' ) ) {
 			$this->error_handler( 403, esc_html__( 'Something went wrong, please refresh the page.', 'elementor-pro' ) );
 			die();
 		}
 		$args = [];
-		$widget_id = $_POST['data']['widgetId'] ? $_POST['data']['widgetId'] : null;
-		$args['page_url'] = $_POST['data']['pageUrl'] ? $_POST['data']['pageUrl'] : null;
+		$widget_id = $data['widgetId'] ?? null;
+		$args['page_url'] = $data['pageUrl'] ?? null;
 
-		Plugin::elementor()->db->switch_to_post( $_POST['data']['postId'] );
-		$document = Plugin::elementor()->documents->get( $_POST['data']['postId'] );
+		Plugin::elementor()->db->switch_to_post( $data['postId'] );
+		$document = Plugin::elementor()->documents->get( $data['postId'] );
 
 		// Retrieve data from widget document
 		if ( $document ) {
@@ -389,8 +406,8 @@ class Module extends Module_Base {
 					'label' => esc_html__( 'Test Secret key', 'elementor-pro' ),
 					'field_args' => [
 						'type' => 'text',
-						/* translators: 1: Link to stripe api key explanation, 2: Link closing tag. */
 						'desc' => sprintf(
+							/* translators: 1: Link to stripe api key explanation, 2: Link closing tag. */
 							esc_html__( 'Enter your test secret key %1$slink%2$s.', 'elementor-pro' ),
 							'<a href=" ' . self::WP_DASH_STRIPE_API_KEYS_LINK . ' " target="_blank">',
 							'</a>'
@@ -407,8 +424,8 @@ class Module extends Module_Base {
 					'label' => esc_html__( 'Live Secret key', 'elementor-pro' ),
 					'field_args' => [
 						'type' => 'text',
-						/* translators: %1$s: Link to stripe api key explanation, %2$s: Link closing tag. */
 						'desc' => sprintf(
+							/* translators: 1: Link to stripe api key explanation, 2: Link closing tag. */
 							esc_html__( 'Enter your Live secret key %1$slink%2$s.', 'elementor-pro' ),
 							'<a href=" ' . self::WP_DASH_STRIPE_API_KEYS_LINK . ' " target="_blank">',
 							'</a>'
@@ -424,9 +441,9 @@ class Module extends Module_Base {
 				'stripe_legal_disclaimer' => [
 					'field_args' => [
 						'type' => 'raw_html',
-						/* translators: %1$s: <br />. */
 						'html' => sprintf(
-							esc_html__( ' Please note: The Stripe name and logos are trademarks or service marks of Stripe, Inc.or its affiliates in the U.S. and other countries.  %1$s Other names may be trademarks of their respective owners.', 'elementor-pro' ),
+							/* translators: %s: <br />. */
+							esc_html__( 'Please note: The Stripe name and logos are trademarks or service marks of Stripe, Inc. or its affiliates in the U.S. and other countries. %s Other names may be trademarks of their respective owners.', 'elementor-pro' ),
 							'<br />'
 						),
 					],
@@ -444,7 +461,7 @@ class Module extends Module_Base {
 		add_action( 'wp_ajax_nopriv_submit_stripe_form', [ $this, 'submit_stripe_form' ] );
 		add_action( 'elementor/ajax/register_actions', [ $this, 'register_ajax_actions' ] );
 
-		if ( current_user_can( 'administrator' ) ) {
+		if ( current_user_can( 'administrator' ) && API::is_licence_has_feature( static::STRIPE_LICENCE_FEATURE_NAME, API::BC_VALIDATION_CALLBACK ) ) {
 			add_action( 'elementor/admin/after_create_settings/' . Settings::PAGE_ID, [ $this, 'register_admin_fields' ], 999 );
 		}
 		add_action( 'wp_ajax_' . self::STRIPE_TEST_SECRET_KEY . '_validate', [ $this, 'ajax_validate_secret_key' ] );

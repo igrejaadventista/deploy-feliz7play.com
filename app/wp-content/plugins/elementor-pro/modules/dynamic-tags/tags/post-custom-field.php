@@ -29,6 +29,8 @@ class Post_Custom_Field extends Tag {
 			Module::URL_CATEGORY,
 			Module::POST_META_CATEGORY,
 			Module::COLOR_CATEGORY,
+			Module::DATETIME_CATEGORY,
+			Module::MEDIA_CATEGORY,
 		];
 	}
 
@@ -58,6 +60,9 @@ class Post_Custom_Field extends Tag {
 				'placeholder' => 'key',
 				'condition' => [
 					'key' => '',
+				],
+				'ai' => [
+					'active' => false,
 				],
 			]
 		);
