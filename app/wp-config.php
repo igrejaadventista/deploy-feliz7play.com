@@ -44,9 +44,9 @@ define( 'DISALLOW_FILE_EDIT', true );
 
 define( 'AS3CF_SETTINGS', serialize( array(
     'provider' => 'aws',
-    'access-key-id' => WP_S3_ACCESS_KEY,
-    'secret-access-key' => WP_S3_SECRET_KEY,
-	'bucket' => WP_S3_BUCKET
+    'access-key-id' => 'WP_S3_ACCESS_KEY',
+    'secret-access-key' => 'WP_S3_SECRET_KEY',
+	'bucket' => 'WP_S3_BUCKET'
 ) ) );
 
 if(!$is_dev):
