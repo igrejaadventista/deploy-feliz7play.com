@@ -12,6 +12,18 @@ jobs:
     steps:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
+
+    - name: Transform wp-config.php
+      run: |
+        echo "Init transform: wp-config.php"
+        sed -i 's/WP_DB_NAME/${{ secrets.WP_DB_NAME }}/' ./app/wp-config.php
+        sed -i 's/WP_DB_USER/${{ secrets.WP_DB_USER }}/' ./app/wp-config.php
+        sed -i 's/WP_DB_PASSWORD/${{ secrets.WP_DB_PASSWORD }}/' ./app/wp-config.php
+        sed -i 's/WP_DB_HOST/${{ secrets.WP_DB_HOST }}/' ./app/wp-config.php
+        sed -i 's/WP_S3_ACCESS_KEY/${{ secrets.WP_S3_ACCESS_KEY }}/' ./app/wp-config.php
+        sed -i 's/WP_S3_SECRET_KEY/${{ secrets.WP_S3_SECRET_KEY }}/' ./app/wp-config.php
+        sed -i 's/WP_S3_BUCKET/${{ secrets.WP_S3_BUCKET }}/' ./app/wp-config.php
+        echo "End transform: wp-config.php"
     
     - name: 📂 Sync files SFTP
       uses: wlixcc/SFTP-Deploy-Action@v1.2.4
