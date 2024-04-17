@@ -1,7 +1,7 @@
 on:
-    push:
-      branches: [dev]
-    workflow_dispatch:
+  push:
+    branches: [dev]
+  workflow_dispatch:
 
 name: Deploy website - DEV
 jobs:
@@ -13,18 +13,13 @@ jobs:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
 
-    - name: Transform wp-config.php
-      run: |
-        echo "Init transform: wp-config.php"
-        echo "End transform: wp-config.php"
-    
-    - name: 📂 Sync files SFTP
-      uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+    - name: Deploy to Server SSH
+      uses: easingthemes/ssh-deploy@main
       with:
-        username: ${{ secrets.FTP_USER }}
-        server: ${{ secrets.FTP_HOST }}
-        port: 65002
-        local_path: './app/*'
-        remote_path: '/home/${{ secrets.FTP_USER }}/domains/dev-f7p.internetdsa.com/public_html/'
-        sftp_only: true
-        password: ${{ secrets.FTP_PWD }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SOURCE: "./app/"
+          REMOTE_HOST: ${{ secrets.FTP_HOST }}
+          REMOTE_PORT: 65002
+          REMOTE_USER: ${{ secrets.FTP_USER }}
+          TARGET: "/home/${{ secrets.FTP_USER }}/domains/dev-f7p.internetdsa.com/public_html"
+          EXCLUDE: "/dist/, /node_modules/"
