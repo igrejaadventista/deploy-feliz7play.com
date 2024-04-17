@@ -13,13 +13,24 @@ jobs:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
     
-    - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+    # - name: 📂 Sync files
+    #   uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+    #   with:
+    #     server: ${{ secrets.FTP_HOST }}
+    #     username: ${{ secrets.FTP_USER }}
+    #     password: ${{ secrets.FTP_PWD }}
+    #     port: 65002
+    #     local-dir: ./app/
+    #     server-dir: /home/${{ secrets.FTP_USER }}/domains/test-f7p.internetdsa.com/public_html/
+    #     protocol: ftps
+
+    - name: 📂 Sync files SFTP
+      uses: wlixcc/SFTP-Deploy-Action@v1.2.4
       with:
-        server: ${{ secrets.FTP_HOST }}
         username: ${{ secrets.FTP_USER }}
-        password: ${{ secrets.FTP_PWD }}
+        server: ${{ secrets.FTP_HOST }}
         port: 65002
-        local-dir: ./app/
-        server-dir: /home/${{ secrets.FTP_USER }}/domains/test-f7p.internetdsa.com/public_html/
-        protocol: ftps
+        local_path: './app/*'
+        remote_path: '/home/${{ secrets.FTP_USER }}/domains/test-f7p.internetdsa.com/public_html/'
+        sftp_only: true
+        password: ${{ secrets.FTP_PWD }}
