@@ -21,5 +21,5 @@ jobs:
         password: ${{ secrets.FTP_PWD }}
         port: 65002
         local-dir: ./app/
-        server-dir: /home/${{ secrets.FTP_USER }}/domains/test-f7p.internetdsa.com/public_html
+        server-dir: /home/${{ secrets.FTP_USER }}/domains/test-f7p.internetdsa.com/public_html/
         protocol: ftps
