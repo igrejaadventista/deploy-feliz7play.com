@@ -44,3 +44,4 @@ jobs:
           REMOTE_USER: ${{ secrets.FTP_USER }}
           TARGET: "/home/${{ secrets.FTP_USER }}/domains/dev-f7p.internetdsa.com/public_html"
           EXCLUDE: "/dist/, /node_modules/"
+          SCRIPT_BEFORE: ls
