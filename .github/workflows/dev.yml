@@ -13,11 +13,34 @@ jobs:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
     
-    - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+    # - name: 📂 Sync files
+    #   uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+    #   with:
+    #     server: ${{ secrets.FTP_HOST }}
+    #     username: ${{ secrets.FTP_USER }}
+    #     password: ${{ secrets.FTP_PWD }}
+    #     local-dir: ./app/
+    #     protocol: ftps
+
+    # - name: rsync deployments
+    #   uses: burnett01/rsync-deployments@7.0.1
+    #   with:
+    #     switches: -avzr --delete
+    #     path: ./app/
+    #     remote_path: /home/${{ secrets.FTP_USER }}/domains/dev-f7p.internetdsa.com/public_html
+    #     remote_host: ${{ secrets.FTP_HOST }}
+    #     remote_user: debian
+    #     remote_key: ${{ secrets.DEPLOY_KEY }}
+
+
+    - name: Deploy to Server SSH
+      uses: easingthemes/ssh-deploy@main
       with:
-        server: ${{ secrets.FTP_HOST }}
-        username: ${{ secrets.FTP_USER }}
-        password: ${{ secrets.FTP_PWD }}
-        local-dir: ./app/
-        protocol: ftps
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-rlgoDzvc -i --delete"
+          SOURCE: "./app/"
+          REMOTE_HOST: ${{ secrets.FTP_HOST }}
+          REMOTE_PORT: 65002
+          REMOTE_USER: ${{ secrets.FTP_USER }}
+          TARGET: "/home/${{ secrets.FTP_USER }}/domains/dev-f7p.internetdsa.com/public_html"
+          EXCLUDE: "/dist/, /node_modules/"
