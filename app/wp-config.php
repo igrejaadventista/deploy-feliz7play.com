@@ -23,16 +23,16 @@
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'feliz7play');
+define( 'DB_NAME', 'WP_DB_NAME');
 
 /** MySQL database username */
-define( 'DB_USER', 'root');
+define( 'DB_USER', 'WP_DB_USER');
 
 /** MySQL database password */
-define( 'DB_PASSWORD', 'root');
+define( 'DB_PASSWORD', 'WP_DB_PASSWORD');
 
 /** MySQL hostname */
-define( 'DB_HOST', 'localhost');
+define( 'DB_HOST', 'WP_DB_HOST:3306');
 
 /** Database Charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8mb4' );
@@ -44,8 +44,8 @@ define( 'DISALLOW_FILE_EDIT', true );
 
 define( 'AS3CF_SETTINGS', serialize( array(
     'provider' => 'aws',
-    'access-key-id' => 'WP_S3_ACCESS_KEY',
-    'secret-access-key' => 'WP_S3_SECRET_KEY',
+    'access-key-id' => 'AWS_ACCESS_KEY_ID',
+    'secret-access-key' => 'AWS_SECRET_ACCESS_KEY',
 	'bucket' => 'WP_S3_BUCKET'
 ) ) );
 
