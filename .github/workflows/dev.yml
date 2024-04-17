@@ -13,13 +13,19 @@ jobs:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
 
-    - name: Deploy to Server SSH
+    - name: Transform wp-config.php
+      run: |
+        echo "Init transform: wp-config.php"
+        grep -lr -e  "WP_DB_NAME" * | xargs sed -i "s/WP_DB_NAME/${{ secrets.WP_DB_NAME }}/g"
+        echo "End transform: wp-config.php"
+
+    - name: Deploy to Server - SSH
       uses: easingthemes/ssh-deploy@main
       with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SOURCE: "./app/"
-          REMOTE_HOST: ${{ secrets.FTP_HOST }}
-          REMOTE_PORT: 65002
-          REMOTE_USER: ${{ secrets.FTP_USER }}
-          TARGET: "/home/${{ secrets.FTP_USER }}/domains/dev-f7p.internetdsa.com/public_html"
-          EXCLUDE: "/dist/, /node_modules/"
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SOURCE: "./app/"
+        REMOTE_HOST: ${{ secrets.FTP_HOST }}
+        REMOTE_PORT: 65002
+        REMOTE_USER: ${{ secrets.FTP_USER }}
+        TARGET: "/home/${{ secrets.FTP_USER }}/domains/dev-f7p.internetdsa.com/public_html"
+        EXCLUDE: "/dist/, /node_modules/"
