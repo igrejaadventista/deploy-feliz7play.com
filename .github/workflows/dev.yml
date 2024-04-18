@@ -16,7 +16,8 @@ jobs:
     - name: Transform wp-config.php
       run: |
         echo "Init transform: wp-config.php"
-        sed -i 's/WP_S3_SECRET_KEY/${{ secrets.WP_S3_SECRET_KEY }}/' ./app/wp-config.php |
+        grep -lr -e  "WP_S3_SECRET_KEY" * | xargs sed -i "s/WP_S3_SECRET_KEY/${{ secrets.WP_S3_SECRET_KEY }}/g" |
+
         echo "End transform: wp-config.php"
 
     - name: Deploy to Server - SSH
