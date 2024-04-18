@@ -45,7 +45,9 @@ define( 'DISALLOW_FILE_EDIT', true );
 define( 'AS3CF_SETTINGS', serialize( array(
     'provider' => 'aws',
     'access-key-id' => 'AWS_ACCESS_KEY_ID',
+    // 
     'secret-access-key' => 'AWS_SECRET_ACCESS_KEY',
+    //
 	'bucket' => 'WP_S3_BUCKET'
 ) ) );
 
