@@ -342,13 +342,16 @@ if ( ! class_exists( 'AS3CF_Utils' ) ) {
 		/**
 		 * Create a site link for given URL.
 		 *
-		 * @param string $url
-		 * @param string $text
+		 * @param string $url   URL for the link
+		 * @param string $text  Text for the link
+		 * @param string $class Optional class to add to link
 		 *
 		 * @return string
 		 */
-		public static function dbrains_link( $url, $text ) {
-			return sprintf( '<a href="%s" target="_blank">%s</a>', esc_url( $url ), esc_html( $text ) );
+		public static function dbrains_link( $url, $text, $class = '' ) {
+			$class = empty( $class ) ? '' : ' class="' . trim( $class ) . '"';
+
+			return sprintf( '<a href="%s"%s target="_blank">%s</a>', esc_url( $url ), $class, esc_html( $text ) );
 		}
 
 		/**
@@ -813,7 +816,7 @@ if ( ! class_exists( 'AS3CF_Utils' ) ) {
 				return $input;
 			}
 
-			$output = preg_replace_callback( '/s:(\d+):"(.*?)";/',
+			$output = preg_replace_callback( '/s:(\d+):"(.*?)"\s?;/',
 				array( __CLASS__, 'fix_serialized_matches' ),
 				$output
 			);
@@ -964,7 +967,7 @@ if ( ! class_exists( 'AS3CF_Utils' ) ) {
 			$broken = false;
 
 			if ( is_serialized( $data ) ) {
-				$value = @unserialize( $data ); // @phpcs:ignore
+				$value = self::maybe_unserialize( $data );
 
 				if ( false === $value && serialize( false ) !== $data ) {
 					$broken = true;
@@ -992,7 +995,7 @@ if ( ! class_exists( 'AS3CF_Utils' ) ) {
 				return false;
 			}
 
-			$pattern    = '/\\\";(s|a|o|i|b|d|})./';
+			$pattern    = '/\\\";(s|a|o|i|b|d|N|})./';
 			$end_quotes = preg_match_all( $pattern, $data, $matches );
 			if ( $end_quotes == 0 ) {
 				return false;
@@ -1041,6 +1044,21 @@ if ( ! class_exists( 'AS3CF_Utils' ) ) {
 			}
 
 			return $is_json;
+		}
+
+		/**
+		 * Maybe unserialize data, but not if an object.
+		 *
+		 * @param mixed $data
+		 *
+		 * @return mixed
+		 */
+		public static function maybe_unserialize( $data ) {
+			if ( is_serialized( $data ) ) {
+				return @unserialize( $data, array( 'allowed_classes' => false ) ); // @phpcs:ignore
+			}
+
+			return $data;
 		}
 	}
 }

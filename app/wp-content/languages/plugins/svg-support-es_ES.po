@@ -2,12 +2,12 @@
 # This file is distributed under the same license as the Plugins - SVG Support - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-12-13 11:38:31+0000\n"
+"PO-Revision-Date: 2023-11-10 10:11:04+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: GlotPress/4.0.0-alpha.3\n"
+"X-Generator: GlotPress/4.0.0-alpha.11\n"
 "Language: es\n"
 "Project-Id-Version: Plugins - SVG Support - Stable (latest release)\n"
 
@@ -461,7 +461,7 @@ msgstr "Valoraciones y reseñas"
 
 #: admin/svgs-settings-page.php:322
 msgid " Checking this will make sure that either the default class or the custom one you set in <b>\"CSS Class to target\"</b> option will be inserted into the style attributes of <code>img</code> tags when you insert SVG images into a post. Additionally, it will remove all of the default WordPress classes. It will leave normal image types as default and only affect SVG files."
-msgstr " Mancando esto te aseguras de que la clase por defecto o la personalizada que establezcas a continuación se inserte en los atributos de estilo de las etiquetas <code>img</code> cuando insertes imágenes SVG. Además, eliminará todas las clases predeterminadas de WordPress. Dejará los tipos de imagen normales como predeterminados y sólo afectará a los archivos SVG."
+msgstr " Marcando esto, te aseguras de que la clase por defecto o la personalizada que establezcas en la opción <b>«Clase CSS objetivo»</b>, se inserte en los atributos de estilo de las etiquetas <code>img</code> cuando insertes imágenes SVG en una entrada. Además, eliminará todas las clases por defecto de WordPress. Dejará los tipos de imagen normales por defecto y solo afectará a los archivos SVG."
 
 #: functions/featured-image.php:23
 msgid "Render this SVG inline (advanced)"

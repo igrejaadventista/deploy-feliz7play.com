@@ -148,7 +148,7 @@ class Flip_Box extends Base_Widget {
 		$this->add_control(
 			'title_text_a',
 			[
-				'label' => esc_html__( 'Title & Description', 'elementor-pro' ),
+				'label' => esc_html__( 'Title', 'elementor-pro' ),
 				'type' => Controls_Manager::TEXT,
 				'default' => esc_html__( 'This is the heading', 'elementor-pro' ),
 				'placeholder' => esc_html__( 'Enter your title', 'elementor-pro' ),
@@ -167,12 +167,10 @@ class Flip_Box extends Base_Widget {
 				'type' => Controls_Manager::TEXTAREA,
 				'default' => esc_html__( 'Lorem ipsum dolor sit amet consectetur adipiscing elit dolor', 'elementor-pro' ),
 				'placeholder' => esc_html__( 'Enter your description', 'elementor-pro' ),
-				'separator' => 'none',
 				'dynamic' => [
 					'active' => true,
 				],
 				'rows' => 10,
-				'show_label' => false,
 			]
 		);
 
@@ -265,7 +263,7 @@ class Flip_Box extends Base_Widget {
 		$this->add_control(
 			'title_text_b',
 			[
-				'label' => esc_html__( 'Title & Description', 'elementor-pro' ),
+				'label' => esc_html__( 'Title', 'elementor-pro' ),
 				'type' => Controls_Manager::TEXT,
 				'default' => esc_html__( 'This is the heading', 'elementor-pro' ),
 				'placeholder' => esc_html__( 'Enter your title', 'elementor-pro' ),
@@ -283,12 +281,10 @@ class Flip_Box extends Base_Widget {
 				'type' => Controls_Manager::TEXTAREA,
 				'default' => esc_html__( 'Lorem ipsum dolor sit amet consectetur adipiscing elit dolor', 'elementor-pro' ),
 				'placeholder' => esc_html__( 'Enter your description', 'elementor-pro' ),
-				'separator' => 'none',
 				'dynamic' => [
 					'active' => true,
 				],
 				'rows' => 10,
-				'show_label' => false,
 			]
 		);
 
@@ -415,22 +411,71 @@ class Flip_Box extends Base_Widget {
 			]
 		);
 
+		$this->add_control(
+			'title_tag',
+			[
+				'label' => esc_html__( 'Title HTML Tag', 'elementor-pro' ),
+				'type' => Controls_Manager::SELECT,
+				'options' => [
+					'h1' => 'H1',
+					'h2' => 'H2',
+					'h3' => 'H3',
+					'h4' => 'H4',
+					'h5' => 'H5',
+					'h6' => 'H6',
+					'div' => 'div',
+					'span' => 'span',
+					'p' => 'p',
+				],
+				'default' => 'h3',
+			]
+		);
+
+		$this->add_control(
+			'description_tag',
+			[
+				'label' => esc_html__( 'Description HTML Tag', 'elementor-pro' ),
+				'type' => Controls_Manager::SELECT,
+				'options' => [
+					'h1' => 'H1',
+					'h2' => 'H2',
+					'h3' => 'H3',
+					'h4' => 'H4',
+					'h5' => 'H5',
+					'h6' => 'H6',
+					'div' => 'div',
+					'span' => 'span',
+					'p' => 'p',
+				],
+				'default' => 'div',
+			]
+		);
+
 		$this->add_responsive_control(
 			'height',
 			[
 				'label' => esc_html__( 'Height', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'vh', 'custom' ],
 				'range' => [
 					'px' => [
 						'min' => 100,
 						'max' => 1000,
+					],
+					'em' => [
+						'min' => 10,
+						'max' => 100,
+					],
+					'rem' => [
+						'min' => 10,
+						'max' => 100,
 					],
 					'vh' => [
 						'min' => 10,
 						'max' => 100,
 					],
 				],
-				'size_units' => [ 'px', 'vh' ],
+				'separator' => 'before',
 				'selectors' => [
 					'{{WRAPPER}} .elementor-flip-box' => 'height: {{SIZE}}{{UNIT}};',
 				],
@@ -442,11 +487,16 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Border Radius', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'px', '%' ],
+				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 200,
+					],
+					'em' => [
+						'max' => 20,
+					],
+					'rem' => [
+						'max' => 20,
 					],
 				],
 				'separator' => 'after',
@@ -478,14 +528,27 @@ class Flip_Box extends Base_Widget {
 			'flip_direction',
 			[
 				'label' => esc_html__( 'Flip Direction', 'elementor-pro' ),
-				'type' => Controls_Manager::SELECT,
+				'type' => Controls_Manager::CHOOSE,
 				'default' => 'up',
 				'options' => [
-					'left' => esc_html__( 'Left', 'elementor-pro' ),
-					'right' => esc_html__( 'Right', 'elementor-pro' ),
-					'up' => esc_html__( 'Up', 'elementor-pro' ),
-					'down' => esc_html__( 'Down', 'elementor-pro' ),
+					'left' => [
+						'title' => esc_html__( 'Left', 'elementor-pro' ),
+						'icon' => 'eicon-h-align-left',
+					],
+					'right' => [
+						'title' => esc_html__( 'Right', 'elementor-pro' ),
+						'icon' => 'eicon-h-align-right',
+					],
+					'up' => [
+						'title' => esc_html__( 'Top', 'elementor-pro' ),
+						'icon' => 'eicon-v-align-top',
+					],
+					'down' => [
+						'title' => esc_html__( 'Bottom', 'elementor-pro' ),
+						'icon' => 'eicon-v-align-bottom',
+					],
 				],
+				'toggle' => false,
 				'condition' => [
 					'flip_effect!' => [
 						'fade',
@@ -528,7 +591,7 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Padding', 'elementor-pro' ),
 				'type' => Controls_Manager::DIMENSIONS,
-				'size_units' => [ 'px', 'em', '%' ],
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-flip-box__front .elementor-flip-box__layer__overlay' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -618,10 +681,16 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Spacing', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -636,9 +705,9 @@ class Flip_Box extends Base_Widget {
 		$this->add_control(
 			'image_width',
 			[
-				'label' => esc_html__( 'Size', 'elementor-pro' ) . ' (%)',
+				'label' => esc_html__( 'Width', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ '%' ],
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'default' => [
 					'unit' => '%',
 				],
@@ -698,10 +767,16 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Border Radius', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 200,
+					],
+					'em' => [
+						'max' => 20,
+					],
+					'rem' => [
+						'max' => 20,
 					],
 				],
 				'selectors' => [
@@ -730,10 +805,16 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Spacing', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -787,10 +868,19 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Icon Size', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
 						'min' => 6,
 						'max' => 300,
+					],
+					'em' => [
+						'min' => 0.6,
+						'max' => 30,
+					],
+					'rem' => [
+						'min' => 0.6,
+						'max' => 30,
 					],
 				],
 				'selectors' => [
@@ -829,6 +919,7 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Icon Rotate', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'deg', 'grad', 'rad', 'turn' ],
 				'default' => [
 					'size' => 0,
 					'unit' => 'deg',
@@ -848,6 +939,18 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Border Width', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
+				'range' => [
+					'px' => [
+						'max' => 20,
+					],
+					'em' => [
+						'max' => 2,
+					],
+					'rem' => [
+						'max' => 2,
+					],
+				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-icon' => 'border-width: {{SIZE}}{{UNIT}}',
 				],
@@ -863,7 +966,7 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Border Radius', 'elementor-pro' ),
 				'type' => Controls_Manager::DIMENSIONS,
-				'size_units' => [ 'px', '%' ],
+				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-icon' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -891,10 +994,16 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Spacing', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -1000,7 +1109,7 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Padding', 'elementor-pro' ),
 				'type' => Controls_Manager::DIMENSIONS,
-				'size_units' => [ 'px', 'em', '%' ],
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-flip-box__back .elementor-flip-box__layer__overlay' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -1091,10 +1200,16 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Spacing', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -1160,10 +1275,16 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Spacing', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -1269,6 +1390,9 @@ class Flip_Box extends Base_Widget {
 				'selectors' => [
 					'{{WRAPPER}} .elementor-flip-box__button' => 'color: {{VALUE}};',
 				],
+				'condition' => [
+					'button_text!' => '',
+				],
 			]
 		);
 
@@ -1284,6 +1408,9 @@ class Flip_Box extends Base_Widget {
 						'default' => 'classic',
 					],
 				],
+				'condition' => [
+					'button_text!' => '',
+				],
 			]
 		);
 
@@ -1294,6 +1421,9 @@ class Flip_Box extends Base_Widget {
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .elementor-flip-box__button' => 'border-color: {{VALUE}};',
+				],
+				'condition' => [
+					'button_text!' => '',
 				],
 			]
 		);
@@ -1307,6 +1437,9 @@ class Flip_Box extends Base_Widget {
 				'condition' => [
 					'button_text!' => '',
 				],
+				'condition' => [
+					'button_text!' => '',
+				],
 			]
 		);
 
@@ -1317,6 +1450,9 @@ class Flip_Box extends Base_Widget {
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .elementor-flip-box__button:hover' => 'color: {{VALUE}};',
+				],
+				'condition' => [
+					'button_text!' => '',
 				],
 			]
 		);
@@ -1333,6 +1469,9 @@ class Flip_Box extends Base_Widget {
 						'default' => 'classic',
 					],
 				],
+				'condition' => [
+					'button_text!' => '',
+				],
 			]
 		);
 
@@ -1343,6 +1482,24 @@ class Flip_Box extends Base_Widget {
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .elementor-flip-box__button:hover' => 'border-color: {{VALUE}};',
+				],
+				'condition' => [
+					'button_text!' => '',
+				],
+			]
+		);
+
+		$this->add_control(
+			'button_hover_transition_duration',
+			[
+				'label' => esc_html__( 'Transition Duration', 'elementor-pro' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 's', 'ms', 'custom' ],
+				'default' => [
+					'unit' => 'ms',
+				],
+				'selectors' => [
+					'{{WRAPPER}} .elementor-flip-box__button' => 'transition-duration: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -1356,10 +1513,16 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Border Width', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 20,
+					],
+					'em' => [
+						'max' => 2,
+					],
+					'rem' => [
+						'max' => 2,
 					],
 				],
 				'selectors' => [
@@ -1377,10 +1540,16 @@ class Flip_Box extends Base_Widget {
 			[
 				'label' => esc_html__( 'Border Radius', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -1401,6 +1570,8 @@ class Flip_Box extends Base_Widget {
 		$settings = $this->get_settings_for_display();
 		$wrapper_tag = 'div';
 		$button_tag = 'a';
+		$title_tag = Utils::validate_html_tag( $settings['title_tag'] );
+		$description_tag = Utils::validate_html_tag( $settings['description_tag'] );
 		$migration_allowed = Icons_Manager::is_migration_allowed();
 		$this->add_render_attribute( 'button', 'class', [
 			'elementor-flip-box__button',
@@ -1444,7 +1615,7 @@ class Flip_Box extends Base_Widget {
 		$is_new = empty( $settings['icon'] ) && $migration_allowed;
 
 		?>
-		<div class="elementor-flip-box">
+		<div class="elementor-flip-box" tabindex="0">
 			<div class="elementor-flip-box__layer elementor-flip-box__front">
 				<div class="elementor-flip-box__layer__overlay">
 					<div class="elementor-flip-box__layer__inner">
@@ -1465,15 +1636,15 @@ class Flip_Box extends Base_Widget {
 						<?php endif; ?>
 
 						<?php if ( ! empty( $settings['title_text_a'] ) ) : ?>
-							<h3 class="elementor-flip-box__layer__title">
+							<<?php Utils::print_validated_html_tag( $title_tag ); ?> class="elementor-flip-box__layer__title">
 								<?php $this->print_unescaped_setting( 'title_text_a' ); ?>
-							</h3>
+							</<?php Utils::print_validated_html_tag( $title_tag ); ?>>
 						<?php endif; ?>
 
 						<?php if ( ! empty( $settings['description_text_a'] ) ) : ?>
-							<div class="elementor-flip-box__layer__description">
+							<<?php Utils::print_validated_html_tag( $description_tag ); ?> class="elementor-flip-box__layer__description">
 								<?php $this->print_unescaped_setting( 'description_text_a' ); ?>
-							</div>
+							</<?php Utils::print_validated_html_tag( $description_tag ); ?>>
 						<?php endif; ?>
 					</div>
 				</div>
@@ -1482,15 +1653,15 @@ class Flip_Box extends Base_Widget {
 			<div class="elementor-flip-box__layer__overlay">
 				<div class="elementor-flip-box__layer__inner">
 					<?php if ( ! empty( $settings['title_text_b'] ) ) : ?>
-						<h3 class="elementor-flip-box__layer__title">
+						<<?php Utils::print_validated_html_tag( $title_tag ); ?> class="elementor-flip-box__layer__title">
 							<?php $this->print_unescaped_setting( 'title_text_b' ); ?>
-						</h3>
+						</<?php Utils::print_validated_html_tag( $title_tag ); ?>>
 					<?php endif; ?>
 
 					<?php if ( ! empty( $settings['description_text_b'] ) ) : ?>
-						<div class="elementor-flip-box__layer__description">
+						<<?php Utils::print_validated_html_tag( $description_tag ); ?> class="elementor-flip-box__layer__description">
 							<?php $this->print_unescaped_setting( 'description_text_b' ); ?>
-						</div>
+						</<?php Utils::print_validated_html_tag( $description_tag ); ?>>
 					<?php endif; ?>
 
 					<?php if ( ! empty( $settings['button_text'] ) ) : ?>
@@ -1531,7 +1702,9 @@ class Flip_Box extends Base_Widget {
 		}
 
 		var wrapperTag = 'div',
-		buttonTag = 'a';
+			buttonTag = 'a',
+			titleTag = elementor.helpers.validateHTMLTag( settings.title_tag ),
+			descriptionTag = elementor.helpers.validateHTMLTag( settings.description_tag );
 
 		if ( 'box' === settings.link_click ) {
 			wrapperTag = 'a';
@@ -1550,7 +1723,7 @@ class Flip_Box extends Base_Widget {
 			migrated = elementor.helpers.isIconMigrated( settings, 'selected_icon' );
 		#>
 
-		<div class="elementor-flip-box">
+		<div class="elementor-flip-box" tabindex="0">
 			<div class="elementor-flip-box__layer elementor-flip-box__front">
 				<div class="elementor-flip-box__layer__overlay">
 					<div class="elementor-flip-box__layer__inner">
@@ -1571,32 +1744,32 @@ class Flip_Box extends Base_Widget {
 						<# } #>
 
 						<# if ( settings.title_text_a ) { #>
-						<h3 class="elementor-flip-box__layer__title">{{{ settings.title_text_a }}}</h3>
+						<{{ titleTag }} class="elementor-flip-box__layer__title">{{{ settings.title_text_a }}}</{{ titleTag }}>
 						<# } #>
 
 						<# if ( settings.description_text_a ) { #>
-						<div class="elementor-flip-box__layer__description">{{{ settings.description_text_a }}}</div>
+						<{{ descriptionTag }} class="elementor-flip-box__layer__description">{{{ settings.description_text_a }}}</{{ descriptionTag }}>
 						<# } #>
 					</div>
 				</div>
 			</div>
 			<{{ wrapperTag }} class="elementor-flip-box__layer elementor-flip-box__back">
-			<div class="elementor-flip-box__layer__overlay">
-				<div class="elementor-flip-box__layer__inner">
-					<# if ( settings.title_text_b ) { #>
-					<h3 class="elementor-flip-box__layer__title">{{{ settings.title_text_b }}}</h3>
-					<# } #>
+				<div class="elementor-flip-box__layer__overlay">
+					<div class="elementor-flip-box__layer__inner">
+						<# if ( settings.title_text_b ) { #>
+						<{{ titleTag }} class="elementor-flip-box__layer__title">{{{ settings.title_text_b }}}</{{ titleTag }}>
+						<# } #>
 
-					<# if ( settings.description_text_b ) { #>
-					<div class="elementor-flip-box__layer__description">{{{ settings.description_text_b }}}</div>
-					<# } #>
+						<# if ( settings.description_text_b ) { #>
+						<{{ descriptionTag }} class="elementor-flip-box__layer__description">{{{ settings.description_text_b }}}</{{ descriptionTag }}>
+						<# } #>
 
-					<# if ( settings.button_text ) { #>
-					<{{ buttonTag }} href="#" class="{{ btnClasses }}">{{{ settings.button_text }}}</{{ buttonTag }}>
-				<# } #>
-			</div>
-		</div>
-		</{{ wrapperTag }}>
+						<# if ( settings.button_text ) { #>
+						<{{ buttonTag }} href="#" class="{{ btnClasses }}">{{{ settings.button_text }}}</{{ buttonTag }}>
+						<# } #>
+					</div>
+				</div>
+			</{{ wrapperTag }}>
 		</div>
 		<?php
 	}

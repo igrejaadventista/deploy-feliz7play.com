@@ -10,6 +10,8 @@ use DeliciousBrains\WP_Offload_Media\Aws3\Psr\Http\Message\StreamInterface;
 class HashingStream implements StreamInterface
 {
     use StreamDecoratorTrait;
+    /** @var StreamInterface */
+    private $stream;
     /** @var HashInterface */
     private $hash;
     /** @var callable|null */
@@ -26,7 +28,7 @@ class HashingStream implements StreamInterface
         $this->hash = $hash;
         $this->callback = $onComplete;
     }
-    public function read($length)
+    public function read($length) : string
     {
         $data = $this->stream->read($length);
         $this->hash->update($data);
@@ -38,13 +40,13 @@ class HashingStream implements StreamInterface
         }
         return $data;
     }
-    public function seek($offset, $whence = \SEEK_SET)
+    public function seek($offset, $whence = \SEEK_SET) : void
     {
-        if ($offset === 0) {
-            $this->hash->reset();
-            return $this->stream->seek($offset);
-        }
         // Seeking arbitrarily is not supported.
-        return \false;
+        if ($offset !== 0) {
+            return;
+        }
+        $this->hash->reset();
+        $this->stream->seek($offset);
     }
 }

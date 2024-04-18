@@ -7,16 +7,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: GlotPress/4.0.0-alpha.4\n"
+"X-Generator: GlotPress/4.0.1\n"
 "Language: pt_BR\n"
 "Project-Id-Version: Themes - Twenty Twenty-Three\n"
 
 #. Description of the theme
+#: style.css
 #, gp-priority: high
 msgid "Twenty Twenty-Three is designed to take advantage of the new design tools introduced in WordPress 6.1. With a clean, blank base as a starting point, this default theme includes ten diverse style variations created by members of the WordPress community. Whether you want to build a complex or incredibly simple website, you can do it quickly and intuitively through the bundled styles or dive into creation and full customization yourself."
 msgstr "O Twenty Twenty-Three foi projetado para aproveitar as novas ferramentas de design introduzidas no WordPress 6.1. Com uma base limpa e em branco como ponto de partida, este tema padrão inclui dez variações de estilo diversas criadas por membros da comunidade WordPress. Se você deseja criar um site complexo ou incrivelmente simples, pode fazê-lo de maneira rápida e intuitiva por meio dos estilos agrupados ou mergulhar na criação e personalização completa."
 
 #. Theme Name of the theme
+#: style.css
 #, gp-priority: high
 msgid "Twenty Twenty-Three"
 msgstr "Twenty Twenty-Three"
@@ -25,11 +27,6 @@ msgstr "Twenty Twenty-Three"
 msgctxt "Template part name"
 msgid "Post Meta"
 msgstr "Metadados do post"
-
-#: theme.json
-msgctxt "Template part name"
-msgid "Comments"
-msgstr "Comentários"
 
 #: theme.json
 msgctxt "Template part name"
@@ -191,32 +188,32 @@ msgctxt "Font size name"
 msgid "Tiny"
 msgstr "Minúscula"
 
-#: theme.json styles/marigold.json styles/pitch.json
+#: styles/marigold.json styles/pitch.json theme.json
 msgctxt "Space size name"
 msgid "6"
 msgstr "6"
 
-#: theme.json styles/marigold.json styles/pitch.json
+#: styles/marigold.json styles/pitch.json theme.json
 msgctxt "Space size name"
 msgid "5"
 msgstr "5"
 
-#: theme.json styles/marigold.json styles/pitch.json
+#: styles/marigold.json styles/pitch.json theme.json
 msgctxt "Space size name"
 msgid "4"
 msgstr "4"
 
-#: theme.json styles/marigold.json styles/pitch.json
+#: styles/marigold.json styles/pitch.json theme.json
 msgctxt "Space size name"
 msgid "3"
 msgstr "3"
 
-#: theme.json styles/marigold.json styles/pitch.json
+#: styles/marigold.json styles/pitch.json theme.json
 msgctxt "Space size name"
 msgid "2"
 msgstr "2"
 
-#: theme.json styles/marigold.json styles/pitch.json
+#: styles/marigold.json styles/pitch.json theme.json
 msgctxt "Space size name"
 msgid "1"
 msgstr "1"
@@ -252,42 +249,42 @@ msgctxt "Style variation name"
 msgid "Block out"
 msgstr "Bloquear"
 
-#: theme.json styles/aubergine.json styles/block-out.json styles/canary.json
+#: styles/aubergine.json styles/block-out.json styles/canary.json
 #: styles/electric.json styles/grapes.json styles/marigold.json
 #: styles/pilgrimage.json styles/pitch.json styles/sherbet.json
-#: styles/whisper.json
+#: styles/whisper.json theme.json
 msgctxt "Color name"
 msgid "Tertiary"
 msgstr "Terciário"
 
-#: theme.json styles/aubergine.json styles/block-out.json styles/canary.json
+#: styles/aubergine.json styles/block-out.json styles/canary.json
 #: styles/electric.json styles/grapes.json styles/marigold.json
 #: styles/pilgrimage.json styles/pitch.json styles/sherbet.json
-#: styles/whisper.json
+#: styles/whisper.json theme.json
 msgctxt "Color name"
 msgid "Secondary"
 msgstr "Secundário"
 
-#: theme.json styles/aubergine.json styles/block-out.json styles/canary.json
+#: styles/aubergine.json styles/block-out.json styles/canary.json
 #: styles/electric.json styles/grapes.json styles/marigold.json
 #: styles/pilgrimage.json styles/pitch.json styles/sherbet.json
-#: styles/whisper.json
+#: styles/whisper.json theme.json
 msgctxt "Color name"
 msgid "Primary"
 msgstr "Primário"
 
-#: theme.json styles/aubergine.json styles/block-out.json styles/canary.json
+#: styles/aubergine.json styles/block-out.json styles/canary.json
 #: styles/electric.json styles/grapes.json styles/marigold.json
 #: styles/pilgrimage.json styles/pitch.json styles/sherbet.json
-#: styles/whisper.json
+#: styles/whisper.json theme.json
 msgctxt "Color name"
 msgid "Contrast"
 msgstr "Contraste"
 
-#: theme.json styles/aubergine.json styles/block-out.json styles/canary.json
+#: styles/aubergine.json styles/block-out.json styles/canary.json
 #: styles/electric.json styles/grapes.json styles/marigold.json
 #: styles/pilgrimage.json styles/pitch.json styles/sherbet.json
-#: styles/whisper.json
+#: styles/whisper.json theme.json
 msgctxt "Color name"
 msgid "Base"
 msgstr "Base"
@@ -417,17 +414,19 @@ msgid "Call to action"
 msgstr "Chamada para ação"
 
 #. Author URI of the theme
-#: patterns/footer-default.php:20
+#: style.css patterns/footer-default.php:20
 #, gp-priority: low
 msgid "https://wordpress.org"
 msgstr "https://br.wordpress.org"
 
 #. Author of the theme
+#: style.css
 #, gp-priority: low
 msgid "the WordPress team"
 msgstr "a equipe do WordPress"
 
 #. Theme URI of the theme
+#: style.css
 #, gp-priority: low
 msgid "https://wordpress.org/themes/twentytwentythree"
 msgstr "https://wordpress.org/themes/twentytwentythree"
