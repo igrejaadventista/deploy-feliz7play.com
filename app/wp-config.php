@@ -43,7 +43,7 @@ define( 'AS3CF_SETTINGS', serialize( array(
     'provider' => 'aws',
     'access-key-id' => 'WP_S3_ACCESS_KEY',
     // 
-    'secret-access-key' => 'WP_S3_SECRET_KEY',
+    'secret-access-key' => 'AWS_S_KEY',
     //
 	'bucket' => 'WP_S3_BUCKET'
 ) ) );
