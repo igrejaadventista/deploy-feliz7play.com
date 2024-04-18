@@ -20,7 +20,7 @@ jobs:
         grep -lr -e  "WP_DB_USER" * | xargs sed -i "s/WP_DB_USER/${{ secrets.WP_DB_USER }}/g" |
         grep -lr -e  "WP_DB_PASSWORD" * | xargs sed -i "s/WP_DB_PASSWORD/${{ secrets.WP_DB_PASSWORD }}/g" |
         grep -lr -e  "WP_DB_HOST" * | xargs sed -i "s/WP_DB_HOST/${{ secrets.WP_DB_HOST }}/g" | 
-        sed -i 's/WP_S3_SECRET_KEY/${{ secrets.WP_S3_SECRET_KEY }}/' ./app/wp-config.php |
+        sed -i 's/WP_S3_SECRET_KEY/${{ secrets.WP_S3_SECRET_KEY }}/g' ./app/wp-config.php |
         grep -lr -e  "WP_S3_ACCESS_KEY" * | xargs sed -i "s/WP_S3_ACCESS_KEY/${{ secrets.WP_S3_ACCESS_KEY }}/g" |
         grep -lr -e  "WP_S3_BUCKET" * | xargs sed -i "s/WP_S3_BUCKET/${{ secrets.WP_S3_BUCKET }}/g" |
         echo "End transform: wp-config.php"
