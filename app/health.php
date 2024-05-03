@@ -1,8 +1,6 @@
 <?php 
 
-echo "Response ok ;-)";
-
-echo "Hello world";
+echo "Response ok ;-) - deploy LMN";
 
 
-?>
+
