@@ -42,7 +42,7 @@ class VideoCPT {
 			'description'           => __( 'Post Type Description', 'f7p' ),
 			'labels'                => $labels,
 			'supports'              => array( 'title', 'thumbnail' ),
-			'taxonomies'            => array( 'genre', 'collection' ),
+			'taxonomies'            => array( 'genre', 'collection', 'categorytest3' ),
 			'hierarchical'          => false,
 			'public'                => false,
 			'show_ui'               => true,
