@@ -201,17 +201,17 @@ function custom_taxonomy_radio_buttons() {
     ?>
     <script>
         jQuery(document).ready(function($) {
-            // $('#categorychecklist input[type="checkbox"]').each(function() {
-            //     $(this).replaceWith('<input type="radio" name="post_category[]" value="' + $(this).val() + '" />');
-            // });
+            $('#categorychecklist input[type="checkbox"]').each(function() {
+				//     $(this).replaceWith('<input type="radio" name="post_category[]" value="' + $(this).val() + '" />');
 
-			 // Substitui o checkbox por um radio button
-			 $(this).replaceWith('<input type="radio" name="post_category[]" value="' + $(this).val() + '" />');
+				// Substitui o checkbox por um radio button
+				$(this).replaceWith('<input type="radio" name="post_category[]" value="' + $(this).val() + '" />');
 
-			// Verifica se a categoria está selecionada e marca o radio button correspondente
-			if ($(this).prop('checked')) {
-				$(this).closest('li').find('input[type="radio"]').prop('checked', true);
-			}
+				// Verifica se a categoria está selecionada e marca o radio button correspondente
+				if ($(this).prop('checked')) {
+					$(this).closest('li').find('input[type="radio"]').prop('checked', true);
+				}
+            });
         });
     </script>
     <?php
