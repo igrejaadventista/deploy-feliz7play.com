@@ -205,7 +205,7 @@ function custom_taxonomy_radio_buttons() {
 				// Verifica se a categoria está selecionada e marca o radio button correspondente
 				$checked = '';
 				if ($(this).prop('checked')) {
-					$(this).closest('li').find('input[type="radio"]').prop('checked', 'checked');
+					// $(this).closest('li').find('input[type="radio"]').prop('checked', 'checked');
 					$checked = 'checked="checked"';
 				}
 				// Substitui o checkbox por um radio button
