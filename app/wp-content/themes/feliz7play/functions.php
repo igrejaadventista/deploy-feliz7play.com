@@ -195,7 +195,7 @@ function cconsole($var) {
     return;
 }
 
-
+// Função que torna taxonomia Category como radio buttons
 function custom_taxonomy_radio_buttons() {
     ?>
     <script>
