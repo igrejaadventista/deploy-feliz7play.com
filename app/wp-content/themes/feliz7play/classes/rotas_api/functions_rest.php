@@ -4,7 +4,13 @@ function get_genre($item)
 {
     $image = get_field('image', 'term_' . $item->term_id)['url'];
 
-    $line = array('id' => $item->term_id, 'line_name' => $item->name, 'line_slug' => $item->slug,  'source' => $item->taxonomy, 'image_default' => $image);
+    $line = array(
+        'id' => $item->term_id, 
+        'line_name' => $item->name, 
+        'line_slug' => $item->slug,  
+        'source' => $item->taxonomy, 
+        'image_default' => $image
+    );
 
     global $lines;
     array_push($lines, $line);
