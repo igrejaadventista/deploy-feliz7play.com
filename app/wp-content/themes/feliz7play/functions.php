@@ -194,3 +194,18 @@ function cconsole($var) {
     echo "<script>console.log('" . $var . "');</script>";
     return;
 }
+
+
+function custom_taxonomy_radio_buttons() {
+    ?>
+    <script>
+        jQuery(document).ready(function($) {
+            $('.categorychecklist input[type="checkbox"]').each(function() {
+                $(this).replaceWith('<input type="radio" name="post_category[]" value="' + $(this).val() + '" />');
+            });
+        });
+    </script>
+    <?php
+}
+add_action('admin_footer', 'custom_taxonomy_radio_buttons');
+
