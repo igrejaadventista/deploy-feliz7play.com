@@ -209,9 +209,7 @@ function custom_taxonomy_radio_buttons() {
 
 				// Verifica se a categoria está selecionada e marca o radio button correspondente
 				if ($(this).prop('checked')) {
-					$(this).replaceWith('<input type="radio" name="post_category[]" value="' + $(this).val() + '" checked />');
-					// $(this).closest('li').find('input[type="radio"]').prop('checked', true);
-					// $(this).closest('li').find('input[type="radio"]').html('::before');
+					$(this).closest('li').find('input[type="radio"]').prop('checked', 'checked');
 				}
             });
         });
