@@ -9,7 +9,8 @@ class CustomTaxonomies {
 	
 	function unregister_taxonomy() {
 		global $wp_taxonomies;
-		$taxonomy = array('category', 'post_tag');
+		// $taxonomy = array('category', 'post_tag');
+		$taxonomy = array('post_tag');
 		foreach ($taxonomy as &$value) {
 			if ( taxonomy_exists($value) ){
 				unset( $wp_taxonomies[$value] );
@@ -91,7 +92,8 @@ class CustomTaxonomies {
 			'rest_base'                  => 'collection',
 		);
 		register_taxonomy( 'collection', array( 'video' ), $args );
-		}
+	}
+
 }
 $PaImageThumbs = new CustomTaxonomies();
 
