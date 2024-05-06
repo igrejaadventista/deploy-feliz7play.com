@@ -202,8 +202,6 @@ function custom_taxonomy_radio_buttons() {
     <script>
         jQuery(document).ready(function($) {
             $('#categorychecklist input[type="checkbox"]').each(function() {
-				//     $(this).replaceWith('<input type="radio" name="post_category[]" value="' + $(this).val() + '" />');
-
 				// Verifica se a categoria está selecionada e marca o radio button correspondente
 				$checked = '';
 				if ($(this).prop('checked')) {
