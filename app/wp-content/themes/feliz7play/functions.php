@@ -200,7 +200,7 @@ function custom_taxonomy_radio_buttons() {
     ?>
     <script>
         jQuery(document).ready(function($) {
-            $('.categorychecklist input[type="checkbox"]').each(function() {
+            $('#categorychecklist input[type="checkbox"]').each(function() {
                 $(this).replaceWith('<input type="radio" name="post_category[]" value="' + $(this).val() + '" />');
             });
         });
