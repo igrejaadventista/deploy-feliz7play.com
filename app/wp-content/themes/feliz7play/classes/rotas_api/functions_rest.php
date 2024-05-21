@@ -40,8 +40,6 @@ function get_line_post($args, $limited = false)
     $items = array();
     $controle = array();
 
-
-
     $posts = get_posts($args);
     foreach ($posts as $post) {
 
