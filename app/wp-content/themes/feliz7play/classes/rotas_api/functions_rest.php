@@ -4,6 +4,10 @@ function get_genre($genre_item, $category_item)
 {
     $image = get_field('image', 'term_' . $genre_item->term_id)['url'];
 
+    $category_item = get_sub_field('genre-category');
+
+    echo $category_item;
+
     $line = array(
         'id' => $genre_item->term_id, 
         'line_name' => $genre_item->name, 
