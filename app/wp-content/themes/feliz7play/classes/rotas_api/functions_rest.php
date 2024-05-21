@@ -4,10 +4,8 @@ function get_genre($genre_item)
 {
     $image = get_field('image', 'term_' . $genre_item->term_id)['url'];
 
-    $line_name = get_sub_field('genre_title');
+    $line_name = get_sub_field('genre-title');
     $category_item = get_sub_field('genre-category');
-
-    echo $category_item;
 
     $line = array(
         'id' => $genre_item->term_id, 
@@ -15,6 +13,7 @@ function get_genre($genre_item)
         'line_slug' => $genre_item->slug,  
         'source' => $genre_item->taxonomy, 
         'image_default' => $image,
+        'echo_category' => $category_item,
         'category' => get_category_by_line($category_item)
     );
 
