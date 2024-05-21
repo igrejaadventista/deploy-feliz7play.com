@@ -1,15 +1,32 @@
 <?php
 
-function get_genre($item)
+function get_genre($genre_item, $category_item)
 {
-    $image = get_field('image', 'term_' . $item->term_id)['url'];
+    $image = get_field('image', 'term_' . $genre_item->term_id)['url'];
+
+    $line = array(
+        'id' => $genre_item->term_id, 
+        'line_name' => $genre_item->name, 
+        'line_slug' => $genre_item->slug,  
+        'source' => $genre_item->taxonomy, 
+        'image_default' => $image,
+        'category' => get_category($category_item)
+    );
+
+    global $lines;
+    array_push($lines, $line);
+    return;
+}
+
+function get_category($item)
+{
+    // $image = get_field('image', 'term_' . $item->term_id)['url'];
 
     $line = array(
         'id' => $item->term_id, 
         'line_name' => $item->name, 
         'line_slug' => $item->slug,  
         'source' => $item->taxonomy, 
-        'image_default' => $image
     );
 
     global $lines;
