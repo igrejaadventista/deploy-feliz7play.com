@@ -25,9 +25,9 @@ function get_genre($genre_item)
 function get_category_by_line($item)
 {
     $line = array(
-        'id' => $item->term_id, 
-        'line_name' => $item->name, 
-        'line_slug' => $item->slug,  
+        'id' => $item[0], 
+        'line_name' => $item[1], 
+        'line_slug' => $item[2],  
         'source' => $item->taxonomy, 
     );
 
