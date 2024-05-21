@@ -1,6 +1,6 @@
 <?php
 
-function get_genre($genre_item, $category_item)
+function get_genre($genre_item)
 {
     $image = get_field('image', 'term_' . $genre_item->term_id)['url'];
 
