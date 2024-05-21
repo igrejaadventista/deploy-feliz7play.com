@@ -13,7 +13,7 @@ function get_genre($genre_item)
         'line_slug' => $genre_item->slug,  
         'source' => $genre_item->taxonomy, 
         'image_default' => $image,
-        'echo_category' => $category_item,
+        'echo_category' => print_r($category_item),
         'category' => get_category_by_line($category_item)
     );
 
