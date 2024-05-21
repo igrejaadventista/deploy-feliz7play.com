@@ -20,8 +20,6 @@ function get_genre($genre_item, $category_item)
 
 function get_category_by_line($item)
 {
-    // $image = get_field('image', 'term_' . $item->term_id)['url'];
-
     $line = array(
         'id' => $item->term_id, 
         'line_name' => $item->name, 
@@ -29,9 +27,7 @@ function get_category_by_line($item)
         'source' => $item->taxonomy, 
     );
 
-    global $lines;
-    array_push($lines, $line);
-    return;
+    return $line;
 }
 
 function get_line_post($args, $limited = false)
