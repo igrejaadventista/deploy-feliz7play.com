@@ -9,7 +9,7 @@ function get_genre($genre_item)
 
     $category_array = [];
     foreach ($category_items as $category_item) {
-       array_push($category_array, $category_item);     
+       array_push($category_array, get_category_by_line($category_item));     
     }
 
     $line = array(
@@ -18,9 +18,7 @@ function get_genre($genre_item)
         'line_slug' => $genre_item->slug,  
         'source' => $genre_item->taxonomy, 
         'image_default' => $image,
-        'echo_genre' => print_r($genre_item, true),
-        'echo_category' => print_r($category_array, true),
-        'category' => get_category_by_line($category_item)
+        'categories' => $category_array
     );
 
     global $lines;
