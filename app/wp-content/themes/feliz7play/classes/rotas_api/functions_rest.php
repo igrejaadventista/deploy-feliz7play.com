@@ -7,6 +7,7 @@ function get_genre($genre_item)
     $line_name = get_sub_field('genre_title');
     $category_items = get_sub_field('genre_category');
 
+    $category_array = [];
     foreach ($category_items as $category_item) {
        array_push($category_array, $category_item);     
     }

@@ -130,25 +130,6 @@
                     "display": "table",
                     "sub_fields": [
                         {
-                            "key": "field_664cec2549914",
-                            "label": "Title",
-                            "name": "genre_title",
-                            "type": "text",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "default_value": "",
-                            "placeholder": "",
-                            "prepend": "",
-                            "append": "",
-                            "maxlength": ""
-                        },
-                        {
                             "key": "field_601c0f1b33a76",
                             "label": "Genre",
                             "name": "genre",
@@ -168,28 +149,6 @@
                             "save_terms": 0,
                             "load_terms": 0,
                             "return_format": "object",
-                            "multiple": 0
-                        },
-                        {
-                            "key": "field_664c9d5a486e9",
-                            "label": "Category",
-                            "name": "genre_category",
-                            "type": "taxonomy",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "taxonomy": "category",
-                            "field_type": "multi_select",
-                            "allow_null": 0,
-                            "add_term": 0,
-                            "save_terms": 0,
-                            "load_terms": 0,
-                            "return_format": "id",
                             "multiple": 0
                         }
                     ],
@@ -237,8 +196,7 @@
                             "choices": {
                                 "default": "Default",
                                 "circle": "Circle",
-                                "vertical": "Vertical",
-                                "highlight": "Highlight"
+                                "vertical": "Vertical"
                             },
                             "default_value": "default",
                             "allow_null": 0,
@@ -342,7 +300,7 @@
                                         {
                                             "key": "field_601c0f7d33a7c",
                                             "label": "Video",
-                                            "name": "to_video",
+                                            "name": "slider_video_object",
                                             "type": "post_object",
                                             "instructions": "",
                                             "required": 0,
@@ -545,5 +503,6 @@
     "instruction_placement": "label",
     "hide_on_screen": "",
     "active": true,
-    "description": ""
+    "description": "",
+    "modified": 1630602521
 }
