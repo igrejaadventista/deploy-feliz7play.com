@@ -23,7 +23,6 @@ function get_genre($genre_items)
         'line_slug' => $genre_item->slug,  
         'source' => $genre_item->taxonomy, 
         'image_default' => $image,
-        'echo_categories' => print_r($category_array, true),
         'categories' => $category_array
     );
 
