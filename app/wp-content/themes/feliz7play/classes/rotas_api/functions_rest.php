@@ -2,7 +2,10 @@
 
 function get_genre($genre_items)
 {
-    $genre_item = $genre_items[0];
+
+    foreach ($genre_items as $g_item) {
+        $genre_item = $g_item;
+    }
     $image = get_field('image', 'term_' . $genre_item->term_id)['url'];
 
     $line_name = get_sub_field('genre_title');
