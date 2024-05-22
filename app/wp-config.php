@@ -18,6 +18,8 @@
  * @package WordPress
  */
 
+$is_dev = false;
+
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
 define( 'DB_NAME', 'WP_DB_NAME');
@@ -30,6 +32,13 @@ define( 'DB_PASSWORD', 'WP_DB_PASSWORD');
 
 /** MySQL hostname */
 define( 'DB_HOST', 'WP_DB_HOST');
+
+if($is_dev):
+    define( 'DB_HOST', 'localhost:3306');
+    define( 'DB_PASSWORD', '');
+    define( 'DB_USER', 'root');
+    define( 'DB_NAME', 'u919907044_devf7p');
+endif;
 
 /** Database Charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8mb4' );

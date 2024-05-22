@@ -5,10 +5,11 @@ function get_genre($genre_item)
     $image = get_field('image', 'term_' . $genre_item->term_id)['url'];
 
     $line_name = get_sub_field('genre_title');
-    $category_item = get_sub_field('genre_category');
+    $category_items = get_sub_field('genre_category');
 
-    // Imprimir o echo em um arquivo
-    file_put_contents('output.txt', print_r($$category_item, true));
+    foreach ($category_items as $category_item) {
+       array_push($category_array, $category_item);     
+    }
 
     $line = array(
         'id' => $genre_item->term_id, 
@@ -16,7 +17,7 @@ function get_genre($genre_item)
         'line_slug' => $genre_item->slug,  
         'source' => $genre_item->taxonomy, 
         'image_default' => $image,
-        'echo_category' => print_r($category_item, true),
+        'echo_category' => print_r($category_array, true),
         'category' => get_category_by_line($category_item)
     );
 
