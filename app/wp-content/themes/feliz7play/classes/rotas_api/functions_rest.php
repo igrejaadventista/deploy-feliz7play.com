@@ -7,6 +7,9 @@ function get_genre($genre_item)
     $line_name = get_sub_field('genre_title');
     $category_item = get_sub_field('genre_category');
 
+    // Imprimir o echo em um arquivo
+    file_put_contents('output.txt', print_r($$category_item, true));
+
     $line = array(
         'id' => $genre_item->term_id, 
         'line_name' => $line_name, 
