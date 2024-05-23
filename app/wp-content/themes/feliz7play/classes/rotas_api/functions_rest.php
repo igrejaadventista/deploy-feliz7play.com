@@ -367,20 +367,34 @@ function get_custom($items)
 
     $line_name = get_sub_field('custom_title');
     $line_model = get_sub_field('model');
+    // $limited = get_sub_field('n_itens');
+    $limited_per_item = 1;
 
-    $line = array('id' => 0, 'line_name' => $line_name, 'line_slug' => false,  'source' => 'custom', 'model' => $line_model,  'items' => []);
+    $line = array(
+        'id' => 0, 
+        'line_name' => $line_name, 
+        'line_slug' => false,  
+        'source' => 'custom', 
+        'model' => $line_model,  
+        'items' => []
+    );
 
     foreach ($items as $item) {
 
         switch ($item['acf_fc_layout']) {
             case 'collection':
 
-                $args = array('taxonomy' => 'collection',  'number' => 0, 'include' => $item['to_custom_collection']->term_id);
+                $args = array(
+                    'taxonomy' => 'collection',  
+                    'number' => 0, 
+                    'include' => $item['to_custom_collection']->term_id
+                );
                 $collection = get_line_collection($args);
 
                 if ($line_model == 'circle') {
                     $collection['included'][0]['video_thumbnail_circle'] = $item['image']['url'];
                 }
+
                 if ($line_model == 'vertical' || $line_model == 'highlight') {
                     $collection['included'][0]['video_thumbnail_vertical'] = $item['image']['url'];
                 }
@@ -391,17 +405,22 @@ function get_custom($items)
 
             case 'video':
 
-                $args = array('post_type' => 'video', 'fields' => '', 'include' => $item['slider_video_object']->ID, 'numberposts' => 0);
+                $args = array(
+                    'post_type' => 'video', 
+                    'fields' => '', 
+                    'include' => $item['slider_video_object']->ID, 'numberposts' => 0
+                );
                 $post = get_line_post($args);
 
                 if ($line_model == 'circle') {
                     $post[0]['video_thumbnail_circle'] = $item['image']['url'];
                 }
+
                 if ($line_model == 'vertical' || $line_model == 'highlight') {
                     $post[0]['video_thumbnail_vertical'] = $item['image']['url'];
                 }
 
-                array_push($line['items'], ...$post);
+                array_push($line['items'], ...$post[0]);
 
                 break;
         }
@@ -419,7 +438,14 @@ function get_recentes()
     $line_name = get_sub_field('recentes_title');
     $limited = get_sub_field('n_itens');
 
-    $line = array('id' => 0, 'line_name' => $line_name, 'line_slug' => false,  'source' => 'custom', 'model' => 'default',  'items' => []);
+    $line = array(
+        'id' => 0, 
+        'line_name' => $line_name, 
+        'line_slug' => false,  
+        'source' => 'custom', 
+        'model' => 'default',  
+        'items' => []
+    );
 
     $args = array(
         'post_type'         => 'video',
