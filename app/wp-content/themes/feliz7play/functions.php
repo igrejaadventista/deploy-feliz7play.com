@@ -14,7 +14,7 @@ require_once (dirname(__FILE__) . '/classes/rotas_api/functions_rest.php');
 
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_slider.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_liners.php');
-require_once (dirname(__FILE__) . '/classes/rotas_api/rest_liners_v2.php');
+// require_once (dirname(__FILE__) . '/classes/rotas_api/rest_liners_v2.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_category.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_collection.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_genre.php');
