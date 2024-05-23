@@ -420,7 +420,7 @@ function get_custom($items)
                     $post[0]['video_thumbnail_vertical'] = $item['image']['url'];
                 }
 
-                array_push($line['items'], ...$post[0]);
+                array_push($line['items'], $post[0]);
 
                 break;
         }
