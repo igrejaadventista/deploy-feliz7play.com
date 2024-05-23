@@ -31,6 +31,50 @@ function get_genre($genre_items)
     return;
 }
 
+function get_genre_v2($genres_items)
+{
+    $genre_array = [];
+    $category_array = [];
+    $line_name = get_sub_field('genre_title');
+    $category_items = get_sub_field('genre_category');
+
+    foreach ($genres_items as $genre_item) {
+        $image = get_field('image', 'term_' . $genre_item->term_id)['url'];
+        $item = get_genre_by_line($genre_item, $image);
+        array_push($genre_array, $item); 
+    }
+
+    foreach ($category_items as $category_item) {
+        $item = get_category_by_line($category_item);
+       array_push($category_array, $item);     
+    }
+
+    $line = array(
+        'id' => '0', 
+        'line_name' => $line_name, 
+        'source' => 'genre', 
+        'genres' => $genre_array,
+        'categories' => $category_array
+    );
+
+    global $lines;
+    array_push($lines, $line);
+    return;
+}
+
+function get_genre_by_line($item, $image)
+{
+    $line = array(
+        'id' => $item->term_id, 
+        'line_name' => $item->name, 
+        'line_slug' => $item->slug,  
+        'source' => $item->taxonomy, 
+        'image_default' => $image,
+    );
+
+    return $line;
+}
+
 function get_category_by_line($item)
 {
     $line = array(
