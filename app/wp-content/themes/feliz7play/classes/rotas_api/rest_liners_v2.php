@@ -3,13 +3,13 @@
 add_action( 'rest_api_init', function(){
 	register_rest_route( 'wp/v3', '/line-v2', array(
 	'methods' => 'GET',
-	'callback' => 'get_page_option_line',
+	'callback' => 'get_page_option_line_v2',
 	));
 });
 
 $lines = array();
 
-function get_page_option_line($data) {
+function get_page_option_line_v2($data) {
 	
 	global $lines;
 	
