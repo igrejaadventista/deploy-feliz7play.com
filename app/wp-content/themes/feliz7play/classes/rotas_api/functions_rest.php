@@ -337,7 +337,7 @@ function get_custom($items)
                 if ($line_model == 'circle') {
                     $collection['included'][0]['video_thumbnail_circle'] = $item['image']['url'];
                 }
-                if ($line_model == 'vertical') {
+                if ($line_model == 'vertical' || $line_model == 'highlight') {
                     $collection['included'][0]['video_thumbnail_vertical'] = $item['image']['url'];
                 }
 
@@ -353,7 +353,7 @@ function get_custom($items)
                 if ($line_model == 'circle') {
                     $post[0]['video_thumbnail_circle'] = $item['image']['url'];
                 }
-                if ($line_model == 'vertical') {
+                if ($line_model == 'vertical' || $line_model == 'highlight') {
                     $post[0]['video_thumbnail_vertical'] = $item['image']['url'];
                 }
 
