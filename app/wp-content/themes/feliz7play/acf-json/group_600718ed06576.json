@@ -1,6 +1,6 @@
 [
     {
-        "key": "group_600718ed06576",
+        "key": "group_664e740e33bc1",
         "title": "Theme Options",
         "fields": [
             {
@@ -312,6 +312,13 @@
                                                             "operator": "==",
                                                             "value": "vertical"
                                                         }
+                                                    ],
+                                                    [
+                                                        {
+                                                            "field": "field_60213ba097610",
+                                                            "operator": "==",
+                                                            "value": "highlight"
+                                                        }
                                                     ]
                                                 ],
                                                 "wrapper": {
@@ -382,6 +389,13 @@
                                                             "field": "field_60213ba097610",
                                                             "operator": "==",
                                                             "value": "vertical"
+                                                        }
+                                                    ],
+                                                    [
+                                                        {
+                                                            "field": "field_60213ba097610",
+                                                            "operator": "==",
+                                                            "value": "highlight"
                                                         }
                                                     ]
                                                 ],
@@ -533,9 +547,9 @@
         "location": [
             [
                 {
-                    "param": "options_page",
+                    "param": "post_type",
                     "operator": "==",
-                    "value": "acf-options-home-options"
+                    "value": "page"
                 }
             ]
         ],
