@@ -124,6 +124,7 @@ function get_line_post($args, $limited = false)
         }
 
         $genre =                get_the_terms($id, 'genre')[0];
+        $category =             get_the_terms($id, 'category')[0];
         $video_lenght =         $meta['post_video_length'][0];
         $video_quality =        $meta['post_video_quality'][0];
 
@@ -141,6 +142,7 @@ function get_line_post($args, $limited = false)
             'subtitle' => $subtitle,
             'description' => $description,
             'genre' => $genre,
+            'category' => $category,
             'collection' => $collection,
             'video_host' => $video_host,
             'video_id' => $video_id,
