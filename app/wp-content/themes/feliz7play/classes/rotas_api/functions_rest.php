@@ -339,7 +339,14 @@ function get_line_collection($args)
         $video_thumbnail = wp_get_attachment_image_src($meta['collection_image'][0])[0];
         $video_image_hover = false;
 
-        $values = array('id' => $id, 'title' => $title, 'slug' => $slug, 'video_type' => $video_type, 'video_thumbnail' => $video_thumbnail, 'video_image_hover' => $video_image_hover);
+        $values = array(
+            'id' => $id, 
+            'title' => $title, 
+            'slug' => $slug, 
+            'video_type' => $video_type, 
+            'video_thumbnail' => $video_thumbnail, 
+            'video_image_hover' => $video_image_hover
+        );
         // $values = array('id' => $id);
 
         array_push($items['included'], $values);
@@ -355,7 +362,13 @@ function get_line_collection($args)
 function get_collection($item)
 {
 
-    $line = array('id' => $item->term_id, 'line_name' => $item->name, 'line_slug' => $item->slug,  'source' => $item->taxonomy, 'seasons' => get_field('seasons', 'collection_' . $item->term_id));
+    $line = array(
+        'id' => $item->term_id, 
+        'line_name' => $item->name, 
+        'line_slug' => $item->slug,  
+        'source' => $item->taxonomy, 
+        'seasons' => get_field('seasons', 'collection_' . $item->term_id)
+    );
 
     global $lines;
     array_push($lines, $line);
