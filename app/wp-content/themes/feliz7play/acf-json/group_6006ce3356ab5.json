@@ -101,6 +101,28 @@
                 "step": ""
             },
             {
+                "key": "field_6660d71a3adab",
+                "label": "Video Age Rating",
+                "name": "collection_video_age_rating",
+                "type": "select",
+                "instructions": "AL\r\nA10\r\nA12\r\nA14\r\nA16\r\nA18\r\nL\r\n10\r\n12\r\n14\r\n16\r\n18",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": [],
+                "default_value": false,
+                "allow_null": 0,
+                "multiple": 0,
+                "ui": 0,
+                "return_format": "value",
+                "ajax": 0,
+                "placeholder": ""
+            },
+            {
                 "key": "field_6006cf04cafa3",
                 "label": "Image",
                 "name": "collection_image",
