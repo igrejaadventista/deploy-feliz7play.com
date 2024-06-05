@@ -36,6 +36,7 @@ function get_page_option($data)
 					$slug = get_post_field('post_name', get_field('slider_video_object', $item->ID));
 					$post_video_lenght = get_field('post_video_lenght', $target);
 					$video_quality = get_field('post_video_quality', $target);
+					$video_age_rating = get_field('post_video_age_rating', $target);
 					$season = false;
 					$video_year = get_field('post_year', $target);
 					$rating = get_field('Rating', $target);
@@ -50,6 +51,7 @@ function get_page_option($data)
 					$slug = get_field('to_collection', $item->ID)->slug;
 					$post_video_lenght = false;
 					$video_quality = get_field('post_video_quality', $target);
+					$video_age_rating = get_field('collection_video_age_rating', $target);
 					$season = '1 temporada';
 					$video_year = get_field('year', 'term_' . $target);
 					$rating = get_field('Rating', 'term_' . $target);
@@ -73,6 +75,7 @@ function get_page_option($data)
 					'video_lenght' => $post_video_lenght,
 					'rating' => $rating,
 					'video_quality' => $video_quality,
+					'vide_age_rating' => $video_age_rating,
 					'video_year' => $video_year,
 					'video_host' => $video_host,
 					'video_id' => $video_id,
