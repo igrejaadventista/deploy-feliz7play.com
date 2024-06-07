@@ -101,6 +101,33 @@
                 "step": ""
             },
             {
+                "key": "field_666300fed87bc",
+                "label": "Video Quality",
+                "name": "collection_video_quality",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "4k": "4k",
+                    "1080p": "1080p",
+                    "720p": "720p",
+                    "480p": "480p"
+                },
+                "default_value": "1080p",
+                "allow_null": 0,
+                "multiple": 0,
+                "ui": 0,
+                "return_format": "value",
+                "ajax": 0,
+                "placeholder": ""
+            },
+            {
                 "key": "field_6660d71a3adab",
                 "label": "Video Age Rating",
                 "name": "collection_video_age_rating",
@@ -406,33 +433,6 @@
                         "maxlength": ""
                     }
                 ]
-            },
-            {
-                "key": "field_666300fed87bc",
-                "label": "Video Quality",
-                "name": "collection_video_quality",
-                "type": "select",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "choices": {
-                    "4k": "4k",
-                    "1080p": "1080p",
-                    "720p": "720p",
-                    "480p": "480p"
-                },
-                "default_value": "1080p",
-                "allow_null": 0,
-                "multiple": 0,
-                "ui": 0,
-                "return_format": "value",
-                "ajax": 0,
-                "placeholder": ""
             }
         ],
         "location": [
