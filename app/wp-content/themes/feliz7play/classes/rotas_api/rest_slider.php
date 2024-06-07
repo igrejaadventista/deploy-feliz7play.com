@@ -52,7 +52,7 @@ function get_page_option($data)
 					$slug = get_field('to_collection', $item->ID)->slug;
 					$post_video_lenght = false;
 					$video_quality = get_field('post_video_quality', $target);
-					$video_age_rating = get_field('post_video_age_rating', $target);
+					$video_age_rating = get_field('collection_video_age_rating', 'term_' . $target);
 					$season = '1 temporada';
 					$video_year = get_field('year', 'term_' . $target);
 					$rating = get_field('Rating', 'term_' . $target);
