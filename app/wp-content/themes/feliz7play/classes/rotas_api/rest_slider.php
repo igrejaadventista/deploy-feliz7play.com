@@ -51,7 +51,7 @@ function get_page_option($data)
 					$description = term_description($target);
 					$slug = get_field('to_collection', $item->ID)->slug;
 					$post_video_lenght = false;
-					$video_quality = get_field('post_video_quality', $target);
+					$video_quality = get_field('collection_video_quality', 'term_' . $target);
 					$video_age_rating = get_field('collection_video_age_rating', 'term_' . $target);
 					$season = '1 temporada';
 					$video_year = get_field('year', 'term_' . $target);
