@@ -472,7 +472,7 @@
                     {
                         "key": "field_666c4f9c818e5",
                         "label": "Titulo",
-                        "name": "titulo",
+                        "name": "extra_titulo",
                         "type": "text",
                         "instructions": "",
                         "required": 1,
@@ -491,7 +491,7 @@
                     {
                         "key": "field_666c4fd2818e6",
                         "label": "List Videos",
-                        "name": "list_videos",
+                        "name": "extra_list_videos",
                         "type": "repeater",
                         "instructions": "",
                         "required": 0,
@@ -510,7 +510,7 @@
                             {
                                 "key": "field_666c5025818e7",
                                 "label": "Videos",
-                                "name": "videos",
+                                "name": "extra_videos",
                                 "type": "post_object",
                                 "instructions": "",
                                 "required": 1,
