@@ -547,6 +547,16 @@ function adding_collection_meta_rest()
 
     register_rest_field(
         'collection',
+        'social_media',
+        array(
+            'get_callback'      => 'collection_meta_callback',
+            'update_callback'   => null,
+            'schema'            => null,
+        )
+    );
+
+    register_rest_field(
+        'collection',
         'extras',
         array(
             'get_callback'      => 'collection_meta_callback',
@@ -605,6 +615,13 @@ function collection_meta_callback($collection, $field_name, $request)
             }
 
             return $items;
+            break;
+
+        case 'social_media':
+            $values = array(
+                'redes' => get_field('redes', 'term_' . $id),
+                'production' => get_field('producao', 'term_' . $id)
+            );
             break;
 
         case 'extras':
