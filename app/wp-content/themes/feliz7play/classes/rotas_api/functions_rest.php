@@ -631,8 +631,20 @@ function collection_meta_callback($collection, $field_name, $request)
             // );
 
             foreach ($items as $item) {
+                $list_video = [];
+                foreach($item['extra_list_video'] as $video) { 
+                    $args = array(
+                        'post_type' => 'video', 
+                        'fields' => '', 
+                        'include' => $video->ID, 'numberposts' => 0
+                    );
+                    $post = get_line_post($args);
+                    $list_video[] = $post;
+                }
+
                 $values[] = array(
                     'title' => $item['extra_titulo'],
+                    'list_video' => $list_video
                 );
             }
             break;
