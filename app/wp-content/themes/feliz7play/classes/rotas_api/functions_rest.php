@@ -646,6 +646,7 @@ function collection_meta_callback($collection, $field_name, $request)
 
                 $values[] = array(
                     'title' => $item['extra_titulo'],
+                    'print' => print_r($item, true),
                     'videos' => $list_videos
                 );
             }
