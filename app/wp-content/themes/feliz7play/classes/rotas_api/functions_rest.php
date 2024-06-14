@@ -628,7 +628,7 @@ function collection_meta_callback($collection, $field_name, $request)
             $items = get_sub_field('extra');
 
             foreach ($items as $item) {
-                $values[] = array(
+                $values = array(
                     'title' => $item['extra_titulo'],
                 );
             }
