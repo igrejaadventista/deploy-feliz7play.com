@@ -520,8 +520,12 @@
                                     "class": "",
                                     "id": ""
                                 },
-                                "post_type": "",
-                                "taxonomy": "",
+                                "post_type": [
+                                    "video"
+                                ],
+                                "taxonomy": [
+                                    "category:extras"
+                                ],
                                 "allow_null": 0,
                                 "multiple": 0,
                                 "return_format": "object",
