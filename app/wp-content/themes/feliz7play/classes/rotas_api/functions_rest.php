@@ -626,15 +626,15 @@ function collection_meta_callback($collection, $field_name, $request)
 
         case 'extras':
             $items = get_field('extra', 'term_' . $id);
-            $values = array(
-                'title' => print_r($items, true),
-            );
+            // $values = array(
+            //     'title' => print_r($items, true),
+            // );
 
-            // foreach ($items as $item) {
-            //     $values = array(
-            //         'title' => $item['extra_titulo'],
-            //     );
-            // }
+            foreach ($items as $item) {
+                $values[] = array(
+                    'title' => $item['extra_titulo'],
+                );
+            }
             break;
 
         case 'link_sharing':
