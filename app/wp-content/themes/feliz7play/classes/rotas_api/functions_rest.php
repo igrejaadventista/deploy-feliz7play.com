@@ -643,12 +643,12 @@ function collection_meta_callback($collection, $field_name, $request)
 
                     // $list_videos = print_r($video, true);
 
-                    $id = $video->ID;
+                    $id = $video['extra_videos']->ID;
             
                     $meta = get_post_meta($id);
             
-                    $title =                $video->post_title;
-                    $slug =                 $video->post_name;
+                    $title =                $video['extra_videos']->post_title;
+                    $slug =                 $video['extra_videos']->post_name;
                     $video_type =           $meta['post_video_type'][0];
                     $video_episode =        $meta['video_episode'][0];
                     $subtitle =             $meta['post_subtitle'][0];
