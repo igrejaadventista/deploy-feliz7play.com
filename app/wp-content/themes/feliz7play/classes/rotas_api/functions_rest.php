@@ -641,10 +641,10 @@ function collection_meta_callback($collection, $field_name, $request)
                     // $post = get_line_post($args);
                     // $list_videos[] = $post;
 
-                    // $list_videos = print_r($video, true);
+                    $list_videos = print_r($video, true);
 
+                    /*  
                     $id = $video['extra_videos']->ID;
-            
                     $meta = get_post_meta($id);
             
                     $title =                $video['extra_videos']->post_title;
@@ -706,9 +706,8 @@ function collection_meta_callback($collection, $field_name, $request)
                         'link' => $link
                     );
             
-                    
                     array_push($list_videos, $video_values);
-                        
+                    */
                 }
 
                 $values[] = array(
