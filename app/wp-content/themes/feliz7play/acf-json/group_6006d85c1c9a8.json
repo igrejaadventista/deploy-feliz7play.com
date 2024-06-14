@@ -635,6 +635,107 @@
                         "maxlength": ""
                     }
                 ]
+            },
+            {
+                "key": "field_666c990b05ba0",
+                "label": "Extras",
+                "name": "",
+                "type": "tab",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_666c993d05ba1",
+                "label": "Extra",
+                "name": "post_extra",
+                "type": "repeater",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "collapsed": "",
+                "min": 0,
+                "max": 0,
+                "layout": "table",
+                "button_label": "",
+                "sub_fields": [
+                    {
+                        "key": "field_666c997005ba2",
+                        "label": "Title",
+                        "name": "post_extra_title",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 1,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "maxlength": ""
+                    },
+                    {
+                        "key": "field_666c998a05ba3",
+                        "label": "List Videos",
+                        "name": "post_extra_list_videos",
+                        "type": "repeater",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "collapsed": "",
+                        "min": 0,
+                        "max": 0,
+                        "layout": "table",
+                        "button_label": "",
+                        "sub_fields": [
+                            {
+                                "key": "field_666c9a2d05ba4",
+                                "label": "video",
+                                "name": "post_extra_video",
+                                "type": "post_object",
+                                "instructions": "",
+                                "required": 1,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "post_type": [
+                                    "video"
+                                ],
+                                "taxonomy": [
+                                    "category:extras"
+                                ],
+                                "allow_null": 0,
+                                "multiple": 0,
+                                "return_format": "object",
+                                "ui": 1
+                            }
+                        ]
+                    }
+                ]
             }
         ],
         "location": [

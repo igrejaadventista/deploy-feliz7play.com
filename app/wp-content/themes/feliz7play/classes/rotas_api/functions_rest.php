@@ -629,11 +629,11 @@ function collection_meta_callback($collection, $field_name, $request)
             foreach ($items as $item) {
                 $list_videos = [];
                 foreach($item['extra_list_videos'] as $video) { 
-                    $id = $video['extra_videos']->ID;
+                    $id = $video['extra_video']->ID;
                     $meta = get_post_meta($id);
             
-                    $title =                $video['extra_videos']->post_title;
-                    $slug =                 $video['extra_videos']->post_name;
+                    $title =                $video['extra_video']->post_title;
+                    $slug =                 $video['extra_video']->post_name;
                     $video_type =           $meta['post_video_type'][0];
                     $video_episode =        $meta['video_episode'][0];
                     $subtitle =             $meta['post_subtitle'][0];
@@ -695,7 +695,7 @@ function collection_meta_callback($collection, $field_name, $request)
                 }
 
                 $values[] = array(
-                    'title' => $item['extra_titulo'],
+                    'title' => $item['extra_title'],
                     'videos' => $list_videos
                 );
             }

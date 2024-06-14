@@ -471,8 +471,8 @@
                 "sub_fields": [
                     {
                         "key": "field_666c4f9c818e5",
-                        "label": "Titulo",
-                        "name": "extra_titulo",
+                        "label": "Title",
+                        "name": "extra_title",
                         "type": "text",
                         "instructions": "",
                         "required": 1,
@@ -509,8 +509,8 @@
                         "sub_fields": [
                             {
                                 "key": "field_666c5025818e7",
-                                "label": "Videos",
-                                "name": "extra_videos",
+                                "label": "Video",
+                                "name": "extra_video",
                                 "type": "post_object",
                                 "instructions": "",
                                 "required": 1,
