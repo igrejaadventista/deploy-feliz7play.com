@@ -300,7 +300,7 @@
             },
             {
                 "key": "field_602a7a6c75d85",
-                "label": "Extras",
+                "label": "Social Media",
                 "name": "",
                 "type": "tab",
                 "instructions": "",
@@ -431,6 +431,103 @@
                         "prepend": "",
                         "append": "",
                         "maxlength": ""
+                    }
+                ]
+            },
+            {
+                "key": "field_666c4a0fbae71",
+                "label": "Extras",
+                "name": "",
+                "type": "tab",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "placement": "top",
+                "endpoint": 0
+            },
+            {
+                "key": "field_666c4c5dd4fa0",
+                "label": "Extra",
+                "name": "extra",
+                "type": "repeater",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "collapsed": "",
+                "min": 0,
+                "max": 0,
+                "layout": "table",
+                "button_label": "",
+                "sub_fields": [
+                    {
+                        "key": "field_666c4f9c818e5",
+                        "label": "Titulo",
+                        "name": "titulo",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 1,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "maxlength": ""
+                    },
+                    {
+                        "key": "field_666c4fd2818e6",
+                        "label": "List Videos",
+                        "name": "list_videos",
+                        "type": "repeater",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "collapsed": "field_666c5025818e7",
+                        "min": 0,
+                        "max": 0,
+                        "layout": "table",
+                        "button_label": "",
+                        "sub_fields": [
+                            {
+                                "key": "field_666c5025818e7",
+                                "label": "Videos",
+                                "name": "videos",
+                                "type": "post_object",
+                                "instructions": "",
+                                "required": 1,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "post_type": "",
+                                "taxonomy": "",
+                                "allow_null": 0,
+                                "multiple": 0,
+                                "return_format": "object",
+                                "ui": 1
+                            }
+                        ]
                     }
                 ]
             }
