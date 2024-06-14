@@ -118,6 +118,7 @@ function get_line_post($args, $limited = false)
         $post_video_age_rating =    $meta['post_video_age_rating'][0];
         $redes =                get_field('redes', $id);
         $production =           get_field('production', $id);
+        $extras =               get_field('post_extra', $id);
         $collection =           get_the_terms($id, 'collection')[0];
 
         if ($collection) {
@@ -158,6 +159,7 @@ function get_line_post($args, $limited = false)
             'post_video_quality' => $video_quality,
             'redes' => $redes,
             'production' => $production,
+            'extras' => $extras,
             'link' => $link
         );
 

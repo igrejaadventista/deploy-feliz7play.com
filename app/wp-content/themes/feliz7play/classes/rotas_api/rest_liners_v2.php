@@ -23,10 +23,16 @@ function get_page_option_line_v2($data) {
 				case 'genre_option': 		
 					get_genre_v2(get_sub_field('genre')); 
 					break;
-				case 'collection_option': 	get_collection(get_sub_field('to_collection')); break;
-				case 'custom_option': 		get_custom(get_sub_field('custom')); break;
-				case 'recentes_option': 	get_recentes(); break;
-				default: 					echo 'erro!'; die; break;
+				case 'collection_option': 	
+					get_collection(get_sub_field('to_collection')); break;
+				case 'custom_option': 		
+					get_custom(get_sub_field('custom')); break;
+				case 'recentes_option': 	
+					get_recentes(); break;
+				default: 					
+					echo 'erro!'; 
+					die; 
+					break;
 			}
 		endwhile;
 	}
