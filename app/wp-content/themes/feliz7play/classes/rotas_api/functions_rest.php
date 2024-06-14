@@ -632,7 +632,7 @@ function collection_meta_callback($collection, $field_name, $request)
 
             foreach ($items as $item) {
                 $list_videos = [];
-                foreach($item['extra_list_video'] as $video) { 
+                foreach($item['extra_list_videos'] as $video) { 
                     // $args = array(
                     //     'post_type' => 'video', 
                     //     'fields' => '', 
