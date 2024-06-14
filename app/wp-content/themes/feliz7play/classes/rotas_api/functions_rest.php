@@ -626,24 +626,9 @@ function collection_meta_callback($collection, $field_name, $request)
 
         case 'extras':
             $items = get_field('extra', 'term_' . $id);
-            // $values = array(
-            //     'title' => print_r($items, true),
-            // );
-
             foreach ($items as $item) {
                 $list_videos = [];
                 foreach($item['extra_list_videos'] as $video) { 
-                    // $args = array(
-                    //     'post_type' => 'video', 
-                    //     'fields' => '', 
-                    //     'include' => $video->ID, 'numberposts' => 0
-                    // );
-                    // $post = get_line_post($args);
-                    // $list_videos[] = $post;
-
-                    // $list_videos = print_r($video, true);
-
-                    
                     $id = $video['extra_videos']->ID;
                     $meta = get_post_meta($id);
             
@@ -711,7 +696,6 @@ function collection_meta_callback($collection, $field_name, $request)
 
                 $values[] = array(
                     'title' => $item['extra_titulo'],
-                    'print' => print_r($item, true),
                     'videos' => $list_videos
                 );
             }
