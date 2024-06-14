@@ -625,7 +625,7 @@ function collection_meta_callback($collection, $field_name, $request)
             break;
 
         case 'extras':
-            $items = get_sub_field('extra');
+            $items = get_field('extra', 'term_' . $id);
             $values = array(
                 'title' => print_r($items, true),
             );
