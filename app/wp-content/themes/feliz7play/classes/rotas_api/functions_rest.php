@@ -631,20 +631,22 @@ function collection_meta_callback($collection, $field_name, $request)
             // );
 
             foreach ($items as $item) {
-                $list_video = [];
+                $list_videos = [];
                 foreach($item['extra_list_video'] as $video) { 
-                    $args = array(
-                        'post_type' => 'video', 
-                        'fields' => '', 
-                        'include' => $video->ID, 'numberposts' => 0
-                    );
-                    $post = get_line_post($args);
-                    $list_video[] = $post;
+                    // $args = array(
+                    //     'post_type' => 'video', 
+                    //     'fields' => '', 
+                    //     'include' => $video->ID, 'numberposts' => 0
+                    // );
+                    // $post = get_line_post($args);
+                    // $list_videos[] = $post;
+
+                    $list_videos = print_r($video, true);
                 }
 
                 $values[] = array(
                     'title' => $item['extra_titulo'],
-                    'list_video' => $list_video
+                    'videos' => $list_videos
                 );
             }
             break;
