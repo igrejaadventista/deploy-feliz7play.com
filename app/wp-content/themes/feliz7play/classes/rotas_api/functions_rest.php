@@ -754,8 +754,8 @@ function video_meta_callback($video, $field_name, $request)
 
 function taxonomy_meta_callback($video)
 {
-
     $taxonomy = array(
+        'category' => get_the_terms($video['id'], 'category'),
         'genre' => get_the_terms($video['id'], 'genre'),
         'collection' => get_the_terms($video['id'], 'collection')
     );
