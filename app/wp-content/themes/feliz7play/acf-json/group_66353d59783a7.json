@@ -2,7 +2,27 @@
     {
         "key": "group_66353d59783a7",
         "title": "Category",
-        "fields": [],
+        "fields": [
+            {
+                "key": "field_6671db863e503",
+                "label": "Visible",
+                "name": "category_visible",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "",
+                "default_value": 0,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            }
+        ],
         "location": [
             [
                 {
