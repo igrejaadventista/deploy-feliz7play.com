@@ -770,10 +770,7 @@ function category_meta_callback($category, $field_name, $request)
 {
     $id = $category['id'];
     $item = get_field('category_visible', 'term_' . $id);
-    $test = get_term($id, 'category');
-    $test2 = get_sub_field('category_visible');
-
-    $visible = print_r($item, true);
+    $visible = $item;
     return $visible;
 }
 
