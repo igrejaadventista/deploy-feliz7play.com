@@ -768,7 +768,8 @@ function adding_category_meta_rest()
 
 function category_meta_callback($category, $field_name, $request)
 {
-    $visible = get_field('category_visible', $category['id']);
+    $id = $category['id'];
+    $visible = get_field('category_visible', $id);
     return $visible;
 }
 
