@@ -935,3 +935,19 @@ function filter_rest_video_query($args, $request)
     }
     return $args;
 }
+
+
+add_filter("rest_category_query", "filter_rest_category_query", 10, 2);
+function filter_rest_category_query($args, $request)
+{
+    $params = $request->get_params();
+
+    if (isset($params['visible'])) {
+        $args['meta_query'][] = array(
+            array(
+                'category_visible' => $params['visible']
+            ),
+        );
+    }
+    return $args;
+}
