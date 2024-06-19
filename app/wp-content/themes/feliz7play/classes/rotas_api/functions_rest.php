@@ -740,6 +740,28 @@ function adding_video_meta_rest()
             'schema'            => null,
         )
     );
+    register_rest_field(
+        'video',
+        'host',
+        array(
+            'get_callback'      => 'video_host_meta_callback',
+            'update_callback'   => null,
+            'schema'            => null,
+        )
+    );
+}
+
+function video_host_meta_callback($video, $field_name, $request)
+{
+    $meta = get_post_meta($video['id']);
+    $video_host = $meta['post_video_host'][0];
+    $video_id = $meta['post_video_id'][0];
+    $host = [
+        'host' => $video_host,
+        'id' => $video_id
+    ];
+
+    return $host;
 }
 
 function video_meta_callback($video, $field_name, $request)
