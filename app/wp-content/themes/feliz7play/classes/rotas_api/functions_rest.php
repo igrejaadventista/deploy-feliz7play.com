@@ -755,7 +755,7 @@ function video_extra_meta_callback($video, $field_name, $request)
 {
     $id = $video['id'];
     $values = [];
-    $items = get_field('post_extra', 'term_' . $id);
+    $items = get_field('post_extra', $id);
 
     foreach ($items as $item) {
         $list_videos = [];
