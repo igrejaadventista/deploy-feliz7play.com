@@ -770,7 +770,7 @@ function category_meta_callback($category, $field_name, $request)
 {
     $id = $category['id'];
     $item = get_field('category_visible', 'term_' . $id);
-    $visible = print_r($item, true);
+    $visible = $item;
     return $visible;
 }
 
@@ -942,10 +942,11 @@ function filter_rest_category_query($args, $request)
 {
     $params = $request->get_params();
 
-    if (isset($params['visible'])) {
+    if (isset($params['meta_key']) && isset($params['meta_value'])) {
         $args['meta_query'][] = array(
             array(
-                'category_visible' => $params['visible']
+                'key'     => $params['meta_key'],
+                'value'   => $params['meta_value'],
             ),
         );
     }
