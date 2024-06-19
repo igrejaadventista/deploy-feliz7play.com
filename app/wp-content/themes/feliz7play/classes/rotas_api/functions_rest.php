@@ -534,6 +534,7 @@ function pagination_array($items = array(), $page, $per_page)
 
 add_action('rest_api_init', 'adding_collection_meta_rest');
 add_action('rest_api_init', 'adding_video_meta_rest');
+add_action('rest_api_init', 'adding_category_meta_rest');
 
 function adding_collection_meta_rest()
 {
@@ -750,6 +751,27 @@ function adding_video_meta_rest()
         )
     );
 }
+
+function adding_category_meta_rest()
+{
+    register_rest_field(
+        'category',
+        'visible',
+        array(
+            'get_callback'      => 'category_meta_callback',
+            'update_callback'   => null,
+            'schema'            => null,
+        )
+    );
+}
+
+
+function category_meta_callback($category, $field_name, $request)
+{
+    $visible = get_field('category_visible', $category['id']);
+    return $visible;
+}
+
 
 function video_extra_meta_callback($video, $field_name, $request)
 {
