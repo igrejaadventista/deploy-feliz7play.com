@@ -770,8 +770,9 @@ function category_meta_callback($category, $field_name, $request)
 {
     $id = $category['id'];
     $item = get_field('category_visible', $id);
+    $meta = get_post_meta($id);
 
-    $visible = print_r($item, true);
+    $visible = print_r($meta, true);
     return $visible;
 }
 
