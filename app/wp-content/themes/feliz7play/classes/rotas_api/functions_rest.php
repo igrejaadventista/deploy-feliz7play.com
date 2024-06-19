@@ -759,12 +759,12 @@ function video_extra_meta_callback($video, $field_name, $request)
 
     foreach ($items as $item) {
         $list_videos = [];
-        foreach($item['post_extra_list_videos'] as $video) { 
-            $id = $video['post_extra_video']->ID;
-            $meta = get_post_meta($id);
+        foreach($item['post_extra_list_videos'] as $video_item) { 
+            $video_id = $video_item['post_extra_video']->ID;
+            $meta = get_post_meta($video_id);
     
-            $title =                $video['extra_video']->post_title;
-            $slug =                 $video['extra_video']->post_name;
+            $title =                $video_item['extra_video']->post_title;
+            $slug =                 $video_item['extra_video']->post_name;
             $video_type =           $meta['post_video_type'][0];
             $video_episode =        $meta['video_episode'][0];
             $subtitle =             $meta['post_subtitle'][0];
@@ -793,7 +793,7 @@ function video_extra_meta_callback($video, $field_name, $request)
             $video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
             $video_image_hover =    wp_get_attachment_image_src($meta['video_image_hover'][0])[0];
     
-            $link =                 get_link_site_next($slug, $video_type, $collection);
+            $link = get_link_site_next($slug, $video_type, $collection);
     
             $video_values = array(
                 'id' => $id,
@@ -826,7 +826,7 @@ function video_extra_meta_callback($video, $field_name, $request)
         }
 
         $values[] = array(
-            'title' => $item['extra_title'],
+            'title' => $item['post_extra_title'],
             'videos' => $list_videos
         );
     }
