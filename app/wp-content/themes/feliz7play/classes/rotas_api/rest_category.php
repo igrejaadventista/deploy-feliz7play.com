@@ -30,6 +30,8 @@ function get_rest_category($data) {
     );
     
     $items = get_line_post_genre($args);
+
+
        
     $infos = pagination_array($items, $page, $per_page);
     $final = $infos['paged'];
