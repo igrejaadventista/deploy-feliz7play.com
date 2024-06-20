@@ -24,13 +24,6 @@ function get_rest_geral_category($data) {
         'posts_per_page'    => -1,
         'post_status'       => 'publish',
         'exclude'           => $id_exclude,
-        'tax_query' => array(
-            array(
-                'taxonomy' => 'category',
-                'field'    => 'category_visible',
-                'terms'    => true,
-            ),
-        ),
     );
     
     $items = get_line_post_genre($args);
