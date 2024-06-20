@@ -20,7 +20,7 @@ function get_rest_geral_category($data) {
     $type_exclude = $data->get_param('type_exclude');
 
     $args = array(
-        'post_type'         => 'video',
+        'post_type'         => 'category',
         'posts_per_page'    => -1,
         'post_status'       => 'publish',
         'exclude'           => $id_exclude,
