@@ -15,7 +15,6 @@ function get_extras($id, $field_name)
 	switch ($field_name) {
         case 'video':
 			$items = get_field('post_extra', $id);
-
 			foreach ($items as $item) {
 				$list_videos = [];
 				foreach($item['post_extra_list_videos'] as $video_item) { 
@@ -91,83 +90,82 @@ function get_extras($id, $field_name)
 			}
 			break;
 
-			case 'collection':
-				$items = get_field('extra', 'term_' . $id);
-				foreach ($items as $item) {
-					$list_videos = [];
-					foreach($item['extra_list_videos'] as $video) { 
-						$id = $video['extra_video']->ID;
-						$meta = get_post_meta($id);
-				
-						$title =                $video['extra_video']->post_title;
-						$slug =                 $video['extra_video']->post_name;
-						$video_type =           $meta['post_video_type'][0];
-						$video_episode =        $meta['video_episode'][0];
-						$subtitle =             $meta['post_subtitle'][0];
-						$description =          wp_strip_all_tags($meta['post_blurb'][0]);
-						$video_host =           $meta['post_video_host'][0];
-						$video_id =             $meta['post_video_id'][0];
-				
-						$post_download_link =   $meta['link_download_app'][0];
-						$download =             $meta['download'][0];
-						$post_year =            $meta['post_year'][0];
-						$post_video_rating =    $meta['post_video_rating'][0];
-						$post_video_age_rating =    $meta['post_video_age_rating'][0];
-						$redes =                get_field('redes', $id);
-						$production =           get_field('production', $id);
-						$collection =           get_the_terms($id, 'collection')[0];
-				
-						if ($collection) {
-							$collection->parent_slug = get_term($collection->parent, 'collection')->slug;
-						}
-				
-						$genre =                get_the_terms($id, 'genre')[0];
-						$category =             get_the_terms($id, 'category')[0];
-						$video_lenght =         $meta['post_video_length'][0];
-						$video_quality =        $meta['post_video_quality'][0];
-				
-						$video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
-						$video_image_hover =    wp_get_attachment_image_src($meta['video_image_hover'][0])[0];
-				
-						$link =                 get_link_site_next($slug, $video_type, $collection);
-				
-						$video_values = array(
-							'id' => $id,
-							'title' => $title,
-							'slug' => $slug,
-							'video_type' => $video_type,
-							'video_episode' => $video_episode,
-							'subtitle' => $subtitle,
-							'description' => $description,
-							'genre' => $genre,
-							'category' => $category,
-							'collection' => $collection,
-							'video_host' => $video_host,
-							'video_id' => $video_id,
-							'post_download_link' => $post_download_link,
-							'download' => $download,
-							'year' => $post_year,
-							'video_rating' => $post_video_rating,
-							'video_age_rating' => $post_video_age_rating,
-							'video_thumbnail' => $video_thumbnail,
-							'video_image_hover' => $video_image_hover,
-							'post_video_length' => $video_lenght,
-							'post_video_quality' => $video_quality,
-							'redes' => $redes,
-							'production' => $production,
-							'link' => $link
-						);
-				
-						array_push($list_videos, $video_values);
+		case 'collection':
+			$items = get_field('extra', 'term_' . $id);
+			foreach ($items as $item) {
+				$list_videos = [];
+				foreach($item['extra_list_videos'] as $video) { 
+					$id = $video['extra_video']->ID;
+					$meta = get_post_meta($id);
+			
+					$title =                $video['extra_video']->post_title;
+					$slug =                 $video['extra_video']->post_name;
+					$video_type =           $meta['post_video_type'][0];
+					$video_episode =        $meta['video_episode'][0];
+					$subtitle =             $meta['post_subtitle'][0];
+					$description =          wp_strip_all_tags($meta['post_blurb'][0]);
+					$video_host =           $meta['post_video_host'][0];
+					$video_id =             $meta['post_video_id'][0];
+			
+					$post_download_link =   $meta['link_download_app'][0];
+					$download =             $meta['download'][0];
+					$post_year =            $meta['post_year'][0];
+					$post_video_rating =    $meta['post_video_rating'][0];
+					$post_video_age_rating =    $meta['post_video_age_rating'][0];
+					$redes =                get_field('redes', $id);
+					$production =           get_field('production', $id);
+					$collection =           get_the_terms($id, 'collection')[0];
+			
+					if ($collection) {
+						$collection->parent_slug = get_term($collection->parent, 'collection')->slug;
 					}
-
-					$values[] = array(
-						'title' => $item['extra_title'],
-						'videos' => $list_videos
+			
+					$genre =                get_the_terms($id, 'genre')[0];
+					$category =             get_the_terms($id, 'category')[0];
+					$video_lenght =         $meta['post_video_length'][0];
+					$video_quality =        $meta['post_video_quality'][0];
+			
+					$video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
+					$video_image_hover =    wp_get_attachment_image_src($meta['video_image_hover'][0])[0];
+			
+					$link =                 get_link_site_next($slug, $video_type, $collection);
+			
+					$video_values = array(
+						'id' => $id,
+						'title' => $title,
+						'slug' => $slug,
+						'video_type' => $video_type,
+						'video_episode' => $video_episode,
+						'subtitle' => $subtitle,
+						'description' => $description,
+						'genre' => $genre,
+						'category' => $category,
+						'collection' => $collection,
+						'video_host' => $video_host,
+						'video_id' => $video_id,
+						'post_download_link' => $post_download_link,
+						'download' => $download,
+						'year' => $post_year,
+						'video_rating' => $post_video_rating,
+						'video_age_rating' => $post_video_age_rating,
+						'video_thumbnail' => $video_thumbnail,
+						'video_image_hover' => $video_image_hover,
+						'post_video_length' => $video_lenght,
+						'post_video_quality' => $video_quality,
+						'redes' => $redes,
+						'production' => $production,
+						'link' => $link
 					);
+			
+					array_push($list_videos, $video_values);
 				}
-            break;
 
+				$values[] = array(
+					'title' => $item['extra_title'],
+					'videos' => $list_videos
+				);
+			}
+		break;
     }
 	return $values;
 }
