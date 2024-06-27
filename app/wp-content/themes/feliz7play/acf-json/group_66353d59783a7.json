@@ -25,7 +25,7 @@
             {
                 "key": "field_667d79b92c610",
                 "label": "Order",
-                "name": "category_ordem",
+                "name": "category_order",
                 "type": "number",
                 "instructions": "Ordem que será exibido na lista de categorias.",
                 "required": 1,
