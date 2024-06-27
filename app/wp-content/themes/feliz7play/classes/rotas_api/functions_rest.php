@@ -763,15 +763,30 @@ function adding_category_meta_rest()
             'schema'            => null,
         )
     );
+
+    register_rest_field(
+        'category',
+        'order',
+        array(
+            'get_callback'      => 'category_meta_callback',
+            'update_callback'   => null,
+            'schema'            => null,
+        )
+    );
 }
 
 
 function category_meta_callback($category, $field_name, $request)
 {
-    $id = $category['id'];
-    $item = get_field('category_visible', 'term_' . $id);
-    $visible = $item;
-    return $visible;
+    switch ($field_name) {
+        case 'visible':
+            $visible = get_field('category_visible', 'term_' . $category['id']);
+            return $visible;
+
+        case 'order':
+            $order = get_field('category_order', 'term_' . $category['id']);
+            return $order;
+    } 
 }
 
 

@@ -21,6 +21,27 @@
                 "ui": 0,
                 "ui_on_text": "",
                 "ui_off_text": ""
+            },
+            {
+                "key": "field_667d79b92c610",
+                "label": "Order",
+                "name": "category_ordem",
+                "type": "number",
+                "instructions": "Ordem que será exibido na lista de categorias.",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": 1,
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "min": 1,
+                "max": "",
+                "step": ""
             }
         ],
         "location": [
