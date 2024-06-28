@@ -2509,7 +2509,8 @@ function get_posts( $args = null ) {
 		$incposts                      = wp_parse_id_list( $parsed_args['include'] );
 		$parsed_args['posts_per_page'] = count( $incposts );  // Only the number of posts included.
 		$parsed_args['post__in']       = $incposts;
-	} elseif ( ! empty( $parsed_args['exclude'] ) ) {
+	} 
+	if ( ! empty( $parsed_args['exclude'] ) ) {
 		$parsed_args['post__not_in'] = wp_parse_id_list( $parsed_args['exclude'] );
 	}
 
