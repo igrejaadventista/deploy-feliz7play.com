@@ -225,7 +225,7 @@ function get_page_option($data)
 					$video_year = get_field('year', 'term_' . $target);
 					$rating = get_field('Rating', 'term_' . $target);
 					$genre = get_field('collection_genre', 'term_' . $target)->name;
-					$category = get_the_terms($target, 'category')[0];
+					$category = get_field('collection_category', 'term_' . $target);
 					$collection_father = get_field('to_collection', $item->ID)->parent ? get_term(get_field('to_collection', $item->ID)->parent)->slug : false;
 					$video_host =  get_field('collection_video_host', 'term_' . $target);
 					$video_id =    get_field('collection_video_id', 'term_' . $target);
