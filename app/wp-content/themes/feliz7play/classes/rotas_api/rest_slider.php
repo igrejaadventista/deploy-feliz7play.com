@@ -209,7 +209,7 @@ function get_page_option($data)
 
 					$video_host =           get_field('post_video_host', $target);
 					$video_id =             get_field('post_video_id', $target);
-					$video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
+					$video_thumbnail =      get_field('video_thumbnail', $target);
 					$extras = get_extras($target, 'video');
 
 				} else {
@@ -229,7 +229,7 @@ function get_page_option($data)
 					$collection_father = get_field('to_collection', $item->ID)->parent ? get_term(get_field('to_collection', $item->ID)->parent)->slug : false;
 					$video_host =  get_field('collection_video_host', 'term_' . $target);
 					$video_id =    get_field('collection_video_id', 'term_' . $target);
-					$video_thumbnail = wp_get_attachment_image_src($meta['collection_image'][0])[0];
+					$video_thumbnail = get_field('collection_image', 'term_' . $target);
 					$extras = get_extras($target, 'collection');
 				}
 
