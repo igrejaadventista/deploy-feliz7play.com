@@ -193,6 +193,7 @@ function get_page_option($data)
 				$slider_mobile = get_field('slider_mobile_image', $item->ID)['url'];
 
 				if ($source == 'video') {
+					$meta = get_post_meta($target);
 
 					$target = get_field('slider_video_object', $item->ID)->ID;
 					$description = get_field('post_blurb',  $target);
@@ -207,10 +208,11 @@ function get_page_option($data)
 
 					$video_host =           get_field('post_video_host', $target);
 					$video_id =             get_field('post_video_id', $target);
-					$video_thumbnail =      get_field('video_thumbnail', $target)->url;
+					$video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
 					$extras = get_extras($target, 'video');
 
 				} else {
+					$meta = get_term_meta($target);
 
 					$target = get_field('to_collection', $item->ID)->term_id;
 					$description = term_description($target);
@@ -225,7 +227,7 @@ function get_page_option($data)
 					$collection_father = get_field('to_collection', $item->ID)->parent ? get_term(get_field('to_collection', $item->ID)->parent)->slug : false;
 					$video_host =  get_field('collection_video_host', 'term_' . $target);
 					$video_id =    get_field('collection_video_id', 'term_' . $target);
-					$video_thumbnail = get_field('collection_image', 'term_' . $target)->url;
+					$video_thumbnail = wp_get_attachment_image_src($meta['collection_image'][0])[0];
 					$extras = get_extras($target, 'collection');
 				}
 
