@@ -207,7 +207,7 @@ function get_page_option($data)
 
 					$video_host =           get_field('post_video_host', $target);
 					$video_id =             get_field('post_video_id', $target);
-					$video_thumbnail =      get_field('video_thumbnail', $target);
+					$video_thumbnail =      get_field('video_thumbnail', $target)->url;
 					$extras = get_extras($target, 'video');
 
 				} else {
@@ -225,7 +225,7 @@ function get_page_option($data)
 					$collection_father = get_field('to_collection', $item->ID)->parent ? get_term(get_field('to_collection', $item->ID)->parent)->slug : false;
 					$video_host =  get_field('collection_video_host', 'term_' . $target);
 					$video_id =    get_field('collection_video_id', 'term_' . $target);
-					$video_thumbnail = get_field('collection_image', 'term_' . $target);
+					$video_thumbnail = get_field('collection_image', 'term_' . $target)->url;
 					$extras = get_extras($target, 'collection');
 				}
 
