@@ -33,11 +33,11 @@ define( 'DB_PASSWORD', 'WP_DB_PASSWORD');
 /** MySQL hostname */
 define( 'DB_HOST', 'WP_DB_HOST');
 
-if(!$is_dev):
-    define( 'DB_HOST', '193.203.175.55:3306');
-    define( 'DB_PASSWORD', 'bj^OSAy9#');
-    define( 'DB_USER', 'u919907044_testf7p');
-    define( 'DB_NAME', 'u919907044_testf7p');
+if($is_dev):
+    define( 'DB_HOST', 'localhost:3306');
+    define( 'DB_PASSWORD', '');
+    define( 'DB_USER', 'test');
+    define( 'DB_NAME', 'wpdb');
 endif;
 
 /** Database Charset to use in creating database tables. */
