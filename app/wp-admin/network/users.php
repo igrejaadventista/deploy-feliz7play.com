@@ -10,8 +10,6 @@
 /** Load WordPress Administration Bootstrap */
 require_once __DIR__ . '/admin.php';
 
-var_dump(current_user_can( 'manage_network_users' ));
-
 if ( ! current_user_can( 'manage_network_users' ) ) {
 wp_die( __( 'Sorry, you are not allowed to access this page.' ), 403 );
 }
