@@ -10,9 +10,12 @@
 /** Load WordPress Administration Bootstrap */
 require_once __DIR__ . '/admin.php';
 
+//FIXME: Remove this comments
 // if ( ! current_user_can( 'manage_network_users' ) ) {
 // 	wp_die( __( 'Sorry, you are not allowed to access this page.' ), 403 );
 // }
+
+print($_GET['action']);
 
 if ( isset( $_GET['action'] ) ) {
 	/** This action is documented in wp-admin/network/edit.php */
@@ -47,9 +50,10 @@ if ( isset( $_GET['action'] ) ) {
 			exit;
 
 		case 'allusers':
-			if ( ! current_user_can( 'manage_network_users' ) ) {
-				wp_die( __( 'Sorry, you are not allowed to access this page.' ), 403 );
-			}
+			// FIXME: Remove this comments
+			// if ( ! current_user_can( 'manage_network_users' ) ) {
+			// 	wp_die( __( 'Sorry, you are not allowed to access this page.' ), 403 );
+			// }
 
 			if ( isset( $_POST['action'] ) && isset( $_POST['allusers'] ) ) {
 				check_admin_referer( 'bulk-users-network' );
