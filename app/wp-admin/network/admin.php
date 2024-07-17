@@ -9,6 +9,8 @@
 
 define( 'WP_NETWORK_ADMIN', true );
 
+wp_die( __( 'TESTE.' ), 403 );
+
 /** Load WordPress Administration Bootstrap */
 require_once dirname( __DIR__ ) . '/admin.php';
 
