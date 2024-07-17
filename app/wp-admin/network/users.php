@@ -10,7 +10,7 @@
 /** Load WordPress Administration Bootstrap */
 require_once __DIR__ . '/admin.php';
 
-//FIXME: Remove this comments
+// FIXME: Remove this comments
 // if ( ! current_user_can( 'manage_network_users' ) ) {
 // 	wp_die( __( 'Sorry, you are not allowed to access this page.' ), 403 );
 // }
