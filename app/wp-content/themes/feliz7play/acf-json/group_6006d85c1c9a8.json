@@ -179,6 +179,22 @@
                 "placeholder": ""
             },
             {
+                "key": "field_669a9b9c8c6be",
+                "label": "HLS Link",
+                "name": "post_hls_link",
+                "type": "url",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": ""
+            },
+            {
                 "key": "field_6006d9acd4d88",
                 "label": "Video Host",
                 "name": "post_video_host",
