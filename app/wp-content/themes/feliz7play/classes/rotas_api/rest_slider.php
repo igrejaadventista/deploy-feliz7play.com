@@ -199,6 +199,7 @@ function get_page_option($data)
 					$description = get_field('post_blurb',  $target);
 					$slug = get_post_field('post_name', get_field('slider_video_object', $item->ID));
 					$post_video_lenght = get_field('post_video_lenght', $target);
+					$video_hls_link = get_field('post_hls_link', $target);
 					$video_quality = get_field('post_video_quality', $target);
 					$video_age_rating = get_field('post_video_age_rating', $target);
 					$season = false;
@@ -227,6 +228,7 @@ function get_page_option($data)
 					$genre = get_field('collection_genre', 'term_' . $target)->name;
 					$category = get_field('collection_category', 'term_' . $target);
 					$collection_father = get_field('to_collection', $item->ID)->parent ? get_term(get_field('to_collection', $item->ID)->parent)->slug : false;
+					$video_hls_link =  get_field('collection_hls_link', 'term_' . $target);
 					$video_host =  get_field('collection_video_host', 'term_' . $target);
 					$video_id =    get_field('collection_video_id', 'term_' . $target);
 					$video_thumbnail = get_field('collection_image', 'term_' . $target);
@@ -249,6 +251,7 @@ function get_page_option($data)
 					'video_year' => $video_year,
 					'video_host' => $video_host,
 					'video_id' => $video_id,
+					'video_hls_link' => $video_hls_link,
 					'video_thumbnail' => $video_thumbnail,
 					'genre' => $genre,
 					'category' => $category,
