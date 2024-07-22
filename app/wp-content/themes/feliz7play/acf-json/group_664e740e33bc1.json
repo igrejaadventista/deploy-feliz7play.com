@@ -240,7 +240,7 @@
                                     "circle": "Circle",
                                     "vertical": "Vertical",
                                     "highlight": "Highlight",
-                                    "recommended: Recommended": "recommended: Recommended"
+                                    "recommended": "Recommended"
                                 },
                                 "default_value": "default",
                                 "allow_null": 0,
