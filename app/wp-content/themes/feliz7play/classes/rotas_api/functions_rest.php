@@ -427,7 +427,8 @@ function get_custom($items)
                 $args = array(
                     'post_type' => 'video', 
                     'fields' => '', 
-                    'include' => $item['slider_video_object']->ID, 'numberposts' => 0
+                    'include' => $item['to_video']->ID, 
+                    'numberposts' => 0
                 );
                 $post = get_line_post($args);
 
