@@ -181,7 +181,7 @@
             {
                 "key": "field_6698290e56d9c",
                 "label": "HLS Link",
-                "name": "hls_link",
+                "name": "post_hls_link",
                 "type": "url",
                 "instructions": "",
                 "required": 0,
@@ -768,7 +768,7 @@
         "style": "default",
         "label_placement": "top",
         "instruction_placement": "label",
-        "hide_on_screen": [],
+        "hide_on_screen": "",
         "active": true,
         "description": ""
     }
