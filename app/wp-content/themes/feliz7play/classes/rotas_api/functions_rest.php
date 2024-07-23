@@ -96,8 +96,6 @@ function get_line_post($args, $limited = false)
     $posts = get_posts($args);
     foreach ($posts as $post) {
 
-
-
         $id = $post->ID;
 
         $meta = get_post_meta($id);
@@ -402,7 +400,6 @@ function get_custom($items)
 
         switch ($item['acf_fc_layout']) {
             case 'collection':
-
                 $args = array(
                     'taxonomy' => 'collection',  
                     'number' => 0, 
@@ -422,7 +419,6 @@ function get_custom($items)
                 break;
 
             case 'video':
-
                 $args = array(
                     'post_type' => 'video', 
                     'fields' => '', 
@@ -442,20 +438,20 @@ function get_custom($items)
                 array_push($line['items'], $post[0]);
                 break;
 
-                /*
+                
             case 'slider':
 
-                $args = array(
-                    'post_type' => 'slider', 
-                    'fields' => '', 
-                    'include' => $item['to_slider']->ID, 
-                    'numberposts' => 0
-                );
-                $post = get_line_post($args);
+                // $args = array(
+                //     'post_type' => 'slider', 
+                //     'fields' => '', 
+                //     'include' => $item['to_slider']->ID, 
+                //     'numberposts' => 0
+                // );
+                // $post = get_line_post($args);
 
-                /*
+                
                 $type = get_field('slider_type', $item['to_slider']->ID);
-
+                /*
                 switch ($type) {
                     case 'video':
                         $title = $item->post_title;
@@ -572,10 +568,10 @@ function get_custom($items)
                 
 
                 // $slider = $item['to_slider']->ID;
-
-                array_push($line['items'], $post[0]);
-                break;
                 */
+
+                array_push($line['items'], $type);
+                break;
         }
     }
 
