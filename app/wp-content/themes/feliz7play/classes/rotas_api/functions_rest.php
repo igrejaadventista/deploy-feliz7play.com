@@ -566,8 +566,6 @@ function get_custom($items)
                         break;
                 }
 
-                $slider = $item['to_slider']->ID;
-
                 array_push($line['items'], $slider);
                 break;
         }
