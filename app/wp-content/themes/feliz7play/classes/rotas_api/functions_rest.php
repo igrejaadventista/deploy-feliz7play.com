@@ -96,8 +96,6 @@ function get_line_post($args, $limited = false)
     $posts = get_posts($args);
     foreach ($posts as $post) {
 
-
-
         $id = $post->ID;
 
         $meta = get_post_meta($id);
@@ -402,7 +400,6 @@ function get_custom($items)
 
         switch ($item['acf_fc_layout']) {
             case 'collection':
-
                 $args = array(
                     'taxonomy' => 'collection',  
                     'number' => 0, 
@@ -419,11 +416,9 @@ function get_custom($items)
                 }
 
                 array_push($line['items'], ...$collection['included']);
-
                 break;
 
             case 'video':
-
                 $args = array(
                     'post_type' => 'video', 
                     'fields' => '', 
@@ -441,7 +436,126 @@ function get_custom($items)
                 }
 
                 array_push($line['items'], $post[0]);
+                break;
+                
+            case 'slider':
+                $type = get_field('slider_type', $item['to_slider']->ID);
+                
+                switch ($type) {
+                    case 'video':
+                        $title = $item->post_title;
+                        $source = get_field('slider_source', $item['to_slider']->ID);
+                        $logo = get_field('slider_logo', $item['to_slider']->ID)['url'];
+                        $slider_desktop = get_field('slider_desktop_image', $item['to_slider']->ID)['url'];
+                        $slider_tablet = get_field('slider_tablet_image', $item['to_slider']->ID)['url'];
+                        $slider_mobile = get_field('slider_mobile_image', $item['to_slider']->ID)['url'];
 
+                        if ($source == 'video') {
+                            $meta = get_post_meta($target);
+
+                            $target = get_field('slider_video_object', $item['to_slider']->ID)->ID;
+                            $description = get_field('post_blurb',  $target);
+                            $slug = get_post_field('post_name', get_field('slider_video_object', $item['to_slider']->ID));
+                            $post_video_lenght = get_field('post_video_lenght', $target);
+                            $video_hls_link = get_field('post_hls_link', $target);
+                            $video_quality = get_field('post_video_quality', $target);
+                            $video_age_rating = get_field('post_video_age_rating', $target);
+                            $season = false;
+                            $video_year = get_field('post_year', $target);
+                            $rating = get_field('Rating', $target);
+                            $genre = get_the_terms($target, 'genre')[0]->name;
+                            $category = get_the_terms($target, 'category')[0];
+
+                            $video_host = get_field('post_video_host', $target);
+                            $video_id = get_field('post_video_id', $target);
+                            $video_thumbnail = get_field('video_thumbnail', $target);
+                            $extras = get_extras($target, 'video');
+
+                        } else {
+
+                            $meta = get_term_meta($target);
+
+                            $target = get_field('to_collection', $item['to_slider']->ID)->term_id;
+                            $description = term_description($target);
+                            $slug = get_field('to_collection', $item['to_slider']->ID)->slug;
+                            $post_video_lenght = false;
+                            $video_quality = get_field('collection_video_quality', 'term_' . $target);
+                            $video_age_rating = get_field('collection_video_age_rating', 'term_' . $target);
+                            $season = '1 temporada';
+                            $video_year = get_field('year', 'term_' . $target);
+                            $rating = get_field('Rating', 'term_' . $target);
+                            $genre = get_field('collection_genre', 'term_' . $target)->name;
+                            $category = get_field('collection_category', 'term_' . $target);
+                            $collection_father = get_field('to_collection', $item['to_slider']->ID)->parent ? get_term(get_field('to_collection', $item['to_slider']->ID)->parent)->slug : false;
+                            $video_hls_link =  get_field('collection_hls_link', 'term_' . $target);
+                            $video_host =  get_field('collection_video_host', 'term_' . $target);
+                            $video_id =    get_field('collection_video_id', 'term_' . $target);
+                            $video_thumbnail = get_field('collection_image', 'term_' . $target);
+                            $extras = get_extras($target, 'collection');
+                        }
+
+                        $slider = array(
+                            'id' => $item['to_slider']->ID,
+                            'title' => $title,
+                            'slug' => $slug,
+                            'type' => $type,
+                            'source' => $source,
+                            'target' => $target,
+                            'logo' => $logo,
+                            'description' => $description,
+                            'video_lenght' => $post_video_lenght,
+                            'rating' => $rating,
+                            'video_quality' => $video_quality,
+                            'video_age_rating' => $video_age_rating,
+                            'video_year' => $video_year,
+                            'video_host' => $video_host,
+                            'video_id' => $video_id,
+                            'video_hls_link' => $video_hls_link,
+                            'video_thumbnail' => $video_thumbnail,
+                            'genre' => $genre,
+                            'category' => $category,
+                            'season' => $season,
+                            'collection_father' => $collection_father,
+
+                            'slider_desktop' =>	$slider_desktop,
+                            'slider_tablet'	=> $slider_tablet,
+                            'slider_mobile' => $slider_mobile,
+                            'extras' => $extras
+                        );
+
+                        // array_push($sliders, $slider);
+                        break;
+
+                    case 'custom':
+
+                        $title = $item->post_title;
+                        $source = get_field('to_collection', $item['to_slider']->ID);
+                        $description = get_field('slider_description', $item['to_slider']->ID);
+                        $slider_mobile = get_field('slider_button', $item['to_slider']->ID);
+                        $slider_text_button = get_field('slider_button', $item['to_slider']->ID);
+                        $slider_link_button = get_field('slider_button_link', $item['to_slider']->ID);
+                        $slider_desktop = get_field('slider_desktop_image', $item['to_slider']->ID)['url'];
+                        $slider_tablet = get_field('slider_tablet_image', $item['to_slider']->ID)['url'];
+                        $slider_mobile = get_field('slider_mobile_image', $item['to_slider']->ID)['url'];
+
+                        $slider = array(
+                            'id' => $item['to_slider']->ID,
+                            'title' => $title,
+                            'type' => $type,
+                            'description' => $description,
+                            'text_button' => $slider_text_button,
+                            'link_button' => $slider_link_button,
+                            'slider_desktop' =>	$slider_desktop,
+                            'slider_tablet'	=> $slider_tablet,
+                            'slider_mobile' => $slider_mobile
+
+                        );
+
+                        // array_push($sliders, $slider);
+                        break;
+                }
+
+                array_push($line['items'], $slider);
                 break;
         }
     }
