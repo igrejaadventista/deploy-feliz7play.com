@@ -442,6 +442,7 @@ function get_custom($items)
                 array_push($line['items'], $post[0]);
                 break;
 
+                /*
             case 'slider':
 
                 $args = array(
@@ -568,12 +569,13 @@ function get_custom($items)
                         // array_push($sliders, $slider);
                         break;
                 }
-                */
+                
 
                 // $slider = $item['to_slider']->ID;
 
                 array_push($line['items'], $post[0]);
                 break;
+                */
         }
     }
 
