@@ -451,7 +451,7 @@ function get_custom($items)
 
                 
                 $type = get_field('slider_type', $item['to_slider']->ID);
-                /*
+                
                 switch ($type) {
                     case 'video':
                         $title = $item->post_title;
@@ -565,12 +565,10 @@ function get_custom($items)
                         // array_push($sliders, $slider);
                         break;
                 }
-                
 
-                // $slider = $item['to_slider']->ID;
-                */
+                $slider = $item['to_slider']->ID;
 
-                array_push($line['items'], $type);
+                array_push($line['items'], $slider);
                 break;
         }
     }
