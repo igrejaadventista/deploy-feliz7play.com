@@ -419,7 +419,6 @@ function get_custom($items)
                 }
 
                 array_push($line['items'], ...$collection['included']);
-
                 break;
 
             case 'video':
@@ -441,11 +440,19 @@ function get_custom($items)
                 }
 
                 array_push($line['items'], $post[0]);
-
                 break;
 
             case 'slider':
 
+                $args = array(
+                    'post_type' => 'slider', 
+                    'fields' => '', 
+                    'include' => $item['to_slider']->ID, 
+                    'numberposts' => 0
+                );
+                $post = get_line_post($args);
+
+                /*
                 $type = get_field('slider_type', $item['to_slider']->ID);
 
                 switch ($type) {
@@ -561,11 +568,11 @@ function get_custom($items)
                         // array_push($sliders, $slider);
                         break;
                 }
+                */
 
-                $slider = $item['to_slider']->ID;
+                // $slider = $item['to_slider']->ID;
 
-                array_push($line['items'], $slider);
-
+                array_push($line['items'], $post[0]);
                 break;
         }
     }
