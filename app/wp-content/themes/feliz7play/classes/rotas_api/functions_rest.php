@@ -415,7 +415,8 @@ function get_custom($items)
                     $collection['included'][0]['video_thumbnail_vertical'] = $item['image']['url'];
                 }
 
-                array_push($line['items'], ...$collection['included']);
+                // array_push($line['items'], ...$collection['included']);
+                array_push($line['items'], ...$collection);
                 break;
 
             case 'video':
@@ -440,16 +441,6 @@ function get_custom($items)
 
                 
             case 'slider':
-
-                // $args = array(
-                //     'post_type' => 'slider', 
-                //     'fields' => '', 
-                //     'include' => $item['to_slider']->ID, 
-                //     'numberposts' => 0
-                // );
-                // $post = get_line_post($args);
-
-                
                 $type = get_field('slider_type', $item['to_slider']->ID);
                 
                 switch ($type) {
