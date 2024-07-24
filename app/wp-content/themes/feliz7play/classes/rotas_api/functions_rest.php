@@ -337,6 +337,7 @@ function get_line_collection($args)
 
         $title = $collection->name;
         $slug = $collection->slug;
+        $description = $collection->description;
         $video_type = $collection->taxonomy;
         $video_thumbnail = wp_get_attachment_image_src($meta['collection_image'][0])[0];
         $video_image_hover = false;
@@ -345,17 +346,13 @@ function get_line_collection($args)
             'id' => $id, 
             'title' => $title, 
             'slug' => $slug, 
+            'description' => $description,
             'video_type' => $video_type, 
             'video_thumbnail' => $video_thumbnail, 
             'video_image_hover' => $video_image_hover
         );
-        // $values = array('id' => $id);
 
         array_push($items['included'], $values);
-
-        // $args = array('post_type' => 'video', 'fields' => 'ids', 'collection' => $slug, 'numberposts' => -1);
-        // $exclude = get_posts($args);
-        // array_push($items['exclude'], ...$exclude);
     }
     return $items;
 }
@@ -415,8 +412,7 @@ function get_custom($items)
                     $collection['included'][0]['video_thumbnail_vertical'] = $item['image']['url'];
                 }
 
-                // array_push($line['items'], ...$collection['included']);
-                array_push($line['items'], $collection);
+                array_push($line['items'], ...$collection['included']);
                 break;
 
             case 'video':
