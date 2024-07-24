@@ -416,7 +416,7 @@ function get_custom($items)
                 }
 
                 // array_push($line['items'], ...$collection['included']);
-                array_push($line['items'], ...$collection);
+                array_push($line['items'], $collection);
                 break;
 
             case 'video':
