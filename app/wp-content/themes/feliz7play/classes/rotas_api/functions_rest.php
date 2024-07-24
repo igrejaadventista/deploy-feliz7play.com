@@ -333,11 +333,10 @@ function get_line_collection($args)
 
         $meta = get_term_meta($id);
 
-        // echox($meta);
-
         $title = $collection->name;
         $slug = $collection->slug;
         $description = $collection->description;
+        $genres = get_field('collection_genre', 'term_' . $id);
         $video_type = $collection->taxonomy;
         $video_thumbnail = wp_get_attachment_image_src($meta['collection_image'][0])[0];
         $video_image_hover = false;
@@ -347,6 +346,7 @@ function get_line_collection($args)
             'title' => $title, 
             'slug' => $slug, 
             'description' => $description,
+            'genres' => $genres,
             'video_type' => $video_type, 
             'video_thumbnail' => $video_thumbnail, 
             'video_image_hover' => $video_image_hover
