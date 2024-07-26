@@ -55,7 +55,6 @@ function get_extras($id, $field_name)
 					$link = get_link_site_next($slug, $video_type, $collection);
 			
 					$video_values = array(
-						'source' => 'extra-video',
 						'id' => $id,
 						'title' => $title,
 						'slug' => $slug,
@@ -133,7 +132,6 @@ function get_extras($id, $field_name)
 					$link =                 get_link_site_next($slug, $video_type, $collection);
 			
 					$video_values = array(
-						'source' => 'extra-collection',
 						'id' => $id,
 						'title' => $title,
 						'slug' => $slug,
