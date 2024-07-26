@@ -21,7 +21,7 @@ function get_extras($id, $field_name)
 					$video_id = $video_item['post_extra_video']->ID;
 					$meta = get_post_meta($video_id);
 			
-					$title = $meta['post_title'][0];
+					$title = $meta['title'][0];
 					$slug = $meta['post_name'][0];
 					$video_type = $meta['post_video_type'][0];
 					$video_episode = $meta['video_episode'][0];
