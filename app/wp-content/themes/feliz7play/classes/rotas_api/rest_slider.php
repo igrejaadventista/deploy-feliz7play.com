@@ -21,8 +21,9 @@ function get_extras($id, $field_name)
 					$video_id = $video_item['post_extra_video']->ID;
 					$meta = get_post_meta($video_id);
 			
-					$title = $meta['title'][0];
-					$slug = $meta['post_name'][0];
+					$title = $video_item['post_extra_video']->post_title;
+					$slug = $video_item['post_extra_video']->post_name;
+					
 					$video_type = $meta['post_video_type'][0];
 					$video_episode = $meta['video_episode'][0];
 					$subtitle = $meta['post_subtitle'][0];
@@ -54,6 +55,7 @@ function get_extras($id, $field_name)
 					$link = get_link_site_next($slug, $video_type, $collection);
 			
 					$video_values = array(
+						'source' => 'extra-video',
 						'id' => $id,
 						'title' => $title,
 						'slug' => $slug,
@@ -131,6 +133,7 @@ function get_extras($id, $field_name)
 					$link =                 get_link_site_next($slug, $video_type, $collection);
 			
 					$video_values = array(
+						'source' => 'extra-collection',
 						'id' => $id,
 						'title' => $title,
 						'slug' => $slug,
