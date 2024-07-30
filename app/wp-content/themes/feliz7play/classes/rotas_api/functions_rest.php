@@ -346,7 +346,7 @@ function get_line_collection($args)
             'title' => $title, 
             'slug' => $slug, 
             'description' => $description,
-            'genres' => $genres,
+            'genre' => $genres,
             'video_type' => $video_type, 
             'video_thumbnail' => $video_thumbnail, 
             'video_image_hover' => $video_image_hover
