@@ -27,29 +27,9 @@ function get_grid(){
     global $lines;
     global $total;
 
-    $itens = get_field('grid_top_left', 'option');
+    $itens_top_left = get_field('grid_top_left', 'option');
 
-    foreach ($itens as $item) {
-
-		// $item = $item['slider_object'];
-
-    }
-
-
-    $grid_title = get_field('grid_top_left_title');
-    $grid_genre = get_field('grid_top_left_genre');
-
-    $grid_data = [
-        'title' => $grid_title, 
-        'genre' => $grid_genre,
-        'itens' => $itens
-    ];
-
-        // array_push($lines, $line);
-
-    // $print = print_r($grid_top_left, true);
-
-    $total['grid']['top_left'] = $grid_data;
+    $total['grid']['top_left'] = $itens_top_left;
 }
 
 
