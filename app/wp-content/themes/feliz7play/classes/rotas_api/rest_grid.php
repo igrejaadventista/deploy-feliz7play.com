@@ -28,8 +28,16 @@ function get_grid(){
     global $total;
 
     $itens_top_left = get_field('grid_top_left', 'option');
+    $itens_top_right = get_field('grid_top_right', 'option');
 
-    $total['grid']['top_left'] = $itens_top_left;
+    $grid = [
+        'top_left' => $itens_top_left,
+        'top_right' => $itens_top_right,
+        // 'bottom_left' => $itens_bottom_left,
+        // 'bottom_right' => $itens_bottom_right
+    ];
+
+    $total['grid'] = $grid;
 }
 
 
