@@ -27,26 +27,21 @@ function get_grid(){
     global $lines;
     global $total;
 
-    $grid_top_left = get_field('grid_top_left', 'option');
+    // $grid_top_left = get_field('grid_top_left', 'option');
 
     $grid_title = get_sub_field('grid_top_left_title');
+    $grid_genre = get_sub_field('grid_top_left_genre');
 
-        // $line = array(
-        //     'id' => $item->term_id, 
-        //     'name'=> $item->name, 
-        //     'slug' => $item->slug, 
-        //     'acf' => array( 
-        //         'image' => array( 
-        //             'url' => $image 
-        //         )
-        //     )
-        // );
+    $grid_data = [
+        'title' => $grid_title, 
+        'genre' => $grid_genre,
+    ];
 
         // array_push($lines, $line);
 
-    $print = print_r($grid_top_left, true);
+    // $print = print_r($grid_top_left, true);
 
-    $total['grid']['top_left'] = $grid_title;
+    $total['grid']['top_left'] = $grid_data;
 }
 
 
