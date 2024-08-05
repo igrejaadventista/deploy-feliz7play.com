@@ -27,14 +27,22 @@ function get_grid(){
     global $lines;
     global $total;
 
-    // $grid_top_left = get_field('grid_top_left', 'option');
+    $itens = get_field('grid_top_left', 'option');
 
-    $grid_title = get_sub_field('grid_top_left_title');
+    foreach ($itens as $item) {
+
+		// $item = $item['slider_object'];
+
+    }
+
+
+    $grid_title = get_field('grid_top_left_title');
     $grid_genre = get_field('grid_top_left_genre');
 
     $grid_data = [
         'title' => $grid_title, 
         'genre' => $grid_genre,
+        'itens' => $itens
     ];
 
         // array_push($lines, $line);
