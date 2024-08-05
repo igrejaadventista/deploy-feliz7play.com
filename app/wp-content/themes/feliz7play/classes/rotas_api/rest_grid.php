@@ -29,6 +29,8 @@ function get_grid(){
 
     $grid_top_left = get_field('grid_top_left', 'option');
 
+    $grid_title = get_sub_field('grid_top_left_title');
+
         // $line = array(
         //     'id' => $item->term_id, 
         //     'name'=> $item->name, 
@@ -42,9 +44,9 @@ function get_grid(){
 
         // array_push($lines, $line);
 
-        $print = print_r($grid_top_left, true);
+    $print = print_r($grid_top_left, true);
 
-    $total['grid']['top_left'] = $print;
+    $total['grid']['top_left'] = $grid_title;
 }
 
 
