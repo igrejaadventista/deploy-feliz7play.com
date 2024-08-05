@@ -30,7 +30,7 @@ function get_grid(){
     // $grid_top_left = get_field('grid_top_left', 'option');
 
     $grid_title = get_sub_field('grid_top_left_title');
-    $grid_genre = get_sub_field('grid_top_left_genre');
+    $grid_genre = get_field('grid_top_left_genre');
 
     $grid_data = [
         'title' => $grid_title, 
