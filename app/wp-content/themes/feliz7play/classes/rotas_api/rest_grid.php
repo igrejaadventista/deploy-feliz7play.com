@@ -27,14 +27,20 @@ function get_grid(){
     global $lines;
     global $total;
 
-    $itens_top_left = get_field('grid_top_left', 'option');
-    $itens_top_right = get_field('grid_top_right', 'option');
+    $itens_large_right = get_field('grid_large_right', 'option');
+    $itens_medium_left = get_field('grid_medium_left', 'option');
+    $itens_top_small_right = get_field('grid_top_small_right', 'option');
+    $itens_top_small_left = get_field('grid_top_small_left', 'option');
+    $itens_bottom_small_right = get_field('grid_bottom_small_right', 'option');
+    $itens_bottom_small_left = get_field('grid_bottom_small_left', 'option');
 
     $grid = [
-        'top_left' => $itens_top_left,
-        'top_right' => $itens_top_right,
-        // 'bottom_left' => $itens_bottom_left,
-        // 'bottom_right' => $itens_bottom_right
+        'large_right' => $itens_large_right,
+        'medium_left' => $itens_medium_left,
+        'top_small_right' => $itens_top_small_right,
+        'top_small_left' => $itens_top_small_left,
+        'bottom_small_right' => $itens_bottom_small_right,
+        'bottom_small_left' => $itens_bottom_small_left
     ];
 
     $total['grid'] = $grid;
