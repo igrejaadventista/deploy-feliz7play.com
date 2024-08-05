@@ -62,4 +62,3 @@ if ( !empty($collections) ) :
 endif;
 
 
-?>
