@@ -2,4 +2,7 @@ mysql
 node_modules
 .cache-loader/c:/Users/Leandro/MonitoraProjects/deploy-feliz7play.com-1/app/wp-config.php
 
-app/wp-content/themes/feliz7play/acf-json/*
+# app/wp-content/themes/feliz7play/acf-json/*
+app/wp-content/themes/feliz7play/dist/*
+app/wp-content/themes/feliz7play/.cache-loader/*
+app/wp-content/themes/.DS_store

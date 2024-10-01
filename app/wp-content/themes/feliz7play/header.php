@@ -4,6 +4,11 @@
     $privacy_policy = get_field('link_privacy_policy', 'site_settings');
     $lang = getLanguage();
     $user = getUser();
+    $menuPrincipal = get_field('idiomas', 'menu_principal');
+    // echo "<pre>";
+    // print_r($menuPrincipal);
+    // echo "</pre>";
+    
 ?>
 
 <header id="header" class="header">
@@ -25,64 +30,31 @@
                 </svg>
             </a>
 
-            <?php if(!empty($menu)): ?>
+            
+            <?php if(!empty($menuPrincipal[0]['links'])):?>
                 <ul>
-                    <?php foreach($menu as $item): ?>
+                    <?php foreach($menuPrincipal[0]['links'] as $menuItem): ?>
                         <li>
-                            <a href="<?= $item['link']['url'] ?>" target="<?= !empty($item['link']['target']) ? $item['link']['target'] : '_self' ?>">
-                                <?php if(!empty($menu)): ?>
-                                    <?= file_get_contents($item['icon']) ?>
-                                <?php endif; ?>
-
-                                <span><?= $item['link']['title'] ?></span>
-                            </a>
-                        </li>
-                    <?php endforeach; ?> 
+                            <a href="<?= $menuItem['links']['url'] ?>" target="<?= !empty($menuItem['links']['target']) ? $menuItem['links']['target'] : '_self' ?>">
+                                    <span><?= $menuItem['links']['title'] ?></span>
+                                </a>
+                            </li>
+                    <?php endforeach; ?>     
                 </ul>
             <?php endif; ?>
-        </div>
-        
-        <button id="button-menu-mobile" class="header__button-mobile">
-            <i class="menu-icon"></i>
-        </button>
-
-        <aside class="header__menu-mobile">
-            <?php if(!empty($menu)): ?>
-                <ul>
-                    <?php foreach($menu as $item): ?>
-                        <li>
-                            <a href="<?= $item['link']['url'] ?>" target="<?= !empty($item['link']['target']) ? $item['link']['target'] : '_self' ?>">
-                                <?php if(!empty($menu)): ?>
-                                    <div class="icon">
-                                        <?= file_get_contents($item['icon']) ?>
-                                    </div>
-                                <?php endif; ?>
-
-                                <span><?= $item['link']['title'] ?></span>
-                            </a>
-                        </li>
-                    <?php endforeach; ?> 
-
-                    <li class="">
-                        <a href="<?= network_site_url($lang . '/busca') ?>">
-                            <div class="icon">
-                                <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path clip-rule="evenodd" d="M19.767 11.467a7.467 7.467 0 1 1-14.934 0 7.467 7.467 0 1 1 14.934 0z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                                    
-                                    <path d="M20.834 20l-3.25-3.25" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                                </svg>
-                            </div>
-                            
-                            <span>Pesquisar</span>
-                        </a>
-                    </li>
-                </ul>
-            <?php endif; ?>
-        </aside>
+        </div> 
         
         <div class="right">
+            <a class="search" href="<?= network_site_url($lang . '/busca') ?>">
+            <svg width="14.7" height="14.7" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M19.7675 11.467V11.467C19.7675 15.591 16.4245 18.934 12.3005 18.934V18.934C8.1765 18.934 4.8335 15.591 4.8335 11.467V11.467C4.8335 7.343 8.1765 4 12.3005 4V4C16.4245 4 19.7675 7.343 19.7675 11.467Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M20.8335 20L17.5835 16.75" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+
+            </a>
             <div class="header__language">
                 <button id="button-language" class="selected">
+                    <img src = "<?= $menuPrincipal[0]['idioma_imagem']['url'] ?>" alt="<?= $menuPrincipal[0]['idioma_imagem']['title'] ?>"/>
                     <span><?= $lang ?></span>
                     
                     <div>
@@ -126,15 +98,7 @@
                     </button>
                 </div>
             </div>
-            
-            <a class="search" href="<?= network_site_url($lang . '/busca') ?>">
-                <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path clip-rule="evenodd" d="M19.767 11.467a7.467 7.467 0 1 1-14.934 0 7.467 7.467 0 1 1 14.934 0z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                    
-                    <path d="M20.834 20l-3.25-3.25" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-            </a>
-            
+
             <div class="header__user">
                 <?php if(empty($user['name'])): ?>
                     <a href="<?= network_site_url('/login') ?>" class="header-not-login">
