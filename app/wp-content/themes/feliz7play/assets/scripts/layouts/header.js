@@ -1,11 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     const $header = document.getElementById('header'),
           $buttonLanguage = document.getElementById('button-language'),
+          $headerLanguage = document.querySelector('.header__language'),
           $buttonUser = document.getElementById('button-user'),
           $buttonMenuMobile = document.getElementById('button-menu-mobile');
+        
+    $headerLanguage.addEventListener('mouseenter', () => $buttonLanguage.classList.add('active'));
+    $headerLanguage.addEventListener('mouseleave', () => $buttonLanguage.classList.remove('active'));
 
-    $buttonLanguage.addEventListener('click', () => $buttonLanguage.classList.toggle('active'));
-    $buttonMenuMobile.addEventListener('click', () => $buttonMenuMobile.classList.toggle('active'));
+    $buttonLanguage.addEventListener('click', () => $buttonMenuMobile.classList.toggle('active'));
 
     if($buttonUser)
         $buttonUser.addEventListener('click', () => $buttonUser.classList.toggle('active'));
@@ -19,5 +22,5 @@ document.addEventListener('DOMContentLoaded', () => {
             $buttonMenuMobile.classList.remove('active');
     }, false);
 
-    window.addEventListener('scroll', () => $header.classList.toggle('black', window.scrollY > 100));
+    window.addEventListener('scroll', () => $header.classList.toggle('black', window.scrollY > 100)); 
 });

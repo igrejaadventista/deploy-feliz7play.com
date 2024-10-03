@@ -36,16 +36,18 @@
             </a>
 
             
-            <?php if(!empty($menuPrincipal[0]['links'])):?>
-                <ul>
-                    <?php foreach($menuPrincipal[0]['links'] as $menuItem): ?>
-                        <li>
-                            <a href="<?= $menuItem['links']['url'] ?>" target="<?= !empty($menuItem['links']['target']) ? $menuItem['links']['target'] : '_self' ?>">
-                                    <span><?= $menuItem['links']['title'] ?></span>
-                                </a>
-                            </li>
-                    <?php endforeach; ?>     
-                </ul>
+            <?php if(!empty($menuPrincipal)):?>
+                <?php foreach($menuPrincipal as $menuIdioma): ?>
+                    <ul class="" id="<?= $menuIdioma['idioma'] ?>">
+                        <?php foreach($menuIdioma['links'] as $menuItem): ?>
+                            <li>
+                                <a href="<?= $menuItem['links']['url'] ?>" target="<?= !empty($menuItem['links']['target']) ? $menuItem['links']['target'] : '_self' ?>">
+                                        <span><?= $menuItem['links']['title'] ?></span>
+                                    </a>
+                                </li>
+                        <?php endforeach; ?>     
+                    </ul>
+                <?php endforeach; ?> 
             <?php endif; ?>
         </div> 
         
