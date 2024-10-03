@@ -6,3 +6,12 @@ node_modules
 app/wp-content/themes/feliz7play/dist/*
 app/wp-content/themes/feliz7play/.cache-loader/*
 app/wp-content/themes/.DS_store
+
+app/wp-content/languages/*
+app/wp-content/plugins/*
+app/wp-content/upgrade/*
+app/wp-content/uploads/*
+
+app/wp-admin/*
+
+app/wp-includes/*

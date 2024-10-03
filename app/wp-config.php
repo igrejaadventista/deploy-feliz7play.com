@@ -18,27 +18,38 @@
  * @package WordPress
  */
 
-$is_dev = false;
+$is_dev = true;
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'WP_DB_NAME');
+// define( 'DB_NAME', 'WP_DB_NAME');
 
+// /** MySQL database username */
+// define( 'DB_USER', 'WP_DB_USER');
+
+// /** MySQL database password */
+// define( 'DB_PASSWORD', 'WP_DB_PASSWORD');
+
+// /** MySQL hostname */
+// define( 'DB_HOST', 'WP_DB_HOST');
+
+define( 'DB_NAME', 'feliz7play');
 /** MySQL database username */
-define( 'DB_USER', 'WP_DB_USER');
-
+define( 'DB_USER', 'feliz7play_user');    
 /** MySQL database password */
-define( 'DB_PASSWORD', 'WP_DB_PASSWORD');
-
+define( 'DB_PASSWORD', 'feliz7play_pass');    
 /** MySQL hostname */
-define( 'DB_HOST', 'WP_DB_HOST');
+define( 'DB_HOST', 'feliz7play_db:3306');
 
-if($is_dev):
-    define( 'DB_HOST', 'localhost:3306');
-    define( 'DB_PASSWORD', '');
-    define( 'DB_USER', 'root');
-    define( 'DB_NAME', 'u919907044_devf7p');
-endif;
+// if($is_dev):
+//     define( 'DB_NAME', 'feliz7play');
+//     /** MySQL database username */
+//     define( 'DB_USER', 'feliz7play_user');    
+//     /** MySQL database password */
+//     define( 'DB_PASSWORD', 'feliz7play_pass');    
+//     /** MySQL hostname */
+//     define( 'DB_HOST', 'feliz7play_db:3306');
+// endif;
 
 /** Database Charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8mb4' );
