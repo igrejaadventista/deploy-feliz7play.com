@@ -20,11 +20,6 @@
   background: linear-gradient(180deg, #0a081c 25.1%, rgba(10, 8, 28, 0.67) 57.1%, rgba(14, 14, 33, 0) 100%);
   transition: all 0.3s ease;
 
-  &.black {
-    background-color: black;
-    padding: 1rem 0;
-  }
-
   .container-fluid {
     display: flex;
     align-items: center;
@@ -35,22 +30,20 @@
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: left;
 
     ul {
       margin: 0 2rem;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: space-around;
       width: 650px;
 
+      &.active {
+        display: flex;
+      }
+
       li {
-        margin-left: 5rem;
-
-        &:first-child {
-          margin-left: 0;
-        }
-
         &.active {
           a {
             svg {
@@ -99,6 +92,14 @@
       position: relative;
       z-index: 5;
     }
+
+    .dropDownGenres {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      gap: 10px;
+    }
   }
 
   .right {
@@ -124,34 +125,16 @@
 
   @media (max-width: 1300px) {
     padding: 1.5rem 0;
-
-    .left {
-      max-width: 58rem;
-
-      ul {
-        li {
-          margin-left: 3rem;
-        }
-      }
-    }
-  }
-
-  @media (max-width: 1200px) {
-    .left {
-      max-width: 56rem;
-    }
   }
 
   @media (max-width: 1150px) {
     .left {
-      max-width: 54rem;
-    }
-  }
-
-  @media (max-width: 1050px) {
-    .left {
       ul {
         display: none;
+
+        &.active {
+          display: none;
+        }
       }
     }
 
@@ -191,7 +174,6 @@
       margin-right: 1.875rem;
       background: transparent;
       border: none;
-      text-transform: uppercase;
 
       svg {
         transition: transform 0.3s;
@@ -227,6 +209,7 @@
       border-radius: 8px;
       width: 160px;
       padding: 33px 0;
+      display: flex;
       flex-direction: column;
       align-items: center;
       margin-left: -83px;
@@ -286,10 +269,18 @@
 
   &__user {
     position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    cursor: pointer;
 
     button {
       background-color: transparent;
       border: none;
+    }
+
+    .signout_icon {
+      margin-left: 20px;
     }
 
     .user {
