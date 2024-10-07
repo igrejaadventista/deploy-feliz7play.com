@@ -39,6 +39,14 @@
             <?php if(!empty($menuPrincipal)):?>
                 <?php foreach($menuPrincipal as $menuIdioma): ?>
                     <ul class="" id="<?= $menuIdioma['idioma'] ?>">
+                        <?php if(!empty($menuIdioma['home'])):?>
+                            <li>
+                                <a href="<?= network_site_url($lang) ?>">
+                                    <img src="<?= $menuIdioma['home']['url'] ?>" alt="<?= $menuIdioma['home']['alt'] ?>">
+                                </a>
+                            </li>                           
+                        <?php endif; ?>
+
                         <?php foreach($menuIdioma['links'] as $menuItem): ?>
                             <li>
                                 <a href="<?= $menuItem['links']['url'] ?>" target="<?= !empty($menuItem['links']['target']) ? $menuItem['links']['target'] : '_self' ?>">
