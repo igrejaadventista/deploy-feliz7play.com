@@ -65,6 +65,21 @@
                     "mime_types": "svg"
                 },
                 {
+                    "key": "field_670428e4cd667",
+                    "label": "Configuração de conta",
+                    "name": "login_config",
+                    "type": "link",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "return_format": "array"
+                },
+                {
                     "key": "field_66fc2ef29ba3b",
                     "label": "Home",
                     "name": "home",
@@ -73,7 +88,7 @@
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
-                        "width": "",
+                        "width": "50",
                         "class": "",
                         "id": ""
                     },
@@ -144,5 +159,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1727813745
+    "modified": 1728325958
 }

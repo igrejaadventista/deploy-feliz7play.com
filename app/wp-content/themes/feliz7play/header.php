@@ -4,11 +4,10 @@
     $privacy_policy = get_field('link_privacy_policy', 'site_settings');
     $lang = getLanguage();
     $user = getUser();
-    $menuPrincipal = get_field('idiomas', 'menu_principal');
-    // echo "<pre>";
+    $menuPrincipal = get_field('idiomas', 'menu_principal'); 
+    // echo "<pre>";   
     // print_r($menuPrincipal);
-    // echo "</pre>";
-    
+    // echo "</pre>";   
 ?>
 
 <header id="header" class="header">
@@ -128,56 +127,38 @@
                         </span>
                     </a>
                 <?php else: ?>
-                    <button id="button-user" class="user">
-                        <div class="avatar">
-                            <?php if(!empty($user['avatar'])): ?>
-                                <img src="https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=4243138775745960&amp;height=50&amp;width=50&amp;ext=1627586724&amp;hash=AeSLCgIUa9lNnIBvg_A">
-                            <?php endif; ?>
-                        </div>
+                    <?php foreach($menuPrincipal as $menuIdioma): ?>
+                        <a href="<?= $menuIdioma['login_config']['url']; ?>" id="user-<?= $menuIdioma['idioma'] ?>" class="user">
+                            <div class="avatar">
+                                <?php if(!empty($_COOKIE['feliz7playAvatar'])): ?>
+                                    <img src="<?= $_COOKIE['feliz7playAvatar'] ?>">
+                                <?php elseif(!empty($user['avatar'])): ?>
+                                    <img src="https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=4243138775745960&amp;height=50&amp;width=50&amp;ext=1627586724&amp;hash=AeSLCgIUa9lNnIBvg_A">
+                                <?php endif; ?>
+                            </div>
 
-                        <span><?= $user['name'] ?></span>
-                        
-                        <div class="arrow">
-                            <svg width="11" height="8" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9.834 0h-8a1 1 0 0 0-.8 1.6l4 5.333a1 1 0 0 0 1.6 0l4-5.333a1 1 0 0 0-.8-1.6z" fill="#F16723"></path>
-                            </svg>
-                        </div>
-                    </button>
-                    
-                    <div class="drop-user">
-                        <a href="<?= network_site_url('/login') ?>">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2.997 12H14M11 8.999L14 12l-3 3.001" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                
-                                <path d="M5.998 9.136V7.398a2 2 0 0 1 1.608-1.96L18.611 3.03a2.147 2.147 0 0 1 2.393 2.167v13.806a2.001 2.001 0 0 1-2.34 1.973L7.659 19.083a2 2 0 0 1-1.661-1.973v-2.138" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            </svg>
-                            
-                            <span>Log out</span>
+                            <span>
+                                <?php if(!empty($_COOKIE['feliz7playAvatar'])): ?>
+                                    <?= $_COOKIE['feliz7playName'] ?>
+                                <?php elseif(!empty($user['avatar'])): ?>
+                                    <?= $user['name'] ?>
+                                <?php endif; ?>
+                            </span>
                         </a>
-                        
-                        <?php if(!empty($feedback['url'])): ?>
-                            <a href="<?= $feedback['url'] ?>" target="<?= !empty($feedback['target']) ? $feedback['target'] : '_self' ?>">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path clip-rule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                    <path d="M9.65 14.346c2.184 2.184 4.95 3.576 6.595 1.938l.399-.399a1.201 1.201 0 0 0-.16-1.84c-.39-.271-.807-.562-1.27-.887a1.213 1.213 0 0 0-1.547.128l-.451.448a9.67 9.67 0 0 1-1.626-1.322l-.002-.002a9.63 9.63 0 0 1-1.322-1.626l.448-.451c.412-.414.463-1.07.128-1.548-.326-.462-.617-.88-.887-1.269a1.203 1.203 0 0 0-1.84-.16l-.4.399C6.08 9.4 7.47 12.164 9.654 14.349" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                </svg>
-                                
-                                <span><?= $feedback['title'] ?></span>
-                            </a>
-                        <?php endif; ?>
-                        
-                        <?php if(!empty($privacy_policy['url'])): ?>
-                            <a href="<?= $privacy_policy['url'] ?>" target="<?= !empty($privacy_policy['target']) ? $privacy_policy['target'] : '_self' ?>">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path clip-rule="evenodd" d="M18.414 6.414l-2.828-2.828A2 2 0 0 0 14.172 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7.828a2 2 0 0 0-.586-1.414z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                    
-                                    <path d="M19 8h-4a1 1 0 0 1-1-1V3M9.5 17h5M14 11.5L11.5 14 10 12.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                </svg>
-                                
-                                <span><?= $privacy_policy['title'] ?></span>
-                            </a>
-                        <?php endif; ?>
-                    </div>
+                    <?php endforeach; ?>
+                    <a href="<?= wp_logout_url(network_site_url('/login')) ?>" class="signout_icon">
+                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_2684_6131)">
+                                <path d="M11.375 4.375H5.25C5.01794 4.375 4.79538 4.46719 4.63128 4.63128C4.46719 4.79538 4.375 5.01794 4.375 5.25V22.75C4.375 22.9821 4.46719 23.2046 4.63128 23.3687C4.79538 23.5328 5.01794 23.625 5.25 23.625H11.375" stroke="#F16723" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M11.375 14H23.625" stroke="#F16723" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19.25 9.625L23.625 14L19.25 18.375" stroke="#F16723" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_2684_6131">
+                                    <rect width="28" height="28" fill="white"></rect>
+                                </clipPath>
+                            </defs>
+                        </svg>
+                    </a>
                 <?php endif; ?>
             </div>
         </div>

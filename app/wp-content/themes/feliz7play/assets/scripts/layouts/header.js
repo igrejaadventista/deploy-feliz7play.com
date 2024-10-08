@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
           $buttonUser = document.getElementById('button-user'),
           $buttonMenuMobile = document.getElementById('button-menu-mobile');
         
-    $headerLanguage.addEventListener('mouseenter', () => $buttonLanguage.classList.add('active'));
-    $headerLanguage.addEventListener('mouseleave', () => $buttonLanguage.classList.remove('active'));
+    $headerLanguage.addEventListener('mouseenter', () => $headerLanguage.classList.add('active'));
+    $headerLanguage.addEventListener('mouseleave', () => $headerLanguage.classList.remove('active'));
 
     $buttonLanguage.addEventListener('click', () => $buttonMenuMobile.classList.toggle('active'));
 
