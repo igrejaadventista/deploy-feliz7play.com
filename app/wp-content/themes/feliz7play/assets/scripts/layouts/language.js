@@ -14,7 +14,6 @@ export function getLanguage() {
           idioma = url.split('/')[1];
 
     return idioma.toUpperCase();
-    // return 'ES';
 }
 
 function activeClass (className) {
