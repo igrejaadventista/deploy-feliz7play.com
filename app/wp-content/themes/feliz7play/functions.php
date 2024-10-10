@@ -219,3 +219,29 @@ function custom_taxonomy_radio_buttons() {
 }
 add_action('admin_footer', 'custom_taxonomy_radio_buttons');
 
+function getTermsByLanguage($termName) {
+	$terms = get_terms($termName);
+	$termsLanguage = [];
+
+    foreach ($terms as $term){
+        foreach (get_field('languages', $term) as $termLang) {            
+            $termsLanguage[strtoupper($termLang['language'])][] = [
+                'title' => $termLang['title'],
+                'slug' => $termLang['slug'],
+            ]; 
+        }
+    }
+
+	return $termsLanguage;
+}
+
+function getActiveImage ($lang) {
+	$url = '';
+	$mainMenu = get_field('languages', 'main_menu');     
+
+	foreach ($mainMenu as $language) {
+        if ($lang == $language['language']) {
+            return $language['language_image']['url'];
+        }
+    }
+}

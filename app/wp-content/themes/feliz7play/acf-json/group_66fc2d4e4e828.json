@@ -4,8 +4,8 @@
     "fields": [
         {
             "key": "field_66fc2ed19ba3a",
-            "label": "Idiomas",
-            "name": "idiomas",
+            "label": "languages",
+            "name": "languages",
             "type": "repeater",
             "instructions": "",
             "required": 0,
@@ -23,8 +23,8 @@
             "sub_fields": [
                 {
                     "key": "field_66fc3141e1d66",
-                    "label": "Idioma",
-                    "name": "idioma",
+                    "label": "Language",
+                    "name": "language",
                     "type": "text",
                     "instructions": "Utilizar apenas a sigla",
                     "required": 0,
@@ -42,8 +42,8 @@
                 },
                 {
                     "key": "field_66fc576ffd12e",
-                    "label": "Idioma Imagem",
-                    "name": "idioma_imagem",
+                    "label": "Language Image",
+                    "name": "language_image",
                     "type": "image",
                     "instructions": "",
                     "required": 0,
@@ -66,7 +66,7 @@
                 },
                 {
                     "key": "field_670428e4cd667",
-                    "label": "Configuração de conta",
+                    "label": "Login Config",
                     "name": "login_config",
                     "type": "link",
                     "instructions": "",
@@ -141,8 +141,8 @@
                 },
                 {
                     "key": "field_6706caca204ca",
-                    "label": "Titulo Gênero",
-                    "name": "titulo_genero",
+                    "label": "Gender titile",
+                    "name": "gender_titile",
                     "type": "text",
                     "instructions": "",
                     "required": 0,
@@ -166,7 +166,7 @@
             {
                 "param": "options_page",
                 "operator": "==",
-                "value": "acf-options-menu-principal"
+                "value": "acf-options-main-menu"
             }
         ]
     ],
@@ -178,5 +178,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1728498463
+    "modified": 1728569590
 }

@@ -28,8 +28,8 @@
         },
         {
             "key": "field_6706bd52aa917",
-            "label": "Idioma",
-            "name": "idioma",
+            "label": "Languages",
+            "name": "languages",
             "type": "repeater",
             "instructions": "",
             "required": 0,
@@ -47,8 +47,8 @@
             "sub_fields": [
                 {
                     "key": "field_6706bd68aa918",
-                    "label": "Idioma",
-                    "name": "idioma",
+                    "label": "Language",
+                    "name": "language",
                     "type": "text",
                     "instructions": "",
                     "required": 0,
@@ -66,8 +66,8 @@
                 },
                 {
                     "key": "field_6706be0c4f6ea",
-                    "label": "Titulo",
-                    "name": "titulo",
+                    "label": "Title",
+                    "name": "title",
                     "type": "text",
                     "instructions": "",
                     "required": 0,
@@ -122,5 +122,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1728495134
+    "modified": 1728571164
 }
