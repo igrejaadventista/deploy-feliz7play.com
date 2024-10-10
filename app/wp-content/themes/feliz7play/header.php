@@ -4,7 +4,7 @@
     $privacy_policy = get_field('link_privacy_policy', 'site_settings');
     $lang = getLanguage();
     $user = getUser();
-    $menuPrincipal = get_field('languages', 'main_menu');     
+    $mainMenu = get_field('languages', 'main_menu');     
     $termsLanguage = getTermsByLanguage('genre');
     $activeImageLang = getActiveImage($lang);       
 ?>
@@ -34,18 +34,21 @@
             </a>
 
             
-            <?php if(!empty($menuPrincipal)):?>
-                <?php foreach($menuPrincipal as $menuIdioma): ?>
-                    <ul class="" id="<?= strtoupper($menuIdioma['language']) ?>">
-                        <?php if(!empty($menuIdioma['home'])):?>
+            <?php if(!empty($mainMenu)):?>
+                <?php foreach($mainMenu as $languageMenu): ?>
+                    <ul class="" id="<?= strtoupper($languageMenu['language']) ?>">
+                        <?php if(!empty($languageMenu['home'])):?>
                             <li>
                                 <a href="<?= network_site_url($lang) ?>">
-                                    <img src="<?= $menuIdioma['home']['url'] ?>" alt="<?= $menuIdioma['home']['alt'] ?>">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                                        <path d="M14 6.688V14c0 .898-.692 1.625-1.546 1.625H4.625a2 2 0 0 1-2-2V6.688M1 6.688l6.255-5.301a1.639 1.639 0 0 1 2.115 0l6.255 5.3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M10.75 14.813V10.62c0-.826-.727-1.496-1.625-1.496H7.5c-.897 0-1.625.67-1.625 1.496v4.191" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
                                 </a>
                             </li>                           
                         <?php endif; ?>
 
-                        <?php foreach($menuIdioma['links'] as $menuItem): ?>
+                        <?php foreach($languageMenu['links'] as $menuItem): ?>
                             <li>
                                 <a href="<?= $menuItem['links']['url'] ?>" target="<?= !empty($menuItem['links']['target']) ? $menuItem['links']['target'] : '_self' ?>">
                                         <span><?= $menuItem['links']['title'] ?></span>
@@ -54,15 +57,15 @@
                         <?php endforeach; ?>     
                     </ul>
                     <div class="header__genre">
-                        <spam href="" class="dropdownGenreAnchor" id="genre-<?= strtoupper($menuIdioma['language']) ?>">
-                            <?= $menuIdioma['gender_titile'] ?>
+                        <spam href="" class="dropdownGenreAnchor" id="genre-<?= strtoupper($languageMenu['language']) ?>">
+                            <?= $languageMenu['gender_titile'] ?>
                             <svg width="11" height="8" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9.834 0h-8a1 1 0 0 0-.8 1.6l4 5.333a1 1 0 0 0 1.6 0l4-5.333a1 1 0 0 0-.8-1.6z" fill="#F16723"></path>
                             </svg>
                         </spam>
 
-                        <div class="dropdownGenre" data-genre="<?= strtoupper($menuIdioma['language']) ?>">
-                            <?php foreach($termsLanguage[strtoupper($menuIdioma['language'])] as $term): ?> 
+                        <div class="dropdownGenre" data-genre="<?= strtoupper($languageMenu['language']) ?>">
+                            <?php foreach($termsLanguage[strtoupper($languageMenu['language'])] as $term): ?> 
                                 <button>
                                     <a href="<?= network_site_url($lang . '/g/' . $term['slug']) ?>">
                                         <?= $term['title'] ?>
@@ -96,14 +99,14 @@
                 </button>
 
                 <div class="dropdownLang">
-                    <?php if(!empty($menuPrincipal)):?>
-                        <?php foreach($menuPrincipal as $menuIdioma): ?>
+                    <?php if(!empty($mainMenu)):?>
+                        <?php foreach($mainMenu as $languageMenu): ?>
                             <button>
                                 <div>
-                                    <a href="<?= network_site_url(strtolower($menuIdioma['language'])) ?>">
-                                        <img src="<?= $menuIdioma['language_image']['url'] ?>" alt="<?= $menuIdioma['language_image']['alt'] ?>">
+                                    <a href="<?= network_site_url(strtolower($languageMenu['language'])) ?>">
+                                        <img src="<?= $languageMenu['language_image']['url'] ?>" alt="<?= $languageMenu['language_image']['alt'] ?>">
                                         
-                                        <span><?= strtoupper($menuIdioma['language']) ?></span>
+                                        <span><?= strtoupper($languageMenu['language']) ?></span>
                                     </a>
                                 </div>
                             </button>
@@ -126,8 +129,8 @@
                         </span>
                     </a>
                 <?php else: ?>
-                    <?php foreach($menuPrincipal as $menuIdioma): ?>
-                        <a href="<?= $menuIdioma['login_config']['url']; ?>" id="user-<?= strtoupper($menuIdioma['language']) ?>" class="user">
+                    <?php foreach($mainMenu as $languageMenu): ?>
+                        <a href="<?= $languageMenu['login_config']['url']; ?>" id="user-<?= strtoupper($languageMenu['language']) ?>" class="user">
                             <div class="avatar">
                                 <img src="<?= $user['avatar'] ?>">
                             </div>
