@@ -1,14 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const url = window.location.pathname;
-    const idioma = url.split('/')[1];
-    const menu = document.querySelector('ul#' + idioma.toUpperCase());
-    const menuConfig = document.querySelector('#user-' + idioma.toUpperCase());
-    
-    if (menu) {
-        menu.classList.add('active');
-    }
+    const idioma = getLanguage(),
+          menu = document.querySelector('ul#' + idioma),
+          menuConfig = document.querySelector('#user-' + idioma),
+          Genre = document.getElementById('genre-' + idioma);
 
-    if (menuConfig) {
-        menuConfig.classList.add('active');
-    }
+    activeClass(menu);
+    activeClass(menuConfig);
+    activeClass(Genre);
 });
+
+export function getLanguage() {
+    const url = window.location.pathname,
+          idioma = url.split('/')[1];
+
+    return idioma.toUpperCase();
+    // return 'ES';
+}
+
+function activeClass (className) {
+    if (className) {
+        className.classList.add('active');
+    }
+}

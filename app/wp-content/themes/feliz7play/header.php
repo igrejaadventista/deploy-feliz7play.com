@@ -5,9 +5,16 @@
     $lang = getLanguage();
     $user = getUser();
     $menuPrincipal = get_field('idiomas', 'menu_principal'); 
-    // echo "<pre>";   
-    // print_r($menuPrincipal);
-    // echo "</pre>";   
+    $terms = get_terms('genre');
+    $termsLanguage;
+    foreach ($terms as $term){
+        foreach (get_field('idioma', $term) as $termLang) {
+            $termsLanguage[strtoupper($termLang['idioma'])][] = [
+                'title' => $termLang['titulo'],
+                'slug' => $termLang['slug'],
+            ]; 
+        }
+    }
 ?>
 
 <header id="header" class="header">
@@ -54,10 +61,28 @@
                                 </li>
                         <?php endforeach; ?>     
                     </ul>
+                    <div class="header__genre">
+                        <spam href="" class="dropdownGenreAnchor" id="genre-<?= strtoupper($menuIdioma['idioma']) ?>">
+                            <?= $menuIdioma['titulo_genero'] ?>
+                            <svg width="11" height="8" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.834 0h-8a1 1 0 0 0-.8 1.6l4 5.333a1 1 0 0 0 1.6 0l4-5.333a1 1 0 0 0-.8-1.6z" fill="#F16723"></path>
+                            </svg>
+                        </spam>
+
+                        <div class="dropdownGenre" data-genre="<?= $menuIdioma['idioma'] ?>">
+                            <?php foreach($termsLanguage[$menuIdioma['idioma']] as $term): ?> 
+                                <button>
+                                    <a href="<?= network_site_url($lang . '/g/' . $term['slug']) ?>">
+                                        <?= $term['title'] ?>
+                                    </a>
+                                </button>    
+                            <?php endforeach; ?>            
+                        </div>
+                    </div>                   
                 <?php endforeach; ?> 
             <?php endif; ?>
         </div> 
-        
+
         <div class="right">
             <a class="search" href="<?= network_site_url($lang . '/busca') ?>">
                 <svg width="14.7" height="14.7" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
