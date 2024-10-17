@@ -34,16 +34,16 @@ add_action( 'http_api_curl', 'curl_error_60_workaround', 10, 3 );
 
 // disable generated image sizes
 function shapeSpace_disable_image_sizes($sizes) {
-	
+
 	unset($sizes['thumbnail']);    // disable thumbnail size
 	unset($sizes['medium']);       // disable medium size
 	unset($sizes['large']);        // disable large size
 	unset($sizes['medium_large']); // disable medium-large size
 	unset($sizes['1536x1536']);    // disable 2x medium-large size
 	unset($sizes['2048x2048']);    // disable 2x large size
-	
+
 	return $sizes;
-	
+
 }
 add_action('intermediate_image_sizes_advanced', 'shapeSpace_disable_image_sizes');
 
@@ -52,17 +52,17 @@ add_filter('big_image_size_threshold', '__return_false');
 
 // disable other image sizes
 function shapeSpace_disable_other_image_sizes() {
-	
-	remove_image_size('post-thumbnail'); // disable images added via set_post_thumbnail_size() 
+
+	remove_image_size('post-thumbnail'); // disable images added via set_post_thumbnail_size()
 	remove_image_size('another-size');   // disable any other added image sizes
-	
+
 }
 add_action('init', 'shapeSpace_disable_other_image_sizes');
 
 add_filter('acf/fields/taxonomy/query/name=to_collection', 'my_acf_fields_taxonomy_result', 10, 4);
 add_filter('acf/fields/taxonomy/query/name=to_custom_collection', 'my_acf_fields_taxonomy_result', 10, 4);
 function my_acf_fields_taxonomy_result( $args ) {
-	
+
 	$args['posts_per_page'] = 40;
 	$args['parent'] = 0;
 
@@ -71,20 +71,20 @@ function my_acf_fields_taxonomy_result( $args ) {
 
 add_filter('acf/fields/taxonomy/query/name=to_genre_suggestion', 'my_acf_fields_genre_result', 10, 4);
 function my_acf_fields_genre_result( $args) {
-	
+
     $args['hide_empty'] = true;
-	
+
 	return $args;
 }
 
 add_filter('acf/fields/post_object/query/name=slider_video_object', 'my_acf_fields_post_result', 10, 4);
 function my_acf_fields_post_result( $args) {
-	
+
 	$args['posts_per_page'] = 40;
 	$args['meta_key'] = 'post_video_type';
     $args['meta_value'] = 'Single';
 	$args['post_status'] = 'publish';
-	
+
 	return $args;
 }
 
@@ -98,18 +98,18 @@ function getVideoInfo($post_id, $video_host, $video_id){
 		case "Youtube":
 			$json = file_get_contents("https://api.feliz7play.com/v4/youtubeinfo?video_id=". $video_id );
 			$obj = json_decode($json);
-			
+
 			$time = $obj->time;
 			$release_year = date('Y', strtotime($obj->release_date));
 
 			if ($obj) {
 				update_field( 'post_video_length', $time, $post_id );
 				update_field( 'post_video_year', $release_year, $post_id );
-			} 
+			}
 
 			unset($json, $obj, $time, $size, $release_year);
 			break;
-			
+
 		case "Vimeo":
 			$json = file_get_contents("https://api.feliz7play.com/v4/vimeoinfo?video_id=". $video_id);
 			$obj = json_decode($json);
@@ -120,13 +120,13 @@ function getVideoInfo($post_id, $video_host, $video_id){
 			if ($time) {
 				update_field( 'post_video_length', $time, $post_id );
 				update_field( 'post_video_year', $release_year, $post_id );
-			} 
-			
+			}
+
 			unset($json, $obj, $time, $release_year);
 			break;
 	}
 
-	
+
 }
 
 function UpdateVideoLenght( $post_id ) {
@@ -151,14 +151,14 @@ add_action( 'acf/save_post', 'UpdateVideoLenght' );
 
 
 if( function_exists('acf_add_options_page') ) {
-	
+
 	acf_add_options_page(array(
 		'page_title' 	=> 'F7P - Settings',
 		'menu_slug' 	=> 'f7p-general-settings',
 		// 'capability' 	=> 'add_users',
 		'icon_url' 		=> 'dashicons-admin-tools',
 	));
-	
+
 }
 
 function enqueueAssets() {
@@ -219,3 +219,16 @@ function custom_taxonomy_radio_buttons() {
 }
 add_action('admin_footer', 'custom_taxonomy_radio_buttons');
 
+add_filter('rest_prepare_video', function ($response, $post, $request) {
+	$languages = $response->data['acf']['languages'];
+	if (isset($languages) && !empty($languages)) {
+		$filtered_languages = [];
+
+		foreach ($languages as $language) {
+			$filtered_languages[$language['language']] = array_diff_key($language, ['language' => '']);
+		}
+
+		$response->data['acf']['languages'] = $filtered_languages;
+	}
+	return $response;
+}, 10, 3);
