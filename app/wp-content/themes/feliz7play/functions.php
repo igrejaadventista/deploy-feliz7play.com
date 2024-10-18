@@ -219,7 +219,7 @@ function custom_taxonomy_radio_buttons() {
 }
 add_action('admin_footer', 'custom_taxonomy_radio_buttons');
 
-add_filter('rest_prepare_video', function ($response, $post, $request) {
+add_filter('rest_prepare_video', function ($response) {
 	$languages = $response->data['acf']['languages'];
 	if (isset($languages) && !empty($languages)) {
 		$filtered_languages = [];
@@ -229,6 +229,7 @@ add_filter('rest_prepare_video', function ($response, $post, $request) {
 		}
 
 		$response->data['acf']['languages'] = $filtered_languages;
+		unset($response->data['slug']);
 	}
 	return $response;
 }, 10, 3);
