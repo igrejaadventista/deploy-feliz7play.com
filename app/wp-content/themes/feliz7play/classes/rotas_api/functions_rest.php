@@ -999,11 +999,26 @@ function video_meta_callback($video, $field_name, $request)
 
 function taxonomy_meta_callback($video)
 {
-    $taxonomy = array(
-        'category' => get_the_terms($video['id'], 'category'),
-        'genre' => get_the_terms($video['id'], 'genre'),
-        'collection' => get_the_terms($video['id'], 'collection')
-    );
+    $taxonomy = [];
+    foreach (['category', 'genre', 'collection'] as $tax) {
+        $terms = get_the_terms($video['id'], $tax);
+
+        foreach ($terms as $key => $term) {
+            $term_lang = get_field('languages', $term->id);
+
+            if (isset($term_lang) && !empty($term_lang)) {
+                $filtered_languages = [];
+
+                foreach ($term_lang as $language) {
+                    $filtered_languages[$language['language']] = array_diff_key($language, ['language' => '']);
+                }
+
+                $terms[$key]->languages = $filtered_languages;
+            }
+        }
+
+        $taxonomy[$tax] = $terms;
+    }
 
     return $taxonomy;
 }
