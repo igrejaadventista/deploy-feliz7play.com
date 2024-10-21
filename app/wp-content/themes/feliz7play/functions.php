@@ -219,21 +219,6 @@ function custom_taxonomy_radio_buttons() {
 }
 add_action('admin_footer', 'custom_taxonomy_radio_buttons');
 
-add_filter('rest_prepare_video', function ($response) {
-	$languages = $response->data['acf']['languages'];
-	if (isset($languages) && !empty($languages)) {
-		$filtered_languages = [];
-
-		foreach ($languages as $language) {
-			$filtered_languages[$language['language']] = array_diff_key($language, ['language' => '']);
-		}
-
-		$response->data['acf']['languages'] = $filtered_languages;
-		unset($response->data['slug']);
-	}
-	return $response;
-}, 10, 3);
-
 function getTermsByLanguage($termName) {
 	$terms = get_terms($termName);
 	$termsLanguage = [];
@@ -250,7 +235,7 @@ function getTermsByLanguage($termName) {
 	return $termsLanguage;
 }
 
-function getActiveImage ($lang) {
+function getActiveImage($lang) {
 	$url = '';
 	$mainMenu = get_field('languages', 'main_menu');
 
@@ -260,3 +245,23 @@ function getActiveImage ($lang) {
         }
     }
 }
+
+function filter_languages_response($response) {
+	$languages = $response->data['acf']['languages'];
+	if (isset($languages) && !empty($languages)) {
+		$filtered_languages = [];
+
+		foreach ($languages as $language) {
+			$filtered_languages[$language['language']] = array_diff_key($language, ['language' => '']);
+		}
+
+		$response->data['acf']['languages'] = $filtered_languages;
+		unset($response->data['slug']);
+	}
+	return $response;
+}
+
+add_filter('rest_prepare_video', 'filter_languages_response', 10, 3);
+add_filter('rest_prepare_genre', 'filter_languages_response', 10, 3);
+add_filter('rest_prepare_collection', 'filter_languages_response', 10, 3);
+add_filter('rest_prepare_category', 'filter_languages_response', 10, 3);
