@@ -159,7 +159,6 @@ class CustomTaxonomies {
 		);
 		$args = array(
 			'labels'                     => $labels,
-			// 'hierarchical'               => true,
 			'public'                     => true,
 			'show_ui'                    => true,
 			'show_admin_column'          => true,
@@ -196,7 +195,6 @@ class CustomTaxonomies {
 		);
 		$args = array(
 			'labels'                     => $labels,
-			// 'hierarchical'               => true,
 			'public'                     => true,
 			'show_ui'                    => true,
 			'show_admin_column'          => true,
