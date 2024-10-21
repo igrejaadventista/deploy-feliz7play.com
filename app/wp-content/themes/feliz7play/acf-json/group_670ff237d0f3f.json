@@ -21,6 +21,7 @@
             "max": 0,
             "layout": "block",
             "button_label": "Add language",
+            "rows_per_page": 20,
             "sub_fields": [
                 {
                     "key": "field_670ff6b737fbb",
@@ -692,6 +693,8 @@
                     "max": 0,
                     "layout": "table",
                     "button_label": "Adicionar linha",
+                    "rows_per_page": 20,
+                    "parent_repeater": "field_670ff24637fba",
                     "sub_fields": [
                         {
                             "key": "field_670ff2380243c",
@@ -758,9 +761,7 @@
                             "mime_types": "",
                             "parent_repeater": "field_670ff237d5fb8"
                         }
-                    ],
-                    "rows_per_page": 20,
-                    "parent_repeater": "field_670ff24637fba"
+                    ]
                 },
                 {
                     "key": "field_670ff237d5fff",
@@ -781,6 +782,8 @@
                     "max": 0,
                     "layout": "table",
                     "button_label": "Adicionar linha",
+                    "rows_per_page": 20,
+                    "parent_repeater": "field_670ff24637fba",
                     "sub_fields": [
                         {
                             "key": "field_670ff2380858c",
@@ -803,9 +806,7 @@
                             "maxlength": "",
                             "parent_repeater": "field_670ff237d5fff"
                         }
-                    ],
-                    "rows_per_page": 20,
-                    "parent_repeater": "field_670ff24637fba"
+                    ]
                 },
                 {
                     "key": "field_670ff237d6070",
@@ -845,6 +846,8 @@
                     "max": 0,
                     "layout": "table",
                     "button_label": "Adicionar linha",
+                    "rows_per_page": 20,
+                    "parent_repeater": "field_670ff24637fba",
                     "sub_fields": [
                         {
                             "key": "field_670ff2380cc65",
@@ -886,6 +889,8 @@
                             "max": 0,
                             "layout": "table",
                             "button_label": "Adicionar linha",
+                            "rows_per_page": 20,
+                            "parent_repeater": "field_670ff237d60d7",
                             "sub_fields": [
                                 {
                                     "key": "field_670ff2380f4db",
@@ -914,16 +919,11 @@
                                     "bidirectional_target": [],
                                     "parent_repeater": "field_670ff2380ccae"
                                 }
-                            ],
-                            "rows_per_page": 20,
-                            "parent_repeater": "field_670ff237d60d7"
+                            ]
                         }
-                    ],
-                    "rows_per_page": 20,
-                    "parent_repeater": "field_670ff24637fba"
+                    ]
                 }
-            ],
-            "rows_per_page": 20
+            ]
         }
     ],
     "location": [
@@ -950,5 +950,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 1,
-    "modified": 1729260664
+    "modified": 1729545766
 }

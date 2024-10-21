@@ -6,6 +6,7 @@
             "key": "field_6007139425091",
             "label": "Content",
             "name": "",
+            "aria-label": "",
             "type": "tab",
             "instructions": "",
             "required": 0,
@@ -16,12 +17,14 @@
                 "id": ""
             },
             "placement": "top",
-            "endpoint": 0
+            "endpoint": 0,
+            "selected": 0
         },
         {
             "key": "field_6007126450b52",
             "label": "Type",
             "name": "slider_type",
+            "aria-label": "",
             "type": "button_group",
             "instructions": "",
             "required": 0,
@@ -44,6 +47,7 @@
             "key": "field_6013eed3b4935",
             "label": "Source",
             "name": "slider_source",
+            "aria-label": "",
             "type": "button_group",
             "instructions": "",
             "required": 0,
@@ -74,6 +78,7 @@
             "key": "field_6013f4ee74f3f",
             "label": "Collection Object",
             "name": "to_collection",
+            "aria-label": "",
             "type": "taxonomy",
             "instructions": "",
             "required": 0,
@@ -103,12 +108,14 @@
             "save_terms": 0,
             "load_terms": 0,
             "return_format": "object",
-            "multiple": 0
+            "multiple": 0,
+            "bidirectional_target": []
         },
         {
             "key": "field_6007129c50b53",
             "label": "Video Object",
             "name": "slider_video_object",
+            "aria-label": "",
             "type": "post_object",
             "instructions": "",
             "required": 0,
@@ -138,12 +145,14 @@
             "allow_null": 0,
             "multiple": 0,
             "return_format": "object",
-            "ui": 1
+            "ui": 1,
+            "bidirectional_target": []
         },
         {
             "key": "field_600712ad50b54",
             "label": "Logo",
             "name": "slider_logo",
+            "aria-label": "",
             "type": "image",
             "instructions": "png - 440px - 440px - Max 800kb",
             "required": 0,
@@ -176,6 +185,7 @@
             "key": "field_600712f10f7f9",
             "label": "Description",
             "name": "slider_description",
+            "aria-label": "",
             "type": "textarea",
             "instructions": "",
             "required": 0,
@@ -203,6 +213,7 @@
             "key": "field_6007133a0f7fa",
             "label": "Button",
             "name": "slider_button",
+            "aria-label": "",
             "type": "text",
             "instructions": "",
             "required": 0,
@@ -230,6 +241,7 @@
             "key": "field_6007134d0f7fb",
             "label": "Button - Link",
             "name": "slider_button_link",
+            "aria-label": "",
             "type": "url",
             "instructions": "",
             "required": 0,
@@ -254,6 +266,7 @@
             "key": "field_600713a125092",
             "label": "Images",
             "name": "",
+            "aria-label": "",
             "type": "tab",
             "instructions": "",
             "required": 0,
@@ -264,12 +277,14 @@
                 "id": ""
             },
             "placement": "top",
-            "endpoint": 0
+            "endpoint": 0,
+            "selected": 0
         },
         {
             "key": "field_600713b025093",
             "label": "Desktop",
             "name": "slider_desktop_image",
+            "aria-label": "",
             "type": "image",
             "instructions": "jpg - 1920px - 970px - Max 1Mb",
             "required": 0,
@@ -294,6 +309,7 @@
             "key": "field_600713c325094",
             "label": "Table",
             "name": "slider_tablet_image",
+            "aria-label": "",
             "type": "image",
             "instructions": "jpg - 1536px - 1194px - Max 800kb",
             "required": 0,
@@ -318,6 +334,7 @@
             "key": "field_600713e625095",
             "label": "Mobile",
             "name": "slider_mobile_image",
+            "aria-label": "",
             "type": "image",
             "instructions": "jpg - 1125px - 1620px - Max 800kb",
             "required": 0,
@@ -356,5 +373,6 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1630070169
+    "show_in_rest": 1,
+    "modified": 1729545765
 }

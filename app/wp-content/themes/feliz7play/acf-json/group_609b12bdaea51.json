@@ -92,6 +92,7 @@
                     "layout": "table",
                     "button_label": "Adicionar linha",
                     "rows_per_page": 20,
+                    "parent_repeater": "field_6716bf80968dc",
                     "sub_fields": [
                         {
                             "key": "field_609b1e1b90bd9",
@@ -141,8 +142,7 @@
                             "placeholder": "",
                             "parent_repeater": "field_609b1dfa90bd8"
                         }
-                    ],
-                    "parent_repeater": "field_6716bf80968dc"
+                    ]
                 },
                 {
                     "key": "field_60ca9d0960909",
@@ -251,6 +251,7 @@
                     "layout": "block",
                     "button_label": "Adicionar link",
                     "rows_per_page": 20,
+                    "parent_repeater": "field_6716bf80968dc",
                     "sub_fields": [
                         {
                             "key": "field_60dc861d421f3",
@@ -295,8 +296,7 @@
                             "return_format": "array",
                             "parent_repeater": "field_60dc8609421f1"
                         }
-                    ],
-                    "parent_repeater": "field_6716bf80968dc"
+                    ]
                 },
                 {
                     "key": "field_609b29efa0692",
@@ -318,6 +318,7 @@
                     "layout": "block",
                     "button_label": "Adicionar link",
                     "rows_per_page": 20,
+                    "parent_repeater": "field_6716bf80968dc",
                     "sub_fields": [
                         {
                             "key": "field_60dc7fab91052",
@@ -336,8 +337,7 @@
                             "return_format": "array",
                             "parent_repeater": "field_609b29efa0692"
                         }
-                    ],
-                    "parent_repeater": "field_6716bf80968dc"
+                    ]
                 },
                 {
                     "key": "field_609b1fd63d658",
@@ -359,6 +359,7 @@
                     "layout": "block",
                     "button_label": "Adicionar site",
                     "rows_per_page": 20,
+                    "parent_repeater": "field_6716bf80968dc",
                     "sub_fields": [
                         {
                             "key": "field_60dc83416f496",
@@ -377,8 +378,7 @@
                             "return_format": "array",
                             "parent_repeater": "field_609b1fd63d658"
                         }
-                    ],
-                    "parent_repeater": "field_6716bf80968dc"
+                    ]
                 },
                 {
                     "key": "field_609b1ffaa8612",
@@ -527,5 +527,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1729544268
+    "modified": 1729545765
 }
