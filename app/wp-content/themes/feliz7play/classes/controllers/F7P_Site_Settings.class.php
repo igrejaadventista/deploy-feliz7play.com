@@ -29,5 +29,5 @@ function get_site_settings() {
 		}
 	}
 
-    return new WP_REST_Response(isset($filtered_languages) && !empty($filtered_languages) ? $filtered_languages : $language, 200);
+    return new WP_REST_Response(isset($filtered_languages) && !empty($filtered_languages) ? $filtered_languages : $languages, 200);
 }
