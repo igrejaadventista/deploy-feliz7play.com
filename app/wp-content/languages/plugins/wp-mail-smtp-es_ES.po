@@ -2,12 +2,12 @@
 # This file is distributed under the same license as the Plugins - WP Mail SMTP by WPForms &#8211; The Most Popular SMTP and Email Log Plugin - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-03-02 11:59:09+0000\n"
+"PO-Revision-Date: 2024-06-30 16:11:46+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: GlotPress/4.0.0-beta.3\n"
+"X-Generator: GlotPress/4.0.1\n"
 "Language: es\n"
 "Project-Id-Version: Plugins - WP Mail SMTP by WPForms &#8211; The Most Popular SMTP and Email Log Plugin - Stable (latest release)\n"
 
@@ -2219,7 +2219,7 @@ msgstr "Smash Balloon Facebook Feeds"
 
 #: src/Admin/Pages/AboutTab.php:357 src/Admin/Pages/AboutTab.php:363
 msgid "Easily display Instagram content on your WordPress site without writing any code. Comes with multiple templates, ability to show content from multiple accounts, hashtags, and more. Trusted by 1 million websites."
-msgstr "Muestra fácilmente el contenido de Instagram en tu sitio WordPress sin escribir ningún código. Viene con múltiples plantillas, la capacidad de mostrar el contenido de múltiples cuentas, hashtags y más. Con la confianza de 1 millón webs."
+msgstr "Muestra fácilmente contenido de Instagram en tu sitio WordPress sin escribir nada de código. Viene con varias plantillas, posibilidad de mostrar contenido de varias cuentas, hashtags y más. Con la confianza de 1 millón de webs."
 
 #: src/Admin/Pages/AboutTab.php:356 src/Admin/Pages/AboutTab.php:362
 msgid "Smash Balloon Instagram Feeds"

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="165" zoomAndPan="magnify" viewBox="0 0 123.75 44.999999" height="60" preserveAspectRatio="xMidYMid meet" version="1.0">
+  <defs>
+    <filter x="0%" y="0%" width="100%" height="100%" id="fbdb5fd0da">
+      <feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" color-interpolation-filters="sRGB"></feColorMatrix>
+    </filter>
+    <clipPath id="c7bea962b7">
+      <path d="M 0 0.046875 L 123.5 0.046875 L 123.5 44.953125 L 0 44.953125 Z M 0 0.046875 " clip-rule="nonzero"></path>
+    </clipPath>
+    <clipPath id="5a53cc299d">
+      <path d="M 3 0.046875 L 84 0.046875 L 84 44.953125 L 3 44.953125 Z M 3 0.046875 " clip-rule="nonzero"></path>
+    </clipPath>
+    <mask id="f2af22a155">
+      <g filter="url(#fbdb5fd0da)">
+        <rect x="-12.375" width="148.5" fill="#000000" y="-4.5" height="53.999999" fill-opacity="0.0863"></rect>
+      </g>
+    </mask>
+    <clipPath id="ddb0b1f894">
+      <path d="M 0.113281 0.046875 L 62 0.046875 L 62 44.953125 L 0.113281 44.953125 Z M 0.113281 0.046875 " clip-rule="nonzero"></path>
+    </clipPath>
+    <clipPath id="e27d453967">
+      <path d="M 19.648438 -17.933594 L 80.417969 -1.660156 L 61.09375 70.503906 L 0.324219 54.230469 Z M 19.648438 -17.933594 " clip-rule="nonzero"></path>
+    </clipPath>
+    <clipPath id="892c25aeb7">
+      <path d="M 50.035156 -9.796875 L 61.222656 70.023438 L 0.453125 53.75 L 50.035156 -9.796875 " clip-rule="nonzero"></path>
+    </clipPath>
+    <clipPath id="7e90f795b3">
+      <rect x="0" width="81" y="0" height="45"></rect>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#c7bea962b7)">
+    <path fill="#ffffff" d="M 0 0.046875 L 123.75 0.046875 L 123.75 45.046875 L 0 45.046875 Z M 0 0.046875 " fill-opacity="1" fill-rule="nonzero"></path>
+    <path fill="#6c1e82" d="M 0 0.046875 L 123.75 0.046875 L 123.75 45.046875 L 0 45.046875 Z M 0 0.046875 " fill-opacity="1" fill-rule="nonzero"></path>
+  </g>
+  <g clip-path="url(#5a53cc299d)">
+    <g mask="url(#f2af22a155)">
+      <g transform="matrix(1, 0, 0, 1, 3, 0.000000000000004829)">
+        <g clip-path="url(#7e90f795b3)">
+          <g clip-path="url(#ddb0b1f894)">
+            <g clip-path="url(#e27d453967)">
+              <g clip-path="url(#892c25aeb7)">
+                <path fill="#ffffff" d="M 19.648438 -17.933594 L 80.417969 -1.660156 L 61.261719 69.871094 L 0.496094 53.597656 Z M 19.648438 -17.933594 " fill-opacity="1" fill-rule="nonzero"></path>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
