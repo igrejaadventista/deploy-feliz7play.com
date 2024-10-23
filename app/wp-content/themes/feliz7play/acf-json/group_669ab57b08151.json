@@ -1,13 +1,13 @@
 {
-    "key": "group_6006ce3356ab5",
-    "title": "Collection",
+    "key": "group_669ab57b08151",
+    "title": "Video Post",
     "fields": [
         {
-            "key": "field_6130ce664f6c9",
-            "label": "Enable",
-            "name": "collection_enable",
+            "key": "field_6006e1e2d4d90",
+            "label": "Info1",
+            "name": "",
             "aria-label": "",
-            "type": "true_false",
+            "type": "tab",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
@@ -16,56 +16,223 @@
                 "class": "",
                 "id": ""
             },
-            "message": "",
-            "default_value": 1,
-            "ui": 1,
-            "ui_on_text": "",
-            "ui_off_text": ""
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
         },
         {
-            "key": "field_60212a484349f",
-            "label": "Seasons",
-            "name": "seasons",
+            "key": "field_6006d863d4d84",
+            "label": "Subtitle",
+            "name": "post_subtitle",
             "aria-label": "",
-            "type": "true_false",
+            "type": "text",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
-                "width": "25",
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": ""
+        },
+        {
+            "key": "field_6006d92bd4d87",
+            "label": "Blurb",
+            "name": "post_blurb",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "maxlength": "",
+            "rows": "",
+            "new_lines": ""
+        },
+        {
+            "key": "field_6006d8d2d4d85",
+            "label": "Video type",
+            "name": "post_video_type",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "Single": "Single",
+                "Episode": "Episode"
+            },
+            "default_value": "Single",
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "return_format": "value",
+            "ajax": 0,
+            "placeholder": ""
+        },
+        {
+            "key": "field_6006e30b0e7d8",
+            "label": "Episode",
+            "name": "video_episode",
+            "aria-label": "",
+            "type": "number",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_6006d8d2d4d85",
+                        "operator": "==contains",
+                        "value": "Episode"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "min": "",
+            "max": "",
+            "step": ""
+        },
+        {
+            "key": "field_607dc6bc1055e",
+            "label": "Download",
+            "name": "download",
+            "aria-label": "",
+            "type": "true_false",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_6006d9acd4d88",
+                        "operator": "==",
+                        "value": "Vimeo"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
                 "class": "",
                 "id": ""
             },
             "message": "",
             "default_value": 0,
-            "ui": 1,
+            "ui": 0,
             "ui_on_text": "",
             "ui_off_text": ""
         },
         {
-            "key": "field_6130cd1c4f6c8",
-            "label": "Season Label",
-            "name": "collection_season_label",
+            "key": "field_6006d913d4d86",
+            "label": "Link Download APP",
+            "name": "link_download_app",
             "aria-label": "",
-            "type": "text",
-            "instructions": "Essa campo serve para especificar um nome para essa collection exemplo: Temporada 1, Adoradores 3 Provai e vede 2022, etc",
+            "type": "url",
+            "instructions": "",
             "required": 0,
-            "conditional_logic": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_607dc6bc1055e",
+                        "operator": "==",
+                        "value": "1"
+                    }
+                ]
+            ],
             "wrapper": {
-                "width": "75",
+                "width": "",
                 "class": "",
                 "id": ""
             },
             "default_value": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
-            "maxlength": ""
+            "placeholder": ""
         },
         {
-            "key": "field_601024d8784a5",
-            "label": "Subtitle",
-            "name": "subtitle",
+            "key": "field_607dc7461055f",
+            "label": "Link extra",
+            "name": "link_extra",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
+        },
+        {
+            "key": "field_6698290e56d9c",
+            "label": "HLS Link (Trailer)",
+            "name": "post_hls_link",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
+        },
+        {
+            "key": "field_6006d9acd4d88",
+            "label": "Video Host",
+            "name": "post_video_host",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "Youtube": "Youtube",
+                "Vimeo": "Vimeo"
+            },
+            "default_value": "Youtube",
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "return_format": "value",
+            "ajax": 0,
+            "placeholder": ""
+        },
+        {
+            "key": "field_6006d9d3d4d89",
+            "label": "Video ID",
+            "name": "post_video_id",
             "aria-label": "",
             "type": "text",
             "instructions": "",
@@ -83,14 +250,40 @@
             "maxlength": ""
         },
         {
-            "key": "field_60104f96e682a",
+            "key": "field_6006e1f9d4d91",
+            "label": "Info2",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_6006d9ddd4d8a",
             "label": "Year",
-            "name": "year",
+            "name": "post_year",
             "aria-label": "",
             "type": "number",
             "instructions": "",
             "required": 0,
-            "conditional_logic": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_6006d8d2d4d85",
+                        "operator": "==",
+                        "value": "Single"
+                    }
+                ]
+            ],
             "wrapper": {
                 "width": "",
                 "class": "",
@@ -105,11 +298,34 @@
             "step": ""
         },
         {
-            "key": "field_666300fed87bc",
-            "label": "Video Quality",
-            "name": "collection_video_quality",
+            "key": "field_6006d9f9d4d8b",
+            "label": "Video Length",
+            "name": "post_video_length",
             "aria-label": "",
-            "type": "select",
+            "type": "number",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "disabled",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "min": "",
+            "max": "",
+            "step": "",
+            "readonly": 1
+        },
+        {
+            "key": "field_6006dba0d4d8f",
+            "label": "Video Rating",
+            "name": "post_video_rating",
+            "aria-label": "",
+            "type": "number",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
@@ -118,24 +334,18 @@
                 "class": "",
                 "id": ""
             },
-            "choices": {
-                "4k": "4k",
-                "1080p": "1080p",
-                "720p": "720p",
-                "480p": "480p"
-            },
-            "default_value": "1080p",
-            "allow_null": 0,
-            "multiple": 0,
-            "ui": 0,
-            "return_format": "value",
-            "ajax": 0,
-            "placeholder": ""
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "min": "",
+            "max": "",
+            "step": ""
         },
         {
-            "key": "field_6660d71a3adab",
+            "key": "field_6660d622bb77f",
             "label": "Video Age Rating",
-            "name": "collection_video_age_rating",
+            "name": "post_video_age_rating",
             "aria-label": "",
             "type": "select",
             "instructions": "",
@@ -169,9 +379,63 @@
             "placeholder": ""
         },
         {
-            "key": "field_6006cf04cafa3",
-            "label": "Image",
-            "name": "collection_image",
+            "key": "field_6006da12d4d8c",
+            "label": "Video Quality",
+            "name": "post_video_quality",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_6006d8d2d4d85",
+                        "operator": "==",
+                        "value": "Single"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "4k": "4k",
+                "1080p": "1080p",
+                "720p": "720p",
+                "480p": "480p"
+            },
+            "default_value": "1080p",
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "return_format": "value",
+            "ajax": 0,
+            "placeholder": ""
+        },
+        {
+            "key": "field_6006e222d4d92",
+            "label": "Info3",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_6006db24d4d8d",
+            "label": "Video Image - Thumbnail",
+            "name": "video_thumbnail",
             "aria-label": "",
             "type": "image",
             "instructions": "jpg - 1280px - 720px - Max 800kb",
@@ -194,14 +458,22 @@
             "mime_types": "jpg"
         },
         {
-            "key": "field_60cb41b866028",
-            "label": "Image Header",
-            "name": "collection_image_header",
+            "key": "field_60ca9eee900a0",
+            "label": "Video Image - Content Header",
+            "name": "image_content_header",
             "aria-label": "",
             "type": "image",
             "instructions": "jpg - 2000px - 790px - Max 1Mb",
             "required": 0,
-            "conditional_logic": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_6006d8d2d4d85",
+                        "operator": "==",
+                        "value": "Single"
+                    }
+                ]
+            ],
             "wrapper": {
                 "width": "",
                 "class": "",
@@ -219,12 +491,12 @@
             "mime_types": "jpg"
         },
         {
-            "key": "field_6006cf18cafa4",
-            "label": "Video Host",
-            "name": "collection_video_host",
+            "key": "field_6006db7bd4d8e",
+            "label": "Video Image - Hover",
+            "name": "video_image_hover",
             "aria-label": "",
-            "type": "select",
-            "instructions": "",
+            "type": "image",
+            "instructions": "jpg - 1280px - 720px - Max 800kb",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -232,42 +504,21 @@
                 "class": "",
                 "id": ""
             },
-            "choices": {
-                "Youtube": "Youtube",
-                "Vimeo": "Vimeo"
-            },
-            "default_value": "Youtube",
-            "allow_null": 0,
-            "multiple": 0,
-            "ui": 0,
-            "return_format": "value",
-            "ajax": 0,
-            "placeholder": ""
+            "return_format": "array",
+            "preview_size": "medium",
+            "library": "all",
+            "min_width": 1280,
+            "min_height": 720,
+            "min_size": 0,
+            "max_width": 1280,
+            "max_height": 720,
+            "max_size": "0.8",
+            "mime_types": "jpg"
         },
         {
-            "key": "field_6006cf48cafa5",
-            "label": "Video ID",
-            "name": "collection_video_id",
-            "aria-label": "",
-            "type": "text",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
-            "maxlength": ""
-        },
-        {
-            "key": "field_669a9c175515a",
-            "label": "HLS Link",
-            "name": "collection_hls_link",
+            "key": "field_66548a050e592",
+            "label": "Link Trailer",
+            "name": "post_link_trailer",
             "aria-label": "",
             "type": "url",
             "instructions": "",
@@ -282,62 +533,22 @@
             "placeholder": ""
         },
         {
-            "key": "field_665f0b86018c1",
-            "label": "Category",
-            "name": "collection_category",
-            "aria-label": "",
-            "type": "taxonomy",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "taxonomy": "category",
-            "field_type": "checkbox",
-            "add_term": 0,
-            "save_terms": 0,
-            "load_terms": 0,
-            "return_format": "object",
-            "multiple": 0,
-            "allow_null": 0,
-            "bidirectional_target": []
-        },
-        {
-            "key": "field_6006cf59cafa6",
-            "label": "Genre",
-            "name": "collection_genre",
-            "aria-label": "",
-            "type": "taxonomy",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "taxonomy": "genre",
-            "field_type": "select",
-            "allow_null": 1,
-            "add_term": 0,
-            "save_terms": 0,
-            "load_terms": 0,
-            "return_format": "object",
-            "multiple": 0,
-            "bidirectional_target": []
-        },
-        {
-            "key": "field_602a7a6c75d85",
-            "label": "Social Media",
+            "key": "field_602acfa6a26dd",
+            "label": "Info4",
             "name": "",
             "aria-label": "",
             "type": "tab",
             "instructions": "",
             "required": 0,
-            "conditional_logic": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_6006d8d2d4d85",
+                        "operator": "==",
+                        "value": "Single"
+                    }
+                ]
+            ],
             "wrapper": {
                 "width": "",
                 "class": "",
@@ -348,7 +559,7 @@
             "selected": 0
         },
         {
-            "key": "field_602a7a8575d86",
+            "key": "field_602acfb6a26de",
             "label": "Redes",
             "name": "redes",
             "aria-label": "",
@@ -369,7 +580,7 @@
             "rows_per_page": 20,
             "sub_fields": [
                 {
-                    "key": "field_602a7ac275d87",
+                    "key": "field_602acfdaa26df",
                     "label": "Name rede",
                     "name": "name_rede",
                     "aria-label": "",
@@ -387,10 +598,10 @@
                     "prepend": "",
                     "append": "",
                     "maxlength": "",
-                    "parent_repeater": "field_602a7a8575d86"
+                    "parent_repeater": "field_602acfb6a26de"
                 },
                 {
-                    "key": "field_602a7aea75d88",
+                    "key": "field_602acfeea26e0",
                     "label": "URL rede",
                     "name": "url_rede",
                     "aria-label": "",
@@ -405,12 +616,12 @@
                     },
                     "default_value": "",
                     "placeholder": "",
-                    "parent_repeater": "field_602a7a8575d86"
+                    "parent_repeater": "field_602acfb6a26de"
                 },
                 {
-                    "key": "field_602a7afe75d89",
-                    "label": "Icone rede",
-                    "name": "icone_rede",
+                    "key": "field_602acffea26e1",
+                    "label": "Icon rede",
+                    "name": "icon_rede",
                     "aria-label": "",
                     "type": "image",
                     "instructions": "",
@@ -431,14 +642,14 @@
                     "max_height": "",
                     "max_size": "",
                     "mime_types": "",
-                    "parent_repeater": "field_602a7a8575d86"
+                    "parent_repeater": "field_602acfb6a26de"
                 }
             ]
         },
         {
-            "key": "field_602a7b2e75d8a",
-            "label": "Produção",
-            "name": "producao",
+            "key": "field_602ad033a26e2",
+            "label": "Production",
+            "name": "production",
             "aria-label": "",
             "type": "repeater",
             "instructions": "",
@@ -457,9 +668,9 @@
             "rows_per_page": 20,
             "sub_fields": [
                 {
-                    "key": "field_602a7b7c75d8b",
-                    "label": "Title produçao",
-                    "name": "title_producao",
+                    "key": "field_602ad060a26e3",
+                    "label": "Title production",
+                    "name": "title_production",
                     "aria-label": "",
                     "type": "text",
                     "instructions": "",
@@ -475,12 +686,12 @@
                     "prepend": "",
                     "append": "",
                     "maxlength": "",
-                    "parent_repeater": "field_602a7b2e75d8a"
+                    "parent_repeater": "field_602ad033a26e2"
                 }
             ]
         },
         {
-            "key": "field_666c4a0fbae71",
+            "key": "field_666c990b05ba0",
             "label": "Extras",
             "name": "",
             "aria-label": "",
@@ -498,9 +709,9 @@
             "selected": 0
         },
         {
-            "key": "field_666c4c5dd4fa0",
+            "key": "field_666c993d05ba1",
             "label": "Extra",
-            "name": "extra",
+            "name": "post_extra",
             "aria-label": "",
             "type": "repeater",
             "instructions": "",
@@ -519,9 +730,9 @@
             "rows_per_page": 20,
             "sub_fields": [
                 {
-                    "key": "field_666c4f9c818e5",
+                    "key": "field_666c997005ba2",
                     "label": "Title",
-                    "name": "extra_title",
+                    "name": "post_extra_title",
                     "aria-label": "",
                     "type": "text",
                     "instructions": "",
@@ -537,12 +748,12 @@
                     "prepend": "",
                     "append": "",
                     "maxlength": "",
-                    "parent_repeater": "field_666c4c5dd4fa0"
+                    "parent_repeater": "field_666c993d05ba1"
                 },
                 {
-                    "key": "field_666c4fd2818e6",
+                    "key": "field_666c998a05ba3",
                     "label": "List Videos",
-                    "name": "extra_list_videos",
+                    "name": "post_extra_list_videos",
                     "aria-label": "",
                     "type": "repeater",
                     "instructions": "",
@@ -553,7 +764,7 @@
                         "class": "",
                         "id": ""
                     },
-                    "collapsed": "field_666c5025818e7",
+                    "collapsed": "",
                     "min": 0,
                     "max": 0,
                     "layout": "table",
@@ -561,9 +772,9 @@
                     "rows_per_page": 20,
                     "sub_fields": [
                         {
-                            "key": "field_666c5025818e7",
-                            "label": "Video",
-                            "name": "extra_video",
+                            "key": "field_666c9a2d05ba4",
+                            "label": "video",
+                            "name": "post_extra_video",
                             "aria-label": "",
                             "type": "post_object",
                             "instructions": "",
@@ -585,10 +796,10 @@
                             "return_format": "object",
                             "ui": 1,
                             "bidirectional_target": [],
-                            "parent_repeater": "field_666c4fd2818e6"
+                            "parent_repeater": "field_666c998a05ba3"
                         }
                     ],
-                    "parent_repeater": "field_666c4c5dd4fa0"
+                    "parent_repeater": "field_666c993d05ba1"
                 }
             ]
         }
@@ -596,9 +807,9 @@
     "location": [
         [
             {
-                "param": "taxonomy",
+                "param": "post_type",
                 "operator": "==",
-                "value": "collection"
+                "value": "video"
             }
         ]
     ],
