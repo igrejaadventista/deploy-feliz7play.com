@@ -1000,13 +1000,12 @@ function video_meta_callback($video, $field_name, $request)
 function taxonomy_meta_callback($video)
 {
     $taxonomy = [];
-    foreach (['category', 'genre', 'collection'] as $tax) {
+    foreach (['category', 'genre', 'collection', 'language_audio', 'language_subtitle'] as $tax) {
         $terms = get_the_terms($video['id'], $tax);
 
         foreach ($terms as $key => $term) {
-            $term_lang = get_field('languages', $term->id);
-
-            if (isset($term_lang) && !empty($term_lang)) {
+            $term_lang = get_field('languages', $term);
+            if (!empty($term_lang)) {
                 $filtered_languages = [];
 
                 foreach ($term_lang as $language) {
