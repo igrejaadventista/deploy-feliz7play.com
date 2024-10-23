@@ -177,6 +177,12 @@ function getUser() {
 }
 
 function getLanguage() {
+	$langByCookie = isset($_COOKIE['feliz7playLang']) ? $_COOKIE['feliz7playLang'] : '';
+
+	if (!empty($langByCookie)) {
+		return $langByCookie;
+	}
+
 	$lang = wp_parse_url(home_url())['path'];
     $lang = explode('/', $lang);
 
