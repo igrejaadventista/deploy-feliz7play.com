@@ -37,7 +37,7 @@
             <?php if(!empty($mainMenu)):?>
                 <?php foreach($mainMenu as $languageMenu): ?>
                     <ul class="" id="<?= strtoupper($languageMenu['language']) ?>">
-                        <?php if(!empty($languageMenu['home'])):?>
+                        <?php if(!empty($lang)):?>
                             <li>
                                 <a href="<?= network_site_url($lang) ?>">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
