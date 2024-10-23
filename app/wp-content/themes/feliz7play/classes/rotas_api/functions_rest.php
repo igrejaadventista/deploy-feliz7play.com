@@ -261,63 +261,39 @@ function get_collection_infos($collection)
 function get_post_infos($post)
 {
 
-    $id = $post->ID;
-    $meta = get_post_meta($id);
-
-    $title =                $post->post_title;
-    $slug =                 $post->post_name;
-    $video_type =           $meta['post_video_type'][0];
-    $video_episode =        $meta['video_episode'][0];
-    $subtitle =             $meta['post_subtitle'][0];
-    $description =          wp_strip_all_tags($meta['post_blurb'][0]);
-    $video_host =           $meta['post_video_host'][0];
-    $video_id =             $meta['post_video_id'][0];
-
-    $post_download_link =   $meta['link_download_app'][0];
-    $download =             $meta['download'][0];
-    $post_year =            $meta['post_year'][0];
-    $post_video_rating =    $meta['post_video_rating'][0];
-    $redes =                get_field('redes', $id);
-    $production =           get_field('production', $id);
-    $collection =           get_the_terms($id, 'collection')[0];
-
+    $genre = get_the_terms($post->ID, 'genre')[0];
+    $collection = get_the_terms($post->ID, 'collection')[0];
     if ($collection) {
         $collection->parent_slug = get_term($collection->parent, 'collection')->slug;
     }
 
-    $genre =                get_the_terms($id, 'genre')[0];
-    $video_lenght =         $meta['post_video_length'][0];
-    $video_quality =        $meta['post_video_quality'][0];
+    $languages = get_field('languages', $post->ID);
 
-    $video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
-    $video_image_hover =    wp_get_attachment_image_src($meta['video_image_hover'][0])[0];
+    if (!empty($languages)) {
+        foreach ($languages as $language) {
+            $key = $language['language'];
+            $filtered_languages[$key] = array_diff_key($language, ['language' => '']);
+            $filtered_languages[$key] = array_merge($filtered_languages[$key], [
+                'video_type' => $language['post_video_type'],
+                'subtitle' => $language['post_subtitle'],
+                'description' => wp_strip_all_tags($language['post_blurb']),
+                'video_host' => $language['post_video_host'],
+                'video_id' => $language['post_video_id'],
+                'video_thumbnail' => wp_get_attachment_image_src($language['video_thumbnail'][0] == "" || is_null($language['video_thumbnail'][0]) ? $language['video_image_hover'][0] : $language['video_thumbnail'])[0],
+                'video_image_hover' => wp_get_attachment_image_src($language['video_image_hover'][0])[0],
+                'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection)
+            ]);
 
-    $link =                 get_link_site_next($slug, $video_type, $collection);
+            foreach (['post_video_type', 'post_subtitle', 'post_blurb', 'post_video_host', 'post_video_id'] as $value) {
+                unset($filtered_languages[$key][$value]);
+            }
+        }
+    }
 
-    return array(
-        'id' => $id,
-        'title' => $title,
-        'slug' => $slug,
-        'video_type' => $video_type,
-        'video_episode' => $video_episode,
-        'subtitle' => $subtitle,
-        'description' => $description,
-        'genre' => $genre,
-        'collection' => $collection,
-        'video_host' => $video_host,
-        'video_id' => $video_id,
-        'post_download_link' => $post_download_link,
-        'download' => $download,
-        'year' => $post_year,
-        'video_rating' => $post_video_rating,
-        'video_thumbnail' => $video_thumbnail,
-        'video_image_hover' => $video_image_hover,
-        'post_video_length' => $video_lenght,
-        'post_video_quality' => $video_quality,
-        'redes' => $redes,
-        'production' => $production,
-        'link' => $link
-    );
+    return [
+        'id' => $post->ID,
+        'languages' => !empty($languages) ? $filtered_languages : 'Video languages not found.'
+    ];
 }
 
 
