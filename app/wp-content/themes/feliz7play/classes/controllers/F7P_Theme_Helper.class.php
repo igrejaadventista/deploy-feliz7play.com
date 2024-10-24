@@ -17,6 +17,14 @@ class ThemeHelper {
 				'parent_slug'	=> 'f7p-general-settings',
 				'capability' 	=> 'add_users',
 			));
+
+			acf_add_options_sub_page(array(
+				'page_title' 	=> 'Main Menu',
+				'menu_title'	=> 'Main Menu',
+				'parent_slug'	=> 'f7p-general-settings',
+				'post_id'       => 'main_menu',
+				'capability' 	=> 'add_users'
+			));
 		}
 	}
 
