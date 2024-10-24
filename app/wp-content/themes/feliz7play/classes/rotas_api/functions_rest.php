@@ -243,19 +243,23 @@ function return_parent_collection($collection)
 
 function get_collection_infos($collection)
 {
+    $languages = get_field('languages', $collection);
 
+    if (!empty($languages)) {
+        foreach ($languages as $language) {
+            $key = $language['language'];
+            $filtered_languages[$key] = array_diff_key($language, ['language' => '']);
+            $filtered_languages[$key] = array_merge($filtered_languages[$key], [
+                'video_thumbnail' => wp_get_attachment_image_src($language['collection_image'][0])[0],
+                'video_type' => $collection->taxonomy,
+            ]);
+        }
+    }
 
-    $id = $collection->term_id;
-    $meta = get_term_meta($id);
-
-    return array(
-        'id' => $id,
-        'title' => $collection->name,
-        'slug' => $collection->slug,
-        'video_type' => $collection->taxonomy,
-        'video_thumbnail' => wp_get_attachment_image_src($meta['collection_image'][0])[0],
-        'video_image_hover' => false
-    );
+    return [
+        'id' => $collection->term_id,
+        'languages' => !empty($languages) ? $filtered_languages : 'Collection languages not found.',
+    ];
 }
 
 function get_post_infos($post)
