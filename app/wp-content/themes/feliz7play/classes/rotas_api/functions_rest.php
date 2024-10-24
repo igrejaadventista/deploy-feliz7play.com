@@ -101,9 +101,9 @@ function get_line_post($args, $limited = false)
 
         $values = get_post_infos($post);
 
-        $is_single = array_reduce($values['languages'] ?? [], function ($carry, $language) {
+        $is_single = is_array($values['languages'] ?? []) ? array_reduce($values['languages'], function ($carry, $language) {
             return $carry || ($language['video_type'] ?? '') === 'Single';
-        }, false);
+        }, false) : false;
 
         if ($limited != false) {
             $id_check = $is_single ? $post->ID : $collection->term_id;
