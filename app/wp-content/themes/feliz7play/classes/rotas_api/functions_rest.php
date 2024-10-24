@@ -89,81 +89,24 @@ function get_category_by_line($item)
 
 function get_line_post($args, $limited = false)
 {
+    $items = [];
+    $controle = [];
 
-    $items = array();
-    $controle = array();
-
-    $posts = get_posts($args);
-    foreach ($posts as $post) {
-
-        $id = $post->ID;
-
-        $meta = get_post_meta($id);
-
-        $title =                $post->post_title;
-        $slug =                 $post->post_name;
-        $video_type =           $meta['post_video_type'][0];
-        $video_episode =        $meta['video_episode'][0];
-        $subtitle =             $meta['post_subtitle'][0];
-        $description =          wp_strip_all_tags($meta['post_blurb'][0]);
-        $video_host =           $meta['post_video_host'][0];
-        $video_id =             $meta['post_video_id'][0];
-
-        $post_download_link =   $meta['link_download_app'][0];
-        $download =             $meta['download'][0];
-        $post_year =            $meta['post_year'][0];
-        $post_video_rating =    $meta['post_video_rating'][0];
-        $post_video_age_rating =    $meta['post_video_age_rating'][0];
-        $redes =                get_field('redes', $id);
-        $production =           get_field('production', $id);
-        $extras =               get_field('post_extra', $id);
-        $collection =           get_the_terms($id, 'collection')[0];
+    foreach (get_posts($args) as $post) {
+        $collection = get_the_terms($id, 'collection')[0];
 
         if ($collection) {
             $collection->parent_slug = get_term($collection->parent, 'collection')->slug;
         }
 
-        $genre =                get_the_terms($id, 'genre')[0];
-        $category =             get_the_terms($id, 'category')[0];
-        $video_lenght =         $meta['post_video_length'][0];
-        $video_quality =        $meta['post_video_quality'][0];
+        $values = get_post_infos($post);
 
-        $video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
-        $video_image_hover =    wp_get_attachment_image_src($meta['video_image_hover'][0])[0];
+        $is_single = array_reduce($values['languages'] ?? [], function ($carry, $language) {
+            return $carry || ($language['video_type'] ?? '') === 'Single';
+        }, false);
 
-        $link =                 get_link_site_next($slug, $video_type, $collection);
-
-        $values = array(
-            'id' => $id,
-            'title' => $title,
-            'slug' => $slug,
-            'video_type' => $video_type,
-            'video_episode' => $video_episode,
-            'subtitle' => $subtitle,
-            'description' => $description,
-            'genre' => $genre,
-            'category' => $category,
-            'collection' => $collection,
-            'video_host' => $video_host,
-            'video_id' => $video_id,
-            'post_download_link' => $post_download_link,
-            'download' => $download,
-            'year' => $post_year,
-            'video_rating' => $post_video_rating,
-            'video_age_rating' => $post_video_age_rating,
-            'video_thumbnail' => $video_thumbnail,
-            'video_image_hover' => $video_image_hover,
-            'post_video_length' => $video_lenght,
-            'post_video_quality' => $video_quality,
-            'redes' => $redes,
-            'production' => $production,
-            'extras' => $extras,
-            'link' => $link
-        );
-
-        if ($limited) {
-
-            $id_check = ($video_type == 'Single') ? $id : $collection->term_id;
+        if ($limited != false) {
+            $id_check = $is_single ? $post->ID : $collection->term_id;
 
             if (!in_array($id_check, $controle)) {
                 array_push($controle, $id_check);
