@@ -207,8 +207,6 @@ function get_collection_infos($collection)
 
 function get_post_infos($post)
 {
-
-    $genre = get_the_terms($post->ID, 'genre')[0];
     $collection = get_the_terms($post->ID, 'collection')[0];
     if ($collection) {
         $collection->parent_slug = get_term($collection->parent, 'collection')->slug;
@@ -242,7 +240,6 @@ function get_post_infos($post)
         'languages' => !empty($languages) ? $filtered_languages : 'Video languages not found.'
     ];
 }
-
 
 function get_line_collection($args)
 {
