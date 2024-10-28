@@ -1,7 +1,7 @@
 <?php
 
 function get_sorted_languages($wp_object, $language_field = 'languages') {
-    $languages = get_field($language_field, $wp_object, $language_field = 'languages');
+    $languages = get_field($language_field, $wp_object);
 
     if (is_array($languages) && !empty($languages)) {
         $filtered_languages = [];
