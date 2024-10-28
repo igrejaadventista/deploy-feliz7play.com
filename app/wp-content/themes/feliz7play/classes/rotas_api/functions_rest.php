@@ -197,20 +197,16 @@ function get_collection_infos($collection) {
     ];
 }
 
-function get_post_infos($post)
-{
+function get_post_infos($post) {
     $collection = get_the_terms($post->ID, 'collection')[0];
     if ($collection) {
         $collection->parent_slug = get_term($collection->parent, 'collection')->slug;
     }
 
-    $languages = get_field('languages', $post->ID);
-
-    if (!empty($languages)) {
-        foreach ($languages as $language) {
-            $key = $language['language'];
-            $filtered_languages[$key] = array_diff_key($language, ['language' => '']);
-            $filtered_languages[$key] = array_merge($filtered_languages[$key], [
+    $languages = get_sorted_languages($post->ID);
+    if (is_array($languages)) {
+        foreach ($languages as $key => $language) {
+            $languages[$key] = array_merge($languages[$key], [
                 'video_type' => $language['post_video_type'],
                 'subtitle' => $language['post_subtitle'],
                 'description' => wp_strip_all_tags($language['post_blurb']),
@@ -222,14 +218,14 @@ function get_post_infos($post)
             ]);
 
             foreach (['post_video_type', 'post_subtitle', 'post_blurb', 'post_video_host', 'post_video_id'] as $value) {
-                unset($filtered_languages[$key][$value]);
+                unset($languages[$key][$value]);
             }
         }
     }
 
     return [
         'id' => $post->ID,
-        'languages' => !empty($languages) ? $filtered_languages : 'Video languages not found.'
+        'languages' => $languages
     ];
 }
 
