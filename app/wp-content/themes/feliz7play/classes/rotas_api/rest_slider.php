@@ -11,15 +11,7 @@ add_action('rest_api_init', function () {
 				$item = $item['slider_object'];
 				$type = get_field('slider_type', $item);
 				$source = get_field('slider_source', $item);
-				$languages = get_field('slider_languages', $item);
-
-				if (!empty($languages)) {
-					$filtered_languages = [];
-					foreach ($languages as $key => $language) {
-						$languages[$language['language']] = array_diff_key($language, ['language' => '']);
-						unset($languages[$key]);
-					}
-				}
+				$languages = get_sorted_languages($item, 'slider_languages');
 
 				$images = [
 					'desktop' => get_field('slider_desktop_image', $item)['url'],

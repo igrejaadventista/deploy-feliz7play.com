@@ -1,8 +1,9 @@
 <?php
 
-function get_sorted_languages($wp_object) {
-    $languages = get_field('languages', $wp_object);
-    if (!empty($languages)) {
+function get_sorted_languages($wp_object, $language_field = 'languages') {
+    $languages = get_field($language_field, $wp_object, $language_field = 'languages');
+
+    if (is_array($languages) && !empty($languages)) {
         $filtered_languages = [];
 
         foreach ($languages as $language) {
@@ -181,22 +182,18 @@ function return_parent_collection($collection)
 }
 
 function get_collection_infos($collection) {
-    $languages = get_field('languages', $collection);
+    $languages = get_sorted_languages($collection);
 
     if (!empty($languages)) {
-        foreach ($languages as $language) {
-            $key = $language['language'];
-            $filtered_languages[$key] = array_diff_key($language, ['language' => '']);
-            $filtered_languages[$key] = array_merge($filtered_languages[$key], [
-                'video_thumbnail' => wp_get_attachment_image_src($language['collection_image'][0])[0],
-                'video_type' => $collection->taxonomy,
-            ]);
+        foreach ($languages as $key => $language) {
+            $languages[$key]['video_thumbnail'] = wp_get_attachment_image_src($language['collection_image'][0])[0];
+            $languages[$key]['video_type'] = $collection->taxonomy;
         }
     }
 
     return [
         'id' => $collection->term_id,
-        'languages' => !empty($languages) ? $filtered_languages : 'Collection languages not found.',
+        'languages' => $languages,
     ];
 }
 
