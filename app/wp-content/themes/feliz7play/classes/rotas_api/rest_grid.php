@@ -21,17 +21,7 @@ add_action('rest_api_init', function() {
 
                 $genre = $field[$prefix . '_genre'];
                 if (!empty($genre)) {
-                    $genre_languages = get_field('languages', $genre);
-
-                    if (!empty($genre_languages)) {
-                        $filtered_languages = [];
-
-                        foreach ($genre_languages as $language) {
-                            $filtered_languages[$language['language']] = array_diff_key($language, ['language' => '']);
-                        }
-                    }
-
-                    $field[$prefix . '_genre']->languages = !empty($genre_languages) ? $filtered_languages : 'Genre languages not found.';
+                    $field[$prefix . '_genre']->languages = get_sorted_languages($genre);
                 }
 
                 $languages = $field[$prefix . '_languages'] ?: [];
