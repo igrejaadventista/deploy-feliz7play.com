@@ -8,54 +8,7 @@ add_action('rest_api_init', function () {
 			$items = get_field('sliders', 'option');
 
 			foreach ($items as $item) {
-				$item = $item['slider_object'];
-				$type = get_field('slider_type', $item);
-				$source = get_field('slider_source', $item);
-				$languages = get_sorted_languages($item, 'slider_languages');
-
-				$images = [
-					'desktop' => get_field('slider_desktop_image', $item)['url'],
-					'tablet' => get_field('slider_tablet_image', $item)['url'],
-					'mobile' => get_field('slider_mobile_image', $item)['url'],
-				];
-
-				if ($type === 'video') {
-					if ($source === 'video') {
-						$video = get_field('slider_video_object', $item);
-
-						array_push($sliders, [
-							'id' => $item->ID,
-							'source' => $source,
-							'languages' => $languages,
-							'images' => $images,
-							'video' => array_merge(get_post_infos($video), [
-								'genre' => get_the_terms($video->ID, 'genre')[0]->name,
-								'category' => get_the_terms($video->ID, 'category')[0],
-							]),
-						]);
-					}
-
-					if ($source === 'collection') {
-						$collection = get_field('to_collection', $item);
-
-						array_push($sliders, [
-							'id' => $item->ID,
-							'source' => $source,
-							'languages' => $languages,
-							'images' => $images,
-							'collection' => get_collection_infos($collection),
-						]);
-					}
-				}
-
-				if ($type === 'custom') {
-					array_push($sliders, [
-						'id' => $item->ID,
-						'type' => $type,
-						'languages' => $languages,
-						'images' =>	$images
-					]);
-				}
+				array_push($sliders, get_slider_infos($item['slider_object']));
 			}
 
 			return new WP_REST_Response($sliders, 200);
