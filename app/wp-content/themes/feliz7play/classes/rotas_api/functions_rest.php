@@ -244,6 +244,12 @@ function get_slider_infos($slider_object) {
     ];
 
     if ($type === 'video') {
+        foreach ($languages as $key => $value) {
+            foreach (['title', 'description', 'button', 'button_link'] as $unused_value) {
+                unset($languages[$key][$unused_value]);
+            }
+        }
+
         if ($source === 'video') {
             $video = get_field('slider_video_object', $item);
 
