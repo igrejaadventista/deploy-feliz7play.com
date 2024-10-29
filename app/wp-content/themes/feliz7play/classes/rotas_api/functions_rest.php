@@ -214,8 +214,9 @@ function get_post_infos($post) {
                 'description' => wp_strip_all_tags($language['post_blurb']),
                 'video_host' => $language['post_video_host'],
                 'video_id' => $language['post_video_id'],
-                'video_thumbnail' => wp_get_attachment_image_src($language['video_thumbnail'][0] == "" || is_null($language['video_thumbnail'][0]) ? $language['video_image_hover'][0] : $language['video_thumbnail'])[0],
-                'video_image_hover' => wp_get_attachment_image_src($language['video_image_hover'][0])[0],
+                'video_thumbnail' => $language['video_thumbnail']['url'],
+                'video_image_hover' => $language['video_image_hover']['url'],
+                'image_content_header' => $language['image_content_header']['url'],
                 'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection)
             ]);
 
