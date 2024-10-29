@@ -142,11 +142,11 @@
                     "display": "table",
                     "sub_fields": [
                         {
-                            "key": "field_664cec2549914",
-                            "label": "Title",
-                            "name": "genre_title",
+                            "key": "field_6720f4aff14a6",
+                            "label": "Languages",
+                            "name": "languages",
                             "aria-label": "",
-                            "type": "text",
+                            "type": "repeater",
                             "instructions": "",
                             "required": 0,
                             "conditional_logic": 0,
@@ -155,11 +155,65 @@
                                 "class": "",
                                 "id": ""
                             },
-                            "default_value": "",
-                            "placeholder": "",
-                            "prepend": "",
-                            "append": "",
-                            "maxlength": ""
+                            "layout": "block",
+                            "min": 0,
+                            "max": 0,
+                            "collapsed": "field_6720e9e17af22",
+                            "button_label": "Add language",
+                            "rows_per_page": 20,
+                            "sub_fields": [
+                                {
+                                    "key": "field_6720f4aff14a7",
+                                    "label": "Language",
+                                    "name": "language",
+                                    "aria-label": "",
+                                    "type": "select",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "choices": {
+                                        "pt": "Portuguese",
+                                        "es": "Spanish",
+                                        "en": "English"
+                                    },
+                                    "default_value": false,
+                                    "return_format": "value",
+                                    "multiple": 0,
+                                    "allow_null": 0,
+                                    "allow_in_bindings": 0,
+                                    "ui": 0,
+                                    "ajax": 0,
+                                    "placeholder": "",
+                                    "parent_repeater": "field_6720f4aff14a6"
+                                },
+                                {
+                                    "key": "field_6720f4aff14a8",
+                                    "label": "Title",
+                                    "name": "title",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "parent_repeater": "field_6720f4aff14a6"
+                                }
+                            ]
                         },
                         {
                             "key": "field_601c0f1b33a76",
@@ -220,24 +274,78 @@
                     "display": "table",
                     "sub_fields": [
                         {
-                            "key": "field_6021217da6ced",
-                            "label": "Title",
-                            "name": "custom_title",
+                            "key": "field_6720ec2daa37e",
+                            "label": "Languages",
+                            "name": "languages",
                             "aria-label": "",
-                            "type": "text",
+                            "type": "repeater",
                             "instructions": "",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
-                                "width": "25",
+                                "width": "",
                                 "class": "",
                                 "id": ""
                             },
-                            "default_value": "",
-                            "placeholder": "",
-                            "prepend": "",
-                            "append": "",
-                            "maxlength": ""
+                            "layout": "block",
+                            "min": 0,
+                            "max": 0,
+                            "collapsed": "field_6720e9e17af22",
+                            "button_label": "Add language",
+                            "rows_per_page": 20,
+                            "sub_fields": [
+                                {
+                                    "key": "field_6720ec2daa37f",
+                                    "label": "Language",
+                                    "name": "language",
+                                    "aria-label": "",
+                                    "type": "select",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "choices": {
+                                        "pt": "Portuguese",
+                                        "es": "Spanish",
+                                        "en": "English"
+                                    },
+                                    "default_value": false,
+                                    "return_format": "value",
+                                    "multiple": 0,
+                                    "allow_null": 0,
+                                    "allow_in_bindings": 0,
+                                    "ui": 0,
+                                    "ajax": 0,
+                                    "placeholder": "",
+                                    "parent_repeater": "field_6720ec2daa37e"
+                                },
+                                {
+                                    "key": "field_6720ec2daa380",
+                                    "label": "Title",
+                                    "name": "title",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "parent_repeater": "field_6720ec2daa37e"
+                                }
+                            ]
                         },
                         {
                             "key": "field_60213ba097610",
@@ -541,24 +649,78 @@
                             "step": ""
                         },
                         {
-                            "key": "field_6130bef6fc566",
-                            "label": "Title",
-                            "name": "recentes_title",
+                            "key": "field_6720e9a77af21",
+                            "label": "Languages",
+                            "name": "languages",
                             "aria-label": "",
-                            "type": "text",
+                            "type": "repeater",
                             "instructions": "",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
-                                "width": "25",
+                                "width": "",
                                 "class": "",
                                 "id": ""
                             },
-                            "default_value": "",
-                            "placeholder": "",
-                            "prepend": "",
-                            "append": "",
-                            "maxlength": ""
+                            "layout": "block",
+                            "min": 0,
+                            "max": 0,
+                            "collapsed": "field_6720e9e17af22",
+                            "button_label": "Add language",
+                            "rows_per_page": 20,
+                            "sub_fields": [
+                                {
+                                    "key": "field_6720e9e17af22",
+                                    "label": "Language",
+                                    "name": "language",
+                                    "aria-label": "",
+                                    "type": "select",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "choices": {
+                                        "pt": "Portuguese",
+                                        "es": "Spanish",
+                                        "en": "English"
+                                    },
+                                    "default_value": false,
+                                    "return_format": "value",
+                                    "multiple": 0,
+                                    "allow_null": 0,
+                                    "allow_in_bindings": 0,
+                                    "ui": 0,
+                                    "ajax": 0,
+                                    "placeholder": "",
+                                    "parent_repeater": "field_6720e9a77af21"
+                                },
+                                {
+                                    "key": "field_6720e9ff7af23",
+                                    "label": "Title",
+                                    "name": "title",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "default_value": "",
+                                    "maxlength": "",
+                                    "allow_in_bindings": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "parent_repeater": "field_6720e9a77af21"
+                                }
+                            ]
                         }
                     ],
                     "min": "",
@@ -1706,5 +1868,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1730127936
+    "modified": 1730213667
 }
