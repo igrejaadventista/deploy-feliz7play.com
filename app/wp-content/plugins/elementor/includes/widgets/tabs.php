@@ -74,6 +74,24 @@ class Widget_Tabs extends Widget_Base {
 		return [ 'tabs', 'accordion', 'toggle' ];
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-tabs' ];
+	}
+
 	public function show_in_panel(): bool {
 		return ! Plugin::$instance->experiments->is_feature_active( 'nested-elements' );
 	}

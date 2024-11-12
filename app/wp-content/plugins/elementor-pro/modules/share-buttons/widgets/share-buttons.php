@@ -40,14 +40,15 @@ class Share_Buttons extends Base_Widget {
 		],
 	];
 
-	public function get_style_depends() {
+	public function get_style_depends(): array {
+		$style_depends = [ 'widget-share-buttons', 'e-apple-webkit' ];
+
 		if ( Icons_Manager::is_migration_allowed() ) {
-			return [
-				'elementor-icons-fa-solid',
-				'elementor-icons-fa-brands',
-			];
+			$style_depends[] = 'elementor-icons-fa-solid';
+			$style_depends[] = 'elementor-icons-fa-brands';
 		}
-		return [];
+
+		return $style_depends;
 	}
 
 	private static function get_network_icon_data( $network_name ) {
@@ -85,6 +86,10 @@ class Share_Buttons extends Base_Widget {
 
 	public function get_keywords() {
 		return [ 'sharing', 'social', 'icon', 'button', 'like' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
 	}
 
 	protected function register_controls() {
@@ -290,7 +295,6 @@ class Share_Buttons extends Base_Widget {
 					'active' => true,
 				],
 				'options' => false,
-				'placeholder' => esc_html__( 'https://your-link.com', 'elementor-pro' ),
 				'condition' => [
 					'share_url_type' => 'custom',
 				],

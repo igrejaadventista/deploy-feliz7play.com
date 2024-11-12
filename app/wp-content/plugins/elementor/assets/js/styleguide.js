@@ -1,4 +1,4 @@
-/*! elementor - v3.21.0 - 15-04-2024 */
+/*! elementor - v3.25.0 - 12-11-2024 */
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -29,9 +29,9 @@ module.exports = Marionette.Behavior.extend({
     if (hasDefault) {
       return false;
     }
-    var isFeatureAvalibleToUser = elementor.helpers.hasPro() && !elementor.helpers.hasProAndNotConnected(),
+    var isFeatureAvailableToUser = elementor.helpers.hasPro() && !elementor.helpers.hasProAndNotConnected(),
       hasTags = this.getOption('tags').length > 0;
-    return !isFeatureAvalibleToUser || hasTags;
+    return !isFeatureAvailableToUser || hasTags;
   },
   renderTools: function renderTools() {
     var _this = this;
@@ -1734,7 +1734,7 @@ var _default = /*#__PURE__*/function (_$e$modules$Component) {
     }
 
     /**
-     * Update the User Preferences to enable/disable the Style Guide Preview.
+     * Update the User Preferences to show the global settings.
      * Triggered on switcher change at Global Colors / Global Typography panels.
      *
      * @param {Array} options

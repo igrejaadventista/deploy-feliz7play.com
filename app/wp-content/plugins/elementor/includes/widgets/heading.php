@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Elementor\Core\Kits\Documents\Tabs\Global_Colors;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
+use Elementor\Modules\ContentSanitizer\Interfaces\Sanitizable;
 
 /**
  * Elementor heading widget.
@@ -15,7 +16,7 @@ use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
  *
  * @since 1.0.0
  */
-class Widget_Heading extends Widget_Base {
+class Widget_Heading extends Widget_Base implements Sanitizable {
 
 	/**
 	 * Get widget name.
@@ -87,6 +88,50 @@ class Widget_Heading extends Widget_Base {
 	 */
 	public function get_keywords() {
 		return [ 'heading', 'title', 'text' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-heading' ];
+	}
+
+	/**
+	 * Remove data attributes from the html.
+	 *
+	 * @param string $content Heading title
+	 * @return string
+	 */
+	public function sanitize( $content ): string {
+		$allowed_tags = wp_kses_allowed_html( 'post' );
+		$allowed_tags_for_heading = [];
+		$non_allowed_tags = [ 'img' ];
+
+		foreach ( $allowed_tags as $tag => $attributes ) {
+			if ( in_array( $tag, $non_allowed_tags, true ) ) {
+				continue;
+			}
+
+			$filtered_attributes = array_filter( $attributes, function( $attribute ) {
+				return ! substr( $attribute, 0, 5 ) === 'data-';
+			}, ARRAY_FILTER_USE_KEY );
+
+			$allowed_tags_for_heading[ $tag ] = $filtered_attributes;
+		}
+
+		return wp_kses( $content, $allowed_tags_for_heading );
 	}
 
 	/**
@@ -331,7 +376,7 @@ class Widget_Heading extends Widget_Base {
 
 		$this->add_inline_editing_attributes( 'title' );
 
-		$title = $settings['title'];
+		$title = wp_kses_post( $settings['title'] );
 
 		if ( ! empty( $settings['link']['url'] ) ) {
 			$this->add_link_attributes( 'url', $settings['link'] );
@@ -356,10 +401,10 @@ class Widget_Heading extends Widget_Base {
 	protected function content_template() {
 		?>
 		<#
-		var title = settings.title;
+		let title = elementor.helpers.sanitize( settings.title, { ALLOW_DATA_ATTR: false } );
 
 		if ( '' !== settings.link.url ) {
-			title = '<a href="' + _.escape( settings.link.url ) + '">' + title + '</a>';
+			title = '<a href="' + elementor.helpers.sanitizeUrl( settings.link.url ) + '">' + title + '</a>';
 		}
 
 		view.addRenderAttribute( 'title', 'class', [ 'elementor-heading-title' ] );

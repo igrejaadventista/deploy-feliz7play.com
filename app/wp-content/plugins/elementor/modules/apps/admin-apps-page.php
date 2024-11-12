@@ -3,6 +3,7 @@ namespace Elementor\Modules\Apps;
 
 use Elementor\Core\Isolation\Wordpress_Adapter;
 use Elementor\Core\Isolation\Plugin_Status_Adapter;
+use Elementor\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -46,7 +47,11 @@ class Admin_Apps_Page {
 	}
 
 	private static function get_plugins() : array {
-		if ( ! self::$wordpress_adapter ) {
+		$container = Plugin::$instance->elementor_container();
+
+		if ( $container->has( Wordpress_Adapter::class ) ) {
+			self::$wordpress_adapter = $container->get( Wordpress_Adapter::class );
+		} else if ( ! self::$wordpress_adapter ) {
 			self::$wordpress_adapter = new Wordpress_Adapter();
 		}
 
@@ -108,18 +113,18 @@ class Admin_Apps_Page {
 
 		if ( self::$plugin_status_adapter->is_plugin_installed( $app['file_path'] ) ) {
 			if ( current_user_can( 'activate_plugins' ) ) {
-				$app['action_label'] = 'Activate';
+				$app['action_label'] = esc_html__( 'Activate', 'elementor' );
 				$app['action_url'] = self::$plugin_status_adapter->get_activate_plugin_url( $app['file_path'] );
 			} else {
-				$app['action_label'] = 'Cannot Activate';
+				$app['action_label'] = esc_html__( 'Cannot Activate', 'elementor' );
 				$app['action_url'] = '#';
 			}
 		} else {
 			if ( current_user_can( 'install_plugins' ) ) {
-				$app['action_label'] = 'Install';
+				$app['action_label'] = esc_html__( 'Install', 'elementor' );
 				$app['action_url'] = self::$plugin_status_adapter->get_install_plugin_url( $app['file_path'] );
 			} else {
-				$app['action_label'] = 'Cannot Install';
+				$app['action_label'] = esc_html__( 'Cannot Install', 'elementor' );
 				$app['action_url'] = '#';
 			}
 		}
@@ -141,10 +146,10 @@ class Admin_Apps_Page {
 		}
 
 		if ( current_user_can( 'activate_plugins' ) ) {
-			$app['action_label'] = 'Activate';
+			$app['action_label'] = esc_html__( 'Activate', 'elementor' );
 			$app['action_url'] = self::$plugin_status_adapter->get_activate_plugin_url( $app['file_path'] );
 		} else {
-			$app['action_label'] = 'Cannot Activate';
+			$app['action_label'] = esc_html__( 'Cannot Activate', 'elementor' );
 			$app['action_url'] = '#';
 		}
 
@@ -163,7 +168,7 @@ class Admin_Apps_Page {
 
 	private static function render_plugin_item( $plugin ) {
 		?>
-		<div class="e-a-item">
+		<div class="e-a-item"<?php echo ! empty( $plugin['file_path'] ) ? ' data-plugin="' . esc_attr( $plugin['file_path'] ) . '"' : ''; ?>>
 			<div class="e-a-heading">
 				<img class="e-a-img" src="<?php echo esc_url( $plugin['image'] ); ?>" alt="<?php echo esc_attr( $plugin['name'] ); ?>">
 				<?php if ( ! empty( $plugin['badge'] ) ) : ?>

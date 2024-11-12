@@ -37,6 +37,20 @@ class Author_Box extends Base {
 		return [ 'author', 'user', 'profile', 'biography', 'testimonial', 'avatar' ];
 	}
 
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-author-box' ];
+	}
+
 	protected function register_controls() {
 		$this->start_controls_section(
 			'section_author_info',
@@ -218,7 +232,6 @@ class Author_Box extends Base {
 			[
 				'label' => esc_html__( 'Link', 'elementor-pro' ),
 				'type' => Controls_Manager::URL,
-				'placeholder' => esc_html__( 'https://your-link.com', 'elementor-pro' ),
 				'condition' => [
 					'source' => 'custom',
 				],
@@ -248,7 +261,6 @@ class Author_Box extends Base {
 			[
 				'label' => esc_html__( 'Archive Button', 'elementor-pro' ),
 				'type' => Controls_Manager::URL,
-				'placeholder' => esc_html__( 'https://your-link.com', 'elementor-pro' ),
 				'dynamic' => [
 					'active' => true,
 				],

@@ -17,14 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Blockquote extends Base_Widget {
 
-	public function get_style_depends() {
-		if ( Icons_Manager::is_migration_allowed() ) {
-			return [ 'elementor-icons-fa-brands' ];
-		}
-
-		return [];
-	}
-
 	public function get_name() {
 		return 'blockquote';
 	}
@@ -37,8 +29,22 @@ class Blockquote extends Base_Widget {
 		return 'eicon-blockquote';
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	public function get_keywords() {
 		return [ 'blockquote', 'quote', 'paragraph', 'testimonial', 'text', 'twitter', 'tweet' ];
+	}
+
+	public function get_style_depends(): array {
+		$style_depends = [ 'widget-blockquote' ];
+
+		if ( Icons_Manager::is_migration_allowed() ) {
+			$style_depends[] = 'elementor-icons-fa-brands';
+		}
+
+		return $style_depends;
 	}
 
 	protected function register_controls() {

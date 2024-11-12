@@ -9,6 +9,7 @@ use Elementor\Group_Control_Typography;
 use Elementor\Modules\DynamicTags\Module as TagsModule;
 use Elementor\Widget_Button;
 use ElementorPro\Base\Base_Widget_Trait;
+use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -431,15 +432,9 @@ abstract class Payment_Button extends Widget_Button {
 			'default' => '#FFF',
 		] );
 
-		$this->update_control(
-			'icon_align',
-			[
-				'options' => [
-					'left' => esc_html__( 'Before Text', 'elementor-pro' ),
-					'right' => esc_html__( 'After Text', 'elementor-pro' ),
-				],
-			]
-		);
+		$this->update_control( 'border_border', [
+			'default' => 'none',
+		] );
 	}
 
 	// Add typography settings for custom messages.
@@ -515,7 +510,12 @@ abstract class Payment_Button extends Widget_Button {
 	protected function render() {
 		$settings = $this->get_settings_for_display();
 
-		$this->add_render_attribute( 'wrapper', 'class', 'elementor-button-wrapper' );
+		$optimized_markup = Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+
+		if ( ! $optimized_markup ) {
+			$this->add_render_attribute( 'wrapper', 'class', 'elementor-button-wrapper' );
+		}
+
 		$this->add_render_attribute( 'button', 'class', 'elementor-button' );
 		$this->add_render_attribute( 'button', 'role', 'button' );
 
@@ -525,16 +525,21 @@ abstract class Payment_Button extends Widget_Button {
 
 		if ( ! empty( $settings['size'] ) ) {
 			$this->add_render_attribute( 'button', 'class', 'elementor-size-' . $settings['size'] );
+		} else {
+			$this->add_render_attribute( 'button', 'class', 'elementor-size-sm' ); // BC, to make sure the class is always present
 		}
 
 		if ( $settings['hover_animation'] ) {
 			$this->add_render_attribute( 'button', 'class', 'elementor-animation-' . $settings['hover_animation'] );
 		}
-
 		?>
+		<?php if ( ! $optimized_markup ) : ?>
 		<div <?php $this->print_render_attribute_string( 'wrapper' ); ?>>
+		<?php endif; ?>
 			<?php $this->render_button(); ?>
+		<?php if ( ! $optimized_markup ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -542,16 +547,48 @@ abstract class Payment_Button extends Widget_Button {
 		return;
 		?>
 		<#
+		const optimized_markup = elementorCommon.config.experimentalFeatures.e_optimized_markup;
+
+		if ( ! optimized_markup ) {
+			view.addRenderAttribute( 'wrapper', 'class', 'elementor-button-wrapper' );
+		}
+
+		view.addRenderAttribute( 'button', 'class', 'elementor-button' );
+		view.addRenderAttribute( 'content-wrapper', 'class', 'elementor-button-content-wrapper' );
+		view.addRenderAttribute( 'icon', 'class', 'elementor-button-icon' );
 		view.addRenderAttribute( 'text', 'class', 'elementor-button-text' );
+
+		if ( '' !== settings.link.url ) {
+			view.addRenderAttribute( 'button', 'class', 'elementor-button-link' );
+			view.addRenderAttribute( 'button', 'href', elementor.helpers.sanitizeUrl( settings.link.url ) );
+		} else {
+			view.addRenderAttribute( 'button', 'role', 'button' );
+		}
+
+		if ( '' !== settings.button_css_id ) {
+			view.addRenderAttribute( 'button', 'id', settings.button_css_id );
+		}
+
+		if ( '' !== settings.size ) {
+			view.addRenderAttribute( 'button', 'class', 'elementor-size-' + settings.size );
+		}
+
+		if ( '' !== settings.hover_animation ) {
+			view.addRenderAttribute( 'button', 'class', 'elementor-animation-' + settings.hover_animation );
+		}
+
 		view.addInlineEditingAttributes( 'text', 'none' );
-		var iconHTML = elementor.helpers.renderIcon( view, settings.selected_icon, { 'aria-hidden': true }, 'i' , 'object' ),
-		migrated = elementor.helpers.isIconMigrated( settings, 'selected_icon' );
+
+		const iconHTML = elementor.helpers.renderIcon( view, settings.selected_icon, { 'aria-hidden': true }, 'i' , 'object' );
+		const migrated = elementor.helpers.isIconMigrated( settings, 'selected_icon' );
 		#>
-		<div class="elementor-button-wrapper">
-			<a id="{{ settings.button_css_id }}" class="elementor-button elementor-size-{{ settings.size }} elementor-animation-{{ settings.hover_animation }}" href="#" role="button">
-				<span class="elementor-button-content-wrapper">
+		<# if ( ! optimized_markup ) { #>
+		<div {{{ view.getRenderAttributeString( 'wrapper' ) }}}>
+		<# } #>
+			<a {{{ view.getRenderAttributeString( 'button' ) }}}>
+				<span {{{ view.getRenderAttributeString( 'content-wrapper' ) }}}>
 					<# if ( settings.icon || settings.selected_icon ) { #>
-					<span class="elementor-button-icon elementor-align-icon-{{ settings.icon_align }}">
+					<span {{{ view.getRenderAttributeString( 'icon' ) }}}>
 						<# if ( ( migrated || ! settings.icon ) && iconHTML.rendered ) { #>
 							{{{ iconHTML.value }}}
 						<# } else { #>
@@ -562,7 +599,9 @@ abstract class Payment_Button extends Widget_Button {
 					<span {{{ view.getRenderAttributeString( 'text' ) }}}>{{{ settings.text }}}</span>
 				</span>
 			</a>
+		<# if ( ! optimized_markup ) { #>
 		</div>
+		<# } #>
 		<?php
 	}
 

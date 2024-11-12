@@ -19,4 +19,4 @@ RewriteRule . index.php [L]
 # END WordPress
 
 
-php_value memory_limit 512M
+#php_value memory_limit 512M

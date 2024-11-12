@@ -11,6 +11,7 @@ use Elementor\Icons_Manager;
 use Elementor\Repeater;
 use Elementor\Utils;
 use ElementorPro\Plugin;
+use ElementorPro\Core\Utils as ProUtils;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -37,6 +38,20 @@ class Media_Carousel extends Base {
 
 	public function get_keywords() {
 		return [ 'media', 'carousel', 'image', 'video', 'lightbox' ];
+	}
+
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'e-swiper', 'widget-media-carousel', 'widget-carousel-module-base' ];
 	}
 
 	protected function render() {
@@ -188,7 +203,6 @@ class Media_Carousel extends Base {
 				'dynamic' => [
 					'active' => true,
 				],
-				'placeholder' => esc_html__( 'https://your-link.com', 'elementor-pro' ),
 				'show_external' => 'true',
 				'condition' => [
 					'type' => 'image',
@@ -238,6 +252,10 @@ class Media_Carousel extends Base {
 		}
 
 		$attachment_post = get_post( $slide['image']['id'] );
+
+		if ( ProUtils::has_invalid_post_permissions( $attachment_post ) ) {
+			return '';
+		}
 
 		if ( 'caption' === $caption_type ) {
 			return $attachment_post->post_excerpt;

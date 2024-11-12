@@ -43,12 +43,16 @@ class Gallery extends Base_Widget {
 		return [ 'elementor-gallery' ];
 	}
 
-	public function get_style_depends() {
-		return [ 'elementor-gallery' ];
+	public function get_style_depends(): array {
+		return [ 'widget-gallery', 'elementor-gallery', 'e-transitions' ];
 	}
 
 	public function get_icon() {
 		return 'eicon-gallery-justified';
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
 	}
 
 	public function get_inline_css_depends() {

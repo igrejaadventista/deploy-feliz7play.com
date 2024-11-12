@@ -31,6 +31,24 @@ class Facebook_Embed extends Base_Widget {
 		return [ 'facebook', 'social', 'embed', 'video', 'post', 'comment' ];
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-social' ];
+	}
+
 	protected function register_controls() {
 		$this->start_controls_section(
 			'section_content',

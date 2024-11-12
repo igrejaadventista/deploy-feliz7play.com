@@ -1,4 +1,4 @@
-/*! elementor-pro - v3.21.0 - 15-04-2024 */
+/*! elementor-pro - v3.25.0 - 03-11-2024 */
 :root {
   --color-box-shadow-color: rgba(0, 0, 0, 0.05);
 }
@@ -207,12 +207,8 @@
 .e-site-editor-conditions__footer {
   display: flex;
   justify-content: flex-end;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  left: 0;
   padding: 0.5rem;
-  border-block-start: 1px solid var(--hr-color);
+  margin-top: 1rem;
 }
 .e-site-editor-conditions__input-wrapper {
   position: relative;
@@ -350,10 +346,19 @@
 
 .e-site-editor__content_container_main {
   flex: 1;
+  padding: 1.875rem;
 }
 
 .e-site-editor__content_container_secondary {
   margin: 0 auto;
-  padding-block-start: 2.75rem;
+  align-items: center;
+  border-block-start: 1px solid var(--hr-color);
+  padding-block-start: 1rem;
+  padding-block-end: 1rem;
+  padding-inline: 1.875rem;
+}
+
+.eps-app__content {
+  padding: 0;
 }
 /*# sourceMappingURL=app.css.map */

@@ -35,6 +35,24 @@ class Price_Table extends Base_Widget {
 		return [ 'pricing', 'table', 'product', 'image', 'plan', 'button' ];
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-price-table' ];
+	}
+
 	protected function register_controls() {
 		$this->start_controls_section(
 			'section_header',
@@ -303,7 +321,6 @@ class Price_Table extends Base_Widget {
 			[
 				'label' => esc_html__( 'Link', 'elementor-pro' ),
 				'type' => Controls_Manager::URL,
-				'placeholder' => esc_html__( 'https://your-link.com', 'elementor-pro' ),
 				'default' => [
 					'url' => '#',
 				],

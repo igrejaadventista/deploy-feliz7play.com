@@ -32,11 +32,18 @@ class Search_Form extends Base {
 		return [ 'search', 'form' ];
 	}
 
-	public function get_style_depends() {
+	public function show_in_panel(): bool {
+		return false;
+	}
+
+	public function get_style_depends(): array {
+		$style_depends = [ 'widget-search-form' ];
+
 		if ( Icons_Manager::is_migration_allowed() ) {
-			return [ 'elementor-icons-fa-solid' ];
+			$style_depends[] = 'elementor-icons-fa-solid';
 		}
-		return [];
+
+		return $style_depends;
 	}
 
 	protected function register_controls() {
@@ -45,6 +52,12 @@ class Search_Form extends Base {
 			[
 				'label' => esc_html__( 'Search Form', 'elementor-pro' ),
 			]
+		);
+
+		$this->add_deprecation_message(
+			'3.24.0',
+			esc_html__( 'You are currently editing a Search Form Widget in its old version. Any new Search widget dragged into the canvas will be the new Search widget, with the improved search capabilities.', 'elementor-pro' ),
+			'search'
 		);
 
 		$this->add_control(
@@ -737,7 +750,7 @@ class Search_Form extends Base {
 			'form',
 			[
 				'class' => 'elementor-search-form',
-				'action' => home_url(),
+				'action' => esc_url( home_url() ),
 				'method' => 'get',
 			]
 		);
@@ -867,8 +880,7 @@ class Search_Form extends Base {
 			'form',
 			{
 				'class': 'elementor-search-form',
-				'action': '<?php // PHPCS - the method home_url is safe.
-					echo home_url(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>',
+				'action': '<?php echo esc_url( home_url() ); ?>',
 				'method': 'get',
 			}
 		);

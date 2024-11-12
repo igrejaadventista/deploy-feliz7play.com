@@ -16,6 +16,7 @@ function echo_select_your_structure_title() {
 </script>
 
 <script type="text/template" id="tmpl-elementor-add-section">
+	<# if ( $e.components.get( 'document/elements' ).utils.allowAddingWidgets() ) { #>
 	<div class="elementor-add-section-inner">
 		<div class="elementor-add-section-close elementor-wizard-icon">
 			<i class="eicon-close" aria-hidden="true"></i>
@@ -23,7 +24,7 @@ function echo_select_your_structure_title() {
 		</div>
 		<?php
 		$experiments_manager = Plugin::$instance->experiments;
-		if ( $experiments_manager->is_feature_active( 'container_grid' ) ) { ?>
+		if ( $experiments_manager->is_feature_active( 'container' ) ) { ?>
 			<div class="elementor-add-section-back elementor-wizard-icon">
 				<i class="eicon-chevron-left" aria-hidden="true"></i>
 				<span class="elementor-screen-only"><?php echo esc_html__( 'Back', 'elementor' ); ?></span>
@@ -114,6 +115,7 @@ function echo_select_your_structure_title() {
 			</div>
 		</div>
 	</div>
+	<# } #>
 </script>
 
 <script type="text/template" id="tmpl-elementor-tag-controls-stack-empty">

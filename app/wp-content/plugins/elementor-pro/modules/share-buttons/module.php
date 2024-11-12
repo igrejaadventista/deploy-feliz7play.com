@@ -73,27 +73,15 @@ class Module extends Module_Base {
 		'print' => [
 			'title' => 'Print',
 		],
+		'x-twitter' => [
+			'title' => 'X',
+		],
+		'threads' => [
+			'title' => 'Threads',
+		],
 	];
 
 	public static function get_networks( $network_name = null ) {
-		// TODO: Remove the class_exists check and move X-twitter and Threads to self::$networks permanently when Elementor 3.22 is released.
-		if ( class_exists( 'Elementor\Widget_Share_Buttons' ) ) {
-			self::$networks = array_merge( self::$networks, [
-				'x-twitter' => [
-					'title' => 'X',
-				],
-				'threads' => [
-					'title' => 'Threads',
-				],
-			] );
-
-			$supported_networks = \Elementor\Widget_Share_Buttons::get_supported_networks();
-
-			self::$networks = array_filter( self::$networks, function( $network_name ) use ( $supported_networks ) {
-				return in_array( $network_name, $supported_networks, true );
-			}, ARRAY_FILTER_USE_KEY );
-		}
-
 		if ( $network_name ) {
 			return self::$networks[ $network_name ] ?? null;
 		}
@@ -117,8 +105,36 @@ class Module extends Module_Base {
 		return $settings;
 	}
 
+	/**
+	 * Get the base URL for assets.
+	 *
+	 * @return string
+	 */
+	public function get_assets_base_url(): string {
+		return ELEMENTOR_PRO_URL;
+	}
+
+	/**
+	 * Register styles.
+	 *
+	 * At build time, Elementor compiles `/modules/share-buttons/assets/scss/frontend.scss`
+	 * to `/assets/css/widget-share-buttons.min.css`.
+	 *
+	 * @return void
+	 */
+	public function register_styles() {
+		wp_register_style(
+			'widget-share-buttons',
+			$this->get_css_assets_url( 'widget-share-buttons', null, true, true ),
+			[ 'elementor-frontend' ],
+			ELEMENTOR_PRO_VERSION
+		);
+	}
+
 	public function __construct() {
 		parent::__construct();
+
+		add_action( 'elementor/frontend/after_register_styles', [ $this, 'register_styles' ] );
 
 		add_filter( 'elementor_pro/frontend/localize_settings', [ $this, 'add_localize_data' ] );
 

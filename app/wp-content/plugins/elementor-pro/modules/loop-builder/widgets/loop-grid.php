@@ -35,6 +35,20 @@ class Loop_Grid extends Base {
 		return 'eicon-loop-builder';
 	}
 
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-loop-builder' ];
+	}
+
 	protected function register_layout_section() {
 		parent::register_layout_section();
 
@@ -254,8 +268,7 @@ class Loop_Grid extends Base {
 		$repeater->add_control(
 			'column_span_masonry_note',
 			[
-				// TODO: Remove define() with the release of Elementor 3.22
-				'type' => defined( 'Controls_Manager::ALERT' ) ? Controls_Manager::ALERT : 'alert',
+				'type' => Controls_Manager::ALERT,
 				'alert_type' => 'warning',
 				'content' => esc_html__( 'Note: The Masonry option combined with Column Span might cause unexpected results and break the layout.', 'elementor-pro' ),
 				'condition' => [
@@ -575,5 +588,13 @@ class Loop_Grid extends Base {
 		);
 
 		$this->end_controls_section();
+	}
+
+	public static function on_import_update_dynamic_content( array $element_config, array $data, $controls = null ) : array {
+		if ( isset( $element_config['settings']['template_id'] ) && isset( $data['post_ids'] ) ) {
+			$element_config['settings']['template_id'] = $data['post_ids'][ $element_config['settings']['template_id'] ];
+		}
+
+		return $element_config;
 	}
 }

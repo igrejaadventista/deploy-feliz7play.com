@@ -323,13 +323,18 @@ class Utils {
 	 * @return string
 	 */
 	public static function trim_words( $text, $length ) {
-		if ( $length && str_word_count( $text ) > $length ) {
-			$text = explode( ' ', $text, $length + 1 );
-			unset( $text[ $length ] );
-			$text = implode( ' ', $text );
+		if ( ! $length ) {
+			return $text;
 		}
 
-		return $text;
+		$whitespace_pattern = '/\s+/u';
+		$words = preg_split( $whitespace_pattern, $text, -1, PREG_SPLIT_NO_EMPTY );
+
+		if ( count( $words ) > $length ) {
+			$words = array_slice( $words, 0, $length );
+		}
+
+		return implode( ' ', $words );
 	}
 
 	/**
@@ -415,5 +420,31 @@ class Utils {
 
 	public static function format_control_condition( $name, $operator, $value ) {
 		return compact( 'name', 'operator', 'value' );
+	}
+
+	public static function create_widget_instance_from_db( $post_id, $widget_id ) {
+		$document = Plugin::elementor()->documents->get( $post_id );
+		$widget_data = \Elementor\Utils::find_element_recursive( $document->get_elements_data(), $widget_id );
+
+		return Plugin::elementor()->elements_manager->create_element_instance( $widget_data );
+	}
+
+	public static function has_invalid_post_permissions( $post ): bool {
+		$is_image_attachment = 'attachment' === $post->post_type && strpos( $post->post_mime_type, 'image/' ) === 0;
+
+		if ( $is_image_attachment ) {
+			return false;
+		}
+
+		$is_private = 'private' === $post->post_status
+			&& ! current_user_can( 'read_private_posts', $post->ID );
+
+		$not_allowed = 'publish' !== $post->post_status
+			&& ! current_user_can( 'edit_post', $post->ID );
+
+		$password_required = post_password_required( $post->ID )
+			&& ! current_user_can( 'edit_post', $post->ID );
+
+		return $is_private || $not_allowed || $password_required;
 	}
 }

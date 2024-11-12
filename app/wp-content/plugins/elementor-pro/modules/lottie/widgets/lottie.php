@@ -37,12 +37,16 @@ class Lottie extends Base_Widget {
 		return [ 'lottie' ];
 	}
 
-	public function get_style_depends() {
-		return [ 'e-lottie' ];
-	}
-
 	public function get_icon() {
 		return 'eicon-lottie';
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function get_style_depends(): array {
+		return [ 'widget-lottie', 'e-lottie' ];
 	}
 
 	protected function register_controls() {
@@ -865,7 +869,7 @@ class Lottie extends Base_Widget {
 		var widget_container = '<div class="e-lottie__container"><div class="e-lottie__animation"></div>' + widget_caption + '</div>';
 
 		if ( settings.custom_link.url && 'custom' === settings.link_to ) {
-			widget_container = '<a class="e-lottie__container__link" href="' + _.escape( settings.custom_link.url ) + '">' + widget_container + '</a>';
+			widget_container = '<a class="e-lottie__container__link" href="' + elementor.helpers.sanitizeUrl( settings.custom_link.url ) + '">' + widget_container + '</a>';
 		}
 
 		print( widget_container );

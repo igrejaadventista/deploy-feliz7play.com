@@ -29,7 +29,11 @@ class Code_Highlight extends Base_Widget {
 	}
 
 	public function get_style_depends() {
-		return [ 'prismjs_style' ];
+		return [ 'widget-code-highlight' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
 	}
 
 	public function get_script_depends() {

@@ -43,6 +43,20 @@ class Nav_Menu extends Base_Widget {
 		return [ 'smartmenus' ];
 	}
 
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-nav-menu' ];
+	}
+
 	protected function get_nav_menu_index() {
 		return $this->nav_menu_index++;
 	}
@@ -65,6 +79,15 @@ class Nav_Menu extends Base_Widget {
 			'section_layout',
 			[
 				'label' => esc_html__( 'Layout', 'elementor-pro' ),
+			]
+		);
+
+		$this->add_control(
+			'menu_name',
+			[
+				'label' => esc_html__( 'Menu Name', 'elementor-pro' ),
+				'type' => Controls_Manager::TEXT,
+				'default' => esc_html__( 'Menu', 'elementor-pro' ),
 			]
 		);
 
@@ -92,8 +115,7 @@ class Nav_Menu extends Base_Widget {
 			$this->add_control(
 				'menu',
 				[
-					// TODO: Remove define() with the release of Elementor 3.22
-					'type' => defined( 'Controls_Manager::ALERT' ) ? Controls_Manager::ALERT : 'alert',
+					'type' => Controls_Manager::ALERT,
 					'alert_type' => 'info',
 					'heading' => esc_html__( 'There are no menus in your site.', 'elementor-pro' ),
 					'content' => sprintf(
@@ -1465,6 +1487,10 @@ class Nav_Menu extends Base_Widget {
 
 		if ( empty( $menu_html ) ) {
 			return;
+		}
+
+		if ( $settings['menu_name'] ) {
+			$this->add_render_attribute( 'main-menu', 'aria-label', $settings['menu_name'] );
 		}
 
 		$is_migrated = isset( $settings['__fa4_migrated']['submenu_icon'] );
