@@ -1,12 +1,13 @@
 <?php
 
+require_once realpath(__DIR__ . "/vendor/autoload.php");
+require_once (dirname(__FILE__) . '/classes/controllers/F7P_Algolia.class.php');
 require_once (dirname(__FILE__) . '/classes/controllers/F7P_Theme_Helper.class.php');
 require_once (dirname(__FILE__) . '/classes/controllers/F7P_TAX_Custom.class.php');
 require_once (dirname(__FILE__) . '/classes/controllers/F7P_API_Rest.class.php');
 require_once (dirname(__FILE__) . '/classes/controllers/F7P_CPT_Video.class.php');
 require_once (dirname(__FILE__) . '/classes/controllers/F7P_CPT_Slider.class.php');
 require_once (dirname(__FILE__) . '/classes/controllers/F7P_Site_Settings.class.php');
-
 
 // Rotas API
 
