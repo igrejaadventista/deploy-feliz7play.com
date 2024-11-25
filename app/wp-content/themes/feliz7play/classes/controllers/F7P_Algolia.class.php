@@ -40,7 +40,9 @@ class Algolia {
 		require_once get_template_directory() . '/algolia.php';
 	}
 
-	function index_data() {
+	function get_data_to_index() {
+		$data = [];
+
 		$videos = get_posts([
 			'post_type' => 'video',
 			'posts_per_page' => -1,
@@ -54,20 +56,30 @@ class Algolia {
 		foreach ($videos as $video) {
 			$languages = get_field('languages', $video->ID);
 			foreach ($languages as $language) {
-				$client = SearchClient::create(self::$app_id, self::$api_key_write);
-				$client->addOrUpdateObject(
-					self::$index,
-					$video->ID . '_' . $language['language'],
-					[
-						'title' => $language['title'],
-						'slug' => $language['slug'],
-						'language' => $language['language'],
-						'subtitle' => $language['post_subtitle'],
-						'description' => $language['post_blurb'],
-						'thumbnail' => $language['video_thumbnail']['url'],
-					],
-				);
+				array_push($data, [
+					'id' => $video->ID . '_' . $language['language'],
+					'title' => $language['title'],
+					'slug' => $language['slug'],
+					'language' => $language['language'],
+					'subtitle' => $language['post_subtitle'],
+					'description' => $language['post_blurb'],
+					'thumbnail' => $language['video_thumbnail']['url'],
+				]);
 			}
+		}
+
+		return $data;
+	}
+
+	function index_data() {
+		$items_to_index = self::get_data_to_index();
+
+		foreach ($items_to_index as $item) {
+			$item_id = $item['id'];
+			unset($item['id']);
+
+			$client = SearchClient::create(self::$app_id, self::$api_key_write);
+			$client->addOrUpdateObject(self::$index, $item_id, $item);
 		}
 	}
 }
