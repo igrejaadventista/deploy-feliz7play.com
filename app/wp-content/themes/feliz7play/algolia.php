@@ -52,7 +52,7 @@
         </div>
         <div id="index-data" class="tabs-panel" style="display:none;">
             <div class="wrap">
-                <button id="index-data" class="button button-primary">Indexar dados</button>
+                <button class="button button-primary button__indexData">Indexar dados</button>
             </div>
         </div>
     </div>
@@ -68,7 +68,13 @@
             $($(this).attr('href')).addClass('is-active').show();
         });
 
-        $('#index-data').click(function() {
+        $('.button__indexData').click(function(event) {
+            var button = $(event.target).get(0);
+            var buttonText = button.innerHTML;
+            button.innerHTML = 'Indexando...';
+            button.disabled = true;
+            $(button).after('<img class="loader" src="<?php echo esc_url(get_admin_url() . 'images/loading.gif'); ?>" />');
+
             $.ajax({
                 url: '<?php echo admin_url('admin-ajax.php'); ?>',
                 type: 'POST',
@@ -76,9 +82,23 @@
                     action: 'index_data'
                 },
                 success: function(response) {
+                    button.innerHTML = buttonText;
+                    button.disabled = false;
+                    $('.loader').remove();
                     alert('Dados indexados com sucesso!');
                 }
             });
         });
     });
 </script>
+
+<style>
+    #index-data .wrap {
+        display: flex;
+        align-items: center;
+    }
+
+    .button__indexData {
+        margin-right: 0.5rem !important;
+    }
+</style>
