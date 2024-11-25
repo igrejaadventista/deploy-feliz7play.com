@@ -51,19 +51,34 @@
             </form>
         </div>
         <div id="index-data" class="tabs-panel" style="display:none;">
-            <p>Sincronizar dados.</p>
+            <div class="wrap">
+                <button id="index-data" class="button button-primary">Indexar dados</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
     jQuery(document).ready(function($) {
-        $(".nav-tab").click(function(e) {
-            e.preventDefault();
-            $(".nav-tab").removeClass("nav-tab-active");
-            $(this).addClass("nav-tab-active");
-            $(".tabs-panel").removeClass("is-active").hide();
-            $($(this).attr("href")).addClass("is-active").show();
+        $('.nav-tab').click(function(event) {
+            event.preventDefault();
+            $('.nav-tab').removeClass('nav-tab-active');
+            $(this).addClass('nav-tab-active');
+            $('.tabs-panel').removeClass('is-active').hide();
+            $($(this).attr('href')).addClass('is-active').show();
+        });
+
+        $('#index-data').click(function() {
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                type: 'POST',
+                data: {
+                    action: 'index_data'
+                },
+                success: function(response) {
+                    alert('Dados indexados com sucesso!');
+                }
+            });
         });
     });
 </script>

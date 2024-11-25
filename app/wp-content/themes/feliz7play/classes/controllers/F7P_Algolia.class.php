@@ -14,8 +14,8 @@ class Algolia {
 		self::$api_key_write = get_option('algolia_api_key_write');
 
 		add_action('admin_menu', [$this, 'register_algolia_page']);
-		add_action('wp_ajax_nopriv_cart_add_product', [$this, 'index_videos']);
-        add_action('wp_ajax_cart_add_product', [$this, 'index_videos']);
+		add_action('wp_ajax_nopriv_index_data', [$this, 'index_data']);
+        add_action('wp_ajax_index_data', [$this, 'index_data']);
 	}
 
 	function register_algolia_page() {
@@ -39,7 +39,7 @@ class Algolia {
 		require_once get_template_directory() . '/algolia.php';
 	}
 
-	private static function index_videos() {
+	function index_data() {
 		$videos = get_posts([
 			'post_type' => 'video',
 			'posts_per_page' => -1,
