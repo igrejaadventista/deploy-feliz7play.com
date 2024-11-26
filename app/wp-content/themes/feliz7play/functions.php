@@ -1,7 +1,6 @@
 <?php
 
 require_once realpath(__DIR__ . "/vendor/autoload.php");
-require_once (dirname(__FILE__) . '/classes/controllers/F7P_Algolia.class.php');
 require_once (dirname(__FILE__) . '/classes/controllers/F7P_Theme_Helper.class.php');
 require_once (dirname(__FILE__) . '/classes/controllers/F7P_TAX_Custom.class.php');
 require_once (dirname(__FILE__) . '/classes/controllers/F7P_API_Rest.class.php');
@@ -23,6 +22,8 @@ require_once (dirname(__FILE__) . '/classes/rotas_api/rest_timestamp.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_suggestion.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_recent.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_grid.php');
+
+require_once (dirname(__FILE__) . '/classes/controllers/F7P_Algolia.class.php');
 
 function curl_error_60_workaround( $handle, $r, $url ) {
 

@@ -55,6 +55,13 @@ class Algolia {
 
 		foreach ($videos as $video) {
 			$languages = get_field('languages', $video->ID);
+
+			$collection = get_the_terms($video->ID, 'collection');
+			if (is_array($collection)) {
+				$collection = $collection[0];
+				$collection->parent_slug = get_term($collection->parent, 'collection')->slug;
+			}
+
 			foreach ($languages as $language) {
 				array_push($data, [
 					'id' => $video->ID . '_' . $language['language'],
@@ -64,7 +71,33 @@ class Algolia {
 					'subtitle' => $language['post_subtitle'],
 					'description' => $language['post_blurb'],
 					'thumbnail' => $language['video_thumbnail']['url'],
+					'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection),
 				]);
+			}
+		}
+
+		foreach (['genre', 'collection', 'category'] as $taxonomy) {
+			$term_query = new WP_Term_Query([
+				'taxonomy' => $taxonomy,
+				'hide_empty' => false,
+			]);
+
+			$terms = $term_query->get_terms();
+
+			foreach ($terms as $term) {
+				$languages = get_field('languages', $term);
+				if (is_array($languages)) {
+					foreach ($languages as $language) {
+						array_push($data, [
+							'id' => $term->term_id . '_' . $language['language'],
+							'title' => $language['title'],
+							'slug' => $language['slug'],
+							'language' => $language['language'],
+							'subtitle' => isset($language['post_subtitle']) ? $language['post_subtitle'] : '',
+							'description' => isset($language['description']) ? $language['description'] : '',
+						]);
+					}
+				}
 			}
 		}
 
