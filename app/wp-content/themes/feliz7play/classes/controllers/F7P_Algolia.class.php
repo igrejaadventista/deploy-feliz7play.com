@@ -14,8 +14,12 @@ class Algolia {
 		self::$api_key_write = get_option('algolia_api_key_write');
 
 		add_action('admin_menu', [$this, 'register_algolia_page']);
+
 		add_action('wp_ajax_nopriv_index_data', [$this, 'index_data']);
         add_action('wp_ajax_index_data', [$this, 'index_data']);
+
+		add_action('wp_ajax_nopriv_get_data_to_index', [$this, 'get_data_to_index']);
+        add_action('wp_ajax_get_data_to_index', [$this, 'get_data_to_index']);
 	}
 
 	function register_algolia_page() {
@@ -56,12 +60,6 @@ class Algolia {
 		foreach ($videos as $video) {
 			$languages = get_field('languages', $video->ID);
 
-			$collection = get_the_terms($video->ID, 'collection');
-			if (is_array($collection)) {
-				$collection = $collection[0];
-				$collection->parent_slug = get_term($collection->parent, 'collection')->slug;
-			}
-
 			foreach ($languages as $language) {
 				array_push($data, [
 					'id' => $video->ID . '_' . $language['language'],
@@ -70,8 +68,7 @@ class Algolia {
 					'language' => $language['language'],
 					'subtitle' => $language['post_subtitle'],
 					'description' => $language['post_blurb'],
-					'thumbnail' => $language['video_thumbnail']['url'],
-					'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection),
+					'thumbnail' => $language['video_thumbnail']['url']
 				]);
 			}
 		}
@@ -101,19 +98,16 @@ class Algolia {
 			}
 		}
 
-		return $data;
+		wp_send_json($data);
 	}
 
 	function index_data() {
-		$items_to_index = self::get_data_to_index();
+		$item = $_POST['item'];
+		$item_id = $item['id'];
+		unset($item['id']);
 
-		foreach ($items_to_index as $item) {
-			$item_id = $item['id'];
-			unset($item['id']);
-
-			$client = SearchClient::create(self::$app_id, self::$api_key_write);
-			$client->addOrUpdateObject(self::$index, $item_id, $item);
-		}
+		$client = SearchClient::create(self::$app_id, self::$api_key_write);
+		$client->addOrUpdateObject(self::$index, $item_id, $item);
 	}
 }
 

@@ -75,18 +75,26 @@
             button.disabled = true;
             $(button).after('<img class="loader" src="<?php echo esc_url(get_admin_url() . 'images/loading.gif'); ?>" />');
 
-            $.ajax({
-                url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                type: 'POST',
-                data: {
-                    action: 'index_data'
-                },
-                success: function(response) {
-                    button.innerHTML = buttonText;
-                    button.disabled = false;
-                    $('.loader').remove();
-                    alert('Dados indexados com sucesso!');
-                }
+            var ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
+
+            $.post(ajaxUrl, {
+                action: 'get_data_to_index'
+            })
+            .done(function (items) {
+                items.forEach(item => {
+                    $.post(ajaxUrl, {
+                        action: 'index_data',
+                        item: item
+                    })
+                    .done(function (response) {
+                        if (items[items.length-1] === item){
+                            button.innerHTML = buttonText;
+                            button.disabled = false;
+                            $('.loader').remove();
+                            alert('Dados indexados com sucesso!');
+                        }
+                    })
+                });
             });
         });
     });
