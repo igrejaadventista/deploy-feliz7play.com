@@ -67,54 +67,64 @@
 </div>
 
 <script>
-    jQuery(document).ready(function($) {
-        $('.nav-tab').click(function(event) {
-            event.preventDefault();
-            $('.nav-tab').removeClass('nav-tab-active');
-            $(this).addClass('nav-tab-active');
-            $('.tabs-panel').removeClass('is-active').hide();
-            $($(this).attr('href')).addClass('is-active').show();
-        });
+(function($) {
+    var url = new URL(location);
 
-        $('.button__indexData').click(function(event) {
-            var button = $(event.target).get(0);
-            var buttonText = button.innerHTML;
-            button.innerHTML = 'Indexando...';
-            button.disabled = true;
-            $(button).after('<img class="loader" src="<?php echo esc_url(get_admin_url() . 'images/loading.gif'); ?>" />');
+    $('.nav-tab').click(function(event) {
+        event.preventDefault();
 
-            var ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
+        $('.nav-tab').removeClass('nav-tab-active');
+        $(this).addClass('nav-tab-active');
+        $('.tabs-panel').removeClass('is-active').hide();
+        $($(this).attr('href')).addClass('is-active').show();
 
-            $.post(ajaxUrl, {
-                action: 'get_data_to_index'
-            })
-            .done(function (items) {
-                items.forEach(item => {
-                    $.post(ajaxUrl, {
-                        action: 'index_data',
-                        item: item
-                    })
-                    .done(function (response) {
-                        if (items[items.length-1] === item){
-                            button.innerHTML = buttonText;
-                            button.disabled = false;
-                            $('.loader').remove();
-                            alert('Dados indexados com sucesso!');
-                        }
-                    })
-                });
+        url.searchParams.set('tab', $(this).attr('href').replace('#', ''));
+        history.pushState({}, '', url);
+    });
+
+    if (url.searchParams.get('tab')) {
+        $('.nav-tab[href="#' + url.searchParams.get('tab') + '"]').click();
+    }
+
+    $('.button__indexData').click(function(event) {
+        var button = $(event.target).get(0);
+        var buttonText = button.innerHTML;
+        button.innerHTML = 'Indexando...';
+        button.disabled = true;
+        $(button).after('<img class="loader" src="<?php echo esc_url(get_admin_url() . 'images/loading.gif'); ?>" />');
+
+        var ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
+
+        $.post(ajaxUrl, {
+            action: 'get_data_to_index'
+        })
+        .done(function (items) {
+            items.forEach(item => {
+                $.post(ajaxUrl, {
+                    action: 'index_data',
+                    item: item
+                })
+                .done(function (response) {
+                    if (items[items.length-1] === item){
+                        button.innerHTML = buttonText;
+                        button.disabled = false;
+                        $('.loader').remove();
+                        alert('Dados indexados com sucesso!');
+                    }
+                })
             });
         });
     });
+})(jQuery);
 </script>
 
 <style>
-    #index-data .wrap {
-        display: flex;
-        align-items: center;
-    }
+#index-data .wrap {
+    display: flex;
+    align-items: center;
+}
 
-    .button__indexData {
-        margin-right: 0.5rem !important;
-    }
+.button__indexData {
+    margin-right: 0.5rem !important;
+}
 </style>
