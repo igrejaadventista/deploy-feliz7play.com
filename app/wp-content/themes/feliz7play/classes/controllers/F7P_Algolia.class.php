@@ -39,6 +39,7 @@ class Algolia {
 			update_option('algolia_app_id', $_POST['algolia_app_id']);
 			update_option('algolia_api_key_search', $_POST['algolia_api_key_search']);
 			update_option('algolia_api_key_write', $_POST['algolia_api_key_write']);
+			update_option('algolia_api_batch', $_POST['algolia_api_batch']);
 		}
 
 		require_once get_template_directory() . '/algolia.php';
@@ -68,7 +69,11 @@ class Algolia {
 					'language' => $language['language'],
 					'subtitle' => $language['post_subtitle'],
 					'description' => $language['post_blurb'],
-					'thumbnail' => $language['video_thumbnail']['url']
+					'thumbnail' => $language['video_thumbnail']['url'],
+					'genre' => '',
+					'audio' => '',
+					'subtitles' => '',
+					'link' => '',
 				]);
 			}
 		}
@@ -92,6 +97,7 @@ class Algolia {
 							'language' => $language['language'],
 							'subtitle' => isset($language['post_subtitle']) ? $language['post_subtitle'] : '',
 							'description' => isset($language['description']) ? $language['description'] : '',
+							// link , category, genre apenas para collection
 						]);
 					}
 				}
