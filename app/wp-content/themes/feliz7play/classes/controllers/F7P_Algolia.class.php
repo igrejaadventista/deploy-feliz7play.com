@@ -13,13 +13,21 @@ class Algolia {
 		self::$api_key_search = get_option('algolia_api_key_search');
 		self::$api_key_write = get_option('algolia_api_key_write');
 
-		add_action('admin_menu', [$this, 'register_algolia_page']);
+		add_action( 'init', function() {
+			add_action('admin_menu', [$this, 'register_algolia_page']);
 
-		add_action('wp_ajax_nopriv_index_data', [$this, 'index_data']);
-        add_action('wp_ajax_index_data', [$this, 'index_data']);
+			add_action('wp_ajax_nopriv_index_data', [$this, 'index_data']);
+			add_action('wp_ajax_index_data', [$this, 'index_data']);
 
-		add_action('wp_ajax_nopriv_get_data_to_index', [$this, 'get_data_to_index']);
-        add_action('wp_ajax_get_data_to_index', [$this, 'get_data_to_index']);
+			add_action('wp_ajax_nopriv_get_data_to_index', [$this, 'get_data_to_index']);
+			add_action('wp_ajax_get_data_to_index', [$this, 'get_data_to_index']);
+
+			// if (!is_admin()) {
+			// 	echo '<pre>';
+			// 	var_dump(self::get_data_to_index());
+			// 	echo '</pre>';
+			// }
+        }, 99);
 	}
 
 	function register_algolia_page() {
