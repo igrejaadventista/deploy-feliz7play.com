@@ -53,6 +53,23 @@ class Algolia {
 		require_once get_template_directory() . '/algolia.php';
 	}
 
+	function get_sorted_taxonomy_terms($video_id, $taxonomy, $current_language) {
+		$sorted_terms = [];
+		$terms = get_the_terms($video_id, $taxonomy);
+		if (!empty($terms)) {
+			foreach ($terms as $term) {
+				$term_language = get_field('languages', $term);
+				foreach ($term_language as $lang) {
+					if ($lang['language'] === $current_language) {
+						array_push($sorted_terms, $lang['title']);
+					}
+				}
+			}
+		}
+
+		return implode(', ', $sorted_terms);
+	}
+
 	function get_data_to_index() {
 		$data = [];
 
@@ -62,26 +79,40 @@ class Algolia {
 			'post_status' => 'publish',
 		]);
 
-		$videos = array_filter($videos, function($video) {
-			return !empty(get_field('languages', $video->ID));
-		});
-
 		foreach ($videos as $video) {
 			$languages = get_field('languages', $video->ID);
 
+			$collection = get_the_terms($video->ID, 'collection');
+			if (is_array($collection) && !empty($collection)) {
+				$collection = $collection[0];
+				$collection->parent_slug = get_term($collection->parent, 'collection')->slug;
+			}
+
+			foreach (['audio', 'subtitle'] as $value) {
+				$terms = get_the_terms($video->ID, 'language_' . $value);
+				if (!empty($terms)) {
+					$terms = array_map(function($term) {
+						return $term->name;
+					}, $terms);
+					$video->$value = implode(', ', $terms);
+				}
+			}
+
 			foreach ($languages as $language) {
+				$current_language = $language['language'];
+
 				array_push($data, [
-					'id' => $video->ID . '_' . $language['language'],
+					'id' => $video->ID . '_' . $current_language,
 					'title' => $language['title'],
 					'slug' => $language['slug'],
-					'language' => $language['language'],
+					'language' => $current_language,
 					'subtitle' => $language['post_subtitle'],
 					'description' => $language['post_blurb'],
 					'thumbnail' => $language['video_thumbnail']['url'],
-					'genre' => '',
-					'audio' => '',
-					'subtitles' => '',
-					'link' => '',
+					'genre' => self::get_sorted_taxonomy_terms($video->ID, 'genre', $current_language),
+					'audio' => $video->audio,
+					'subtitle' => $video->subtitle,
+					'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection),
 				]);
 			}
 		}
@@ -113,6 +144,7 @@ class Algolia {
 		}
 
 		wp_send_json($data);
+		// return $data;
 	}
 
 	function index_data() {
