@@ -112,7 +112,9 @@ class Algolia {
 					'genre' => self::get_sorted_taxonomy_terms($video->ID, 'genre', $current_language),
 					'audio' => $video->audio,
 					'subtitle' => $video->subtitle,
+					'type' => 'video',
 					'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection),
+					// collection
 				]);
 			}
 		}
@@ -136,6 +138,7 @@ class Algolia {
 							'language' => $language['language'],
 							'subtitle' => isset($language['post_subtitle']) ? $language['post_subtitle'] : '',
 							'description' => isset($language['description']) ? $language['description'] : '',
+							'type' => $taxonomy,
 							// link , category, genre apenas para collection
 						]);
 					}
@@ -152,8 +155,20 @@ class Algolia {
 		$item_id = $item['id'];
 		unset($item['id']);
 
+		foreach ($item as $key => $value) {
+			$item[$key] = stripslashes($value);
+		}
+
 		$client = SearchClient::create(self::$app_id, self::$api_key_write);
-		$client->addOrUpdateObject(self::$index, $item_id, $item);
+		$response = $client->addOrUpdateObject(self::$index, $item_id, $item);
+		$get_edit_link_function = $item['type'] === 'video' ? 'get_edit_post_link' : 'get_edit_term_link';
+
+		wp_send_json(array_merge($response, [
+			'title' => $item['title'],
+			'language' => $item['language'],
+			'type' => $item['type'],
+			'edit_link' => $get_edit_link_function(explode('_', $item_id)[0]),
+		]));
 	}
 }
 

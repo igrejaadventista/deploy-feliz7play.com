@@ -62,6 +62,7 @@
             <div class="wrap">
                 <button class="button button-primary button__indexData">Indexar dados</button>
             </div>
+            <div class="wrap" id="results"><div class="inner"></div></div>
         </div>
     </div>
 </div>
@@ -93,6 +94,8 @@
         button.disabled = true;
         $(button).after('<img class="loader" src="<?php echo esc_url(get_admin_url() . 'images/loading.gif'); ?>" />');
 
+        $('#results .inner').empty();
+
         var ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
 
         $.post(ajaxUrl, {
@@ -105,6 +108,14 @@
                     item: item
                 })
                 .done(function (response) {
+                    var {title, type, language, edit_link, message} = response;
+
+                    $('#results .inner').append(`
+                        <a href="${edit_link}" target="_blank">
+                            ${title} - ${type} - ${language.toUpperCase()} - ${message ? message : 'OK'}
+                        </a>
+                    `);
+
                     if (items[items.length-1] === item){
                         button.innerHTML = buttonText;
                         button.disabled = false;
@@ -119,12 +130,46 @@
 </script>
 
 <style>
-#index-data .wrap {
+#index-data .wrap:first-child {
     display: flex;
     align-items: center;
 }
 
 .button__indexData {
     margin-right: 0.5rem !important;
+}
+
+#results {
+    padding: 14px;
+    line-height: 2;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.inner {
+    overflow: auto;
+    max-height: 60vh;
+}
+
+.inner a {
+    display: block;
+}
+
+.inner::-webkit-scrollbar {
+    width: 10px;
+}
+
+.inner::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background-color: #e5e5e5;
+}
+
+.inner::-webkit-scrollbar-thumb {
+    background-color: #2271b1;
+    border-radius: 5px;
+}
+
+.inner::-webkit-scrollbar-thumb:hover {
+    background-color: #135e96;
 }
 </style>
