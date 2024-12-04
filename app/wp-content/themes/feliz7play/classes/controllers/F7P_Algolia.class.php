@@ -53,9 +53,9 @@ class Algolia {
 		require_once get_template_directory() . '/algolia.php';
 	}
 
-	function get_sorted_taxonomy_terms($video_id, $taxonomy, $current_language) {
+	function get_terms_names($terms, $current_language) {
 		$sorted_terms = [];
-		$terms = get_the_terms($video_id, $taxonomy);
+
 		if (!empty($terms)) {
 			foreach ($terms as $term) {
 				$term_language = get_field('languages', $term);
@@ -109,8 +109,8 @@ class Algolia {
 					'subtitle' => $language['post_subtitle'],
 					'description' => $language['post_blurb'],
 					'thumbnail' => $language['video_thumbnail']['url'],
-					'genre' => self::get_sorted_taxonomy_terms($video->ID, 'genre', $current_language),
-					'collection' => self::get_sorted_taxonomy_terms($video->ID, 'collection', $current_language),
+					'genre' => self::get_terms_names(get_the_terms($video->ID, 'genre'), $current_language),
+					'collection' => self::get_terms_names(get_the_terms($video->ID, 'collection'), $current_language),
 					'audio' => $video->audio,
 					'subtitles' => $video->subtitle,
 					'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection),
@@ -130,16 +130,27 @@ class Algolia {
 				$languages = get_field('languages', $term);
 				if (is_array($languages)) {
 					foreach ($languages as $language) {
-						array_push($data, [
+						$current_language = $language['language'];
+
+						$term_data = [
 							'type' => $taxonomy,
-							'id' => $term->term_id . '_' . $language['language'],
+							'id' => $term->term_id . '_' . $current_language,
 							'title' => $language['title'],
 							'slug' => $language['slug'],
-							'language' => $language['language'],
+							'language' => $current_language,
 							'subtitle' => isset($language['post_subtitle']) ? $language['post_subtitle'] : '',
 							'description' => isset($language['description']) ? $language['description'] : '',
-							// link , category, genre apenas para collection
-						]);
+						];
+
+						if ($taxonomy === 'collection') {
+							$term_data = array_merge($term_data, [
+								'link' => get_link_site_next($language['slug'], 'Episode', $term),
+								'genre' => self::get_terms_names([$language['collection_genre']], $current_language),
+								'category' => self::get_terms_names($language['collection_category'], $current_language),
+							]);
+						}
+
+						array_push($data, $term_data);
 					}
 				}
 			}
