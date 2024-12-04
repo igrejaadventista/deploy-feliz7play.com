@@ -84,8 +84,7 @@ class Algolia {
 
 			$collection = get_the_terms($video->ID, 'collection');
 			if (is_array($collection) && !empty($collection)) {
-				$collection = $collection[0];
-				$collection->parent_slug = get_term($collection->parent, 'collection')->slug;
+				$collection[0]->parent_slug = get_term($collection->parent, 'collection')->slug;
 			}
 
 			foreach (['audio', 'subtitle'] as $value) {
@@ -102,6 +101,7 @@ class Algolia {
 				$current_language = $language['language'];
 
 				array_push($data, [
+					'type' => 'video',
 					'id' => $video->ID . '_' . $current_language,
 					'title' => $language['title'],
 					'slug' => $language['slug'],
@@ -110,11 +110,10 @@ class Algolia {
 					'description' => $language['post_blurb'],
 					'thumbnail' => $language['video_thumbnail']['url'],
 					'genre' => self::get_sorted_taxonomy_terms($video->ID, 'genre', $current_language),
+					'collection' => self::get_sorted_taxonomy_terms($video->ID, 'collection', $current_language),
 					'audio' => $video->audio,
-					'subtitle' => $video->subtitle,
-					'type' => 'video',
+					'subtitles' => $video->subtitle,
 					'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection),
-					// collection
 				]);
 			}
 		}
@@ -132,13 +131,13 @@ class Algolia {
 				if (is_array($languages)) {
 					foreach ($languages as $language) {
 						array_push($data, [
+							'type' => $taxonomy,
 							'id' => $term->term_id . '_' . $language['language'],
 							'title' => $language['title'],
 							'slug' => $language['slug'],
 							'language' => $language['language'],
 							'subtitle' => isset($language['post_subtitle']) ? $language['post_subtitle'] : '',
 							'description' => isset($language['description']) ? $language['description'] : '',
-							'type' => $taxonomy,
 							// link , category, genre apenas para collection
 						]);
 					}
