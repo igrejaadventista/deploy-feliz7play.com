@@ -48,7 +48,7 @@
                                 <label for="algolia_api_batch">Lote para indexação:</label>
                             </th>
                             <td>
-                                <input type="number" id="algolia_api_batch" name="algolia_api_batch" class="regular-text" value="<?php echo get_option('algolia_api_batch'); ?>" required>
+                                <input type="number" id="algolia_api_batch" name="algolia_api_batch" class="regular-text" value="<?php echo get_option('algolia_api_batch'); ?>" min="1">
                             </td>
                         </tr>
                     </tbody>
@@ -69,17 +69,21 @@
 
 <script>
 (function($) {
-    var url = new URL(location);
+    const url = new URL(location);
+    const ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
+    const indexBatch = <?php echo get_option('algolia_api_batch') ?: 0; ?>;
+    const buttonIndexData = $('.button__indexData');
 
-    $('.nav-tab').click(function(event) {
+    $('.nav-tab').click(event => {
         event.preventDefault();
+        const tab = $(event.target);
 
         $('.nav-tab').removeClass('nav-tab-active');
-        $(this).addClass('nav-tab-active');
+        tab.addClass('nav-tab-active');
         $('.tabs-panel').removeClass('is-active').hide();
-        $($(this).attr('href')).addClass('is-active').show();
+        $(tab.attr('href')).addClass('is-active').show();
 
-        url.searchParams.set('tab', $(this).attr('href').replace('#', ''));
+        url.searchParams.set('tab', $(tab).attr('href').replace('#', ''));
         history.pushState({}, '', url);
     });
 
@@ -87,42 +91,51 @@
         $('.nav-tab[href="#' + url.searchParams.get('tab') + '"]').click();
     }
 
-    $('.button__indexData').click(function(event) {
-        var button = $(event.target).get(0);
-        var buttonText = button.innerHTML;
-        button.innerHTML = 'Indexando...';
-        button.disabled = true;
-        $(button).after('<img class="loader" src="<?php echo esc_url(get_admin_url() . 'images/loading.gif'); ?>" />');
+    const indexData = (items, item) => {
+        $.post(ajaxUrl, {
+            action: 'index_data',
+            item: item
+        })
+        .done(response => {
+            const {title, type, language, edit_link, message} = response;
 
+            $('#results .inner').append(`
+                <a href="${edit_link}" target="_blank">
+                    ${title} - ${type} - ${language.toUpperCase()} - ${message ? message : 'OK'}
+                </a>
+            `);
+
+            if (items[items.length-1] === item) {
+                $('.loader').remove();
+                buttonIndexData.prop('disabled', false);
+                buttonIndexData.text('Indexar dados');
+                alert('Dados indexados com sucesso!');
+            }
+        });
+    };
+
+    buttonIndexData.click(() => {
+        buttonIndexData.text('Indexando...');
+        buttonIndexData.prop('disabled', true);
+        buttonIndexData.after('<img class="loader" src="<?php echo esc_url(get_admin_url() . 'images/loading.gif'); ?>" />');
         $('#results .inner').empty();
-
-        var ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
 
         $.post(ajaxUrl, {
             action: 'get_data_to_index'
         })
-        .done(function (items) {
+        .done(items => {
+            if (indexBatch && indexBatch > 0) {
+                for (let i = 0; i < items.length; i += indexBatch) {
+                    const batch = items.slice(i, i + indexBatch);
+                    batch.forEach(item => {
+                        indexData(items, item);
+                    });
+                }
+                return;
+            }
+
             items.forEach(item => {
-                $.post(ajaxUrl, {
-                    action: 'index_data',
-                    item: item
-                })
-                .done(function (response) {
-                    var {title, type, language, edit_link, message} = response;
-
-                    $('#results .inner').append(`
-                        <a href="${edit_link}" target="_blank">
-                            ${title} - ${type} - ${language.toUpperCase()} - ${message ? message : 'OK'}
-                        </a>
-                    `);
-
-                    if (items[items.length-1] === item){
-                        button.innerHTML = buttonText;
-                        button.disabled = false;
-                        $('.loader').remove();
-                        alert('Dados indexados com sucesso!');
-                    }
-                })
+                indexData(items, item);
             });
         });
     });
