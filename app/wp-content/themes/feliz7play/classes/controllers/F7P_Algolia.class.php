@@ -102,7 +102,7 @@ class Algolia {
 
 				array_push($data, [
 					'type' => 'video',
-					'id' => $video->ID . '_' . $current_language,
+					'id' => $video->ID,
 					'title' => $language['title'],
 					'slug' => $language['slug'],
 					'language' => $current_language,
@@ -132,7 +132,7 @@ class Algolia {
 
 						$term_data = [
 							'type' => $taxonomy,
-							'id' => $term->term_id . '_' . $current_language,
+							'id' => $term->term_id,
 							'title' => $language['title'],
 							'slug' => $language['slug'],
 							'language' => $current_language,
@@ -160,22 +160,19 @@ class Algolia {
 
 	function index_data() {
 		$item = $_POST['item'];
-		$item_id = $item['id'];
-		$item_wp_id = explode('_', $item_id)[0];
-		unset($item['id']);
 
 		foreach ($item as $key => $value) {
 			$item[$key] = stripslashes($value);
 		}
 
 		$client = SearchClient::create(self::$app_id, self::$api_key_write);
-		$response = $client->addOrUpdateObject(self::$index, $item_id, $item);
+		$response = $client->addOrUpdateObject(self::$index, $item['id'] . '_' . $item['language'], $item);
 
 		wp_send_json(array_merge($response, [
 			'title' => $item['title'],
 			'language' => $item['language'],
 			'type' => $item['type'],
-			'edit_link' => $item['type'] === 'video' ? get_edit_post_link($item_wp_id) : get_edit_term_link($item_wp_id, $item['type']),
+			'edit_link' => $item['type'] === 'video' ? get_edit_post_link($item['id']) : get_edit_term_link($item['id'], $item['type']),
 		]));
 	}
 }
