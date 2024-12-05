@@ -161,6 +161,7 @@ class Algolia {
 	function index_data() {
 		$item = $_POST['item'];
 		$item_id = $item['id'];
+		$item_wp_id = explode('_', $item_id)[0];
 		unset($item['id']);
 
 		foreach ($item as $key => $value) {
@@ -169,13 +170,12 @@ class Algolia {
 
 		$client = SearchClient::create(self::$app_id, self::$api_key_write);
 		$response = $client->addOrUpdateObject(self::$index, $item_id, $item);
-		$get_edit_link_function = $item['type'] === 'video' ? 'get_edit_post_link' : 'get_edit_term_link';
 
 		wp_send_json(array_merge($response, [
 			'title' => $item['title'],
 			'language' => $item['language'],
 			'type' => $item['type'],
-			'edit_link' => $get_edit_link_function(explode('_', $item_id)[0]),
+			'edit_link' => $item['type'] === 'video' ? get_edit_post_link($item_wp_id) : get_edit_term_link($item_wp_id, $item['type']),
 		]));
 	}
 }
