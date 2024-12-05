@@ -51,6 +51,17 @@
                                 <input type="number" id="algolia_api_batch" name="algolia_api_batch" class="regular-text" value="<?php echo get_option('algolia_api_batch'); ?>" min="1">
                             </td>
                         </tr>
+                        <tr>
+                            <th scope="row">
+                                Indexação automática
+                            </th>
+                            <td>
+                                <input name="algolia_api_auto_index" type="checkbox" id="algolia_api_auto_index" <?php echo get_option('algolia_api_auto_index') ? 'checked' : ''; ?>>
+                                <label for="algolia_api_auto_index">
+                                    Permitir indexação automática de vídeos e termos das taxonomias quando criados ou atualizados
+                                </label>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 <p class="submit">
