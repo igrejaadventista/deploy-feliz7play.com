@@ -119,12 +119,10 @@ class Algolia {
 		}
 
 		foreach (['genre', 'collection', 'category'] as $taxonomy) {
-			$term_query = new WP_Term_Query([
+			$terms = get_terms([
 				'taxonomy' => $taxonomy,
 				'hide_empty' => false,
 			]);
-
-			$terms = $term_query->get_terms();
 
 			foreach ($terms as $term) {
 				$languages = get_field('languages', $term);
