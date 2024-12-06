@@ -40,6 +40,22 @@ class Algolia {
 					self::index_data($item);
 				}
 			}, 10, 3);
+
+			foreach (['genre', 'collection', 'category'] as $taxonomy) {
+				foreach (['created', 'edited'] as $hook_prefix) {
+					add_action($hook_prefix . '_' . $taxonomy, function($term_id) {
+						if (self::$auto_index !== 'on') {
+							return;
+						}
+
+						$term = get_term($term_id);
+						$data_to_index = self::get_term_data($term, $term->taxonomy);
+						foreach ($data_to_index as $item) {
+							self::index_data($item);
+						}
+					}, 10, 3);
+				}
+			}
         }, 99);
 	}
 
@@ -131,6 +147,39 @@ class Algolia {
 		return $data;
 	}
 
+	function get_term_data($term, $taxonomy) {
+		$data = [];
+
+		$languages = get_field('languages', $term);
+		if (is_array($languages)) {
+			foreach ($languages as $language) {
+				$current_language = $language['language'];
+
+				$term_data = [
+					'type' => $taxonomy,
+					'id' => $term->term_id,
+					'title' => $language['title'],
+					'slug' => $language['slug'],
+					'language' => $current_language,
+					'subtitle' => isset($language['post_subtitle']) ? $language['post_subtitle'] : '',
+					'description' => isset($language['description']) ? $language['description'] : '',
+				];
+
+				if ($taxonomy === 'collection') {
+					$term_data = array_merge($term_data, [
+						'link' => get_link_site_next($language['slug'], 'Episode', $term),
+						'genre' => self::get_terms_names([$language['collection_genre']], $current_language),
+						'category' => self::get_terms_names($language['collection_category'], $current_language),
+					]);
+				}
+
+				array_push($data, $term_data);
+			}
+		}
+
+		return $data;
+	}
+
 	function get_data_to_index() {
 		$data = [];
 
@@ -155,31 +204,9 @@ class Algolia {
 			]);
 
 			foreach ($terms as $term) {
-				$languages = get_field('languages', $term);
-				if (is_array($languages)) {
-					foreach ($languages as $language) {
-						$current_language = $language['language'];
-
-						$term_data = [
-							'type' => $taxonomy,
-							'id' => $term->term_id,
-							'title' => $language['title'],
-							'slug' => $language['slug'],
-							'language' => $current_language,
-							'subtitle' => isset($language['post_subtitle']) ? $language['post_subtitle'] : '',
-							'description' => isset($language['description']) ? $language['description'] : '',
-						];
-
-						if ($taxonomy === 'collection') {
-							$term_data = array_merge($term_data, [
-								'link' => get_link_site_next($language['slug'], 'Episode', $term),
-								'genre' => self::get_terms_names([$language['collection_genre']], $current_language),
-								'category' => self::get_terms_names($language['collection_category'], $current_language),
-							]);
-						}
-
-						array_push($data, $term_data);
-					}
+				$term_data = self::get_term_data($term, $taxonomy);
+				foreach ($term_data as $item) {
+					array_push($data, $item);
 				}
 			}
 		}
