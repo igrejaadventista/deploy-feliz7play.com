@@ -16,7 +16,7 @@
                                 <label for="algolia_index">Index:</label>
                             </th>
                             <td>
-                                <input type="text" id="algolia_index" name="algolia_index" class="regular-text" value="<?php echo get_option('algolia_index'); ?>" required>
+                                <input type="text" id="algolia_index" name="algolia_index" class="regular-text" value="<?php echo esc_attr(get_option('algolia_index')); ?>" required>
                             </td>
                         </tr>
                         <tr>
@@ -24,7 +24,7 @@
                                 <label for="algolia_app_id">Application ID:</label>
                             </th>
                             <td>
-                                <input type="text" id="algolia_app_id" name="algolia_app_id" class="regular-text" value="<?php echo get_option('algolia_app_id'); ?>" required>
+                                <input type="text" id="algolia_app_id" name="algolia_app_id" class="regular-text" value="<?php echo esc_attr(get_option('algolia_app_id')); ?>" required>
                             </td>
                         </tr>
                         <tr>
@@ -32,7 +32,7 @@
                                 <label for="algolia_api_key_search">API Key - Search:</label>
                             </th>
                             <td>
-                                <input type="text" id="algolia_api_key_search" name="algolia_api_key_search" class="regular-text" value="<?php echo get_option('algolia_api_key_search'); ?>" required>
+                                <input type="text" id="algolia_api_key_search" name="algolia_api_key_search" class="regular-text" value="<?php echo esc_attr(get_option('algolia_api_key_search')); ?>" required>
                             </td>
                         </tr>
                         <tr>
@@ -40,7 +40,7 @@
                                 <label for="algolia_api_key_write">API Key - Write:</label>
                             </th>
                             <td>
-                                <input type="text" id="algolia_api_key_write" name="algolia_api_key_write" class="regular-text" value="<?php echo get_option('algolia_api_key_write'); ?>" required>
+                                <input type="text" id="algolia_api_key_write" name="algolia_api_key_write" class="regular-text" value="<?php echo esc_attr(get_option('algolia_api_key_write')); ?>" required>
                             </td>
                         </tr>
                         <tr>
@@ -48,7 +48,7 @@
                                 <label for="algolia_api_batch">Lote para indexação:</label>
                             </th>
                             <td>
-                                <input type="number" id="algolia_api_batch" name="algolia_api_batch" class="regular-text" value="<?php echo get_option('algolia_api_batch'); ?>" min="1">
+                                <input type="number" id="algolia_api_batch" name="algolia_api_batch" class="regular-text" value="<?php echo esc_attr(get_option('algolia_api_batch')); ?>" min="1">
                             </td>
                         </tr>
                         <tr>
