@@ -1,0 +1,240 @@
+<?php
+use Algolia\AlgoliaSearch\Api\SearchClient;
+
+class Algolia {
+	static $index;
+	static $app_id;
+	static $api_key_search;
+	static $api_key_write;
+	static $auto_index;
+
+	public function __construct() {
+		self::$index = get_option('algolia_index');
+		self::$app_id = get_option('algolia_app_id');
+		self::$api_key_search = get_option('algolia_api_key_search');
+		self::$api_key_write = get_option('algolia_api_key_write');
+		self::$auto_index = get_option('algolia_api_auto_index');
+
+		add_action( 'init', function() {
+			add_action('admin_menu', [$this, 'register_algolia_page']);
+
+			add_action('wp_ajax_nopriv_index_data', [$this, 'index_data']);
+			add_action('wp_ajax_index_data', [$this, 'index_data']);
+
+			add_action('wp_ajax_nopriv_get_data_to_index', [$this, 'get_data_to_index']);
+			add_action('wp_ajax_get_data_to_index', [$this, 'get_data_to_index']);
+
+			add_action('acf/save_post', function($post_id) {
+				if (get_post_type($post_id) !== 'video' || self::$auto_index !== 'on') {
+					return;
+				}
+
+				$data_to_index = self::get_video_data($post_id);
+				foreach ($data_to_index as $item) {
+					self::index_data($item);
+				}
+			}, 10, 3);
+
+			foreach (['genre', 'collection', 'category'] as $taxonomy) {
+				foreach (['created', 'edited'] as $hook_prefix) {
+					add_action($hook_prefix . '_' . $taxonomy, function($term_id) {
+						if (self::$auto_index !== 'on') {
+							return;
+						}
+
+						$term = get_term($term_id);
+						$data_to_index = self::get_term_data($term, $term->taxonomy);
+						foreach ($data_to_index as $item) {
+							self::index_data($item);
+						}
+					}, 10, 3);
+				}
+			}
+        }, 99);
+	}
+
+	function register_algolia_page() {
+		add_menu_page(
+			'Algolia',
+			'Algolia',
+			'manage_options',
+			'algolia',
+			[$this, 'algolia_page_content'],
+			'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MDAgNTAwLjM0Ij48cGF0aCBmaWxsPSIjYTdhYWFkIiBkPSJNMjUwIDBDMTEzLjM4IDAgMiAxMTAuMTYuMDMgMjQ2LjMyYy0yIDEzOC4yOSAxMTAuMTkgMjUyLjg3IDI0OC40OSAyNTMuNjcgNDIuNzEuMjUgODMuODUtMTAuMiAxMjAuMzgtMzAuMDUgMy41Ni0xLjkzIDQuMTEtNi44MyAxLjA4LTkuNTJsLTIzLjM5LTIwLjc0Yy00Ljc1LTQuMjItMTEuNTItNS40MS0xNy4zNy0yLjkyLTI1LjUgMTAuODUtNTMuMjEgMTYuMzktODEuNzYgMTYuMDQtMTExLjc1LTEuMzctMjAyLjA0LTk0LjM1LTIwMC4yNi0yMDYuMUM0OC45NiAxMzYuMzcgMTM5LjI2IDQ3LjE1IDI1MCA0Ny4xNWgyMDIuODN2MzYwLjUzTDMzNy43NSAzMDUuNDNjLTMuNzItMy4zMS05LjQzLTIuNjYtMTIuNDMgMS4zMS0xOC40NyAyNC40Ni00OC41NiAzOS42Ny04MS45OCAzNy4zNi00Ni4zNi0zLjItODMuOTItNDAuNTItODcuNC04Ni44Ni00LjE1LTU1LjI4IDM5LjY1LTEwMS41OCA5NC4wNy0xMDEuNTggNDkuMjEgMCA4OS43NCAzNy44OCA5My45NyA4Ni4wMS4zOCA0LjI4IDIuMzEgOC4yOCA1LjUzIDExLjEzbDI5Ljk3IDI2LjU3YzMuNCAzLjAxIDguOCAxLjE3IDkuNjMtMy4zIDIuMTYtMTEuNTUgMi45Mi0yMy42IDIuMDctMzUuOTUtNC44My03MC4zOS02MS44NC0xMjcuMDEtMTMyLjI2LTEzMS4zNS04MC43My00Ljk4LTE0OC4yMyA1OC4xOC0xNTAuMzcgMTM3LjM1LTIuMDkgNzcuMTUgNjEuMTIgMTQzLjY2IDEzOC4yOCAxNDUuMzYgMzIuMjEuNzEgNjIuMDctOS40MiA4Ni4yLTI2Ljk3TDQ4My4zOSA0OTcuOGM2LjQ1IDUuNzEgMTYuNjIgMS4xNCAxNi42Mi03LjQ4VjkuNDlDNTAwIDQuMjUgNDk1Ljc1IDAgNDkwLjUxIDBIMjUwWiIvPjwvc3ZnPg0K',
+		);
+	}
+
+	function algolia_page_content() {
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			update_option('algolia_index', $_POST['algolia_index']);
+			update_option('algolia_app_id', $_POST['algolia_app_id']);
+			update_option('algolia_api_key_search', $_POST['algolia_api_key_search']);
+			update_option('algolia_api_key_write', $_POST['algolia_api_key_write']);
+			update_option('algolia_api_batch', $_POST['algolia_api_batch']);
+			update_option('algolia_api_auto_index', $_POST['algolia_api_auto_index']);
+		}
+
+		require_once get_template_directory() . '/algolia.php';
+	}
+
+	function get_terms_names($terms, $current_language) {
+		$sorted_terms = [];
+
+		if (!empty($terms)) {
+			foreach ($terms as $term) {
+				$term_language = get_field('languages', $term);
+				foreach ($term_language as $lang) {
+					if ($lang['language'] === $current_language) {
+						array_push($sorted_terms, $lang['title']);
+					}
+				}
+			}
+		}
+
+		return implode(', ', $sorted_terms);
+	}
+
+	function get_video_data($video_id) {
+		$data = [];
+		$languages = get_field('languages', $video_id);
+
+		$collection = get_the_terms($video_id, 'collection');
+		if (is_array($collection) && !empty($collection)) {
+			$collection[0]->parent_slug = get_term($collection->parent, 'collection')->slug;
+		}
+
+		$language_taxonomies = [
+			'audio' => '',
+			'subtitle' => '',
+		];
+
+		foreach ($language_taxonomies as $key => $value) {
+			$terms = get_the_terms($video_id, 'language_' . $key);
+			if (!empty($terms)) {
+				$terms = array_map(function($term) {
+					return $term->name;
+				}, $terms);
+				$language_taxonomies[$key] = implode(', ', $terms);
+			}
+		}
+
+		foreach ($languages as $language) {
+			$current_language = $language['language'];
+
+			array_push($data, [
+				'type' => 'video',
+				'id' => $video_id,
+				'title' => $language['title'],
+				'slug' => $language['slug'],
+				'language' => $current_language,
+				'subtitle' => $language['post_subtitle'],
+				'description' => $language['post_blurb'],
+				'thumbnail' => $language['video_thumbnail']['url'],
+				'genre' => self::get_terms_names(get_the_terms($video_id, 'genre'), $current_language),
+				'collection' => self::get_terms_names(get_the_terms($video_id, 'collection'), $current_language),
+				'audio' => $language_taxonomies['audio'],
+				'subtitles' => $language_taxonomies['subtitle'],
+				'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection),
+			]);
+		}
+
+		return $data;
+	}
+
+	function get_term_data($term, $taxonomy) {
+		$data = [];
+
+		$languages = get_field('languages', $term);
+		if (is_array($languages)) {
+			foreach ($languages as $language) {
+				$current_language = $language['language'];
+
+				$term_data = [
+					'type' => $taxonomy,
+					'id' => $term->term_id,
+					'title' => $language['title'],
+					'slug' => $language['slug'],
+					'language' => $current_language,
+					'subtitle' => isset($language['post_subtitle']) ? $language['post_subtitle'] : '',
+					'description' => isset($language['description']) ? $language['description'] : '',
+				];
+
+				if ($taxonomy === 'collection') {
+					$term_data = array_merge($term_data, [
+						'link' => get_link_site_next($language['slug'], 'Episode', $term),
+						'genre' => self::get_terms_names([$language['collection_genre']], $current_language),
+						'category' => self::get_terms_names($language['collection_category'], $current_language),
+					]);
+				}
+
+				array_push($data, $term_data);
+			}
+		}
+
+		return $data;
+	}
+
+	function get_data_to_index() {
+		$data = [];
+
+		$videos = get_posts([
+			'post_type' => 'video',
+			'posts_per_page' => -1,
+			'post_status' => 'publish',
+			'fields' => 'ids',
+		]);
+
+		foreach ($videos as $video_id) {
+			$video_data = self::get_video_data($video_id);
+			foreach ($video_data as $item) {
+				array_push($data, $item);
+			}
+		}
+
+		foreach (['genre', 'collection', 'category'] as $taxonomy) {
+			$terms = get_terms([
+				'taxonomy' => $taxonomy,
+				'hide_empty' => false,
+			]);
+
+			foreach ($terms as $term) {
+				$term_data = self::get_term_data($term, $taxonomy);
+				foreach ($term_data as $item) {
+					array_push($data, $item);
+				}
+			}
+		}
+
+		if (!wp_doing_ajax()) {
+			return $data;
+		}
+
+		wp_send_json($data);
+	}
+
+	function index_data($item_to_index) {
+		$item = isset($_POST['item']) ? $_POST['item'] : $item_to_index;
+
+		foreach ($item as $key => $value) {
+			$item[$key] = stripslashes($value);
+		}
+
+		$client = SearchClient::create(self::$app_id, self::$api_key_write);
+		$response = $client->addOrUpdateObject(self::$index, $item['id'] . '_' . $item['language'], $item);
+
+		$data = array_merge($response, [
+			'title' => $item['title'],
+			'language' => $item['language'],
+			'type' => $item['type'],
+			'edit_link' => $item['type'] === 'video' ? get_edit_post_link($item['id']) : get_edit_term_link($item['id'], $item['type']),
+		]);
+
+		if (!wp_doing_ajax()) {
+			return $data;
+		}
+
+		wp_send_json($data);
+	}
+}
+
+$Algolia = new Algolia();
