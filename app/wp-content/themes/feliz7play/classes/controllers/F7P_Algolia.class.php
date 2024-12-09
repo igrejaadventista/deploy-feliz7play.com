@@ -24,12 +24,6 @@ class Algolia {
 			add_action('wp_ajax_nopriv_get_data_to_index', [$this, 'get_data_to_index']);
 			add_action('wp_ajax_get_data_to_index', [$this, 'get_data_to_index']);
 
-			// if (!is_admin()) {
-			// 	echo '<pre>';
-			// 	var_dump(self::get_data_to_index());
-			// 	echo '</pre>';
-			// }
-
 			add_action('acf/save_post', function($post_id) {
 				if (get_post_type($post_id) !== 'video' || self::$auto_index !== 'on') {
 					return;
