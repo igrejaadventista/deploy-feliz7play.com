@@ -182,6 +182,12 @@ class Algolia {
 			'posts_per_page' => -1,
 			'post_status' => 'publish',
 			'fields' => 'ids',
+			'meta_query' => [
+				[
+					'key'     => 'languages_0_language',
+					'compare' => 'EXISTS',
+				]
+			],
 		]);
 
 		foreach ($videos as $video_id) {
