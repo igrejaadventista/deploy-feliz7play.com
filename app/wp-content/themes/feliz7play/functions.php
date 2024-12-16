@@ -273,3 +273,337 @@ add_filter('rest_prepare_video', 'filter_languages_response', 10, 3);
 add_filter('rest_prepare_genre', 'filter_languages_response', 10, 3);
 add_filter('rest_prepare_collection', 'filter_languages_response', 10, 3);
 add_filter('rest_prepare_category', 'filter_languages_response', 10, 3);
+
+function upload_file_by_url( $image_url ) {
+
+	// it allows us to use download_url() and wp_handle_sideload() functions
+	require_once( ABSPATH . 'wp-admin/includes/file.php' );
+
+	// download to temp dir
+	$temp_file = download_url( $image_url );
+
+	if( is_wp_error( $temp_file ) ) {
+		return false;
+	}
+
+	// move the temp file into the uploads directory
+	$file = array(
+		'name'     => basename( $image_url ),
+		'type'     => mime_content_type( $temp_file ),
+		'tmp_name' => $temp_file,
+		'size'     => filesize( $temp_file ),
+	);
+	$sideload = wp_handle_sideload(
+		$file,
+		array(
+			'test_form'   => false // no needs to check 'action' parameter
+		)
+	);
+
+	if( ! empty( $sideload[ 'error' ] ) ) {
+		// you may return error message if you want
+		return false;
+	}
+
+	// it is time to add our uploaded image into WordPress media library
+	$attachment_id = wp_insert_attachment(
+		array(
+			'guid'           => $sideload[ 'url' ],
+			'post_mime_type' => $sideload[ 'type' ],
+			'post_title'     => basename( $sideload[ 'file' ] ),
+			'post_content'   => '',
+			'post_status'    => 'inherit',
+		),
+		$sideload[ 'file' ]
+	);
+
+	if( is_wp_error( $attachment_id ) || ! $attachment_id ) {
+		return false;
+	}
+
+	// update medatata, regenerate image sizes
+	require_once( ABSPATH . 'wp-admin/includes/image.php' );
+
+	wp_update_attachment_metadata(
+		$attachment_id,
+		wp_generate_attachment_metadata( $attachment_id, $sideload[ 'file' ] )
+	);
+
+	return $attachment_id;
+
+}
+
+function get_attachment_id_by_name($filename) {
+	global $wpdb;
+
+	$query = $wpdb->prepare("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s", '%' . $wpdb->esc_like($filename) . '%');
+	$attachment_id = $wpdb->get_var($query);
+
+	if ($attachment_id) {
+		$attachment_url = wp_get_attachment_url($attachment_id);
+		if ($attachment_url && strpos($attachment_url, $filename) !== false) {
+			return $attachment_id;
+		}
+	}
+
+	return false;
+}
+
+function clear_content() {
+	$videos = get_posts([
+		'post_type' => ['video', 'attachment'],
+		'posts_per_page' => -1,
+		'post_status' => ['any', 'publish', 'trash'],
+		'fields' => 'ids'
+	]);
+
+	foreach ($videos as $video_id) {
+		wp_delete_post($video_id, true);
+	}
+
+	foreach (['genre', 'collection', 'category'] as $taxonomy) {
+		$terms = get_terms([
+			'taxonomy'   => $taxonomy,
+			'hide_empty' => false,
+		]);
+
+		foreach ($terms as $term) {
+			wp_delete_term($term->term_id, $term->taxonomy);
+		}
+	}
+}
+
+function import_category_terms() {
+	$categories = [
+		[
+			// extras
+			'pt' => 574,
+			'es' => 622,
+		],
+		[
+			// filmes/peliculas
+			'pt' => 569,
+			'es' => 618,
+		],
+		[
+			// infantil/ninos
+			'pt' => 571,
+			'es' => 621,
+		],
+		[
+			// musicas
+			'pt' => 572,
+			'es' => 620,
+		],
+		[
+			// series
+			'pt' => 570,
+			'es' => 619,
+		],
+	];
+
+	foreach ($categories as $category) {
+		$current_term = null;
+
+		foreach ($category as $language => $id) {
+			$response = wp_remote_get("https://test-f7p.internetdsa.com/{$language}/e/wp-json/wp/v2/category/{$id}");
+			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
+
+			if ($language === 'pt') {
+				$term = wp_insert_term($data['name'], 'category');
+				$current_term = get_term($term['term_id'], 'category');
+			}
+
+			if ($current_term !== null) {
+				$row = [
+					'language' => $language,
+					'title' => $data['name'],
+					'slug' => $data['slug'],
+					'description' => $data['description'],
+					...$data['acf'],
+				];
+
+				add_row('field_671244c1d177f', $row, $current_term);
+			}
+		}
+
+		$current_term = null;
+	}
+}
+
+function import_collection_terms() {
+	$collections = [
+		[
+			'pt' => 101,
+			'es' => 162,
+		],
+		[
+			'pt' => 433,
+			'es' => 550,
+		],
+		[
+			'pt' => 546,
+			'es' => 610,
+		],
+	];
+
+	foreach ($collections as $collection) {
+		$current_term = null;
+
+		foreach ($collection as $language => $id) {
+			$response = wp_remote_get("https://test-f7p.internetdsa.com/{$language}/e/wp-json/wp/v2/collection/{$id}");
+			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
+
+			foreach (['collection_image', 'collection_image_header'] as $image_field) {
+				$url = isset($data['acf'][$image_field]) ? $data['acf'][$image_field]['url'] : '';
+				if (!empty($url)) {
+					$filename = $data['acf'][$image_field]['filename'];
+					$file_id = get_attachment_id_by_name($filename) ?: upload_file_by_url($url);
+					$data['acf'][$image_field] = $file_id;
+				}
+			}
+
+			if ($language === 'pt') {
+				$term = wp_insert_term($data['name'], 'collection');
+				$current_term = get_term($term['term_id'], 'collection');
+			}
+
+			if ($current_term !== null) {
+				$row = [
+					'language' => $language,
+					'title' => $data['name'],
+					'slug' => $data['slug'],
+					'description' => $data['description'],
+					...$data['acf'],
+				];
+
+				add_row('field_6712409cbf2d8', $row, $current_term);
+			}
+		}
+
+		$current_term = null;
+	}
+}
+
+function import_genre_terms() {
+	$genres = [
+		[
+			'pt' => 4,
+			'es' => 4,
+		],
+		[
+			'pt' => 8,
+			'es' => 9,
+		],
+		[
+			'pt' => 414,
+			'es' => 8,
+		],
+		[
+			'pt' => 15,
+			'es' => 13,
+		],
+	];
+
+	foreach ($genres as $genre) {
+		$current_term = null;
+
+		foreach ($genre as $language => $id) {
+			$response = wp_remote_get("https://test-f7p.internetdsa.com/{$language}/e/wp-json/wp/v2/genre/{$id}");
+			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
+
+			if ($language === 'pt') {
+				$term = wp_insert_term($data['name'], 'genre');
+				$current_term = get_term($term['term_id'], 'genre');
+			}
+
+			if ($current_term !== null) {
+				$image_url = isset($data['acf']['image']) ? $data['acf']['image']['url'] : '';
+				if (!empty($image_url)) {
+					$filename = $data['acf']['image']['filename'];
+					$file_id = get_attachment_id_by_name($filename) ?: upload_file_by_url($image_url);
+					update_field('field_6022ce8e5a16f', $file_id, $current_term);
+				}
+
+				$row = [
+					'language' => $language,
+					'title' => $data['name'],
+					'slug' => sanitize_title($data['name']),
+				];
+
+				add_row('field_6706bd52aa917', $row, $current_term);
+			}
+		}
+
+		$current_term = null;
+	}
+}
+
+function import_videos() {
+	$posts = [
+		[
+			'pt' => 10283,
+			'es' => 8694,
+		],
+		[
+			'pt' => 10282,
+			'es' => 8693,
+		],
+	];
+
+	foreach ($posts as $post) {
+		foreach ($post as $language => $id) {
+			$response = wp_remote_get("https://test-f7p.internetdsa.com/{$language}/e/wp-json/wp/v2/video/{$id}");
+			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
+			$title = $data['title']['rendered'];
+
+			foreach (['video_thumbnail', 'video_image_hover','image_content_header'] as $image_field) {
+				$url = isset($data['acf'][$image_field]) ? $data['acf'][$image_field]['url'] : '';
+				if (!empty($url)) {
+					$filename = $data['acf'][$image_field]['filename'];
+					$file_id = get_attachment_id_by_name($filename) ?: upload_file_by_url($url);
+					$data['acf'][$image_field] = $file_id;
+				}
+			}
+
+			if ($language === 'pt' && !post_exists($title)) {
+				$new_video = [
+					'post_title' => $title,
+					'post_type' => 'video',
+					'post_status' => 'publish',
+				];
+				$video_id = wp_insert_post($new_video);
+			}
+
+			if ($video_id) {
+				$row = [
+					'language' => $language,
+					'title' => $title,
+					'slug' => $data['slug'],
+					...$data['acf'],
+				];
+
+				add_row('field_670ff24637fba', $row, $video_id);
+
+				if (isset($data['taxonomies']) && !empty($data['taxonomies'])) {
+					foreach ($data['taxonomies'] as $taxonomy => $terms) {
+						foreach ($terms as $term_data) {
+							$term = get_term_by('slug', $term_data['slug'], $taxonomy);
+							if ($term) {
+								wp_set_post_terms($video_id, $term->term_id, $taxonomy);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// add_action('admin_init', 'clear_content');
+// add_action('admin_init', 'import_category_terms');
+// add_action('admin_init', 'import_genre_terms');
+// add_action('admin_init', 'import_collection_terms');
+// add_action('admin_init', 'import_videos');
+// var_dump(get_attachment_id_by_name('Miniatura_Provai_e_Vede_2024_Eps1.jpg'));
+// die();
