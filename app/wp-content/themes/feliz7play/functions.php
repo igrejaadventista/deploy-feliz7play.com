@@ -424,6 +424,8 @@ function import_category_terms() {
 				];
 
 				add_row('field_671244c1d177f', $row, $current_term);
+
+				add_term_meta($current_term->term_id, 'old_id_' . $language, $id);
 			}
 		}
 
@@ -463,6 +465,30 @@ function import_collection_terms() {
 				}
 			}
 
+			foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
+				$current_taxonomy_field = $data['acf'][$taxonomy_field];
+
+				if (isset($current_taxonomy_field) && !empty($current_taxonomy_field)) {
+					$terms = [];
+
+					if (count($current_taxonomy_field) == count($current_taxonomy_field, COUNT_RECURSIVE)) {
+						$term = get_term_by('slug', $current_taxonomy_field['slug'], $current_taxonomy_field['taxonomy']);
+						if ($term) {
+							$terms = $term->term_id;
+						}
+					} else {
+						foreach ($current_taxonomy_field as $term_data) {
+							$term = get_term_by('slug', $term_data['slug'], $term_data['taxonomy']);
+							if ($term) {
+								$terms[] = $term->term_id;
+							}
+						}
+					}
+
+					$data['acf'][$taxonomy_field] = $terms;
+				}
+			}
+
 			if ($language === 'pt') {
 				$term = wp_insert_term($data['name'], 'collection');
 				$current_term = get_term($term['term_id'], 'collection');
@@ -478,6 +504,8 @@ function import_collection_terms() {
 				];
 
 				add_row('field_6712409cbf2d8', $row, $current_term);
+
+				add_term_meta($current_term->term_id, 'old_id_' . $language, $id);
 			}
 		}
 
@@ -532,6 +560,8 @@ function import_genre_terms() {
 				];
 
 				add_row('field_6706bd52aa917', $row, $current_term);
+
+				add_term_meta($current_term->term_id, 'old_id_' . $language, $id);
 			}
 		}
 
@@ -595,6 +625,8 @@ function import_videos() {
 						}
 					}
 				}
+
+				add_post_meta($video_id, 'old_id_' . $language, $id, true);
 			}
 		}
 	}
@@ -606,4 +638,12 @@ function import_videos() {
 // add_action('admin_init', 'import_collection_terms');
 // add_action('admin_init', 'import_videos');
 // var_dump(get_attachment_id_by_name('Miniatura_Provai_e_Vede_2024_Eps1.jpg'));
+// die();
+// videos
+// var_dump(get_post_meta(659, 'old_id_pt', true));
+// var_dump(get_post_meta(659, 'old_id_es', true));
+// die();
+// terms
+// var_dump(get_term_meta(250, 'old_id_pt', true));
+// var_dump(get_term_meta(250, 'old_id_es', true));
 // die();
