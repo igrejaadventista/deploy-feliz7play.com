@@ -377,28 +377,28 @@ function import_category_terms() {
 	$categories = [
 		[
 			// extras
-			'pt' => 574,
-			'es' => 622,
+			'pt' => 1,
+			'es' => 1,
 		],
 		[
 			// filmes/peliculas
-			'pt' => 569,
-			'es' => 618,
+			'pt' => 590,
+			'es' => 633,
 		],
 		[
 			// infantil/ninos
-			'pt' => 571,
-			'es' => 621,
+			'pt' => 591,
+			'es' => 631,
 		],
 		[
 			// musicas
-			'pt' => 572,
-			'es' => 620,
+			'pt' => 593,
+			'es' => 632,
 		],
 		[
 			// series
-			'pt' => 570,
-			'es' => 619,
+			'pt' => 592,
+			'es' => 634,
 		],
 	];
 
@@ -406,7 +406,7 @@ function import_category_terms() {
 		$current_term = null;
 
 		foreach ($category as $language => $id) {
-			$response = wp_remote_get("https://test-f7p.internetdsa.com/{$language}/e/wp-json/wp/v2/category/{$id}");
+			$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/category/{$id}");
 			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
 
 			if ($language === 'pt') {
@@ -447,13 +447,21 @@ function import_collection_terms() {
 			'pt' => 546,
 			'es' => 610,
 		],
+		[
+			'pt' => 48,
+			'es' => 44,
+		],
+		[
+			'pt' => 610,
+			'es' => 656,
+		],
 	];
 
 	foreach ($collections as $collection) {
 		$current_term = null;
 
 		foreach ($collection as $language => $id) {
-			$response = wp_remote_get("https://test-f7p.internetdsa.com/{$language}/e/wp-json/wp/v2/collection/{$id}");
+			$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/collection/{$id}");
 			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
 
 			foreach (['collection_image', 'collection_image_header'] as $image_field) {
@@ -516,20 +524,44 @@ function import_collection_terms() {
 function import_genre_terms() {
 	$genres = [
 		[
-			'pt' => 4,
-			'es' => 4,
+			'pt' => 599,
+			'es' => 650,
 		],
 		[
-			'pt' => 8,
-			'es' => 9,
+			'pt' => 2,
+			'es' => 647,
 		],
 		[
-			'pt' => 414,
-			'es' => 8,
+			'pt' => 596,
+			'es' => 653,
 		],
 		[
-			'pt' => 15,
-			'es' => 13,
+			'pt' => 18,
+			'es' => 648,
+		],
+		[
+			'pt' => 6,
+			'es' => 5,
+		],
+		[
+			'pt' => 600,
+			'es' => 651,
+		],
+		[
+			'pt' => 598,
+			'es' => 649,
+		],
+		[
+			'pt' => 431,
+			'es' => 597,
+		],
+		[
+			'pt' => 532,
+			'es' => 657,
+		],
+		[
+			'pt' => 11,
+			'es' => 642,
 		],
 	];
 
@@ -537,7 +569,7 @@ function import_genre_terms() {
 		$current_term = null;
 
 		foreach ($genre as $language => $id) {
-			$response = wp_remote_get("https://test-f7p.internetdsa.com/{$language}/e/wp-json/wp/v2/genre/{$id}");
+			$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/genre/{$id}");
 			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
 
 			if ($language === 'pt') {
@@ -579,11 +611,23 @@ function import_videos() {
 			'pt' => 10282,
 			'es' => 8693,
 		],
+		[
+			'pt' => 5108,
+			'es' => 2751,
+		],
+		[
+			'pt' => 5114,
+			'es' => 2761,
+		],
+		[
+			'pt' => 11447,
+			'es' => 9254,
+		],
 	];
 
 	foreach ($posts as $post) {
 		foreach ($post as $language => $id) {
-			$response = wp_remote_get("https://test-f7p.internetdsa.com/{$language}/e/wp-json/wp/v2/video/{$id}");
+			$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/video/{$id}");
 			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
 			$title = $data['title']['rendered'];
 
