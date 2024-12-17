@@ -572,6 +572,14 @@ function import_genre_terms() {
 			'pt' => 11,
 			'es' => 642,
 		],
+		[
+			'pt' => 7,
+			'es' => 652,
+		],
+		[
+			'pt' => 603,
+			'es' => 663,
+		],
 	];
 
 	foreach ($genres as $genre) {
@@ -632,6 +640,10 @@ function import_videos() {
 			'pt' => 11447,
 			'es' => 9254,
 		],
+		[
+			'pt' => 7831,
+			'es' => 7311,
+		],
 	];
 
 	foreach ($posts as $post) {
@@ -671,9 +683,15 @@ function import_videos() {
 				if (isset($data['taxonomies']) && !empty($data['taxonomies'])) {
 					foreach ($data['taxonomies'] as $taxonomy => $terms) {
 						foreach ($terms as $term_data) {
+							$current_terms = get_the_terms($video_id, $taxonomy) ?: [];
+							if (!empty($current_terms)) {
+								$current_terms = wp_list_pluck($current_terms, 'term_id');
+							}
+
 							$term = get_term_by('slug', $term_data['slug'], $taxonomy);
+
 							if ($term) {
-								wp_set_post_terms($video_id, $term->term_id, $taxonomy);
+								wp_set_post_terms($video_id, [$term->term_id, ...$current_terms], $taxonomy);
 							}
 						}
 					}
