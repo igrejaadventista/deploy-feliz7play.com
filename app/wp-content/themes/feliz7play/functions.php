@@ -498,7 +498,16 @@ function import_collection_terms() {
 			}
 
 			if ($language === 'pt') {
-				$term = wp_insert_term($data['name'], 'collection');
+				$args = [];
+
+				if ($data['parent'] !== 0) {
+					$parent_data = json_decode(wp_remote_get("https://test-f7p.internetdsa.com/{$language}/e/wp-json/wp/v2/collection/{$data['parent']}")['body'], true, JSON_UNESCAPED_SLASHES);
+					if (!empty($parent_data)) {
+						$args['parent'] = get_term_by('slug', $parent_data['slug'], 'collection')->term_id;
+					}
+				}
+
+				$term = wp_insert_term($data['name'], 'collection', $args);
 				$current_term = get_term($term['term_id'], 'collection');
 			}
 
