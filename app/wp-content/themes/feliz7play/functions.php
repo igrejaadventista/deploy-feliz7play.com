@@ -411,7 +411,9 @@ function import_category_terms() {
 
 			if ($language === 'pt') {
 				$term = wp_insert_term($data['name'], 'category');
-				$current_term = get_term($term['term_id'], 'category');
+				if (!is_wp_error($term)) {
+					$current_term = get_term($term['term_id'], 'category');
+				}
 			}
 
 			if ($current_term !== null) {
@@ -465,7 +467,7 @@ function import_collection_terms() {
 			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
 
 			foreach (['collection_image', 'collection_image_header'] as $image_field) {
-				$url = isset($data['acf'][$image_field]) ? $data['acf'][$image_field]['url'] : '';
+				$url = isset($data['acf'][$image_field]['url']) ? $data['acf'][$image_field]['url'] : '';
 				if (!empty($url)) {
 					$filename = $data['acf'][$image_field]['filename'];
 					$file_id = get_attachment_id_by_name($filename) ?: upload_file_by_url($url);
@@ -474,20 +476,20 @@ function import_collection_terms() {
 			}
 
 			foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
-				$current_taxonomy_field = $data['acf'][$taxonomy_field];
+				$current_taxonomy_field = isset($data['acf'][$taxonomy_field]) ? $data['acf'][$taxonomy_field] : '';
 
-				if (isset($current_taxonomy_field) && !empty($current_taxonomy_field)) {
+				if (!empty($current_taxonomy_field)) {
 					$terms = [];
 
 					if (count($current_taxonomy_field) == count($current_taxonomy_field, COUNT_RECURSIVE)) {
 						$term = get_term_by('slug', $current_taxonomy_field['slug'], $current_taxonomy_field['taxonomy']);
-						if ($term) {
+						if (!is_wp_error($term)) {
 							$terms = $term->term_id;
 						}
 					} else {
 						foreach ($current_taxonomy_field as $term_data) {
 							$term = get_term_by('slug', $term_data['slug'], $term_data['taxonomy']);
-							if ($term) {
+							if (!is_wp_error($term)) {
 								$terms[] = $term->term_id;
 							}
 						}
@@ -549,36 +551,96 @@ function import_genre_terms() {
 			'es' => 648,
 		],
 		[
-			'pt' => 6,
-			'es' => 5,
+			'pt' => 531,
+			'es' => 664,
 		],
 		[
 			'pt' => 600,
 			'es' => 651,
 		],
 		[
+			'pt' => 5,
+			'es' => 3,
+		],
+		[
+			'pt' => 6,
+			'es' => 5,
+		],
+		[
 			'pt' => 598,
 			'es' => 649,
 		],
 		[
-			'pt' => 431,
-			'es' => 597,
-		],
-		[
-			'pt' => 532,
-			'es' => 657,
-		],
-		[
-			'pt' => 11,
-			'es' => 642,
+			'pt' => 579,
+			'es' => 624,
 		],
 		[
 			'pt' => 7,
 			'es' => 652,
 		],
 		[
+			'pt' => 602,
+			'es' => 662,
+		],
+		[
+			'pt' => 529,
+			'es' => 658,
+		],
+		[
+			'pt' => 431,
+			'es' => 597,
+		],
+		[
+			'pt' => 431,
+			'es' => 597,
+		],
+		[
+			'pt' => 10,
+			'es' => 7,
+		],
+		[
+			'pt' => 11,
+			'es' => 642,
+		],
+		[
+			'pt' => 597,
+			'es' => 637,
+		],
+		[
+			'pt' => 532,
+			'es' => 657,
+		],
+		[
 			'pt' => 603,
 			'es' => 663,
+		],
+		[
+			'pt' => 468,
+			'es' => 659,
+		],
+		[
+			'pt' => 604,
+			'es' => 641,
+		],
+		[
+			'pt' => 12,
+			'es' => 660,
+		],
+		[
+			'pt' => 13,
+			'es' => 11,
+		],
+		[
+			'pt' => 530,
+			'es' => 661,
+		],
+		[
+			'pt' => 17,
+			'es' => 655,
+		],
+		[
+			'pt' => 20,
+			'es' => 15,
 		],
 	];
 
@@ -591,11 +653,13 @@ function import_genre_terms() {
 
 			if ($language === 'pt') {
 				$term = wp_insert_term($data['name'], 'genre');
-				$current_term = get_term($term['term_id'], 'genre');
+				if (!is_wp_error($term)) {
+					$current_term = get_term($term['term_id'], 'genre');
+				}
 			}
 
 			if ($current_term !== null) {
-				$image_url = isset($data['acf']['image']) ? $data['acf']['image']['url'] : '';
+				$image_url = isset($data['acf']['image']['url']) ? $data['acf']['image']['url'] : '';
 				if (!empty($image_url)) {
 					$filename = $data['acf']['image']['filename'];
 					$file_id = get_attachment_id_by_name($filename) ?: upload_file_by_url($image_url);
@@ -653,7 +717,7 @@ function import_videos() {
 			$title = $data['title']['rendered'];
 
 			foreach (['video_thumbnail', 'video_image_hover','image_content_header'] as $image_field) {
-				$url = isset($data['acf'][$image_field]) ? $data['acf'][$image_field]['url'] : '';
+				$url = isset($data['acf'][$image_field]['url']) ? $data['acf'][$image_field]['url'] : '';
 				if (!empty($url)) {
 					$filename = $data['acf'][$image_field]['filename'];
 					$file_id = get_attachment_id_by_name($filename) ?: upload_file_by_url($url);
@@ -680,18 +744,20 @@ function import_videos() {
 
 				add_row('field_670ff24637fba', $row, $video_id);
 
-				if (isset($data['taxonomies']) && !empty($data['taxonomies'])) {
+				if (isset($data['taxonomies']) && is_array($data['taxonomies'])) {
 					foreach ($data['taxonomies'] as $taxonomy => $terms) {
-						foreach ($terms as $term_data) {
-							$current_terms = get_the_terms($video_id, $taxonomy) ?: [];
-							if (!empty($current_terms)) {
-								$current_terms = wp_list_pluck($current_terms, 'term_id');
-							}
+						if (is_array($terms)) {
+							foreach ($terms as $term_data) {
+								$current_terms = get_the_terms($video_id, $taxonomy) ?: [];
+								if (!empty($current_terms)) {
+									$current_terms = wp_list_pluck($current_terms, 'term_id');
+								}
 
-							$term = get_term_by('slug', $term_data['slug'], $taxonomy);
+								$term = get_term_by('slug', $term_data['slug'], $taxonomy);
 
-							if ($term) {
-								wp_set_post_terms($video_id, [$term->term_id, ...$current_terms], $taxonomy);
+								if ($term) {
+									wp_set_post_terms($video_id, [$term->term_id, ...$current_terms], $taxonomy);
+								}
 							}
 						}
 					}
