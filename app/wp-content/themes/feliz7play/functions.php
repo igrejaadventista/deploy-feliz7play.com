@@ -763,6 +763,13 @@ function import_videos() {
 					}
 				}
 
+				$lang_audio_term = get_term_by('slug', $language, 'language_audio');
+				$lang_current_terms = get_the_terms($video_id, 'language_audio') ?: [];
+				if (!empty($lang_current_terms)) {
+					$lang_current_terms = wp_list_pluck($lang_current_terms, 'term_id');
+				}
+				wp_set_post_terms($video_id, [$lang_audio_term->term_id, ...$lang_current_terms], 'language_audio');
+
 				add_post_meta($video_id, 'old_id_' . $language, $id, true);
 			}
 		}
