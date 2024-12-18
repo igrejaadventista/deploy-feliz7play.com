@@ -409,7 +409,7 @@ function import_category_terms() {
 			$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/category/{$id}");
 			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
 
-			if ($language === 'pt') {
+			if ($language === array_key_first($category)) {
 				$term = wp_insert_term($data['name'], 'category');
 				if (!is_wp_error($term)) {
 					$current_term = get_term($term['term_id'], 'category');
@@ -499,7 +499,7 @@ function import_collection_terms() {
 				}
 			}
 
-			if ($language === 'pt') {
+			if ($language === array_key_first($collection)) {
 				$args = [];
 
 				if ($data['parent'] !== 0) {
@@ -651,7 +651,7 @@ function import_genre_terms() {
 			$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/genre/{$id}");
 			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
 
-			if ($language === 'pt') {
+			if ($language === array_key_first($genre)) {
 				$term = wp_insert_term($data['name'], 'genre');
 				if (!is_wp_error($term)) {
 					$current_term = get_term($term['term_id'], 'genre');
@@ -708,6 +708,13 @@ function import_videos() {
 			'pt' => 7831,
 			'es' => 7311,
 		],
+		[
+			'pt' => 11000
+		],
+		[
+			'pt' => 10378,
+			'es' => 8921,
+		],
 	];
 
 	foreach ($posts as $post) {
@@ -725,7 +732,7 @@ function import_videos() {
 				}
 			}
 
-			if ($language === 'pt' && !post_exists($title)) {
+			if ($language === array_key_first($post) && !post_exists($title)) {
 				$new_video = [
 					'post_title' => $title,
 					'post_type' => 'video',
