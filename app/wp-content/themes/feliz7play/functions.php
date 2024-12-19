@@ -796,68 +796,76 @@ function import_collection_terms() {
 		$current_term = null;
 
 		foreach ($collection as $language => $id) {
-			$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/collection/{$id}");
-			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
+			try {
+				$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/collection/{$id}");
+				$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
 
-			foreach (['collection_image', 'collection_image_header'] as $image_field) {
-				$url = isset($data['acf'][$image_field]['url']) ? $data['acf'][$image_field]['url'] : '';
-				if (!empty($url)) {
-					$filename = $data['acf'][$image_field]['filename'];
-					$file_id = get_attachment_id_by_name($filename) ?: upload_file_by_url($url);
-					$data['acf'][$image_field] = $file_id;
+				foreach (['collection_image', 'collection_image_header'] as $image_field) {
+					$url = isset($data['acf'][$image_field]['url']) ? $data['acf'][$image_field]['url'] : '';
+					if (!empty($url)) {
+						$filename = $data['acf'][$image_field]['filename'];
+						$file_id = get_attachment_id_by_name($filename) ?: upload_file_by_url($url);
+						$data['acf'][$image_field] = $file_id;
+					}
 				}
-			}
 
-			foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
-				$current_taxonomy_field = isset($data['acf'][$taxonomy_field]) ? $data['acf'][$taxonomy_field] : '';
+				foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
+					$current_taxonomy_field = isset($data['acf'][$taxonomy_field]) ? $data['acf'][$taxonomy_field] : '';
 
-				if (!empty($current_taxonomy_field)) {
-					$terms = [];
+					if (!empty($current_taxonomy_field)) {
+						$terms = [];
 
-					if (count($current_taxonomy_field) == count($current_taxonomy_field, COUNT_RECURSIVE)) {
-						$term = get_term_by('slug', $current_taxonomy_field['slug'], $current_taxonomy_field['taxonomy']);
-						if (!is_wp_error($term)) {
-							$terms = $term->term_id;
-						}
-					} else {
-						foreach ($current_taxonomy_field as $term_data) {
-							$term = get_term_by('slug', $term_data['slug'], $term_data['taxonomy']);
+						if (count($current_taxonomy_field) == count($current_taxonomy_field, COUNT_RECURSIVE)) {
+							$term = get_term_by('slug', $current_taxonomy_field['slug'], $current_taxonomy_field['taxonomy']);
 							if (!is_wp_error($term)) {
-								$terms[] = $term->term_id;
+								$terms = $term->term_id;
+							}
+						} else {
+							foreach ($current_taxonomy_field as $term_data) {
+								$term = get_term_by('slug', $term_data['slug'], $term_data['taxonomy']);
+								if (!is_wp_error($term)) {
+									$terms[] = $term->term_id;
+								}
 							}
 						}
-					}
 
-					$data['acf'][$taxonomy_field] = $terms;
-				}
-			}
-
-			if ($language === array_key_first($collection)) {
-				$args = [];
-
-				if ($data['parent'] !== 0) {
-					$parent_data = json_decode(wp_remote_get("https://test-f7p.internetdsa.com/{$language}/e/wp-json/wp/v2/collection/{$data['parent']}")['body'], true, JSON_UNESCAPED_SLASHES);
-					if (!empty($parent_data)) {
-						$args['parent'] = get_term_by('slug', $parent_data['slug'], 'collection')->term_id;
+						$data['acf'][$taxonomy_field] = $terms;
 					}
 				}
 
-				$term = wp_insert_term($data['name'], 'collection', $args);
-				$current_term = get_term($term['term_id'], 'collection');
-			}
+				if ($language === array_key_first($collection)) {
+					$args = [];
 
-			if ($current_term !== null) {
-				$row = [
-					'language' => $language,
-					'title' => $data['name'],
-					'slug' => $data['slug'],
-					'description' => $data['description'],
-					...$data['acf'],
-				];
+					if ($data['parent'] !== 0) {
+						$parent_data = json_decode(wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/collection/{$data['parent']}")['body'], true, JSON_UNESCAPED_SLASHES);
+						if (!empty($parent_data)) {
+							$args['parent'] = get_term_by('slug', $parent_data['slug'], 'collection')->term_id;
+						}
+					}
 
-				add_row('field_6712409cbf2d8', $row, $current_term);
+					$term = wp_insert_term($data['name'], 'collection', $args);
+					$current_term = get_term($term['term_id'], 'collection');
+				}
 
-				add_term_meta($current_term->term_id, 'old_id_' . $language, $id);
+				if ($current_term !== null) {
+					$row = [
+						'language' => $language,
+						'title' => $data['name'],
+						'slug' => $data['slug'],
+						'description' => $data['description'],
+						...$data['acf'],
+					];
+
+					add_row('field_6712409cbf2d8', $row, $current_term);
+
+					add_term_meta($current_term->term_id, 'old_id_' . $language, $id);
+				}
+			} catch (\Throwable $error) {
+				echo '</pre>';
+				echo $error->getMessage();
+				var_dump($language, $id);
+				echo '</pre>';
+				die();
 			}
 		}
 
