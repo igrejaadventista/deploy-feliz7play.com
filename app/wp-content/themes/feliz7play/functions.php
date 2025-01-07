@@ -258,7 +258,14 @@ function filter_languages_response($response) {
 		$filtered_languages = [];
 
 		foreach ($languages as $language) {
-			$filtered_languages[$language['language']] = array_diff_key($language, ['language' => '']);
+			$current_language = $language['language'];
+			$filtered_languages[$current_language] = array_diff_key($language, ['language' => '']);
+
+			foreach (['video_thumbnail', 'image_content_header', 'video_image_hover'] as $image_field) {
+				if (isset($language[$image_field]) && !empty($language[$image_field])) {
+					$filtered_languages[$current_language][$image_field] = wp_get_attachment_url($language[$image_field], 'full');
+				}
+			}
 		}
 
 		$response->data['acf']['languages'] = $filtered_languages;
