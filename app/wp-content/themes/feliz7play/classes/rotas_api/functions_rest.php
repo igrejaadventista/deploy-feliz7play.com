@@ -135,7 +135,7 @@ function get_line_post_genre($args, $limited = false)
         $id = $post->ID;
         $meta = get_post_meta($id);
 
-        $video_type = $meta['post_video_type'][0];
+        $video_type = $meta['languages_0_post_video_type'][0];
 
 
 
@@ -147,7 +147,7 @@ function get_line_post_genre($args, $limited = false)
 
             $meta = get_term_meta($collection->term_id);
 
-            if ($meta['collection_enable'][0]) {
+            if ($meta['languages_0_collection_enable'][0]) {
                 $id_check =  $collection->term_id;
             } else {
                 continue;
