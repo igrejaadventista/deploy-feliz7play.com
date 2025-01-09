@@ -254,7 +254,11 @@ function getActiveImage($lang) {
     }
 }
 
-function filter_languages_response($response) {
+function filter_rest_api_response($response) {
+	if (isset($response->data['acf']['image']) && !empty($response->data['acf']['image'])) {
+		$response->data['acf']['image'] = wp_get_attachment_url($response->data['acf']['image'], 'full');
+	}
+
 	$languages = $response->data['acf']['languages'];
 	if (isset($languages) && !empty($languages)) {
 		$filtered_languages = [];
@@ -263,7 +267,7 @@ function filter_languages_response($response) {
 			$current_language = $language['language'];
 			$filtered_languages[$current_language] = array_diff_key($language, ['language' => '']);
 
-			foreach (['video_thumbnail', 'image_content_header', 'video_image_hover'] as $image_field) {
+			foreach (['video_thumbnail', 'image_content_header', 'video_image_hover', 'collection_image', 'collection_image_header'] as $image_field) {
 				if (isset($language[$image_field]) && !empty($language[$image_field])) {
 					$filtered_languages[$current_language][$image_field] = wp_get_attachment_url($language[$image_field], 'full');
 				}
@@ -273,10 +277,11 @@ function filter_languages_response($response) {
 		$response->data['acf']['languages'] = $filtered_languages;
 		unset($response->data['slug']);
 	}
+
 	return $response;
 }
 
-add_filter('rest_prepare_video', 'filter_languages_response', 10, 3);
-add_filter('rest_prepare_genre', 'filter_languages_response', 10, 3);
-add_filter('rest_prepare_collection', 'filter_languages_response', 10, 3);
-add_filter('rest_prepare_category', 'filter_languages_response', 10, 3);
+add_filter('rest_prepare_video', 'filter_rest_api_response', 10, 3);
+add_filter('rest_prepare_genre', 'filter_rest_api_response', 10, 3);
+add_filter('rest_prepare_collection', 'filter_rest_api_response', 10, 3);
+add_filter('rest_prepare_category', 'filter_rest_api_response', 10, 3);
