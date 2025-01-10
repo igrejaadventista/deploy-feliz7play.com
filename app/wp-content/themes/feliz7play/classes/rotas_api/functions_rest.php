@@ -135,7 +135,7 @@ function get_line_post_genre($args, $limited = false)
         $id = $post->ID;
         $meta = get_post_meta($id);
 
-        $video_type = $meta['post_video_type'][0];
+        $video_type = $meta['languages_0_post_video_type'][0];
 
 
 
@@ -147,7 +147,7 @@ function get_line_post_genre($args, $limited = false)
 
             $meta = get_term_meta($collection->term_id);
 
-            if ($meta['collection_enable'][0]) {
+            if ($meta['languages_0_collection_enable'][0]) {
                 $id_check =  $collection->term_id;
             } else {
                 continue;
@@ -203,6 +203,12 @@ function get_post_infos($post) {
     $collection = get_the_terms($post->ID, 'collection')[0];
     if ($collection) {
         $collection->parent_slug = get_term($collection->parent, 'collection')->slug;
+        $collection_data = get_collection_infos($collection);
+    }
+
+    $category = get_the_terms($post->ID, 'category')[0];
+    if ($category) {
+        $category_data = get_collection_infos($category);
     }
 
     $languages = get_sorted_languages($post->ID);
@@ -217,7 +223,9 @@ function get_post_infos($post) {
                 'video_thumbnail' => $language['video_thumbnail']['url'],
                 'video_image_hover' => $language['video_image_hover']['url'],
                 'image_content_header' => $language['image_content_header']['url'],
-                'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection)
+                'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection),
+                'collection' => isset($collection_data['languages'][$key]) ? ['id' => $collection_data['id'], ...$collection_data['languages'][$key]] : [],
+                'category' => isset($category_data['languages'][$key]) ? ['id' => $category_data['id'], ...$category_data['languages'][$key]] : [],
             ]);
 
             foreach (['post_video_type', 'post_subtitle', 'post_blurb', 'post_video_host', 'post_video_id'] as $value) {

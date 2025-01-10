@@ -138,8 +138,10 @@
             if (indexBatch && indexBatch > 0) {
                 for (let i = 0; i < items.length; i += indexBatch) {
                     const batch = items.slice(i, i + indexBatch);
-                    batch.forEach(item => {
-                        indexData(items, item);
+                    batch.forEach((item, index) => {
+                        setTimeout(() => {
+                            indexData(items, item);
+                        }, index * 1000);
                     });
                 }
                 return;
