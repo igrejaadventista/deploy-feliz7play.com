@@ -272,6 +272,35 @@ function filter_rest_api_response($response) {
 					$filtered_languages[$current_language][$image_field] = wp_get_attachment_url($language[$image_field], 'full');
 				}
 			}
+
+			foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
+				if (isset($language[$taxonomy_field]) && !empty($language[$taxonomy_field])) {
+					if (is_array($language[$taxonomy_field])) {
+						$taxonomy_data = [];
+						foreach ($language[$taxonomy_field] as $term_id) {
+							$term = get_term($term_id);
+							$term_languages = get_field('languages', $term) ?: [];
+							foreach ($term_languages as $term_language) {
+								if ($term_language['language'] === $current_language) {
+									unset($term_language['language']);
+									$taxonomy_data[] = $term_language;
+								}
+							}
+						}
+					} else {
+						$term = get_term($language[$taxonomy_field]);
+						$term_languages = get_field('languages', $term) ?: [];
+						foreach ($term_languages as $term_language) {
+							if ($term_language['language'] === $current_language) {
+								unset($term_language['language']);
+								$taxonomy_data = $term_language;
+							}
+						}
+					}
+
+					$filtered_languages[$current_language][$taxonomy_field] = $taxonomy_data;
+				}
+			}
 		}
 
 		$response->data['acf']['languages'] = $filtered_languages;
