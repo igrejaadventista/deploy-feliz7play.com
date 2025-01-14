@@ -81,9 +81,14 @@ add_filter('acf/fields/post_object/query/name=slider_video_object', 'my_acf_fiel
 function my_acf_fields_post_result( $args) {
 
 	$args['posts_per_page'] = 40;
-	$args['meta_key'] = 'post_video_type';
-    $args['meta_value'] = 'Single';
-	$args['post_status'] = 'publish';
+	$args['meta_query'] = [
+		'relation' => 'AND',
+		[
+			'key' => 'languages_0_post_video_type',
+			'value' => 'Single',
+			'compare' => '=',
+		],
+	];
 
 	return $args;
 }
