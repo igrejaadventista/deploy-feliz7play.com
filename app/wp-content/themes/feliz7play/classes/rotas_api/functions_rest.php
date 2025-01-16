@@ -511,20 +511,15 @@ function collection_meta_callback($collection, $field_name, $request)
                 'collection',
                 array(
                     'hide_empty' => 0,
-                    'parent' => $id,
-                    'meta_key'       => 'collection_enable',
-                    'meta_value'     => true,
-                    'meta_compare'   => '='
+                    'parent' => $id
                 )
             );
 
             foreach ($items as $key => $item) {
                 $link = 'collection/' . $collection['slug'] . '/' . $item->slug . '?s=' . $item->term_id;
                 $items[$key]->link_sharing = get_site_url(null, $link);
-                $items[$key]->collection_image = get_field('collection_image', 'collection_' . $item->term_id)['url'];
-                $items[$key]->enable = get_field('collection_enable', 'collection_' . $item->term_id);
-                $season_label = get_field('collection_season_label', 'collection_' . $item->term_id);
                 $items[$key]->season_label = $season_label != "" && !is_null($season_label) ? $season_label : $item->name;
+                $items[$key]->languages = get_field('languages', $item);
             }
 
             return $items;
