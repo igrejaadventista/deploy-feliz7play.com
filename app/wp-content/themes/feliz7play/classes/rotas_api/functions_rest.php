@@ -519,7 +519,7 @@ function collection_meta_callback($collection, $field_name, $request)
                 $link = 'collection/' . $collection['slug'] . '/' . $item->slug . '?s=' . $item->term_id;
                 $items[$key]->link_sharing = get_site_url(null, $link);
                 $items[$key]->season_label = $season_label != "" && !is_null($season_label) ? $season_label : $item->name;
-                $items[$key]->languages = get_field('languages', $item);
+                $items[$key]->languages = get_sorted_languages($item);
             }
 
             return $items;
