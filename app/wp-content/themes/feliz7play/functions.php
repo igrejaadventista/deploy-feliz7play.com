@@ -260,6 +260,10 @@ function getActiveImage($lang) {
 }
 
 function filter_rest_api_response($response) {
+	foreach($response->get_links() as $key => $value) {
+		$response->remove_link($key);
+	}
+
 	if (isset($response->data['acf']['image']) && !empty($response->data['acf']['image'])) {
 		$response->data['acf']['image'] = wp_get_attachment_url($response->data['acf']['image'], 'full');
 	}
@@ -272,12 +276,14 @@ function filter_rest_api_response($response) {
 			$current_language = $language['language'];
 			$filtered_languages[$current_language] = array_diff_key($language, ['language' => '']);
 
+			// Retorna a URL da imagem ao invés do ID
 			foreach (['video_thumbnail', 'image_content_header', 'video_image_hover', 'collection_image', 'collection_image_header'] as $image_field) {
 				if (isset($language[$image_field]) && !empty($language[$image_field])) {
 					$filtered_languages[$current_language][$image_field] = wp_get_attachment_url($language[$image_field], 'full');
 				}
 			}
 
+			// Retorna o objeto da taxonomia de acordo com o idioma ao invés do ID
 			foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
 				if (isset($language[$taxonomy_field]) && !empty($language[$taxonomy_field])) {
 					if (is_array($language[$taxonomy_field])) {
@@ -319,3 +325,18 @@ add_filter('rest_prepare_video', 'filter_rest_api_response', 10, 3);
 add_filter('rest_prepare_genre', 'filter_rest_api_response', 10, 3);
 add_filter('rest_prepare_collection', 'filter_rest_api_response', 10, 3);
 add_filter('rest_prepare_category', 'filter_rest_api_response', 10, 3);
+
+// Remove empty collections from the json response
+add_filter('rest_post_dispatch', function ($response, $server, $request) {
+    if ($request->get_route() === '/wp/v2/collection') {
+        if (!is_wp_error($response) && isset($response->data)) {
+            $filtered_data = array_filter($response->data, function ($term) {
+                return isset($term['count']) && $term['count'] > 0;
+            });
+
+            $response->data = array_values($filtered_data);
+        }
+    }
+
+    return $response;
+}, 10, 3);
