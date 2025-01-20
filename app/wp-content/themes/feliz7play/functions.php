@@ -2416,78 +2416,94 @@ function import_videos() {
 		]
 	];
 
-	foreach ($posts as $post) {
-		foreach ($post as $language => $id) {
-			try {
-				$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/video/{$id}");
-				$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
-				$title = $data['title']['rendered'];
+	// foreach ($posts as $post) {
+	// 	foreach ($post as $language => $id) {
+	// 		try {
+	// 			$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/video/{$id}");
+	// 			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
+	// 			$title = $data['title']['rendered'];
 
-				foreach (['video_thumbnail', 'video_image_hover','image_content_header'] as $image_field) {
-					$url = isset($data['acf'][$image_field]['url']) ? $data['acf'][$image_field]['url'] : '';
-					if (!empty($url)) {
-						$filename = $data['acf'][$image_field]['filename'];
-						$file_id = get_attachment_id_by_name($filename) ?: upload_file_by_url($url);
-						$data['acf'][$image_field] = $file_id;
-					}
-				}
+	// 			foreach (['video_thumbnail', 'video_image_hover','image_content_header'] as $image_field) {
+	// 				$url = isset($data['acf'][$image_field]['url']) ? $data['acf'][$image_field]['url'] : '';
+	// 				if (!empty($url)) {
+	// 					$filename = $data['acf'][$image_field]['filename'];
+	// 					$file_id = get_attachment_id_by_name($filename) ?: upload_file_by_url($url);
+	// 					$data['acf'][$image_field] = $file_id;
+	// 				}
+	// 			}
 
-				if ($language === array_key_first($post) && !post_exists($title)) {
-					$new_video = [
-						'post_title' => $title,
-						'post_type' => 'video',
-						'post_status' => 'publish',
-					];
-					$video_id = wp_insert_post($new_video);
-				}
+	// 			if ($language === array_key_first($post) && !post_exists($title)) {
+	// 				$new_video = [
+	// 					'post_title' => $title,
+	// 					'post_type' => 'video',
+	// 					'post_status' => 'publish',
+	// 				];
+	// 				$video_id = wp_insert_post($new_video);
+	// 			}
 
-				if ($video_id) {
-					$row = [
-						'language' => $language,
-						'title' => $title,
-						'slug' => $data['slug'],
-						...$data['acf'],
-					];
+	// 			if ($video_id) {
+	// 				$row = [
+	// 					'language' => $language,
+	// 					'title' => $title,
+	// 					'slug' => $data['slug'],
+	// 					...$data['acf'],
+	// 				];
 
-					add_row('field_670ff24637fba', $row, $video_id);
+	// 				add_row('field_670ff24637fba', $row, $video_id);
 
-					if (isset($data['taxonomies']) && is_array($data['taxonomies'])) {
-						foreach ($data['taxonomies'] as $taxonomy => $terms) {
-							if (is_array($terms)) {
-								foreach ($terms as $term_data) {
-									$current_terms = get_the_terms($video_id, $taxonomy) ?: [];
-									if (!empty($current_terms)) {
-										$current_terms = wp_list_pluck($current_terms, 'term_id');
-									}
+	// 				if (isset($data['taxonomies']) && is_array($data['taxonomies'])) {
+	// 					foreach ($data['taxonomies'] as $taxonomy => $terms) {
+	// 						if (is_array($terms)) {
+	// 							foreach ($terms as $term_data) {
+	// 								$current_terms = get_the_terms($video_id, $taxonomy) ?: [];
+	// 								if (!empty($current_terms)) {
+	// 									$current_terms = wp_list_pluck($current_terms, 'term_id');
+	// 								}
 
-									$term = get_term_by('slug', $term_data['slug'], $taxonomy);
+	// 								$term = get_term_by('slug', $term_data['slug'], $taxonomy);
 
-									if ($term) {
-										wp_set_post_terms($video_id, [$term->term_id, ...$current_terms], $taxonomy);
-									}
-								}
-							}
-						}
-					}
+	// 								if ($term) {
+	// 									wp_set_post_terms($video_id, [$term->term_id, ...$current_terms], $taxonomy);
+	// 								}
+	// 							}
+	// 						}
+	// 					}
+	// 				}
 
-					$lang_audio_term = get_term_by('slug', $language, 'language_audio');
-					$lang_current_terms = get_the_terms($video_id, 'language_audio') ?: [];
-					if (!empty($lang_current_terms)) {
-						$lang_current_terms = wp_list_pluck($lang_current_terms, 'term_id');
-					}
-					wp_set_post_terms($video_id, [$lang_audio_term->term_id, ...$lang_current_terms], 'language_audio');
+	// 				$lang_audio_term = get_term_by('slug', $language, 'language_audio');
+	// 				$lang_current_terms = get_the_terms($video_id, 'language_audio') ?: [];
+	// 				if (!empty($lang_current_terms)) {
+	// 					$lang_current_terms = wp_list_pluck($lang_current_terms, 'term_id');
+	// 				}
+	// 				wp_set_post_terms($video_id, [$lang_audio_term->term_id, ...$lang_current_terms], 'language_audio');
 
-					add_post_meta($video_id, 'old_id_' . $language, $id, true);
-				}
-			} catch (\Throwable $error) {
-				echo '</pre>';
-				echo $error->getMessage();
-				var_dump($language, $id);
-				echo '</pre>';
-				die();
-			}
-		}
-	}
+	// 				add_post_meta($video_id, 'old_id_' . $language, $id, true);
+	// 			}
+	// 		} catch (\Throwable $error) {
+	// 			echo '</pre>';
+	// 			echo $error->getMessage();
+	// 			var_dump($language, $id);
+	// 			echo '</pre>';
+	// 			die();
+	// 		}
+	// 	}
+	// }
+
+	// echo '<pre>';
+	// $json_data = file_get_contents("http://localhost/content-f7p.json");
+	// $json_data = json_decode($json_data, true);
+	// foreach ($json_data as $post_language) {
+	// 	foreach ($post_language as $value) {
+	// 		$language = $value['language'];
+	// 		$id = $value['ID'];
+	// 		if (!empty($id)) {
+	// 			var_dump($language, $id);
+	// 		}
+	// 	}
+
+	// }
+	// echo '</pre>';
+	// die();
 }
 
 // add_action('admin_init', 'clear_content');
