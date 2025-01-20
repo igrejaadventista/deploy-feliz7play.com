@@ -258,6 +258,10 @@ function getActiveImage($lang) {
 }
 
 function filter_rest_api_response($response) {
+	foreach($response->get_links() as $key => $value) {
+		$response->remove_link($key);
+	}
+
 	if (isset($response->data['acf']['image']) && !empty($response->data['acf']['image'])) {
 		$response->data['acf']['image'] = wp_get_attachment_url($response->data['acf']['image'], 'full');
 	}
