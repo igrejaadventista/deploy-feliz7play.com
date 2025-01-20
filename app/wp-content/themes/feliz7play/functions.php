@@ -274,12 +274,14 @@ function filter_rest_api_response($response) {
 			$current_language = $language['language'];
 			$filtered_languages[$current_language] = array_diff_key($language, ['language' => '']);
 
+			// Retorna a URL da imagem ao invés do ID
 			foreach (['video_thumbnail', 'image_content_header', 'video_image_hover', 'collection_image', 'collection_image_header'] as $image_field) {
 				if (isset($language[$image_field]) && !empty($language[$image_field])) {
 					$filtered_languages[$current_language][$image_field] = wp_get_attachment_url($language[$image_field], 'full');
 				}
 			}
 
+			// Retorna o objeto da taxonomia de acordo com o idioma ao invés do ID
 			foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
 				if (isset($language[$taxonomy_field]) && !empty($language[$taxonomy_field])) {
 					if (is_array($language[$taxonomy_field])) {
