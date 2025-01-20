@@ -211,6 +211,11 @@ function get_post_infos($post) {
         $category_data = get_collection_infos($category);
     }
 
+    $genre = get_the_terms($post->ID, 'genre')[0];
+    if ($genre) {
+        $genre_data = get_collection_infos($genre);
+    }
+
     $languages = get_sorted_languages($post->ID);
     if (is_array($languages)) {
         foreach ($languages as $key => $language) {
@@ -226,6 +231,7 @@ function get_post_infos($post) {
                 'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection),
                 'collection' => isset($collection_data['languages'][$key]) ? ['id' => $collection_data['id'], ...$collection_data['languages'][$key]] : [],
                 'category' => isset($category_data['languages'][$key]) ? ['id' => $category_data['id'], ...$category_data['languages'][$key]] : [],
+                'genre' => isset($genre_data['languages'][$key]) ? ['id' => $genre_data['id'], ...$genre_data['languages'][$key]] : [],
             ]);
 
             foreach (['post_video_type', 'post_subtitle', 'post_blurb', 'post_video_host', 'post_video_id'] as $value) {
@@ -505,20 +511,15 @@ function collection_meta_callback($collection, $field_name, $request)
                 'collection',
                 array(
                     'hide_empty' => 0,
-                    'parent' => $id,
-                    'meta_key'       => 'collection_enable',
-                    'meta_value'     => true,
-                    'meta_compare'   => '='
+                    'parent' => $id
                 )
             );
 
             foreach ($items as $key => $item) {
                 $link = 'collection/' . $collection['slug'] . '/' . $item->slug . '?s=' . $item->term_id;
                 $items[$key]->link_sharing = get_site_url(null, $link);
-                $items[$key]->collection_image = get_field('collection_image', 'collection_' . $item->term_id)['url'];
-                $items[$key]->enable = get_field('collection_enable', 'collection_' . $item->term_id);
-                $season_label = get_field('collection_season_label', 'collection_' . $item->term_id);
                 $items[$key]->season_label = $season_label != "" && !is_null($season_label) ? $season_label : $item->name;
+                $items[$key]->languages = get_sorted_languages($item);
             }
 
             return $items;
