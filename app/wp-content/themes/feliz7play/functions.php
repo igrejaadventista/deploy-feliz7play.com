@@ -328,15 +328,31 @@ add_filter('rest_prepare_category', 'filter_rest_api_response', 10, 3);
 
 // Remove empty collections from the json response
 add_filter('rest_post_dispatch', function ($response, $server, $request) {
-    if ($request->get_route() === '/wp/v2/collection') {
-        if (!is_wp_error($response) && isset($response->data)) {
-            $filtered_data = array_filter($response->data, function ($term) {
-                return isset($term['count']) && $term['count'] > 0;
-            });
+	if ($request->get_route() === '/wp/v2/collection') {
+		if (!is_wp_error($response) && isset($response->data)) {
+			$filtered_data = array_filter($response->data, function ($term) {
+				if ($term['count'] > 0) {
+					return $term;
+				}
 
-            $response->data = array_values($filtered_data);
-        }
-    }
+				$children = get_terms([
+					'taxonomy' => 'collection',
+					'parent' => $term['id'],
+					'hide_empty' => false,
+				]);
 
-    return $response;
+				foreach ($children as $child) {
+					if ($child->count > 0) {
+						return $term;
+					}
+				}
+
+				return;
+			});
+
+			$response->data = array_values($filtered_data);
+		}
+	}
+
+	return $response;
 }, 10, 3);

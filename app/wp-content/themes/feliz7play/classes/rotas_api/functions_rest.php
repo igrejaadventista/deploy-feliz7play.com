@@ -307,9 +307,10 @@ function get_slider_infos($slider_object) {
 }
 
 function get_collection_seasons($collection) {
-    $seasons = get_terms('collection', [
-        'hide_empty' => false,
-        'parent' => $collection->term_id
+    $seasons = get_terms([
+        'taxonomy' => 'collection',
+        'parent' => $collection->term_id,
+        'hide_empty' => true,
     ]);
 
     foreach ($seasons as $key => $item) {
@@ -521,13 +522,11 @@ function collection_meta_callback($collection, $field_name, $request)
 
     switch ($field_name) {
         case 'seasons':
-            $items = get_terms(
-                'collection',
-                array(
-                    'hide_empty' => 0,
-                    'parent' => $id
-                )
-            );
+            $items = get_terms([
+                'taxonomy' => 'collection',
+                'parent' => $id,
+                'hide_empty' => true,
+            ]);
 
             foreach ($items as $key => $item) {
                 $link = 'collection/' . $collection['slug'] . '/' . $item->slug . '?s=' . $item->term_id;
