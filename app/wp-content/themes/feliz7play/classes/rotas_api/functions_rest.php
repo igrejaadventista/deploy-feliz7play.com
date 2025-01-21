@@ -307,9 +307,10 @@ function get_slider_infos($slider_object) {
 }
 
 function get_collection_seasons($collection) {
-    $seasons = get_terms('collection', [
+    $seasons = get_terms([
+        'taxonomy' => 'collection',
+        'parent' => $collection->term_id,
         'hide_empty' => false,
-        'parent' => $collection->term_id
     ]);
 
     foreach ($seasons as $key => $item) {
