@@ -12,7 +12,7 @@ add_action('rest_api_init', function() {
 
 					switch (get_row_layout()) {
 						case 'genre_option':
-							array_push($data, get_genre(get_sub_field('genre')));
+							array_push($data, get_genre());
 							break;
 
 						case 'collection_option':
