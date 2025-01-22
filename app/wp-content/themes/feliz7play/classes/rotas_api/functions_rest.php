@@ -313,11 +313,12 @@ function get_collection_seasons($collection) {
         'hide_empty' => true,
     ]);
 
+    $filtered_seasons = [];
     foreach ($seasons as $key => $item) {
-        $seasons[$key]->languages = get_sorted_languages($item);
+        array_push($filtered_seasons, get_sorted_languages($item));
     }
 
-    return $seasons;
+    return $filtered_seasons;
 }
 
 function get_line_languages() {
@@ -522,20 +523,7 @@ function collection_meta_callback($collection, $field_name, $request)
 
     switch ($field_name) {
         case 'seasons':
-            $items = get_terms([
-                'taxonomy' => 'collection',
-                'parent' => $id,
-                'hide_empty' => true,
-            ]);
-
-            foreach ($items as $key => $item) {
-                $link = 'collection/' . $collection['slug'] . '/' . $item->slug . '?s=' . $item->term_id;
-                $items[$key]->link_sharing = get_site_url(null, $link);
-                $items[$key]->season_label = $season_label != "" && !is_null($season_label) ? $season_label : $item->name;
-                $items[$key]->languages = get_sorted_languages($item);
-            }
-
-            return $items;
+            return get_collection_seasons($collection);
             break;
 
         case 'social_media':
