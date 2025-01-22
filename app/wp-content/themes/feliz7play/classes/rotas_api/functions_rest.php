@@ -41,39 +41,6 @@ function get_genre() {
     ];
 }
 
-function get_genre_v2($genres_items) {
-    $languages = get_sub_field('languages');
-    if (is_array($languages) && !empty($languages)) {
-        $filtered_languages = [];
-
-        foreach ($languages as $language) {
-            $filtered_languages[$language['language']] = array_diff_key($language, ['language' => '']);
-        }
-    }
-
-    $genre_array = [];
-    foreach ($genres_items as $genre_item) {
-        $item = get_genre_by_line($genre_item);
-        array_push($genre_array, $item);
-    }
-
-    $category_array = [];
-    $category_items = get_sub_field('genre_category');
-    foreach ($category_items as $category_item) {
-        $item = get_category_by_line($category_item);
-        array_push($category_array, $item);
-    }
-
-    $line = [
-        'languages' => $languages,
-        'source' => 'genre',
-        'genres' => $genre_array,
-        'categories' => $category_array
-    ];
-
-    return $line;
-}
-
 function get_genre_by_line($item) {
     return [
         'id' => $item->term_id,
@@ -313,11 +280,12 @@ function get_collection_seasons($collection) {
         'hide_empty' => true,
     ]);
 
+    $filtered_seasons = [];
     foreach ($seasons as $key => $item) {
-        $seasons[$key]->languages = get_sorted_languages($item);
+        array_push($filtered_seasons, get_sorted_languages($item));
     }
 
-    return $seasons;
+    return $filtered_seasons;
 }
 
 function get_line_languages() {
@@ -522,20 +490,7 @@ function collection_meta_callback($collection, $field_name, $request)
 
     switch ($field_name) {
         case 'seasons':
-            $items = get_terms([
-                'taxonomy' => 'collection',
-                'parent' => $id,
-                'hide_empty' => true,
-            ]);
-
-            foreach ($items as $key => $item) {
-                $link = 'collection/' . $collection['slug'] . '/' . $item->slug . '?s=' . $item->term_id;
-                $items[$key]->link_sharing = get_site_url(null, $link);
-                $items[$key]->season_label = $season_label != "" && !is_null($season_label) ? $season_label : $item->name;
-                $items[$key]->languages = get_sorted_languages($item);
-            }
-
-            return $items;
+            return get_collection_seasons($collection);
             break;
 
         case 'social_media':

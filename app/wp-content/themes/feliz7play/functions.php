@@ -14,7 +14,6 @@ require_once (dirname(__FILE__) . '/classes/rotas_api/functions_rest.php');
 
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_slider.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_liners.php');
-require_once (dirname(__FILE__) . '/classes/rotas_api/rest_liners_v2.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_category.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_collection.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_genre.php');
@@ -286,15 +285,19 @@ function filter_rest_api_response($response) {
 			// Retorna o objeto da taxonomia de acordo com o idioma ao invés do ID
 			foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
 				if (isset($language[$taxonomy_field]) && !empty($language[$taxonomy_field])) {
+					$taxonomy_data = [];
+
 					if (is_array($language[$taxonomy_field])) {
-						$taxonomy_data = [];
 						foreach ($language[$taxonomy_field] as $term_id) {
 							$term = get_term($term_id);
 							$term_languages = get_field('languages', $term) ?: [];
 							foreach ($term_languages as $term_language) {
 								if ($term_language['language'] === $current_language) {
 									unset($term_language['language']);
-									$taxonomy_data[] = $term_language;
+									$term->name = $term_language['title'];
+									$term->slug = $term_language['slug'];
+									$term->description = $term_language['description'];
+									$taxonomy_data[] = $term;
 								}
 							}
 						}
@@ -304,7 +307,10 @@ function filter_rest_api_response($response) {
 						foreach ($term_languages as $term_language) {
 							if ($term_language['language'] === $current_language) {
 								unset($term_language['language']);
-								$taxonomy_data = $term_language;
+								$term->name = $term_language['title'];
+								$term->slug = $term_language['slug'];
+								$term->description = $term_language['description'];
+								$taxonomy_data = $term;
 							}
 						}
 					}
