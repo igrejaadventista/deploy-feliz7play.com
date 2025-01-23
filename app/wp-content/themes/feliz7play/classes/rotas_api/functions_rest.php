@@ -297,8 +297,7 @@ function get_collection_seasons($collection_id) {
                     $taxonomy_data = [];
 
                     if (is_array($term_languages[$key][$taxonomy_field])) {
-                        foreach ($term_languages[$key][$taxonomy_field] as $term_id) {
-							$term = get_term($term_id);
+                        foreach ($term_languages[$key][$taxonomy_field] as $term) {
 							$sub_term_languages = get_field('languages', $term) ?: [];
 							foreach ($sub_term_languages as $language) {
 								if ($language['language'] === $key) {
@@ -311,7 +310,7 @@ function get_collection_seasons($collection_id) {
 							}
 						}
                     } else {
-                        $term = get_term($term_id);
+                        $term = $term_languages[$key][$taxonomy_field];
                         $sub_term_languages = get_field('languages', $term) ?: [];
                         foreach ($sub_term_languages as $language) {
                             if ($language['language'] === $key) {
