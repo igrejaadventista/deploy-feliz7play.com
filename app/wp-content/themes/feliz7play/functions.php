@@ -92,67 +92,39 @@ function my_acf_fields_post_result( $args) {
 	return $args;
 }
 
+add_action('acf/save_post', function($post_id) {
+	$languages = get_field('languages', $post_id);
 
-function getVideoInfo($post_id, $video_host, $video_id){
-
-	$data =  array($post_id, $video_host, $video_id);
-
-	// SET VIDEO LENGHT BY VIEMO/YOUTUBE API
-	switch ($video_host) {
-		case "Youtube":
-			$json = file_get_contents("https://api.feliz7play.com/v4/youtubeinfo?video_id=". $video_id );
-			$obj = json_decode($json);
-
-			$time = $obj->time;
-			$release_year = date('Y', strtotime($obj->release_date));
-
-			if ($obj) {
-				update_field( 'post_video_length', $time, $post_id );
-				update_field( 'post_video_year', $release_year, $post_id );
-			}
-
-			unset($json, $obj, $time, $size, $release_year);
-			break;
-
-		case "Vimeo":
-			$json = file_get_contents("https://api.feliz7play.com/v4/vimeoinfo?video_id=". $video_id);
-			$obj = json_decode($json);
-
-			$time = $obj->time;
-			$release_year = date('Y', strtotime($obj->release_date));
-
-			if ($time) {
-				update_field( 'post_video_length', $time, $post_id );
-				update_field( 'post_video_year', $release_year, $post_id );
-			}
-
-			unset($json, $obj, $time, $release_year);
-			break;
+	if (!$languages) {
+		return;
 	}
 
+	foreach ($languages as $key => $language_data) {
+		if (empty($language_data['post_video_length']) || empty($language_data['post_year'])) {
+			$video_id = $language_data['post_video_id'];
+			if (empty($video_id)) {
+				return;
+			}
 
-}
+			$video_host = $language_data['post_video_host'];
+			$response = wp_remote_get('https://api.feliz7play.com/v4/' . ($video_host === 'Youtube' ? 'youtubeinfo' : 'vimeoinfo') . '/?video_id=' . $video_id);
+			if (is_wp_error($response)) {
+				return;
+			}
 
-function UpdateVideoLenght( $post_id ) {
-	$video_host = get_field("post_video_host", $post_id);
-	$video_id = get_field("post_video_id", $post_id);
-	$video_lenght = get_field("post_video_length", $post_id);
-	$release_year = get_field("post_video_year", $post_id);
+			$video_data = json_decode(wp_remote_retrieve_body($response));
+			if ($video_data && property_exists($video_data, 'time') && property_exists($video_data, 'release_date')) {
+				$time = $video_data->time;
+				$release_year = date('Y', strtotime($video_data->release_date));
 
-	$data = array($post_id, $video_host, $video_lenght, $release_year);
-
-	if ( !$video_lenght || !$release_year ){
-		getVideoInfo( $post_id, $video_host, $video_id );
+				if ($time && $release_year) {
+					update_field('languages_' . $key . '_post_video_length', $time, $post_id);
+					update_field('languages_' . $key . '_post_year', $release_year, $post_id);
+				}
+			}
+		}
 	}
-
-	//RESET CF CACHE
-	$json = file_get_contents("https://api.feliz7play.com/v4/clear-cf-cache?zone=feliz7play.com");
-	$obj = json_decode($json);
-
-	unset($json, $obj, $data);
-}
-add_action( 'acf/save_post', 'UpdateVideoLenght' );
-
+});
 
 if( function_exists('acf_add_options_page') ) {
 
