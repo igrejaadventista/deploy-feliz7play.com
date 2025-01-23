@@ -282,7 +282,26 @@ function get_collection_seasons($collection) {
 
     $filtered_seasons = [];
     foreach ($seasons as $key => $item) {
-        array_push($filtered_seasons, get_sorted_languages($item));
+        $term_languages = get_sorted_languages($item);
+
+        foreach ($term_languages as $key => $value) {
+            foreach (['collection_image', 'collection_image_header'] as $image_field) {
+                if (isset($value[$image_field]) && !empty($value[$image_field])) {
+                    $term_languages[$key][$image_field] = $value[$image_field]['url'];
+                }
+            }
+
+            $term_languages[$key]['link_sharing'] = get_site_url() . '/' . $item->taxonomy . '/' . get_term_field('slug', $collection->term_id, 'collection') . '/' . $item->slug . '?c=' . $item->term_id;
+
+            $term_languages[$key]['enable'] = $term_languages[$key]['collection_enable'];
+            unset($term_languages[$key]['collection_enable']);
+
+            $term_languages[$key]['season_label'] = $term_languages[$key]['collection_season_label'];
+            unset($term_languages[$key]['collection_season_label']);
+        }
+
+        $item->languages = $term_languages;
+        array_push($filtered_seasons, $item);
     }
 
     return $filtered_seasons;
