@@ -273,15 +273,16 @@ function get_slider_infos($slider_object) {
     }
 }
 
-function get_collection_seasons($collection) {
+function get_collection_seasons($collection_id) {
     $seasons = get_terms([
         'taxonomy' => 'collection',
-        'parent' => $collection->term_id,
+        'parent' => $collection_id,
         'hide_empty' => true,
     ]);
 
     $filtered_seasons = [];
     foreach ($seasons as $key => $item) {
+        $parent_item = get_sorted_languages(get_term($collection_id, 'collection'));
         $term_languages = get_sorted_languages($item);
 
         foreach ($term_languages as $key => $value) {
@@ -291,7 +292,43 @@ function get_collection_seasons($collection) {
                 }
             }
 
-            $term_languages[$key]['link_sharing'] = get_site_url() . '/' . $item->taxonomy . '/' . get_term_field('slug', $collection->term_id, 'collection') . '/' . $item->slug . '?c=' . $item->term_id;
+            foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
+                if (isset($term_languages[$key][$taxonomy_field]) && !empty($term_languages[$key][$taxonomy_field])) {
+                    $taxonomy_data = [];
+
+                    if (is_array($term_languages[$key][$taxonomy_field])) {
+                        foreach ($term_languages[$key][$taxonomy_field] as $term_id) {
+							$term = get_term($term_id);
+							$sub_term_languages = get_field('languages', $term) ?: [];
+							foreach ($sub_term_languages as $language) {
+								if ($language['language'] === $key) {
+									unset($language['language']);
+									$term->name = $language['title'];
+									$term->slug = $language['slug'];
+									$term->description = $language['description'];
+									$taxonomy_data[] = $term;
+								}
+							}
+						}
+                    } else {
+                        $term = get_term($term_id);
+                        $sub_term_languages = get_field('languages', $term) ?: [];
+                        foreach ($sub_term_languages as $language) {
+                            if ($language['language'] === $key) {
+                                unset($language['language']);
+                                $term->name = $language['title'];
+                                $term->slug = $language['slug'];
+                                $term->description = $language['description'];
+                                $taxonomy_data = $term;
+                            }
+                        }
+                    }
+
+                    $term_languages[$key][$taxonomy_field] = $taxonomy_data;
+                }
+            }
+
+            $term_languages[$key]['link_sharing'] = get_site_url() . '/' . $item->taxonomy . '/' . $parent_item[$key]['slug'] . '/' . $term_languages[$key]['slug'] . '?c=' . $item->term_id;
 
             $term_languages[$key]['enable'] = $term_languages[$key]['collection_enable'];
             unset($term_languages[$key]['collection_enable']);
@@ -324,7 +361,7 @@ function get_collection($item) {
         'id' => $item->term_id,
         'source' => $item->taxonomy,
         'languages' => get_sorted_languages($item),
-        'seasons' => get_collection_seasons($item),
+        'seasons' => get_collection_seasons($item->term_id),
     ];
 }
 
@@ -509,7 +546,7 @@ function collection_meta_callback($collection, $field_name, $request)
 
     switch ($field_name) {
         case 'seasons':
-            return get_collection_seasons(get_term($id, 'collection'));
+            return get_collection_seasons($id);
             break;
 
         case 'social_media':
