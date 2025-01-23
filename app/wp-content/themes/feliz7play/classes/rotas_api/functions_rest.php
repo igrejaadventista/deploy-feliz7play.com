@@ -490,7 +490,7 @@ function collection_meta_callback($collection, $field_name, $request)
 
     switch ($field_name) {
         case 'seasons':
-            return get_collection_seasons($collection);
+            return get_collection_seasons(get_term($id, 'collection'));
             break;
 
         case 'social_media':
