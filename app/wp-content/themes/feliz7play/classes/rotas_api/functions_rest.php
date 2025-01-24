@@ -16,65 +16,36 @@ function get_sorted_languages($wp_object, $language_field = 'languages') {
     return 'Languages not found.';
 }
 
-function get_genre($genre_items) {
-    foreach ($genre_items as $genre_item) {
-        $category_items = get_sub_field('genre_category');
-        if (is_array($category_items)) {
-            $categories = [];
-            foreach ($category_items as $category_item) {
-               array_push($categories, get_category_by_line($category_item));
-            }
-        }
-
-        return [
-            'id' => $genre_item->term_id,
-            'source' => $genre_item->taxonomy,
-            'languages' => get_sorted_languages($genre_item),
-            'image_default' => get_field('image', $genre_item)['url'],
-            'categories' => $categories ?: []
-        ];
-    }
-}
-
-function get_genre_v2($genres_items) {
-    $languages = get_sub_field('languages');
-    if (is_array($languages) && !empty($languages)) {
-        $filtered_languages = [];
-
-        foreach ($languages as $language) {
-            $filtered_languages[$language['language']] = array_diff_key($language, ['language' => '']);
-        }
-    }
-
-    $genre_array = [];
-    foreach ($genres_items as $genre_item) {
-        $image = get_field('image', 'term_' . $genre_item->term_id)['url'];
-        $item = get_genre_by_line($genre_item, $image);
-        array_push($genre_array, $item);
-    }
-
-    $category_array = [];
+function get_genre() {
     $category_items = get_sub_field('genre_category');
-    foreach ($category_items as $category_item) {
-        $item = get_category_by_line($category_item);
-        array_push($category_array, $item);
+    if (is_array($category_items)) {
+        $categories = [];
+        foreach ($category_items as $category_item) {
+           array_push($categories, get_category_by_line($category_item));
+        }
     }
 
-    $line = [
-        'languages' => $languages,
-        'source' => 'genre',
-        'genres' => $genre_array,
-        'categories' => $category_array
-    ];
+    $genre_items = get_sub_field('genre');
+    if (is_array($genre_items)) {
+        $genres = [];
+        foreach ($genre_items as $genre_item) {
+           array_push($genres, get_genre_by_line($genre_item));
+        }
+    }
 
-    return $line;
+    return [
+        'languages' => get_line_languages(),
+        'source' => 'genre',
+        'genres' => $genres ?: [],
+        'categories' => $categories ?: [],
+    ];
 }
 
-function get_genre_by_line($item, $image) {
+function get_genre_by_line($item) {
     return [
         'id' => $item->term_id,
-        'source' => $item->taxonomy,
-        'image_default' => $image,
+        // 'source' => $item->taxonomy,
+        'image_default' => get_field('image', 'term_' . $item->term_id)['url'],
         'languages' => get_sorted_languages($item),
     ];
 }
@@ -82,7 +53,6 @@ function get_genre_by_line($item, $image) {
 function get_category_by_line($item) {
     return [
         'id' => $item->term_id,
-        'source' => $item->taxonomy,
         'languages' => get_sorted_languages($item),
     ];
 }
@@ -303,18 +273,77 @@ function get_slider_infos($slider_object) {
     }
 }
 
-function get_collection($item) {
-    return [
-        'id' => $item->term_id,
-        'languages' => get_sorted_languages($item),
-        'source' => $item->taxonomy,
-        'seasons' => get_field('seasons', $item)
-    ];
+function get_collection_seasons($collection_id) {
+    $seasons = get_terms([
+        'taxonomy' => 'collection',
+        'parent' => $collection_id,
+        'hide_empty' => true,
+    ]);
+
+    $filtered_seasons = [];
+    foreach ($seasons as $key => $item) {
+        $parent_item = get_sorted_languages(get_term($collection_id, 'collection'));
+        $term_languages = get_sorted_languages($item);
+
+        foreach ($term_languages as $key => $value) {
+            foreach (['collection_image', 'collection_image_header'] as $image_field) {
+                if (isset($value[$image_field]) && !empty($value[$image_field])) {
+                    $term_languages[$key][$image_field] = $value[$image_field]['url'];
+                }
+            }
+
+            foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
+                if (isset($term_languages[$key][$taxonomy_field]) && !empty($term_languages[$key][$taxonomy_field])) {
+                    $taxonomy_data = [];
+
+                    if (is_array($term_languages[$key][$taxonomy_field])) {
+                        foreach ($term_languages[$key][$taxonomy_field] as $term) {
+							$sub_term_languages = get_field('languages', $term) ?: [];
+							foreach ($sub_term_languages as $language) {
+								if ($language['language'] === $key) {
+									unset($language['language']);
+									$term->name = $language['title'];
+									$term->slug = $language['slug'];
+									$term->description = $language['description'];
+									$taxonomy_data[] = $term;
+								}
+							}
+						}
+                    } else {
+                        $term = $term_languages[$key][$taxonomy_field];
+                        $sub_term_languages = get_field('languages', $term) ?: [];
+                        foreach ($sub_term_languages as $language) {
+                            if ($language['language'] === $key) {
+                                unset($language['language']);
+                                $term->name = $language['title'];
+                                $term->slug = $language['slug'];
+                                $term->description = $language['description'];
+                                $taxonomy_data = $term;
+                            }
+                        }
+                    }
+
+                    $term_languages[$key][$taxonomy_field] = $taxonomy_data;
+                }
+            }
+
+            $term_languages[$key]['link_sharing'] = get_site_url() . '/' . $item->taxonomy . '/' . $parent_item[$key]['slug'] . '/' . $term_languages[$key]['slug'] . '?c=' . $item->term_id;
+
+            $term_languages[$key]['enable'] = $term_languages[$key]['collection_enable'];
+            unset($term_languages[$key]['collection_enable']);
+
+            $term_languages[$key]['season_label'] = $term_languages[$key]['collection_season_label'];
+            unset($term_languages[$key]['collection_season_label']);
+        }
+
+        $item->languages = $term_languages;
+        array_push($filtered_seasons, $item);
+    }
+
+    return $filtered_seasons;
 }
 
-function get_custom($items) {
-    $limited_per_item = 1;
-
+function get_line_languages() {
     $languages = get_sub_field('languages');
     if (is_array($languages) && !empty($languages)) {
         $filtered_languages = [];
@@ -323,9 +352,25 @@ function get_custom($items) {
             $filtered_languages[$language['language']] = array_diff_key($language, ['language' => '']);
         }
     }
+    return $filtered_languages;
+}
+
+function get_collection($item) {
+    return [
+        'id' => $item->term_id,
+        'source' => $item->taxonomy,
+        'languages' => get_sorted_languages($item),
+        'seasons' => get_collection_seasons($item->term_id),
+    ];
+}
+
+function get_custom($items) {
+    $limited_per_item = 1;
+
+    $languages = get_line_languages();
 
     $line = [
-        'languages' => isset($filtered_languages) ? $filtered_languages : 'Languages not found.',
+        'languages' => isset($languages) ? $languages : 'Languages not found.',
         'source' => 'custom',
         'model' => get_sub_field('model'),
         'items' => []
@@ -367,17 +412,10 @@ function get_custom($items) {
 
 function get_recentes() {
     $limited = get_sub_field('n_itens');
-    $languages = get_sub_field('languages');
-    if (is_array($languages) && !empty($languages)) {
-        $filtered_languages = [];
-
-        foreach ($languages as $language) {
-            $filtered_languages[$language['language']] = array_diff_key($language, ['language' => '']);
-        }
-    }
+    $languages = get_line_languages();
 
     $line = [
-        'languages' => isset($filtered_languages) ? $filtered_languages : 'Languages not found.',
+        'languages' => isset($languages) ? $languages : 'Languages not found.',
         'source' => 'custom',
         'model' => 'default',
         'items' => [],
@@ -507,22 +545,7 @@ function collection_meta_callback($collection, $field_name, $request)
 
     switch ($field_name) {
         case 'seasons':
-            $items = get_terms(
-                'collection',
-                array(
-                    'hide_empty' => 0,
-                    'parent' => $id
-                )
-            );
-
-            foreach ($items as $key => $item) {
-                $link = 'collection/' . $collection['slug'] . '/' . $item->slug . '?s=' . $item->term_id;
-                $items[$key]->link_sharing = get_site_url(null, $link);
-                $items[$key]->season_label = $season_label != "" && !is_null($season_label) ? $season_label : $item->name;
-                $items[$key]->languages = get_sorted_languages($item);
-            }
-
-            return $items;
+            return get_collection_seasons($id);
             break;
 
         case 'social_media':

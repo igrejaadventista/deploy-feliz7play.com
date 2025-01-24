@@ -98,6 +98,10 @@ class Algolia {
 		$data = [];
 		$languages = get_field('languages', $video_id);
 
+		if (!is_array($languages)) {
+			return $data;
+		}
+
 		$collection = get_the_terms($video_id, 'collection');
 		if (is_array($collection) && !empty($collection)) {
 			$collection[0]->parent_slug = get_term($collection->parent, 'collection')->slug;
@@ -129,7 +133,7 @@ class Algolia {
 				'language' => $current_language,
 				'subtitle' => $language['post_subtitle'],
 				'description' => $language['post_blurb'],
-				'thumbnail' => $language['video_thumbnail']['url'],
+				'thumbnail' => !empty($language['video_thumbnail'])? $language['video_thumbnail']['url'] : '',
 				'genre' => self::get_terms_names(get_the_terms($video_id, 'genre'), $current_language),
 				'collection' => self::get_terms_names(get_the_terms($video_id, 'collection'), $current_language),
 				'audio' => $language_taxonomies['audio'],
@@ -164,6 +168,13 @@ class Algolia {
 						'link' => get_link_site_next($language['slug'], 'Episode', $term),
 						'genre' => self::get_terms_names([$language['collection_genre']], $current_language),
 						'category' => self::get_terms_names($language['collection_category'], $current_language),
+						'thumbnail' => $language['collection_image']['url'],
+					]);
+				}
+
+				if ($taxonomy === 'genre') {
+					$term_data = array_merge($term_data, [
+						'thumbnail' => get_field('image', $term)['url'],
 					]);
 				}
 

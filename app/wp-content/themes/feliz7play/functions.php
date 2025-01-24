@@ -14,7 +14,6 @@ require_once (dirname(__FILE__) . '/classes/rotas_api/functions_rest.php');
 
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_slider.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_liners.php');
-require_once (dirname(__FILE__) . '/classes/rotas_api/rest_liners_v2.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_category.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_collection.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_genre.php');
@@ -95,67 +94,39 @@ function my_acf_fields_post_result( $args) {
 	return $args;
 }
 
+add_action('acf/save_post', function($post_id) {
+	$languages = get_field('languages', $post_id);
 
-function getVideoInfo($post_id, $video_host, $video_id){
-
-	$data =  array($post_id, $video_host, $video_id);
-
-	// SET VIDEO LENGHT BY VIEMO/YOUTUBE API
-	switch ($video_host) {
-		case "Youtube":
-			$json = file_get_contents("https://api.feliz7play.com/v4/youtubeinfo?video_id=". $video_id );
-			$obj = json_decode($json);
-
-			$time = $obj->time;
-			$release_year = date('Y', strtotime($obj->release_date));
-
-			if ($obj) {
-				update_field( 'post_video_length', $time, $post_id );
-				update_field( 'post_video_year', $release_year, $post_id );
-			}
-
-			unset($json, $obj, $time, $size, $release_year);
-			break;
-
-		case "Vimeo":
-			$json = file_get_contents("https://api.feliz7play.com/v4/vimeoinfo?video_id=". $video_id);
-			$obj = json_decode($json);
-
-			$time = $obj->time;
-			$release_year = date('Y', strtotime($obj->release_date));
-
-			if ($time) {
-				update_field( 'post_video_length', $time, $post_id );
-				update_field( 'post_video_year', $release_year, $post_id );
-			}
-
-			unset($json, $obj, $time, $release_year);
-			break;
+	if (!$languages) {
+		return;
 	}
 
+	foreach ($languages as $key => $language_data) {
+		if (empty($language_data['post_video_length']) || empty($language_data['post_year'])) {
+			$video_id = $language_data['post_video_id'];
+			if (empty($video_id)) {
+				return;
+			}
 
-}
+			$video_host = $language_data['post_video_host'];
+			$response = wp_remote_get('https://api.feliz7play.com/v4/' . ($video_host === 'Youtube' ? 'youtubeinfo' : 'vimeoinfo') . '/?video_id=' . $video_id);
+			if (is_wp_error($response)) {
+				return;
+			}
 
-function UpdateVideoLenght( $post_id ) {
-	$video_host = get_field("post_video_host", $post_id);
-	$video_id = get_field("post_video_id", $post_id);
-	$video_lenght = get_field("post_video_length", $post_id);
-	$release_year = get_field("post_video_year", $post_id);
+			$video_data = json_decode(wp_remote_retrieve_body($response));
+			if ($video_data && property_exists($video_data, 'time') && property_exists($video_data, 'release_date')) {
+				$time = $video_data->time;
+				$release_year = date('Y', strtotime($video_data->release_date));
 
-	$data = array($post_id, $video_host, $video_lenght, $release_year);
-
-	if ( !$video_lenght || !$release_year ){
-		getVideoInfo( $post_id, $video_host, $video_id );
+				if ($time && $release_year) {
+					update_field('languages_' . $key . '_post_video_length', $time, $post_id);
+					update_field('languages_' . $key . '_post_year', $release_year, $post_id);
+				}
+			}
+		}
 	}
-
-	//RESET CF CACHE
-	$json = file_get_contents("https://api.feliz7play.com/v4/clear-cf-cache?zone=feliz7play.com");
-	$obj = json_decode($json);
-
-	unset($json, $obj, $data);
-}
-add_action( 'acf/save_post', 'UpdateVideoLenght' );
-
+});
 
 if( function_exists('acf_add_options_page') ) {
 
@@ -260,6 +231,10 @@ function getActiveImage($lang) {
 }
 
 function filter_rest_api_response($response) {
+	foreach($response->get_links() as $key => $value) {
+		$response->remove_link($key);
+	}
+
 	if (isset($response->data['acf']['image']) && !empty($response->data['acf']['image'])) {
 		$response->data['acf']['image'] = wp_get_attachment_url($response->data['acf']['image'], 'full');
 	}
@@ -272,23 +247,29 @@ function filter_rest_api_response($response) {
 			$current_language = $language['language'];
 			$filtered_languages[$current_language] = array_diff_key($language, ['language' => '']);
 
+			// Retorna a URL da imagem ao invés do ID
 			foreach (['video_thumbnail', 'image_content_header', 'video_image_hover', 'collection_image', 'collection_image_header'] as $image_field) {
 				if (isset($language[$image_field]) && !empty($language[$image_field])) {
 					$filtered_languages[$current_language][$image_field] = wp_get_attachment_url($language[$image_field], 'full');
 				}
 			}
 
+			// Retorna o objeto da taxonomia de acordo com o idioma ao invés do ID
 			foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
 				if (isset($language[$taxonomy_field]) && !empty($language[$taxonomy_field])) {
+					$taxonomy_data = [];
+
 					if (is_array($language[$taxonomy_field])) {
-						$taxonomy_data = [];
 						foreach ($language[$taxonomy_field] as $term_id) {
 							$term = get_term($term_id);
 							$term_languages = get_field('languages', $term) ?: [];
 							foreach ($term_languages as $term_language) {
 								if ($term_language['language'] === $current_language) {
 									unset($term_language['language']);
-									$taxonomy_data[] = $term_language;
+									$term->name = $term_language['title'];
+									$term->slug = $term_language['slug'];
+									$term->description = $term_language['description'];
+									$taxonomy_data[] = $term;
 								}
 							}
 						}
@@ -298,7 +279,10 @@ function filter_rest_api_response($response) {
 						foreach ($term_languages as $term_language) {
 							if ($term_language['language'] === $current_language) {
 								unset($term_language['language']);
-								$taxonomy_data = $term_language;
+								$term->name = $term_language['title'];
+								$term->slug = $term_language['slug'];
+								$term->description = $term_language['description'];
+								$taxonomy_data = $term;
 							}
 						}
 					}
@@ -319,6 +303,37 @@ add_filter('rest_prepare_video', 'filter_rest_api_response', 10, 3);
 add_filter('rest_prepare_genre', 'filter_rest_api_response', 10, 3);
 add_filter('rest_prepare_collection', 'filter_rest_api_response', 10, 3);
 add_filter('rest_prepare_category', 'filter_rest_api_response', 10, 3);
+
+// Remove empty collections from the json response
+add_filter('rest_post_dispatch', function ($response, $server, $request) {
+	if ($request->get_route() === '/wp/v2/collection') {
+		if (!is_wp_error($response) && isset($response->data)) {
+			$filtered_data = array_filter($response->data, function ($term) {
+				if ($term['count'] > 0) {
+					return $term;
+				}
+
+				$children = get_terms([
+					'taxonomy' => 'collection',
+					'parent' => $term['id'],
+					'hide_empty' => false,
+				]);
+
+				foreach ($children as $child) {
+					if ($child->count > 0) {
+						return $term;
+					}
+				}
+
+				return;
+			});
+
+			$response->data = array_values($filtered_data);
+		}
+	}
+
+	return $response;
+}, 10, 3);
 
 function upload_file_by_url( $image_url ) {
 
