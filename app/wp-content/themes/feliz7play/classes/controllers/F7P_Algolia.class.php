@@ -168,6 +168,13 @@ class Algolia {
 						'link' => get_link_site_next($language['slug'], 'Episode', $term),
 						'genre' => self::get_terms_names([$language['collection_genre']], $current_language),
 						'category' => self::get_terms_names($language['collection_category'], $current_language),
+						'thumbnail' => $language['collection_image']['url'],
+					]);
+				}
+
+				if ($taxonomy === 'genre') {
+					$term_data = array_merge($term_data, [
+						'thumbnail' => get_field('image', $term)['url'],
 					]);
 				}
 
