@@ -1188,8 +1188,35 @@ add_action('admin_notices', function () {
 	}
 });
 
-// add_action('admin_init', 'import_videos');
 // add_action('admin_init', 'clear_content');
 // add_action('admin_init', 'import_genre_terms');
 // add_action('admin_init', 'import_category_terms');
 // add_action('admin_init', 'import_collection_terms');
+
+
+add_action('admin_menu', 'add_import_page');
+
+function add_import_page() {
+    add_management_page(
+        'Import Videos',
+        'Import Videos',
+        'manage_options',
+        'import-videos',
+        'import_videos_page'
+    );
+}
+
+function import_videos_page() {
+    if (isset($_POST['start_import'])) {
+        import_videos();
+    }
+
+    ?>
+    <div class="wrap">
+        <h2>Import Videos</h2>
+        <form method="post">
+            <input type="submit" name="start_import" class="button button-primary" value="Start Import">
+        </form>
+    </div>
+    <?php
+}
