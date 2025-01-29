@@ -1085,138 +1085,186 @@ function import_genre_terms() {
 }
 
 function import_videos() {
+	$import_errors = [];
 	$json_data = file_get_contents('http://localhost/content-f7p.json');
 	$json_data = json_decode($json_data, true);
 	foreach ($json_data as $json_data_key => $post_language) {
-		// TOTAL 4169
-		if ($json_data_key >= 0 && $json_data_key <= 100) {
-			foreach ($post_language as $value) {
-				$language = $value['language'];
-				$id = $value['ID'];
-				if (!empty($id)) {
-					try {
-						$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/video/{$id}");
-						$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
-						if (isset($data['code']) && $data['code'] === 'rest_forbidden') {
-							$_SESSION['import_errors'][] = [
-								'language' => $language,
-								'id' => $id,
-								'error' => 'rest_forbidden - not found',
-							];
+		foreach ($post_language as $value) {
+			$language = $value['language'];
+			$id = $value['ID'];
+			if (!empty($id)) {
+				try {
+					$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/video/{$id}");
+					$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
+					if (isset($data['code']) && $data['code'] === 'rest_forbidden') {
+						$import_errors[] = [
+							'language' => $language,
+							'id' => $id,
+							'error' => 'rest_forbidden - not found',
+						];
+					}
+
+					$title = $data['title']['rendered'];
+
+					if (empty($title)) {
+						$title = 'IMPORT ERROR - ' . $language . ' ' . $id;
+					}
+
+					foreach (['video_thumbnail', 'video_image_hover','image_content_header'] as $image_field) {
+						$url = isset($data['acf'][$image_field]['url']) ? $data['acf'][$image_field]['url'] : '';
+						if (!empty($url)) {
+							$filename = $data['acf'][$image_field]['filename'];
+							$file_id = get_attachment_id_by_name($filename) ?: upload_file_by_url($url);
+							$data['acf'][$image_field] = $file_id;
 						}
+					}
 
-						$title = $data['title']['rendered'];
+					if ($language === 'pt') {
+						$new_video = [
+							'post_title' => $title,
+							'post_type' => 'video',
+							'post_status' => 'publish',
+						];
+						$video_id = wp_insert_post($new_video);
+					}
 
-						foreach (['video_thumbnail', 'video_image_hover','image_content_header'] as $image_field) {
-							$url = isset($data['acf'][$image_field]['url']) ? $data['acf'][$image_field]['url'] : '';
-							if (!empty($url)) {
-								$filename = $data['acf'][$image_field]['filename'];
-								$file_id = get_attachment_id_by_name($filename) ?: upload_file_by_url($url);
-								$data['acf'][$image_field] = $file_id;
-							}
-						}
+					if ($video_id) {
+						$row = [
+							'language' => $language,
+							'title' => $title,
+							'slug' => $data['slug'],
+							...$data['acf'],
+						];
 
-						if ($language === 'pt') {
-							$new_video = [
-								'post_title' => $title,
-								'post_type' => 'video',
-								'post_status' => 'publish',
-							];
-							$video_id = wp_insert_post($new_video);
-						}
+						add_row('field_670ff24637fba', $row, $video_id);
 
-						if ($video_id) {
-							$row = [
-								'language' => $language,
-								'title' => $title,
-								'slug' => $data['slug'],
-								...$data['acf'],
-							];
+						if (isset($data['taxonomies']) && is_array($data['taxonomies'])) {
+							foreach ($data['taxonomies'] as $taxonomy => $terms) {
+								if (is_array($terms)) {
+									foreach ($terms as $term_data) {
+										$current_terms = get_the_terms($video_id, $taxonomy) ?: [];
+										if (!empty($current_terms)) {
+											$current_terms = wp_list_pluck($current_terms, 'term_id');
+										}
 
-							add_row('field_670ff24637fba', $row, $video_id);
+										$term = get_term_by('slug', $term_data['slug'], $taxonomy);
 
-							if (isset($data['taxonomies']) && is_array($data['taxonomies'])) {
-								foreach ($data['taxonomies'] as $taxonomy => $terms) {
-									if (is_array($terms)) {
-										foreach ($terms as $term_data) {
-											$current_terms = get_the_terms($video_id, $taxonomy) ?: [];
-											if (!empty($current_terms)) {
-												$current_terms = wp_list_pluck($current_terms, 'term_id');
-											}
-
-											$term = get_term_by('slug', $term_data['slug'], $taxonomy);
-
-											if ($term) {
-												wp_set_post_terms($video_id, [$term->term_id, ...$current_terms], $taxonomy);
-											}
+										if ($term) {
+											wp_set_post_terms($video_id, [$term->term_id, ...$current_terms], $taxonomy);
 										}
 									}
 								}
 							}
-
-							$lang_audio_term = get_term_by('slug', $language, 'language_audio');
-							$lang_current_terms = get_the_terms($video_id, 'language_audio') ?: [];
-							if (!empty($lang_current_terms)) {
-								$lang_current_terms = wp_list_pluck($lang_current_terms, 'term_id');
-							}
-							wp_set_post_terms($video_id, [$lang_audio_term->term_id, ...$lang_current_terms], 'language_audio');
-
-							add_post_meta($video_id, 'old_id_' . $language, $id, true);
 						}
-					} catch (\Throwable $error) {
-						$_SESSION['import_errors'][] = [
-							'language' => $language,
-							'id' => $id,
-							'error' => $error->getMessage(),
-						];
+
+						$lang_audio_term = get_term_by('slug', $language, 'language_audio');
+						$lang_current_terms = get_the_terms($video_id, 'language_audio') ?: [];
+						if (!empty($lang_current_terms)) {
+							$lang_current_terms = wp_list_pluck($lang_current_terms, 'term_id');
+						}
+						wp_set_post_terms($video_id, [$lang_audio_term->term_id, ...$lang_current_terms], 'language_audio');
+
+						add_post_meta($video_id, 'old_id_' . $language, $id, true);
 					}
+				} catch (\Throwable $error) {
+					$import_errors[] = [
+						'language' => $language,
+						'id' => $id,
+						'error' => $error->getMessage(),
+					];
 				}
 			}
 		}
 	}
+	setcookie('import_errors', json_encode($import_errors), time()+3600, "/");
 }
 
 add_action('admin_notices', function () {
-	if (isset($_SESSION['import_errors'])) {
+	if (isset($_COOKIE['import_errors'])) {
+		$errors = json_decode($_COOKIE['your_cookie_name'], true);
 		echo '
 		<div class="notice notice-error">
 			<p>Erros ocorreram durante a importação:</p>';
-			foreach($_SESSION['import_errors'] as $error) {
+			foreach($errors as $error) {
 				echo '<p>' . $error['language'] . ' - ' . $error['id'] . ' - ' . $error['error'] . '</p>';
 			}
 		echo '</div>';
 	}
 });
 
-// add_action('admin_init', 'clear_content');
 // add_action('admin_init', 'import_genre_terms');
 // add_action('admin_init', 'import_category_terms');
 // add_action('admin_init', 'import_collection_terms');
 
-
-add_action('admin_menu', 'add_import_page');
-
-function add_import_page() {
+add_action('admin_menu', function () {
     add_management_page(
-        'Import Videos',
-        'Import Videos',
+        'Import Content',
+        'Import Content',
         'manage_options',
-        'import-videos',
-        'import_videos_page'
+        'import-content',
+        'import_content_page'
     );
-}
+});
 
-function import_videos_page() {
-    if (isset($_POST['start_import'])) {
+function import_content_page() {
+    if (isset($_POST['import_videos'])) {
         import_videos();
     }
 
-    ?>
-    <div class="wrap">
-        <h2>Import Videos</h2>
-        <form method="post">
-            <input type="submit" name="start_import" class="button button-primary" value="Start Import">
-        </form>
-    </div>
-    <?php
+    if (isset($_POST['clear_content'])) {
+        clear_content();
+    }
+
+	$options = [
+		'import_videos' => 'Import Videos',
+		'clear_content' => 'Clear Content',
+	];
+
+	echo '<h2>Import Content</h2>';
+
+	foreach ($options as $key => $value) {
+		echo '
+		<div class="wrap">
+			<form method="post">
+				<input type="submit" name="' . $key . '" class="button button-primary" value="' . $value . '">
+			</form>
+		</div>
+		';
+	}
 }
+
+// function get_import_error_videos() {
+// 	$args = [
+// 		'post_type' => 'video',
+// 		's' => 'IMPORT ERROR',
+// 		'posts_per_page' => -1,
+// 		'fields' => 'ids',
+// 	];
+
+// 	$posts = get_posts($args);
+// 	echo 'Total de erros:' . count($posts);
+
+
+// 	echo '<table>';
+// 	echo '<tr>';
+// 	echo '<td>id</td>';
+// 	echo '<td>language</td>';
+// 	echo '<td>url</td>';
+// 	echo '</tr>';
+// 	foreach (array_reverse($posts) as $post_id) {
+// 		echo '<tr>';
+// 		$data = explode(' ', get_the_title($post_id));
+// 		$language = $data[3];
+// 		$id = $data[4];
+// 		echo '<td>' . $id . '</td>';
+// 		echo '<td>' . $language . '</td>';
+// 		$url = "https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/video/{$id}";
+// 		echo '<td><a href="' . $url . '" target="blank">' . $url . '</a>';
+// 		echo '</tr>';
+// 	}
+// 	echo '</table>';
+
+// }
+
+// get_import_error_videos();
+// die();
