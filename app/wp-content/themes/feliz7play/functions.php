@@ -228,13 +228,13 @@ function getActiveImage($lang) {
     }
 }
 
-function filter_rest_api_response($response) {
+function filter_rest_api_response($response, $post, $request) {
 	foreach($response->get_links() as $key => $value) {
 		$response->remove_link($key);
 	}
 
 	if (isset($response->data['acf']['image']) && !empty($response->data['acf']['image'])) {
-		$response->data['acf']['image'] = wp_get_attachment_url($response->data['acf']['image'], 'full');
+		$response->data['acf']['image'] = wp_get_attachment_url($response->data['acf']['image']);
 	}
 
 	$languages = $response->data['acf']['languages'];
@@ -248,7 +248,7 @@ function filter_rest_api_response($response) {
 			// Retorna a URL da imagem ao invés do ID
 			foreach (['video_thumbnail', 'image_content_header', 'video_image_hover', 'collection_image', 'collection_image_header'] as $image_field) {
 				if (isset($language[$image_field]) && !empty($language[$image_field])) {
-					$filtered_languages[$current_language][$image_field] = wp_get_attachment_url($language[$image_field], 'full');
+					$filtered_languages[$current_language][$image_field] = wp_get_attachment_url($language[$image_field]);
 				}
 			}
 
@@ -288,6 +288,57 @@ function filter_rest_api_response($response) {
 					$filtered_languages[$current_language][$taxonomy_field] = $taxonomy_data;
 				}
 			}
+
+			// Filter extra fields
+			$extra_fields = [
+				'extra' => 'extra_list_',
+				'post_extra' => 'post_extra_list_',
+			];
+
+			foreach ($extra_fields as $extra_field_key => $extra_field_prefix) {
+				if (isset($language[$extra_field_key]) && !empty($language[$extra_field_key])) {
+					unset($filtered_languages[$current_language][$extra_field_key]);
+
+					foreach ($language[$extra_field_key] as $extra_key => $extra_field) {
+						$videos = [];
+						if (is_array($extra_field[$extra_field_prefix . 'videos'])) {
+							foreach ($extra_field[$extra_field_prefix . 'videos'] as $extra_video) {
+								$video = get_post($extra_video[$extra_field_key . '_video']);
+								$videos[] = get_post_infos($video);
+							}
+						}
+
+						$filtered_languages[$current_language]['extra'][] = [
+							'title' => $extra_field[$extra_field_key . '_title'],
+							'videos' => $videos,
+						];
+					}
+				}
+			}
+
+			// Filter social media
+			if (isset($language['redes']) && !empty($language['redes'])) {
+				foreach ($language['redes'] as $social_key => $social) {
+					if (isset($social['name_rede']) && !empty($social['name_rede'])) {
+						$filtered_languages[$current_language]['redes'][$social_key]['name'] = $language['redes'][$social_key]['name_rede'];
+						unset($filtered_languages[$current_language]['redes'][$social_key]['name_rede']);
+					}
+
+					if (isset($social['url_rede']) && !empty($social['url_rede'])) {
+						$filtered_languages[$current_language]['redes'][$social_key]['url'] = $language['redes'][$social_key]['url_rede'];
+						unset($filtered_languages[$current_language]['redes'][$social_key]['url_rede']);
+					}
+
+					$icon_key = isset($social['icone_rede']) ? 'icone_rede' : 'icon_rede';
+					if (isset($social[$icon_key]) && !empty($social[$icon_key])) {
+						$filtered_languages[$current_language]['redes'][$social_key]['icon'] = wp_get_attachment_url($language['redes'][$social_key][$icon_key]);
+						unset($filtered_languages[$current_language]['redes'][$social_key][$icon_key]);
+					}
+				}
+			}
+
+			$filtered_languages[$current_language]['social_media'] = $filtered_languages[$current_language]['redes'];
+			unset($filtered_languages[$current_language]['redes']);
 		}
 
 		$response->data['acf']['languages'] = $filtered_languages;
