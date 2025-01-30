@@ -319,18 +319,18 @@ function filter_rest_api_response($response, $post, $request) {
 			// Filter social media
 			if (isset($language['redes']) && !empty($language['redes'])) {
 				foreach ($language['redes'] as $social_key => $social) {
-					if (isset($social['name_rede']) && !empty($social['name_rede'])) {
+					if (isset($social['name_rede'])) {
 						$filtered_languages[$current_language]['redes'][$social_key]['name'] = $language['redes'][$social_key]['name_rede'];
 						unset($filtered_languages[$current_language]['redes'][$social_key]['name_rede']);
 					}
 
-					if (isset($social['url_rede']) && !empty($social['url_rede'])) {
+					if (isset($social['url_rede'])) {
 						$filtered_languages[$current_language]['redes'][$social_key]['url'] = $language['redes'][$social_key]['url_rede'];
 						unset($filtered_languages[$current_language]['redes'][$social_key]['url_rede']);
 					}
 
 					$icon_key = isset($social['icone_rede']) ? 'icone_rede' : 'icon_rede';
-					if (isset($social[$icon_key]) && !empty($social[$icon_key])) {
+					if (isset($social[$icon_key])) {
 						$filtered_languages[$current_language]['redes'][$social_key]['icon'] = wp_get_attachment_url($language['redes'][$social_key][$icon_key]);
 						unset($filtered_languages[$current_language]['redes'][$social_key][$icon_key]);
 					}
