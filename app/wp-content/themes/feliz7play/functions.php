@@ -310,7 +310,7 @@ function filter_rest_api_response($response, $post, $request) {
 							}
 						}
 
-						$filtered_languages[$current_language]['extra'][] = [
+						$filtered_languages[$current_language]['extras'][] = [
 							'title' => $extra_field[$extra_field_key . '_title'],
 							'videos' => $videos,
 						];
