@@ -1141,7 +1141,7 @@ function import_videos() {
 	foreach ($json_data as $json_data_key => $post_language) {
 		foreach ($post_language as $value) {
 			$language = $value['language'];
-			$id = $value['ID'];
+			$id = $value['id'];
 			if (!empty($id)) {
 				try {
 					$response = wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/video/{$id}");
@@ -1168,6 +1168,13 @@ function import_videos() {
 							'post_status' => 'publish',
 						];
 						$video_id = wp_insert_post($new_video);
+
+						$date_gmt = explode('T', $data['date_gmt']);
+
+						wp_update_post([
+							'ID' => $video_id,
+							'post_date' => $date_gmt[0] . ' ' . $date_gmt[1],
+						]);
 					}
 
 					if ($video_id) {
@@ -1219,7 +1226,6 @@ function import_videos() {
 			}
 		}
 	}
-	setcookie('import_errors', json_encode($import_errors), time()+3600, "/");
 }
 
 // add_action('admin_init', 'import_genre_terms');
