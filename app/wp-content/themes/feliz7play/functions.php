@@ -1333,3 +1333,24 @@ function get_import_error_videos() {
 
 // var_dump(count($posts_with_multiple_languages));
 // die();
+
+// echo '<pre>';
+// $csv = array_map('str_getcsv', file('http://localhost/content-f7p.csv'));
+// array_shift($csv);
+// $data = [];
+// foreach ($csv as $value) {
+// 	array_push($data, [
+// 		[
+// 			'language' => $value[0],
+// 			'id' => $value[1],
+// 		],
+// 		[
+// 			'language' => $value[2],
+// 			'id' => $value[3],
+// 		],
+// 	]);
+// }
+// $data = json_encode($data);
+// var_dump($data);
+// echo '</pre>';
+// die();
