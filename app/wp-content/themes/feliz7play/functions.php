@@ -102,26 +102,27 @@ add_action('acf/save_post', function($post_id) {
 	}
 
 	foreach ($languages as $key => $language_data) {
+		if (!empty($language_data['title']) && empty($language_data['slug'])) {
+			$slug = sanitize_title($language_data['title']);
+			update_field('languages_' . $key . '_slug', $slug, $post_id);
+		}
+
 		if (empty($language_data['post_video_length']) || empty($language_data['post_year'])) {
 			$video_id = $language_data['post_video_id'];
-			if (empty($video_id)) {
-				return;
-			}
+			if (!empty($video_id)) {
+				$video_host = $language_data['post_video_host'];
+				$response = wp_remote_get('https://api.feliz7play.com/v4/' . ($video_host === 'Youtube' ? 'youtubeinfo' : 'vimeoinfo') . '/?video_id=' . $video_id);
+				if (!is_wp_error($response)) {
+					$video_data = json_decode(wp_remote_retrieve_body($response));
+					if ($video_data && property_exists($video_data, 'time') && property_exists($video_data, 'release_date')) {
+						$time = $video_data->time;
+						$release_year = date('Y', strtotime($video_data->release_date));
 
-			$video_host = $language_data['post_video_host'];
-			$response = wp_remote_get('https://api.feliz7play.com/v4/' . ($video_host === 'Youtube' ? 'youtubeinfo' : 'vimeoinfo') . '/?video_id=' . $video_id);
-			if (is_wp_error($response)) {
-				return;
-			}
-
-			$video_data = json_decode(wp_remote_retrieve_body($response));
-			if ($video_data && property_exists($video_data, 'time') && property_exists($video_data, 'release_date')) {
-				$time = $video_data->time;
-				$release_year = date('Y', strtotime($video_data->release_date));
-
-				if ($time && $release_year) {
-					update_field('languages_' . $key . '_post_video_length', $time, $post_id);
-					update_field('languages_' . $key . '_post_year', $release_year, $post_id);
+						if ($time && $release_year) {
+							update_field('languages_' . $key . '_post_video_length', $time, $post_id);
+							update_field('languages_' . $key . '_post_year', $release_year, $post_id);
+						}
+					}
 				}
 			}
 		}
