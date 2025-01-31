@@ -484,200 +484,44 @@ add_action('rest_api_init', 'adding_collection_meta_rest');
 add_action('rest_api_init', 'adding_video_meta_rest');
 add_action('rest_api_init', 'adding_category_meta_rest');
 
-function adding_collection_meta_rest()
-{
-    register_rest_field(
-        'collection',
-        'seasons',
-        array(
-            'get_callback'      => 'collection_meta_callback',
-            'update_callback'   => null,
-            'schema'            => null,
-        )
-    );
+function adding_collection_meta_rest() {
+    register_rest_field('collection', 'seasons', [
+        'get_callback'    => 'collection_meta_callback',
+        'update_callback' => null,
+        'schema'          => null,
+    ]);
 
-    register_rest_field(
-        'collection',
-        'social_media',
-        array(
-            'get_callback'      => 'collection_meta_callback',
-            'update_callback'   => null,
-            'schema'            => null,
-        )
-    );
-
-    register_rest_field(
-        'collection',
-        'extras',
-        array(
-            'get_callback'      => 'collection_meta_callback',
-            'update_callback'   => null,
-            'schema'            => null,
-        )
-    );
-
-    register_rest_field(
-        'collection',
-        'link_sharing',
-        array(
-            'get_callback'      => 'collection_meta_callback',
-            'update_callback'   => null,
-            'schema'            => null,
-        )
-    );
-
-    register_rest_field(
-        'collection',
-        'season_label',
-        array(
-            'get_callback'      => 'collection_meta_callback',
-            'update_callback'   => null,
-            'schema'            => null,
-        )
-    );
+    register_rest_field('collection', 'link_sharing', [
+        'get_callback'    => 'collection_meta_callback',
+        'update_callback' => null,
+        'schema'          => null,
+    ]);
 }
 
-function collection_meta_callback($collection, $field_name, $request)
-{
-
+function collection_meta_callback($collection, $field_name, $request) {
     $id = $collection['id'];
-    $values = array();
-
     switch ($field_name) {
         case 'seasons':
             return get_collection_seasons($id);
-            break;
-
-        case 'social_media':
-            $values = array(
-                'redes' => get_field('redes', 'term_' . $id),
-                'production' => get_field('producao', 'term_' . $id)
-            );
-            break;
-
-        case 'extras':
-            $items = get_field('extra', 'term_' . $id);
-            foreach ($items as $item) {
-                $list_videos = [];
-                foreach($item['extra_list_videos'] as $video) {
-                    $id = $video['extra_video']->ID;
-                    $meta = get_post_meta($id);
-
-                    $title =                $video['extra_video']->post_title;
-                    $slug =                 $video['extra_video']->post_name;
-                    $video_type =           $meta['post_video_type'][0];
-                    $video_episode =        $meta['video_episode'][0];
-                    $subtitle =             $meta['post_subtitle'][0];
-                    $description =          wp_strip_all_tags($meta['post_blurb'][0]);
-                    $video_host =           $meta['post_video_host'][0];
-                    $video_id =             $meta['post_video_id'][0];
-
-                    $post_download_link =   $meta['link_download_app'][0];
-                    $download =             $meta['download'][0];
-                    $post_year =            $meta['post_year'][0];
-                    $post_video_rating =    $meta['post_video_rating'][0];
-                    $post_video_age_rating =    $meta['post_video_age_rating'][0];
-                    $redes =                get_field('redes', $id);
-                    $production =           get_field('production', $id);
-                    $collection =           get_the_terms($id, 'collection')[0];
-
-                    if ($collection) {
-                        $collection->parent_slug = get_term($collection->parent, 'collection')->slug;
-                    }
-
-                    $genre =                get_the_terms($id, 'genre')[0];
-                    $category =             get_the_terms($id, 'category')[0];
-                    $video_lenght =         $meta['post_video_length'][0];
-                    $video_quality =        $meta['post_video_quality'][0];
-
-                    $video_thumbnail =      wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
-                    $video_image_hover =    wp_get_attachment_image_src($meta['video_image_hover'][0])[0];
-
-                    $link =                 get_link_site_next($slug, $video_type, $collection);
-
-                    $video_values = array(
-                        'id' => $id,
-                        'title' => $title,
-                        'slug' => $slug,
-                        'video_type' => $video_type,
-                        'video_episode' => $video_episode,
-                        'subtitle' => $subtitle,
-                        'description' => $description,
-                        'genre' => $genre,
-                        'category' => $category,
-                        'collection' => $collection,
-                        'video_host' => $video_host,
-                        'video_id' => $video_id,
-                        'post_download_link' => $post_download_link,
-                        'download' => $download,
-                        'year' => $post_year,
-                        'video_rating' => $post_video_rating,
-                        'video_age_rating' => $post_video_age_rating,
-                        'video_thumbnail' => $video_thumbnail,
-                        'video_image_hover' => $video_image_hover,
-                        'post_video_length' => $video_lenght,
-                        'post_video_quality' => $video_quality,
-                        'redes' => $redes,
-                        'production' => $production,
-                        'link' => $link
-                    );
-
-                    array_push($list_videos, $video_values);
-                }
-
-                $values[] = array(
-                    'title' => $item['extra_title'],
-                    'videos' => $list_videos
-                );
-            }
-            break;
 
         case 'link_sharing':
             $link = 'collection/' . $collection['slug'] . '?c=' . $id;
-            $values =    get_site_url(null, $link);
-
-            break;
-
-        case 'season_label':
-
-            $season_label = get_field('collection_season_label', 'collection_' . $id);
-            $values = $season_label != "" && !is_null($season_label) ? $season_label : $collection['name'];
-
-            break;
+            return get_site_url(null, $link);
     }
-
-    return $values;
 }
 
-function adding_video_meta_rest()
-{
-    register_rest_field(
-        'video',
-        'link_sharing',
-        array(
-            'get_callback'      => 'video_meta_callback',
-            'update_callback'   => null,
-            'schema'            => null,
-        )
-    );
-    register_rest_field(
-        'video',
-        'taxonomies',
-        array(
-            'get_callback'      => 'taxonomy_meta_callback',
-            'update_callback'   => null,
-            'schema'            => null,
-        )
-    );
-    register_rest_field(
-        'video',
-        'extras',
-        array(
-            'get_callback'      => 'video_extra_meta_callback',
-            'update_callback'   => null,
-            'schema'            => null,
-        )
-    );
+function adding_video_meta_rest() {
+    register_rest_field('video', 'link_sharing', [
+        'get_callback'    => 'video_meta_callback',
+        'update_callback' => null,
+        'schema'          => null,
+    ]);
+
+    register_rest_field('video', 'taxonomies', [
+        'get_callback'    => 'taxonomy_meta_callback',
+        'update_callback' => null,
+        'schema'          => null,
+    ]);
 }
 
 function adding_category_meta_rest()
@@ -703,7 +547,6 @@ function adding_category_meta_rest()
     );
 }
 
-
 function category_meta_callback($category, $field_name, $request)
 {
     switch ($field_name) {
@@ -716,91 +559,6 @@ function category_meta_callback($category, $field_name, $request)
             return $order;
     }
 }
-
-
-function video_extra_meta_callback($video, $field_name, $request)
-{
-    $id = $video['id'];
-    $values = [];
-    $items = get_field('post_extra', $id);
-
-    foreach ($items as $item) {
-        $list_videos = [];
-        foreach($item['post_extra_list_videos'] as $video_item) {
-            $video_id = $video_item['post_extra_video']->ID;
-            $meta = get_post_meta($video_id);
-
-            $title = $video_item['post_extra_video']->post_title;
-            $slug = $video_item['post_extra_video']->post_name;
-            $video_type = $meta['post_video_type'][0];
-            $video_episode = $meta['video_episode'][0];
-            $subtitle = $meta['post_subtitle'][0];
-            $description = wp_strip_all_tags($meta['post_blurb'][0]);
-            $video_host = $meta['post_video_host'][0];
-            $video_id = $meta['post_video_id'][0];
-
-            $post_download_link = $meta['link_download_app'][0];
-            $download = $meta['download'][0];
-            $post_year = $meta['post_year'][0];
-            $post_video_rating = $meta['post_video_rating'][0];
-            $post_video_age_rating = $meta['post_video_age_rating'][0];
-            $redes = get_field('redes', $id);
-            $production = get_field('production', $id);
-            $collection = get_the_terms($id, 'collection')[0];
-
-            if ($collection) {
-                $collection->parent_slug = get_term($collection->parent, 'collection')->slug;
-            }
-
-            $genre = get_the_terms($id, 'genre')[0];
-            $category = get_the_terms($id, 'category')[0];
-            $video_lenght = $meta['post_video_length'][0];
-            $video_quality = $meta['post_video_quality'][0];
-
-            $video_thumbnail = wp_get_attachment_image_src($meta['video_thumbnail'][0] == "" || is_null($meta['video_thumbnail'][0]) ? $meta['video_image_hover'][0] : $meta['video_thumbnail'][0])[0];
-            $video_image_hover = wp_get_attachment_image_src($meta['video_image_hover'][0])[0];
-
-            $link = get_link_site_next($slug, $video_type, $collection);
-
-            $video_values = array(
-                'id' => $id,
-                'title' => $title,
-                'slug' => $slug,
-                'video_type' => $video_type,
-                'video_episode' => $video_episode,
-                'subtitle' => $subtitle,
-                'description' => $description,
-                'genre' => $genre,
-                'category' => $category,
-                'collection' => $collection,
-                'video_host' => $video_host,
-                'video_id' => $video_id,
-                'post_download_link' => $post_download_link,
-                'download' => $download,
-                'year' => $post_year,
-                'video_rating' => $post_video_rating,
-                'video_age_rating' => $post_video_age_rating,
-                'video_thumbnail' => $video_thumbnail,
-                'video_image_hover' => $video_image_hover,
-                'post_video_length' => $video_lenght,
-                'post_video_quality' => $video_quality,
-                'redes' => $redes,
-                'production' => $production,
-                'link' => $link
-            );
-
-            array_push($list_videos, $video_values);
-        }
-
-        $values[] = array(
-            'title' => $item['post_extra_title'],
-            'videos' => $list_videos
-        );
-    }
-
-    return $values;
-}
-
 
 function video_meta_callback($video, $field_name, $request)
 {
