@@ -1217,12 +1217,13 @@ function import_videos() {
 						add_post_meta($video_id, 'old_id_' . $language, $id, true);
 					}
 				} catch (\Throwable $error) {
+					echo '<pre>';
 					var_dump([
 						'language' => $language,
 						'id' => $id,
 						'error' => $error->getMessage(),
 					]);
-					die();
+					echo '</pre>';
 				}
 			}
 		}
