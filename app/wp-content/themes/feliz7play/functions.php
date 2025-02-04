@@ -548,7 +548,7 @@ function import_category_terms() {
 	}
 }
 
-function import_collection_terms() {
+function import_collection_terms($collection) {
 	$collections = [
 		// Batch 1
 		// ['pt' => 101, 'es' => 162],
@@ -905,6 +905,10 @@ function import_collection_terms() {
 		// ['pt' => 381]
 	];
 
+	if (isset($collection)) {
+		$collections = [$collection];
+	}
+
 	foreach ($collections as $collection) {
 		$current_term = null;
 
@@ -1188,6 +1192,36 @@ function import_videos() {
 
 						add_row('field_670ff24637fba', $row, $video_id);
 
+						if (isset($data['taxonomies']['collection']) && is_array($data['taxonomies']['collection'])) {
+							foreach ($data['taxonomies']['collection'] as $collection) {
+								$slug = sanitize_title($collection['name']);
+								$collection_term_exists = false;
+
+								$collection_terms = get_terms([
+									'taxonomy'   => 'collection',
+									'hide_empty' => false,
+								]);
+
+								foreach ($collection_terms as $term) {
+									if ($slug === $term->slug) {
+										$collection_term_exists = true;
+									}
+
+									$languages = get_field('languages', $term);
+									if (isset($languages[$language]) && !empty($languages[$language])) {
+										if ($slug === $languages[$language]['slug']) {
+											$collection_term_exists = true;
+										}
+									}
+								}
+
+								if (!$collection_term_exists) {
+									var_dump('term created for ' . $language . ' ' . $id);
+									import_collection_terms([$language => $collection['term_id']]);
+								}
+							}
+						}
+
 						if (isset($data['taxonomies']) && is_array($data['taxonomies'])) {
 							foreach ($data['taxonomies'] as $taxonomy => $terms) {
 								if (is_array($terms)) {
@@ -1291,6 +1325,7 @@ function get_import_error_videos() {
 	echo '<td>Admin link</td>';
 	echo '</tr>';
 	foreach (array_reverse($posts) as $post_id) {
+		wp_delete_post($post_id, true);
 		echo '<tr>';
 		$data = explode(' ', get_the_title($post_id));
 		$language = $data[3];
@@ -1319,7 +1354,6 @@ function get_import_error_videos() {
 		echo '</tr>';
 	}
 	echo '</table>';
-
 }
 
 // get_import_error_videos();
