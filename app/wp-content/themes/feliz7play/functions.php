@@ -548,7 +548,7 @@ function import_category_terms() {
 	}
 }
 
-function import_collection_terms($collection) {
+function import_collection_terms($collection = []) {
 	$collections = [
 		// Batch 1
 		// ['pt' => 101, 'es' => 162],
@@ -709,12 +709,7 @@ function import_collection_terms($collection) {
 		// ['pt' => 428],
 		// ['pt' => 571, 'es' => 626],
 		// ['pt' => 549],
-
-		// // //// //// //// //// //
-		// // TERMO NÃO EXISTE
-		// // ['pt' => 509, 'es' => 8470],
-		// // //// //// //// //// //
-
+		// ['pt' => 509],
 		// ['pt' => 98, 'es' => 234],
 		// ['pt' => 147],
 		// ['pt' => 463],
@@ -905,7 +900,7 @@ function import_collection_terms($collection) {
 		// ['pt' => 381]
 	];
 
-	if (isset($collection)) {
+	if (!empty($collection)) {
 		$collections = [$collection];
 	}
 
@@ -951,7 +946,9 @@ function import_collection_terms($collection) {
 				}
 
 				if ($language === array_key_first($collection)) {
-					$args = [];
+					$args = [
+						'slug' => $data['slug'],
+					];
 
 					if ($data['parent'] !== 0) {
 						$parent_data = json_decode(wp_remote_get("https://v3.feliz7play.com/{$language}/e/wp-json/wp/v2/collection/{$data['parent']}")['body'], true, JSON_UNESCAPED_SLASHES);
@@ -982,7 +979,7 @@ function import_collection_terms($collection) {
 				echo $error->getMessage();
 				var_dump($language, $id);
 				echo '</pre>';
-				die();
+				// die();
 			}
 		}
 
@@ -1208,15 +1205,15 @@ function import_videos() {
 									}
 
 									$languages = get_field('languages', $term);
-									if (isset($languages[$language]) && !empty($languages[$language])) {
-										if ($slug === $languages[$language]['slug']) {
+									foreach ($languages as $collection_language) {
+										if ($collection_language['language'] === $language && $slug === $collection_language['slug']) {
 											$collection_term_exists = true;
 										}
 									}
 								}
 
-								if (!$collection_term_exists) {
-									var_dump('term created for ' . $language . ' ' . $id);
+								if ($collection_term_exists === false) {
+									var_dump('term created for ' . $language . ' ' . $id . ' ' . $collection['term_id']);
 									import_collection_terms([$language => $collection['term_id']]);
 								}
 							}
@@ -1266,7 +1263,6 @@ function import_videos() {
 
 // add_action('admin_init', 'import_genre_terms');
 // add_action('admin_init', 'import_category_terms');
-// add_action('admin_init', 'import_collection_terms');
 
 add_action('admin_menu', function () {
     add_management_page(
@@ -1287,7 +1283,12 @@ function import_content_page() {
         clear_content();
     }
 
+    if (isset($_POST['import_collection_terms'])) {
+        import_collection_terms();
+    }
+
 	$options = [
+		'import_collection_terms' => 'Import Collection Terms',
 		'import_videos' => 'Import Videos',
 		'clear_content' => 'Clear Content',
 	];
