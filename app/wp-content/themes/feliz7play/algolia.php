@@ -115,13 +115,6 @@
                     ${title} - ${type} - ${language.toUpperCase()} - ${message ? message : 'OK'}
                 </a>
             `);
-
-            if (items[items.length-1] === item) {
-                $('.loader').remove();
-                buttonIndexData.prop('disabled', false);
-                buttonIndexData.text('Indexar dados');
-                alert('Dados indexados com sucesso!');
-            }
         });
     };
 
@@ -136,14 +129,27 @@
         })
         .done(items => {
             if (indexBatch && indexBatch > 0) {
+                const queue = [];
                 for (let i = 0; i < items.length; i += indexBatch) {
                     const batch = items.slice(i, i + indexBatch);
-                    batch.forEach((item, index) => {
-                        setTimeout(() => {
-                            indexData(items, item);
-                        }, index * 1000);
-                    });
+                    queue.push(...batch);
                 }
+
+                const processQueue = () => {
+                    if (queue.length === 0 && $('.loader').length > 0) {
+                        $('.loader').remove();
+                        buttonIndexData.prop('disabled', false);
+                        buttonIndexData.text('Indexar dados');
+                        alert('Dados indexados com sucesso!');
+                        return;
+                    }
+
+                    const item = queue.shift();
+                    indexData(items, item);
+                    setTimeout(processQueue, 100); // Adjust the delay as needed
+                };
+
+                processQueue();
                 return;
             }
 
