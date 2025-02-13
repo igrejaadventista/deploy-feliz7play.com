@@ -1397,3 +1397,146 @@ function get_import_error_videos() {
 // var_dump($data);
 // echo '</pre>';
 // die();
+
+// add_action('template_redirect', function() {
+// 	// $posts = array_chunk(get_posts([
+// 	// 	'post_type' => 'video',
+// 	// 	'posts_per_page' => -1,
+// 	// 	'fields' => 'ids',
+// 	// ]), 500);
+
+// 	// $posts = $posts[0]; ok
+// 	// $posts = $posts[1]; ok
+// 	// $posts = $posts[2]; ok
+// 	// $posts = $posts[3]; ok
+// 	// $posts = $posts[4]; ok
+// 	// $posts = $posts[5]; ok
+// 	// $posts = $posts[6]; ok
+// 	// $posts = $posts[7]; ok
+
+// 	$posts = get_posts([
+// 		'post_type' => 'video',
+// 		'posts_per_page' => -1,
+// 		'fields' => 'ids',
+// 	]);
+
+// 	foreach ($posts as $post_id) {
+// 		$local_response = wp_remote_get("http://localhost/wp-json/wp/v2/video/{$post_id}");
+// 		$local_data = json_decode($local_response['body'], true, JSON_UNESCAPED_SLASHES);
+
+// 		if (!isset($local_data['acf']['languages'])) {
+// 			echo 'languages not found.';
+// 		}
+
+// 		echo '<div style="font-family:arial;font-size:12px;">';
+// 		echo '<summary>' . $local_data['title']['rendered'] . ' - ' . $post_id .  '</summary>';
+
+// 		$local_taxonomies = [];
+// 		foreach ($local_data['taxonomies'] as $taxonomy => $terms) {
+// 			foreach ($terms as $term) {
+// 				foreach ($term['languages'] as $term_language) {
+// 					$local_taxonomies[$taxonomy][] = $term_language['slug'];
+// 				}
+// 			}
+// 		}
+// 		// var_dump($local_taxonomies);
+
+// 		foreach ($local_data['acf']['languages'] as $key => $language) {
+// 			$old_id = get_post_meta($post_id, 'old_id_' . $key, true);
+// 			if (empty($old_id)) {
+// 				echo 'Old id not found.';
+// 			}
+
+// 			$response = wp_remote_get("https://v3.feliz7play.com/{$key}/e/wp-json/wp/v2/video/{$old_id}");
+// 			$data = json_decode($response['body'], true, JSON_UNESCAPED_SLASHES);
+
+// 			echo '<hr/>';
+// 			echo  '<strong>' . $key . ' - ' . $old_id . '</strong>';
+
+// 			$api_taxonomies = [];
+// 			foreach ($data['taxonomies'] as $taxonomy => $terms) {
+// 				foreach ($terms as $term) {
+// 					$api_taxonomies[$taxonomy][] = $term['slug'];
+// 				}
+// 			}
+
+// 			// var_dump($api_taxonomies);
+// 			foreach ($api_taxonomies as $taxonomy => $terms) {
+// 				echo '<p>';
+// 				echo 'taxonomy ' . $taxonomy . ' <br/> ';
+// 				foreach ($terms as $term) {
+// 					if (in_array($term, $local_taxonomies[$taxonomy])) {
+// 						echo '- ' . $term . ' ok.';
+// 					} else {
+// 						echo '<span style="display:block;background-color:red;color:#fff;">ERROR: ' . $term . ' not found.</span>';
+// 					}
+// 				}
+// 				echo '</p>';
+// 			}
+
+// 			foreach ($local_data['acf']['languages'][$key] as $field_key => $value) {
+// 				echo '<p>';
+
+// 				if ($field_key === 'title') {
+// 					// var_dump('<br/>' . $value . '<br/>' . $data['title']['rendered'] . '<br/>');
+// 					if ($data['title']['rendered'] = $value) {
+// 						echo 'title ok.';
+// 					} else {
+// 						echo '<span style="display:block;background-color:red;color:#fff;">ERROR: ' . $field_key . ' diff.</span>';
+// 					}
+// 				}
+
+// 				else if ($field_key === 'slug') {
+// 					if ($data['slug'] === $value) {
+// 						echo 'slug ok.';
+// 					} else {
+// 						echo '<span style="display:block;background-color:red;color:#fff;">ERROR: ' . $field_key . ' diff.</span>';
+// 					}
+// 				}
+
+// 				else if (in_array($field_key, ['video_image_hover', 'video_thumbnail', 'image_content_header'])) {
+// 					$local_file = end(explode('/', $value));
+// 					$api_file = end(explode('/', $data['acf'][$field_key]['url']));
+// 					$api_file = str_replace('--', '-', $api_file);
+// 					$api_file = str_replace('%', '', $api_file);
+
+
+// 					if ($local_file === $api_file) {
+// 						echo $field_key . ' ok.';
+// 					} else {
+// 						// Verifica se a imagem criada durante o upload termina com -1 no caso de ter sido duplicada
+// 						$local_file_name = explode('.', $local_file)[0];
+// 						if (str_ends_with($local_file_name, '-1')) {
+// 							$local_file_name = substr($local_file_name, 0, -2);
+// 							$local_file = $local_file_name . '.' . end(explode('.', $local_file));
+// 						}
+
+// 						if ($local_file === $api_file) {
+// 							echo $field_key . ' ok.';
+// 						} else {
+// 							$api_url = $data['acf'][$field_key]['url'];
+// 							$api_response = wp_remote_head($api_url);
+// 							if (is_wp_error($api_response) || wp_remote_retrieve_response_code($api_response) == 404) {
+// 								echo '<span style="display:block;background-color:red;color:#fff;">ERROR: API ' . $field_key . ' URL returns 404.</span>';
+// 							} else {
+// 								var_dump('LOCAL: ' . $local_file);
+// 								var_dump('API: ' . $api_file);
+// 								echo '<span style="display:block;background-color:red;color:#fff;">ERROR: ' . $field_key . ' diff.</span>';
+// 							}
+// 						}
+// 					}
+// 				}
+
+// 				elseif ($data['acf'][$field_key] == $value) {
+// 					echo $field_key . ' ok.';
+// 				}
+
+// 				echo '</p>';
+// 			}
+// 		}
+
+// 		echo '</div><br/>';
+// 	}
+
+// 	die();
+// });
