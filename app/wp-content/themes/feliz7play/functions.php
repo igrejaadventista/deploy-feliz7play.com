@@ -1399,28 +1399,22 @@ function get_import_error_videos() {
 // die();
 
 // add_action('template_redirect', function() {
-// 	// $posts = array_chunk(get_posts([
-// 	// 	'post_type' => 'video',
-// 	// 	'posts_per_page' => -1,
-// 	// 	'fields' => 'ids',
-// 	// ]), 500);
-
-// 	// $posts = $posts[0]; ok
-// 	// $posts = $posts[1]; ok
-// 	// $posts = $posts[2]; ok
-// 	// $posts = $posts[3]; ok
-// 	// $posts = $posts[4]; ok
-// 	// $posts = $posts[5]; ok
-// 	// $posts = $posts[6]; ok
-// 	// $posts = $posts[7]; ok
-
-// 	$posts = get_posts([
+// 	$posts = array_chunk(get_posts([
 // 		'post_type' => 'video',
 // 		'posts_per_page' => -1,
 // 		'fields' => 'ids',
-// 	]);
+// 	]), 500);
 
-// 	foreach ($posts as $post_id) {
+// 	// $posts = $posts[0]; // ok
+// 	// $posts = $posts[1]; // ok
+// 	// $posts = $posts[2]; // ok
+// 	// $posts = $posts[3]; // ok
+// 	// $posts = $posts[4]; // ok
+// 	// $posts = $posts[5]; // ok
+// 	// $posts = $posts[6]; // ok
+// 	$posts = $posts[7]; // ok
+
+// 	foreach ($posts as $post_id_key => $post_id) {
 // 		$local_response = wp_remote_get("http://localhost/wp-json/wp/v2/video/{$post_id}");
 // 		$local_data = json_decode($local_response['body'], true, JSON_UNESCAPED_SLASHES);
 
