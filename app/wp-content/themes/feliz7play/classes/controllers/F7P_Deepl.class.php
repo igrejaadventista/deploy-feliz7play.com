@@ -1,57 +1,55 @@
 <?php
 class Deepl {
 	public function __construct() {
-		add_action('init', function() {
-			add_action('acf/save_post', function($post_id) {
-				if (get_post_type($post_id) !== 'video') {
-					return;
+		add_action('acf/save_post', function($post_id) {
+			if (get_post_type($post_id) !== 'video') {
+				return;
+			}
+
+			$languages = get_field('languages', $post_id);
+			if (!$languages) {
+				return;
+			}
+
+			$default_language = '';
+			$current_post_languages = [];
+			foreach ($languages as $language_data) {
+				if ($language_data['language'] === 'pt') {
+					$default_language = $language_data;
 				}
+				$current_post_languages[] = $language_data['language'];
+			}
 
-				$languages = get_field('languages', $post_id);
-				if (!$languages) {
-					return;
-				}
+			$languages_to_translate = array_diff(['pt', 'es', 'en'], $current_post_languages);
 
-				$default_language = '';
-				$current_post_languages = [];
-				foreach ($languages as $language_data) {
-					if ($language_data['language'] === 'pt') {
-						$default_language = $language_data;
-					}
-					$current_post_languages[] = $language_data['language'];
-				}
+			if (empty($default_language) || empty($languages_to_translate)) {
+				return;
+			}
 
-				$languages_to_translate = array_diff(['pt', 'es', 'en'], $current_post_languages);
+			$authKey = '';
+			$deeplClient = new \DeepL\DeepLClient($authKey);
 
-				if (empty($default_language) || empty($languages_to_translate)) {
-					return;
-				}
+			foreach ($languages_to_translate as $language_to_translate) {
+				$string_to_translate = $default_language['title'] . ' : ' . $default_language['post_subtitle'] . ' : ' . $default_language['slug'] . ' : ' . $default_language['post_blurb'];
 
-				$authKey = '';
-				$deeplClient = new \DeepL\DeepLClient($authKey);
+				$translation = $deeplClient->translateText(
+					$string_to_translate,
+					null,
+					$language_to_translate === 'en' ? 'en-us' : $language_to_translate
+				);
 
-				foreach ($languages_to_translate as $language_to_translate) {
-					$string_to_translate = $default_language['title'] . ' : ' . $default_language['post_subtitle'] . ' : ' . $default_language['slug'] . ' : ' . $default_language['post_blurb'];
+				$translation = explode(': ', $translation->text);
 
-					$translation = $deeplClient->translateText(
-						$string_to_translate,
-						null,
-						$language_to_translate === 'en' ? 'en-us' : $language_to_translate
-					);
+				$row = $default_language;
+				$row['language'] = $language_to_translate;
+				$row['title'] = $translation[0];
+				$row['post_subtitle'] = $translation[1];
+				$row['slug'] = sanitize_title($translation[2]);
+				$row['post_blurb'] = $translation[3];
 
-					$translation = explode(': ', $translation->text);
-
-					$row = $default_language;
-					$row['language'] = $language_to_translate;
-					$row['title'] = $translation[0];
-					$row['post_subtitle'] = $translation[1];
-					$row['slug'] = $translation[2];
-					$row['post_blurb'] = $translation[3];
-
-					add_row('field_670ff24637fba', $row, $post_id);
-				}
-			}, 10, 3);
-        }, 99);
+				add_row('field_670ff24637fba', $row, $post_id);
+			}
+		}, 10, 3);
 	}
 }
 
