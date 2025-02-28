@@ -27,7 +27,7 @@ class Deepl {
 					return;
 				}
 
-				$authKey = '337ca2f4-8e2b-41f2-ba1c-51382743985c:fx';
+				$authKey = '';
 				$deeplClient = new \DeepL\DeepLClient($authKey);
 
 				foreach ($languages_to_translate as $language_to_translate) {
