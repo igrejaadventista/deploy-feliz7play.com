@@ -238,6 +238,24 @@ function filter_rest_api_response($response, $post, $request) {
 		$response->data['acf']['image'] = wp_get_attachment_url($response->data['acf']['image']);
 	}
 
+	// Retorna o objeto da taxonomia de acordo com o idioma ao invés do ID
+	foreach (['collection_audio', 'collection_subtitle'] as $taxonomy_field) {
+		if (isset($response->data['acf'][$taxonomy_field]) && !empty($response->data['acf'][$taxonomy_field])) {
+			$taxonomy_data = [];
+
+			if (is_array($response->data['acf'][$taxonomy_field])) {
+				foreach ($response->data['acf'][$taxonomy_field] as $term_id) {
+					$taxonomy_data[] = get_term($term_id);
+				}
+			} else {
+				$term = get_term($response->data['acf'][$taxonomy_field]);
+				$taxonomy_data = $term;
+			}
+
+			$response->data['acf'][$taxonomy_field] = $taxonomy_data;
+		}
+	}
+
 	$languages = $response->data['acf']['languages'];
 	if (isset($languages) && !empty($languages)) {
 		$filtered_languages = [];
@@ -253,7 +271,6 @@ function filter_rest_api_response($response, $post, $request) {
 				}
 			}
 
-			// Retorna o objeto da taxonomia de acordo com o idioma ao invés do ID
 			foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
 				if (isset($language[$taxonomy_field]) && !empty($language[$taxonomy_field])) {
 					$taxonomy_data = [];
