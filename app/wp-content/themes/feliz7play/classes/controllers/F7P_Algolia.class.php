@@ -130,32 +130,34 @@ class Algolia {
 		foreach ($languages as $language) {
 			$current_language = $language['language'];
 
-			$current_collection = null;
-			if (!empty($collection_data)) {
-				foreach ($collection_data as $collection_terms) {
-					foreach ($collection_terms as $term) {
-						if ($term['language'] === $current_language) {
-							$current_collection = $term;
+			if ($language['post_video_type'] === 'Single') {
+				$current_collection = null;
+				if (!empty($collection_data)) {
+					foreach ($collection_data as $collection_terms) {
+						foreach ($collection_terms as $term) {
+							if ($term['language'] === $current_language) {
+								$current_collection = $term;
+							}
 						}
 					}
 				}
-			}
 
-			array_push($data, [
-				'type' => 'video',
-				'id' => $video_id,
-				'title' => $language['title'],
-				'slug' => $language['slug'],
-				'language' => $current_language,
-				'subtitle' => $language['post_subtitle'],
-				'description' => $language['post_blurb'],
-				'thumbnail' => !empty($language['video_thumbnail'])? $language['video_thumbnail']['url'] : '',
-				'genre' => self::get_terms_names(get_the_terms($video_id, 'genre'), $current_language),
-				'collection' => $current_collection,
-				'audio' => $language_taxonomies['audio'],
-				'subtitles' => $language_taxonomies['subtitle'],
-				'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection[0]),
-			]);
+				array_push($data, [
+					'type' => 'video',
+					'id' => $video_id,
+					'title' => $language['title'],
+					'slug' => $language['slug'],
+					'language' => $current_language,
+					'subtitle' => $language['post_subtitle'],
+					'description' => $language['post_blurb'],
+					'thumbnail' => !empty($language['video_thumbnail'])? $language['video_thumbnail']['url'] : '',
+					'genre' => self::get_terms_names(get_the_terms($video_id, 'genre'), $current_language),
+					'collection' => $current_collection,
+					'audio' => $language_taxonomies['audio'],
+					'subtitles' => $language_taxonomies['subtitle'],
+					'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection[0]),
+				]);
+			}
 		}
 
 		return $data;
