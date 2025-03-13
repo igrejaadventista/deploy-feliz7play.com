@@ -131,7 +131,7 @@ class Algolia {
 			$current_language = $language['language'];
 
 			if ($language['post_video_type'] === 'Single') {
-				$current_collection = null;
+				$current_collection = '';
 				if (!empty($collection_data)) {
 					foreach ($collection_data as $collection_terms) {
 						foreach ($collection_terms as $term) {
@@ -150,12 +150,12 @@ class Algolia {
 					'language' => $current_language,
 					'subtitle' => $language['post_subtitle'],
 					'description' => $language['post_blurb'],
-					'thumbnail' => !empty($language['video_thumbnail'])? $language['video_thumbnail']['url'] : '',
+					'thumbnail' => $language['video_thumbnail'] !== false ? $language['video_thumbnail']['url'] : '',
 					'genre' => self::get_terms_names(get_the_terms($video_id, 'genre'), $current_language),
 					'collection' => $current_collection,
 					'audio' => $language_taxonomies['audio'],
 					'subtitles' => $language_taxonomies['subtitle'],
-					'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection[0]),
+					'link' => get_link_site_next($language['slug'], $language['post_video_type'], !empty($collection) ? $collection[0] : ''),
 				]);
 			}
 		}
@@ -192,12 +192,37 @@ class Algolia {
 						}
 					}
 
+					$episodes = get_posts([
+						'post_type' => 'video',
+						'posts_per_page' => -1,
+						'post_status' => 'publish',
+						'fields' => 'ids',
+						'tax_query' => [
+							[
+								'taxonomy' => $taxonomy,
+								'field' => 'term_id',
+								'terms' => $term->term_id,
+							],
+						],
+					]);
+
+					if (!empty($episodes)) {
+						foreach ($episodes as $episode_key => $episode_id) {
+							$episode_languages = get_field('languages', $episode_id);
+							foreach ($episode_languages as $episode_language) {
+								$episodes[$episode_key] = $episode_language['language'] === $current_language ? $episode_language['title'] : get_the_title($episode_id);
+							}
+						}
+					}
+
 					$term_data = array_merge($term_data, [
 						'link' => get_link_site_next($language['slug'], 'Episode', $term),
 						'genre' => self::get_terms_names([$language['collection_genre']], $current_language),
 						'category' => self::get_terms_names($language['collection_category'], $current_language),
-						'thumbnail' => isset($language['collection_image']) ? $language['collection_image']['url'] : false,
+						'thumbnail' => $language['collection_image'] !== false ? $language['collection_image']['url'] : '',
 						'parent' => $parent_data,
+						'episodes' => implode(', ', $episodes),
+						'episodes_count' => count($episodes),
 					]);
 				}
 
