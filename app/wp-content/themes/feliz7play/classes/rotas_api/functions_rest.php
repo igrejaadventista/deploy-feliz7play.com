@@ -603,11 +603,15 @@ function get_link_site_next($slug, $video_type, $collection)
 
         case 'Episode':
 
-            if ($collection->parent) {
-                $parent = get_term($collection->parent, 'collection');
-                $link = get_site_url() . "/c/" . $parent->slug . "/" . $collection->slug . '?target=' . $slug;
+            if (is_object($collection)) {
+                if ($collection->parent) {
+                    $parent = get_term($collection->parent, 'collection');
+                    $link = get_site_url() . "/c/" . $parent->slug . "/" . $collection->slug . '?target=' . $slug;
+                } else {
+                    $link = get_site_url() . "/c/" . $collection->slug . '?target=' . $slug;
+                }
             } else {
-                $link = get_site_url() . "/c/" . $collection->slug . '?target=' . $slug;
+                $link = get_site_url() . "/" . $slug;
             }
 
             break;
