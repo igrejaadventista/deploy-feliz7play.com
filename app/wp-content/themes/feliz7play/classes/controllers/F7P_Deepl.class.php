@@ -30,7 +30,7 @@ class Deepl {
 			$deeplClient = new \DeepL\DeepLClient($authKey);
 
 			foreach ($languages_to_translate as $language_to_translate) {
-				$string_to_translate = $default_language['title'] . ' : ' . $default_language['post_subtitle'] . ' : ' . $default_language['slug'] . ' : ' . $default_language['post_blurb'];
+				$string_to_translate = $default_language['title'] . ' : ' . $default_language['post_subtitle'] . ' : ' . $default_language['post_blurb'];
 
 				$translation = $deeplClient->translateText(
 					$string_to_translate,
@@ -44,10 +44,11 @@ class Deepl {
 				$row['language'] = $language_to_translate;
 				$row['title'] = $translation[0];
 				$row['post_subtitle'] = $translation[1];
-				$row['slug'] = sanitize_title($translation[2]);
-				$row['post_blurb'] = $translation[3];
+				$row['slug'] = sanitize_title($translation[0]);
+				$row['post_blurb'] = $translation[2];
 
 				add_row('field_670ff24637fba', $row, $post_id);
+				wp_set_post_terms($post_id, $language_to_translate, 'language_audio', true);
 			}
 		}, 10, 3);
 	}
