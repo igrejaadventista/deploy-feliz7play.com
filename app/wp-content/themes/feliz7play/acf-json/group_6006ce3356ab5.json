@@ -3,6 +3,58 @@
     "title": "Collection",
     "fields": [
         {
+            "key": "field_67c20e669e32a",
+            "label": "Audio",
+            "name": "collection_audio",
+            "aria-label": "",
+            "type": "taxonomy",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "taxonomy": "language_audio",
+            "add_term": 0,
+            "save_terms": 0,
+            "load_terms": 0,
+            "return_format": "object",
+            "field_type": "multi_select",
+            "allow_null": 1,
+            "allow_in_bindings": 1,
+            "bidirectional": 0,
+            "multiple": 0,
+            "bidirectional_target": []
+        },
+        {
+            "key": "field_67c20e949e32b",
+            "label": "Subtitles",
+            "name": "collection_subtitle",
+            "aria-label": "",
+            "type": "taxonomy",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "taxonomy": "language_subtitle",
+            "add_term": 0,
+            "save_terms": 0,
+            "load_terms": 0,
+            "return_format": "object",
+            "field_type": "multi_select",
+            "allow_null": 1,
+            "allow_in_bindings": 1,
+            "bidirectional": 0,
+            "multiple": 0,
+            "bidirectional_target": []
+        },
+        {
             "key": "field_6712409cbf2d8",
             "label": "Languages",
             "name": "languages",
@@ -750,5 +802,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 1,
-    "modified": 1729545765
+    "modified": 1741636085
 }
