@@ -456,7 +456,7 @@ function get_recentes() {
     return $line;
 }
 
-function pagination_array($items = array(), $page, $per_page)
+function pagination_array($page, $per_page, $items = array())
 {
 
     $page = is_null($page) ? 1 : $page;
