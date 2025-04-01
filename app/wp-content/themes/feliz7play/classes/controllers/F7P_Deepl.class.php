@@ -5,13 +5,22 @@ class Deepl {
 	public function __construct() {
 		self::$auth_key = get_option('deepl_auth_key');
 
-		add_action('admin_menu', [$this, 'register_algolia_page']);
+		add_action('admin_menu', [$this, 'register_deepl_page']);
+
 		add_action('acf/save_post', function($post_id) {
-			self::translate_video($post_id);
+			if (get_post_type($post_id) === 'video') {
+				self::translate_video($post_id);
+			}
+
+			$post_id = str_replace('term_', '', $post_id);
+			$term = get_term($post_id);
+			if ($term !== null) {
+				self::translate_term($term);
+			}
 		}, 10, 3);
 	}
 
-	function register_algolia_page() {
+	function register_deepl_page() {
 		add_menu_page(
 			'Deepl',
 			'Deepl',
@@ -31,10 +40,6 @@ class Deepl {
 	}
 
 	public function translate_video($post_id) {
-		if (get_post_type($post_id) !== 'video') {
-			return;
-		}
-
 		$languages = get_field('languages', $post_id);
 		if (!$languages) {
 			return;
@@ -78,6 +83,11 @@ class Deepl {
 			add_row('field_670ff24637fba', $row, $post_id);
 			wp_set_post_terms($post_id, $language_to_translate, 'language_audio', true);
 		}
+	}
+
+	public function translate_term($term) {
+		var_dump($term);
+		die();
 	}
 }
 
