@@ -46,8 +46,14 @@ class Deepl {
 
 	function deepl_page_content() {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			update_option('deepl_auth_key', $_POST['deepl_auth_key']);
-			update_option('deepl_auto_translate', $_POST['deepl_auto_translate']);
+			$deepl_auth_key = isset($_POST['deepl_auth_key']) ? sanitize_text_field($_POST['deepl_auth_key']) : null;
+			update_option('deepl_auth_key', $deepl_auth_key, true);
+			self::$auth_key = $deepl_auth_key;
+			self::$deepl_client = new \DeepL\DeepLClient($deepl_auth_key);
+
+			$deepl_auto_translate = isset($_POST['deepl_auto_translate']) ? sanitize_text_field($_POST['deepl_auto_translate']) : false;
+			update_option('deepl_auto_translate', $deepl_auto_translate, true);
+			self::$auto_translate = $deepl_auto_translate;
 		}
 
 		require_once get_template_directory() . '/deepl.php';
