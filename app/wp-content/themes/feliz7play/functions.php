@@ -109,8 +109,8 @@ add_action('acf/save_post', function($post_id) {
 		}
 
 		if (empty($language_data['post_video_length']) || empty($language_data['post_year'])) {
-			$video_id = $language_data['post_video_id'];
-			if (!empty($video_id)) {
+			$video_id = isset($language_data['post_video_id']) ? $language_data['post_video_id'] : null;
+			if ($video_id !== null) {
 				$video_host = $language_data['post_video_host'];
 				$response = wp_remote_get('https://api.feliz7play.com/v4/' . ($video_host === 'Youtube' ? 'youtubeinfo' : 'vimeoinfo') . '/?video_id=' . $video_id);
 				if (!is_wp_error($response)) {
