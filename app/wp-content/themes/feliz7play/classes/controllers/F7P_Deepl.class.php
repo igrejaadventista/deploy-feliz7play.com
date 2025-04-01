@@ -1,11 +1,24 @@
 <?php
 class Deepl {
 	static $auth_key;
+	static $deepl_client;
+	static $auto_translate;
+	static $required_languages = ['pt', 'es', 'en'];
 
 	public function __construct() {
-		self::$auth_key = get_option('deepl_auth_key');
-
 		add_action('admin_menu', [$this, 'register_deepl_page']);
+
+		self::$auth_key = get_option('deepl_auth_key');
+		if (!self::$auth_key) {
+			return;
+		}
+
+		self::$deepl_client = new \DeepL\DeepLClient(self::$auth_key);
+
+		self::$auto_translate = get_option('deepl_auto_translate');
+		if (self::$auto_translate !== 'on') {
+			return;
+		}
 
 		add_action('acf/save_post', function($post_id) {
 			if (get_post_type($post_id) === 'video') {
@@ -34,13 +47,14 @@ class Deepl {
 	function deepl_page_content() {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			update_option('deepl_auth_key', $_POST['deepl_auth_key']);
+			update_option('deepl_auto_translate', $_POST['deepl_auto_translate']);
 		}
 
 		require_once get_template_directory() . '/deepl.php';
 	}
 
-	public function translate_video($post_id) {
-		$languages = get_field('languages', $post_id);
+	function get_content_languages($id) {
+		$languages = get_field('languages', $id);
 		if (!$languages) {
 			return;
 		}
@@ -54,31 +68,53 @@ class Deepl {
 			$current_post_languages[] = $language_data['language'];
 		}
 
-		$languages_to_translate = array_diff(['pt', 'es', 'en'], $current_post_languages);
+		$languages_to_translate = array_diff(self::$required_languages, $current_post_languages);
 
 		if (empty($default_language) || empty($languages_to_translate)) {
 			return;
 		}
 
-		$deeplClient = new \DeepL\DeepLClient(self::$auth_key);
+		return [
+			'default_language' => $default_language,
+			'languages_to_translate' => $languages_to_translate,
+		];
+	}
 
-		foreach ($languages_to_translate as $language_to_translate) {
-			$string_to_translate = $default_language['title'] . ' : ' . $default_language['post_subtitle'] . ' : ' . $default_language['post_blurb'];
+	function get_translation($language, $data) {
+		$translation = self::$deepl_client->translateText(
+			$data,
+			null,
+			$language === 'en' ? 'en-us' : $language
+		);
 
-			$translation = $deeplClient->translateText(
-				$string_to_translate,
-				null,
-				$language_to_translate === 'en' ? 'en-us' : $language_to_translate
-			);
+		if (is_array($translation)) {
+			return array_map(function($item) {
+				return $item->text;
+			}, $translation);
+		}
 
-			$translation = explode(': ', $translation->text);
+		return $translation->text;
+	}
 
-			$row = $default_language;
+	public function translate_video($post_id) {
+		$languages = self::get_content_languages($post_id);
+		if (!$languages) {
+			return;
+		}
+
+		foreach ($languages['languages_to_translate'] as $language_to_translate) {
+			$translations = self::get_translation($language_to_translate, [
+				$languages['default_language']['title'] ?? '',
+				$languages['default_language']['post_subtitle'] ?? '',
+				$languages['default_language']['post_blurb'] ?? '',
+			]);
+
+			$row = $languages['default_language'];
 			$row['language'] = $language_to_translate;
-			$row['title'] = $translation[0];
-			$row['post_subtitle'] = $translation[1];
-			$row['slug'] = sanitize_title($translation[0]);
-			$row['post_blurb'] = $translation[2];
+			$row['title'] = $translations[0] ?? '';
+			$row['post_subtitle'] = $translations[1] ?? '';
+			$row['post_blurb'] = $translations[2] ?? '';
+			$row['slug'] = sanitize_title($translations[0] ?? '');
 
 			add_row('field_670ff24637fba', $row, $post_id);
 			wp_set_post_terms($post_id, $language_to_translate, 'language_audio', true);
@@ -86,8 +122,35 @@ class Deepl {
 	}
 
 	public function translate_term($term) {
-		var_dump($term);
-		die();
+		$languages = self::get_content_languages($term);
+		if (!$languages) {
+			return;
+		}
+
+		$field_keys = [
+			'genre' => 'field_6706bd52aa917',
+			'category' => 'field_671244c1d177f',
+			'collection' => 'field_6712409cbf2d8',
+		];
+
+		foreach ($languages['languages_to_translate'] as $language_to_translate) {
+			$translations = self::get_translation($language_to_translate, [
+				$languages['default_language']['title'] ?? '',
+				$languages['default_language']['subtitle'] ?? '',
+				$languages['default_language']['description'] ?? '',
+				$languages['default_language']['collection_season_label'] ?? '',
+			]);
+
+			$row = $languages['default_language'];
+			$row['language'] = $language_to_translate;
+			$row['title'] = $translations[0] ?? '';
+			$row['subtitle'] = $translations[1] ?? '';
+			$row['description'] = $translations[2] ?? '';
+			$row['slug'] = sanitize_title($translations[0] ?? '');
+			$row['collection_season_label'] = $translations[3] ?? '';
+
+			add_row($field_keys[$term->taxonomy], $row, $term);
+		}
 	}
 }
 
