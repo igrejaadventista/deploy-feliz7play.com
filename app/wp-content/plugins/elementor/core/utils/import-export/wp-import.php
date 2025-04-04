@@ -54,12 +54,17 @@ class WP_Import extends \WP_Importer {
 		'errors' => [],
 	];
 
-	/*
+	/**
 	 * WXR attachment ID
+	 *
+	 * @var string
 	 */
 	private $id;
 
-	// Information to import from WXR file.
+	/**
+	 * Information to import from WXR file.
+	 */
+	// phpcs:ignore Squiz.Commenting.VariableComment.MissingVar
 	private $version;
 	private $authors = [];
 	private $posts = [];
@@ -68,7 +73,10 @@ class WP_Import extends \WP_Importer {
 	private $page_on_front;
 	private $base_blog_url = '';
 
-	// Mappings from old information to new.
+	/**
+	 * Mappings from old information to new.
+	 */
+	// phpcs:ignore Squiz.Commenting.VariableComment.MissingVar
 	private $processed_taxonomies;
 	private $processed_terms = [];
 	private $processed_posts = [];
@@ -121,7 +129,6 @@ class WP_Import extends \WP_Importer {
 	 * @link  http://tools.ietf.org/html/rfc6266
 	 *
 	 * @see WP_REST_Attachments_Controller::get_filename_from_disposition()
-	 *
 	 */
 	protected static function get_filename_from_disposition( $disposition_header ) {
 		// Get the filename.
@@ -340,7 +347,7 @@ class WP_Import extends \WP_Importer {
 
 		foreach ( (array) $this->args['imported_authors'] as $i => $old_login ) {
 			// Multisite adds strtolower to sanitize_user. Need to sanitize here to stop breakage in process_posts.
-			$santized_old_login = sanitize_user( $old_login, true );
+			$sanitized_old_login = sanitize_user( $old_login, true );
 			$old_id = isset( $this->authors[ $old_login ]['author_id'] ) ? (int) $this->authors[ $old_login ]['author_id'] : false;
 
 			if ( ! empty( $this->args['user_map'][ $i ] ) ) {
@@ -349,7 +356,7 @@ class WP_Import extends \WP_Importer {
 					if ( $old_id ) {
 						$this->processed_authors[ $old_id ] = $user->ID;
 					}
-					$this->author_mapping[ $santized_old_login ] = $user->ID;
+					$this->author_mapping[ $sanitized_old_login ] = $user->ID;
 				}
 			} elseif ( $create_users ) {
 				$user_id = 0;
@@ -371,7 +378,7 @@ class WP_Import extends \WP_Importer {
 					if ( $old_id ) {
 						$this->processed_authors[ $old_id ] = $user_id;
 					}
-					$this->author_mapping[ $santized_old_login ] = $user_id;
+					$this->author_mapping[ $sanitized_old_login ] = $user_id;
 				} else {
 					$error = sprintf(
 						/* translators: %s: Author display name. */
@@ -388,11 +395,11 @@ class WP_Import extends \WP_Importer {
 			}
 
 			// Failsafe: if the user_id was invalid, default to the current user.
-			if ( ! isset( $this->author_mapping[ $santized_old_login ] ) ) {
+			if ( ! isset( $this->author_mapping[ $sanitized_old_login ] ) ) {
 				if ( $old_id ) {
 					$this->processed_authors[ $old_id ] = (int) get_current_user_id();
 				}
-				$this->author_mapping[ $santized_old_login ] = (int) get_current_user_id();
+				$this->author_mapping[ $sanitized_old_login ] = (int) get_current_user_id();
 			}
 		}
 	}
@@ -1021,7 +1028,7 @@ class WP_Import extends \WP_Importer {
 	 */
 	private function fetch_remote_file( $url, $post ) {
 		// Extract the file name from the URL.
-		$file_name = basename( parse_url( $url, PHP_URL_PATH ) );
+		$file_name = basename( wp_parse_url( $url, PHP_URL_PATH ) );
 
 		if ( ! $file_name ) {
 			$file_name = md5( $url );

@@ -123,13 +123,15 @@ class AWS_Provider extends Storage_Provider {
 		'ap-east-1'      => 'Asia Pacific (Hong Kong)',
 		'ap-south-1'     => 'Asia Pacific (Mumbai)',
 		'ap-south-2'     => 'Asia Pacific (Hyderabad)',
+		'ap-northeast-1' => 'Asia Pacific (Tokyo)',
 		'ap-northeast-2' => 'Asia Pacific (Seoul)',
 		'ap-northeast-3' => 'Asia Pacific (Osaka)',
 		'ap-southeast-1' => 'Asia Pacific (Singapore)',
 		'ap-southeast-2' => 'Asia Pacific (Sydney)',
 		'ap-southeast-3' => 'Asia Pacific (Jakarta)',
 		'ap-southeast-4' => 'Asia Pacific (Melbourne)',
-		'ap-northeast-1' => 'Asia Pacific (Tokyo)',
+		'ap-southeast-5' => 'Asia Pacific (Malaysia)',
+		'ap-southeast-7' => 'Asia Pacific (Thailand)',
 		'cn-north-1'     => 'China (Beijing)',
 		'cn-northwest-1' => 'China (Ningxia)',
 		'eu-central-1'   => 'EU (Frankfurt)',
@@ -143,6 +145,7 @@ class AWS_Provider extends Storage_Provider {
 		'il-central-1'   => 'Israel (Tel Aviv)',
 		'me-south-1'     => 'Middle East (Bahrain)',
 		'me-central-1'   => 'Middle East (UAE)',
+		'mx-central-1'   => 'Mexico (Central)',
 		'sa-east-1'      => 'South America (São Paulo)',
 	);
 
@@ -200,6 +203,47 @@ class AWS_Provider extends Storage_Provider {
 		if ( ! function_exists( 'idn_to_ascii' ) && ! defined( 'IDNA_DEFAULT' ) ) {
 			define( 'IDNA_DEFAULT', 0 );
 		}
+
+		add_filter(
+			'as3cf_get_unsigned_url_can_access_private_file_desc_aws',
+			array( $this, 'get_unsigned_url_can_access_private_file_desc' )
+		);
+	}
+
+	/**
+	 * Optionally modify the description for the "Can access private file" warning from the delivery provider
+	 * validation if OOE is enabled on the current bucket.
+	 *
+	 * @handles as3cf_get_unsigned_url_can_access_private_file_desc_aws
+	 *
+	 * @param string $message
+	 *
+	 * @return string
+	 */
+	public function get_unsigned_url_can_access_private_file_desc( $message ): string {
+		$bucket = $this->as3cf->get_setting( 'bucket' );
+		$region = $this->as3cf->get_setting( 'region' );
+
+		// Return default message if no bucket is defined.
+		if ( empty( $bucket ) ) {
+			return $message;
+		}
+
+		// Ensure we have a valid client.
+		$this->get_client( array( 'region' => $region ) );
+
+		// Return default message if OOE not enabled.
+		if ( ! $this->object_ownership_enforced( $bucket ) ) {
+			return $message;
+		}
+
+		return sprintf(
+			__(
+				'Delivery provider is connected, but private media is currently exposed through unsigned URLs. Because Object Ownership is enforced on the bucket, access can only be controlled by editing the Amazon S3 bucket policy or by using a CDN that supports private media. <a href="%1$s" target="_blank">Read more</a>',
+				'amazon-s3-and-cloudfront'
+			),
+			static::get_provider_service_quick_start_url() . '#object-ownership'
+		);
 	}
 
 	/**
