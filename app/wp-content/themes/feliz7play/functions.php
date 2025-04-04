@@ -23,6 +23,7 @@ require_once (dirname(__FILE__) . '/classes/rotas_api/rest_recent.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_grid.php');
 
 require_once (dirname(__FILE__) . '/classes/controllers/F7P_Algolia.class.php');
+require_once (dirname(__FILE__) . '/classes/controllers/F7P_Deepl.class.php');
 
 function curl_error_60_workaround( $handle, $r, $url ) {
 
