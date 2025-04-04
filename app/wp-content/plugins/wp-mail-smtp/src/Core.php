@@ -2,17 +2,18 @@
 
 namespace WPMailSMTP;
 
+use Exception;
+use ReflectionFunction;
 use WPMailSMTP\Admin\AdminBarMenu;
 use WPMailSMTP\Admin\DashboardWidget;
 use WPMailSMTP\Admin\DebugEvents\DebugEvents;
 use WPMailSMTP\Admin\Notifications;
+use WPMailSMTP\Compatibility\Compatibility;
+use WPMailSMTP\Providers\Outlook\Provider as OutlookProvider;
+use WPMailSMTP\Queue\Queue;
+use WPMailSMTP\Reports\Reports;
 use WPMailSMTP\Tasks\Meta;
 use WPMailSMTP\UsageTracking\UsageTracking;
-use WPMailSMTP\Compatibility\Compatibility;
-use WPMailSMTP\Reports\Reports;
-use ReflectionFunction;
-use Exception;
-use WPMailSMTP\Queue\Queue;
 
 /**
  * Class Core to handle all plugin initialization.
@@ -147,6 +148,7 @@ class Core {
 			'plugins_loaded',
 			function() {
 				( new OptimizedEmailSending() )->hooks();
+				( new OutlookProvider() )->hooks();
 			}
 		);
 	}
@@ -449,11 +451,42 @@ class Core {
 	}
 
 	/**
-	 * Display various notifications to a user
+	 * Display various notifications to a user.
 	 *
 	 * @since 1.0.0
 	 */
-	public function init_notifications() { }
+	public function init_notifications() {
+
+		// Old PHP version notification.
+		if (
+			version_compare( phpversion(), '7.4', '<' ) &&
+			is_super_admin() &&
+			(
+				(
+					isset( $GLOBALS['pagenow'] ) &&
+					$GLOBALS['pagenow'] === 'index.php'
+				) ||
+				wp_mail_smtp()->get_admin()->is_admin_page()
+			)
+		) {
+			WP::add_admin_notice(
+				sprintf(
+					wp_kses( /* translators: %1$s - WP Mail SMTP plugin name. */
+						__( 'Your site is running an outdated version of PHP. In an upcoming %1$s plugin release, the minimum required PHP version will be increased to <strong>7.4</strong>. If no further action is taken, you will not be able to update the plugin and receive new features and security updates.', 'wp-mail-smtp' ),
+						[
+							'strong' => [],
+						]
+					),
+					'<strong>WP Mail SMTP</strong>'
+				) .
+				'<br><br>' .
+				esc_html__( 'For better security and performance, we recommend upgrading your site to PHP version 8.0 or higher, as it is faster and more secure than version 7.4.', 'wp-mail-smtp' ),
+				WP::ADMIN_NOTICE_ERROR,
+				true,
+				'outdated_php_version_below_74'
+			);
+		}
+	}
 
 	/**
 	 * Display all debug mail-delivery related notices.

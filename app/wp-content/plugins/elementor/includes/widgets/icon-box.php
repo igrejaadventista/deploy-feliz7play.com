@@ -73,6 +73,28 @@ class Widget_Icon_Box extends Widget_Base {
 		return [ 'icon box', 'icon' ];
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-icon-box' ];
+	}
+
 	/**
 	 * Register icon box widget controls.
 	 *
@@ -126,8 +148,9 @@ class Widget_Icon_Box extends Widget_Base {
 				'label' => esc_html__( 'Shape', 'elementor' ),
 				'type' => Controls_Manager::SELECT,
 				'options' => [
-					'circle' => esc_html__( 'Circle', 'elementor' ),
 					'square' => esc_html__( 'Square', 'elementor' ),
+					'rounded' => esc_html__( 'Rounded', 'elementor' ),
+					'circle' => esc_html__( 'Circle', 'elementor' ),
 				],
 				'default' => 'circle',
 				'condition' => [
@@ -685,14 +708,13 @@ class Widget_Icon_Box extends Widget_Base {
 		$has_link = ! empty( $settings['link']['url'] );
 		$html_tag = $has_link ? 'a' : 'span';
 
-		$this->add_render_attribute( 'icon', 'class', [ 'elementor-icon', 'elementor-animation-' . $settings['hover_animation'] ] );
+		$this->add_render_attribute( 'icon', 'class', 'elementor-icon' );
 
-		if ( ! isset( $settings['icon'] ) && ! Icons_Manager::is_migration_allowed() ) {
-			// add old default
-			$settings['icon'] = 'fa fa-star';
+		if ( ! empty( $settings['hover_animation'] ) ) {
+			$this->add_render_attribute( 'icon', 'class', 'elementor-animation-' . $settings['hover_animation'] );
 		}
 
-		$has_icon = ! empty( $settings['icon'] );
+		$has_icon = ! empty( $settings['selected_icon']['value'] );
 		$has_content = ! Utils::is_empty( $settings['title_text'] ) || ! Utils::is_empty( $settings['description_text'] );
 
 		if ( ! $has_icon && ! $has_content ) {
@@ -702,9 +724,17 @@ class Widget_Icon_Box extends Widget_Base {
 		if ( $has_link ) {
 			$this->add_link_attributes( 'link', $settings['link'] );
 			$this->add_render_attribute( 'icon', 'tabindex', '-1' );
+			if ( ! empty( $settings['title_text'] ) ) {
+				$this->add_render_attribute( 'icon', 'aria-label', $settings['title_text'] );
+			}
 		}
 
-		if ( $has_icon ) {
+		if ( ! isset( $settings['icon'] ) && ! Icons_Manager::is_migration_allowed() ) {
+			// add old default
+			$settings['icon'] = 'fa fa-star';
+		}
+
+		if ( ! empty( $settings['icon'] ) ) {
 			$this->add_render_attribute( 'i', 'class', $settings['icon'] );
 			$this->add_render_attribute( 'i', 'aria-hidden', 'true' );
 		}
@@ -713,12 +743,9 @@ class Widget_Icon_Box extends Widget_Base {
 
 		$this->add_inline_editing_attributes( 'title_text', 'none' );
 		$this->add_inline_editing_attributes( 'description_text' );
-		if ( ! $has_icon && ! empty( $settings['selected_icon']['value'] ) ) {
-			$has_icon = true;
-		}
+
 		$migrated = isset( $settings['__fa4_migrated']['selected_icon'] );
 		$is_new = ! isset( $settings['icon'] ) && Icons_Manager::is_migration_allowed();
-
 		?>
 		<div class="elementor-icon-box-wrapper">
 
@@ -785,11 +812,18 @@ class Widget_Icon_Box extends Widget_Base {
 			migrated = elementor.helpers.isIconMigrated( settings, 'selected_icon' ),
 			titleSizeTag = elementor.helpers.validateHTMLTag( settings.title_size );
 
-		view.addRenderAttribute( 'icon', 'class', 'elementor-icon elementor-animation-' + settings.hover_animation );
+		view.addRenderAttribute( 'icon', 'class', 'elementor-icon' );
+
+		if ( '' !== settings.hover_animation ) {
+			view.addRenderAttribute( 'icon', 'class', 'elementor-animation-' + settings.hover_animation );
+		}
 
 		if ( hasLink ) {
-			view.addRenderAttribute( 'link', 'href', settings.link.url );
+			view.addRenderAttribute( 'link', 'href', elementor.helpers.sanitizeUrl( settings.link.url ) );
 			view.addRenderAttribute( 'icon', 'tabindex', '-1' );
+			if ( '' !== settings.title_text ) {
+				view.addRenderAttribute( 'icon', 'aria-label', settings.title_text );
+			}
 		}
 
 		view.addRenderAttribute( 'description_text', 'class', 'elementor-icon-box-description' );
@@ -803,9 +837,9 @@ class Widget_Icon_Box extends Widget_Base {
 			<div class="elementor-icon-box-icon">
 				<{{{ htmlTag }}} {{{ view.getRenderAttributeString( 'link' ) }}} {{{ view.getRenderAttributeString( 'icon' ) }}}>
 					<# if ( iconHTML && iconHTML.rendered && ( ! settings.icon || migrated ) ) { #>
-						{{{ iconHTML.value }}}
+						{{{ elementor.helpers.sanitize( iconHTML.value ) }}}
 					<# } else { #>
-						<i class="{{ settings.icon }}" aria-hidden="true"></i>
+						<i class="{{ _.escape( settings.icon ) }}" aria-hidden="true"></i>
 					<# } #>
 				</{{{ htmlTag }}}>
 			</div>
@@ -817,13 +851,13 @@ class Widget_Icon_Box extends Widget_Base {
 				<# if ( settings.title_text ) { #>
 				<{{{ titleSizeTag }}} class="elementor-icon-box-title">
 					<{{{ htmlTag }}} {{{ view.getRenderAttributeString( 'link' ) }}} {{{ view.getRenderAttributeString( 'title_text' ) }}}>
-						{{{ settings.title_text }}}
+						{{{ elementor.helpers.sanitize( settings.title_text ) }}}
 					</{{{ htmlTag }}}>
 				</{{{ titleSizeTag }}}>
 				<# } #>
 
 				<# if ( settings.description_text ) { #>
-				<p {{{ view.getRenderAttributeString( 'description_text' ) }}}>{{{ settings.description_text }}}</p>
+				<p {{{ view.getRenderAttributeString( 'description_text' ) }}}>{{{ elementor.helpers.sanitize( settings.description_text ) }}}</p>
 				<# } #>
 
 			</div>

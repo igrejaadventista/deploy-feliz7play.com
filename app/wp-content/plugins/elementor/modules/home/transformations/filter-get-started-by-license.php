@@ -4,7 +4,7 @@ namespace Elementor\Modules\Home\Transformations;
 use Elementor\Modules\Home\Transformations\Base\Transformations_Abstract;
 use Elementor\Utils;
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Filter_Get_Started_By_License extends Transformations_Abstract {
@@ -16,7 +16,7 @@ class Filter_Get_Started_By_License extends Transformations_Abstract {
 		$this->has_pro = Utils::has_pro();
 	}
 
-	private function valid_item( $item ) {
+	private function is_valid_item( $item ) {
 		$has_pro_json_not_free = $this->has_pro && 'pro' === $item['license'][0];
 		$is_not_pro_json_not_pro = ! $this->has_pro && 'free' === $item['license'][0];
 
@@ -27,7 +27,7 @@ class Filter_Get_Started_By_License extends Transformations_Abstract {
 		$new_get_started = [];
 
 		foreach ( $home_screen_data['get_started'] as $index => $item ) {
-			if ( $this->valid_item( $item ) ) {
+			if ( $this->is_valid_item( $item ) ) {
 				$new_get_started[] = $item;
 			}
 		}

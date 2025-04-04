@@ -92,6 +92,10 @@ class Element_Section extends Element_Base {
 		return 'eicon-columns';
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	/**
 	 * Get presets.
 	 *
@@ -229,7 +233,7 @@ class Element_Section extends Element_Base {
 			]
 		);
 
-		// Element Name for the Navigator
+		// Element Name for the Navigator.
 		$this->add_control(
 			'_title',
 			[
@@ -433,7 +437,7 @@ class Element_Section extends Element_Base {
 				'selectors' => [
 					'{{WRAPPER}} > .elementor-container > .elementor-column > .elementor-widget-wrap' => 'align-content: {{VALUE}}; align-items: {{VALUE}};',
 				],
-				// TODO: The following line is for BC since 2.7.0
+				// TODO: The following line is for BC since 2.7.0.
 				'prefix_class' => 'elementor-section-content-',
 			]
 		);
@@ -500,7 +504,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section Structure
+		// Section Structure.
 		$this->start_controls_section(
 			'section_structure',
 			[
@@ -522,7 +526,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section background
+		// Section background.
 		$this->start_controls_section(
 			'section_background',
 			[
@@ -548,6 +552,43 @@ class Element_Section extends Element_Base {
 				'fields_options' => [
 					'background' => [
 						'frontend_available' => true,
+					],
+				],
+			]
+		);
+
+		$this->add_control(
+			'handle_slideshow_asset_loading',
+			[
+				'type' => Controls_Manager::HIDDEN,
+				'assets' => [
+					'styles' => [
+						[
+							'name' => 'e-swiper',
+							'conditions' => [
+								'terms' => [
+									[
+										'name' => 'background_background',
+										'operator' => '===',
+										'value' => 'slideshow',
+									],
+								],
+							],
+						],
+					],
+					'scripts' => [
+						[
+							'name' => 'swiper',
+							'conditions' => [
+								'terms' => [
+									[
+										'name' => 'background_background',
+										'operator' => '===',
+										'value' => 'slideshow',
+									],
+								],
+							],
+						],
 					],
 				],
 			]
@@ -596,7 +637,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Background Overlay
+		// Background Overlay.
 		$this->start_controls_section(
 			'section_background_overlay',
 			[
@@ -783,7 +824,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section border
+		// Section border.
 		$this->start_controls_section(
 			'section_border',
 			[
@@ -889,7 +930,7 @@ class Element_Section extends Element_Base {
 							'value' => '',
 						],
 						[
-							'name' => 'border_border',
+							'name' => 'border_hover_border',
 							'operator' => '!==',
 							'value' => '',
 						],
@@ -908,7 +949,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section Shape Divider
+		// Section Shape Divider.
 		$this->start_controls_section(
 			'section_shape_divider',
 			[
@@ -948,6 +989,22 @@ class Element_Section extends Element_Base {
 					'options' => $shapes_options,
 					'render_type' => 'none',
 					'frontend_available' => true,
+					'assets' => [
+						'styles' => [
+							[
+								'name' => 'e-shapes',
+								'conditions' => [
+									'terms' => [
+										[
+											'name' => $base_control_key,
+											'operator' => '!==',
+											'value' => '',
+										],
+									],
+								],
+							],
+						],
+					],
 				]
 			);
 
@@ -1073,7 +1130,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section Typography
+		// Section Typography.
 		$this->start_controls_section(
 			'section_typo',
 			[
@@ -1161,7 +1218,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section Advanced
+		// Section Advanced.
 		$this->start_controls_section(
 			'section_advanced',
 			[
@@ -1308,7 +1365,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section Responsive
+		// Section Responsive.
 		$this->start_controls_section(
 			'_section_responsive',
 			[
@@ -1391,7 +1448,7 @@ class Element_Section extends Element_Base {
 		#>
 			<div {{{ view.getRenderAttributeString( 'background-video-container' ) }}}>
 				<div class="elementor-background-video-embed"></div>
-				<video class="elementor-background-video-hosted elementor-html5-video" {{ videoAttributes }}></video>
+				<video class="elementor-background-video-hosted" {{ videoAttributes }}></video>
 			</div>
 		<# } #>
 		<div class="elementor-background-overlay"></div>
@@ -1424,7 +1481,7 @@ class Element_Section extends Element_Base {
 					$this->add_render_attribute( 'background-video-container', 'class', 'elementor-background-video-container' );
 
 					if ( ! $settings['background_play_on_mobile'] ) {
-						$this->add_render_attribute( 'background-video-container', 'class', 'elementor-hidden-phone' );
+						$this->add_render_attribute( 'background-video-container', 'class', 'elementor-hidden-mobile' );
 					}
 					?>
 					<div <?php $this->print_render_attribute_string( 'background-video-container' ); ?>>
@@ -1437,7 +1494,7 @@ class Element_Section extends Element_Base {
 								$video_tag_attributes .= ' loop';
 							endif;
 							?>
-							<video class="elementor-background-video-hosted elementor-html5-video" <?php
+							<video class="elementor-background-video-hosted" <?php
 								// PHPCS - the variable $video_tag_attributes is a plain string.
 								echo $video_tag_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 							?>></video>
