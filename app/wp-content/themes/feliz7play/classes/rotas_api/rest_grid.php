@@ -1,51 +1,53 @@
 <?php
-  
-add_action( 'rest_api_init', function(){
-	register_rest_route( 'wp/v3', '/grid', array(
-	'methods' => 'GET',
-	'callback' => 'get_page_option_grid',
-	));
+
+add_action('rest_api_init', function() {
+	register_rest_route( 'wp/v3', '/grid', [
+        'methods' => 'GET',
+	    'callback' => function () {
+            $field_ids = [
+                'large_right',
+                'medium_left',
+                'top_small_right',
+                'top_small_left',
+                'bottom_small_right',
+                'bottom_small_left'
+            ];
+
+            $data = [];
+
+            foreach ($field_ids as $id) {
+                $prefix = 'grid_' . $id;
+                $field = get_field($prefix, 'option');
+
+                $genre = $field[$prefix . '_genre'];
+                if (!empty($genre)) {
+                    $field[$prefix . '_genre']->languages = get_sorted_languages($genre);
+                }
+
+                $languages = $field[$prefix . '_languages'] ?: [];
+                if (!empty($languages)) {
+                    foreach ($languages as $key => $language) {
+                        $languages[$language['language']] = array_diff_key($language, ['language' => '']);
+                        unset($languages[$key]);
+                    }
+
+                    $field[$prefix . '_languages'] = $languages;
+                }
+
+                foreach ($field as $key => $value) {
+                    $sufix = explode('_', $key);
+    	            $sufix = trim(end($sufix));
+                    $field[$sufix] = $value;
+                    unset($field[$key]);
+                }
+
+                $data[$id] = $field;
+            }
+
+            return new WP_REST_Response($data , 200);
+        },
+    ]);
 });
-
-$lines = array();
-$total = array();
-
-function get_page_option_grid($data) {
-	
-    global $total;
-    
-    get_grid();
-           
-    
-	return new WP_REST_Response($total , 200 );
-}
-
-
-
-function get_grid(){
-
-    global $lines;
-    global $total;
-
-    $itens_large_right = get_field('grid_large_right', 'option');
-    $itens_medium_left = get_field('grid_medium_left', 'option');
-    $itens_top_small_right = get_field('grid_top_small_right', 'option');
-    $itens_top_small_left = get_field('grid_top_small_left', 'option');
-    $itens_bottom_small_right = get_field('grid_bottom_small_right', 'option');
-    $itens_bottom_small_left = get_field('grid_bottom_small_left', 'option');
-
-    $grid = [
-        'large_right' => $itens_large_right,
-        'medium_left' => $itens_medium_left,
-        'top_small_right' => $itens_top_small_right,
-        'top_small_left' => $itens_top_small_left,
-        'bottom_small_right' => $itens_bottom_small_right,
-        'bottom_small_left' => $itens_bottom_small_left
-    ];
-
-    $total['grid'] = $grid;
-}
-
 
 
 
