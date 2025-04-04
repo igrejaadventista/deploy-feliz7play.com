@@ -9,10 +9,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <script type="text/template" id="tmpl-elementor-panel-elements">
+	<# if ( $e.components.get( 'document/elements' ).utils.allowAddingWidgets()) { #>
 	<div id="elementor-panel-elements-navigation" class="elementor-panel-navigation">
 		<button class="elementor-component-tab elementor-panel-navigation-tab" data-tab="categories"><?php echo esc_html__( 'Elements', 'elementor' ); ?></button>
 		<button class="elementor-component-tab elementor-panel-navigation-tab" data-tab="global"><?php echo esc_html__( 'Globals', 'elementor' ); ?></button>
 	</div>
+	<# } #>
 	<div id="elementor-panel-elements-search-area"></div>
 	<div id="elementor-panel-elements-notice-area"></div>
 	<div id="elementor-panel-elements-wrapper"></div>
@@ -65,11 +67,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<# } #>
 	</button>
 	<div class="elementor-panel-category-items elementor-responsive-panel"></div>
-</script>
-
-<script type="text/template" id="tmpl-elementor-panel-elements-notice">
-	<div class="elementor-panel-notice">
-	</div>
 </script>
 
 <script type="text/template" id="tmpl-elementor-panel-element-search">

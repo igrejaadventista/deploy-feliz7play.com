@@ -2,8 +2,8 @@
 
 namespace WPMailSMTP\Admin;
 
-use WPMailSMTP\WP;
 use WPMailSMTP\Options;
+use WPMailSMTP\WP;
 
 /**
  * Class Area registers and process all wp-admin display functionality.
@@ -1229,16 +1229,23 @@ class Area {
 			return false;
 		}
 
-		if ( empty( $_POST['notice'] ) || empty( $_POST['mailer'] ) ) {
+		if ( empty( $_POST['notice'] ) ) {
 			return false;
 		}
 
 		$notice = sanitize_key( $_POST['notice'] );
-		$mailer = sanitize_key( $_POST['mailer'] );
 
-		update_user_meta( get_current_user_id(), "wp_mail_smtp_notice_{$notice}_for_{$mailer}_dismissed", true );
+		if ( ! empty( $_POST['mailer'] ) ) {
+			$mailer = sanitize_key( $_POST['mailer'] );
 
-		return esc_html__( 'Educational notice for this mailer was successfully dismissed.', 'wp-mail-smtp' );
+			update_user_meta( get_current_user_id(), "wp_mail_smtp_notice_{$notice}_for_{$mailer}_dismissed", true );
+
+			return esc_html__( 'Educational notice for this mailer was successfully dismissed.', 'wp-mail-smtp' );
+		} else {
+			update_user_meta( get_current_user_id(), "wp_mail_smtp_notice_{$notice}_dismissed", true );
+
+			return esc_html__( 'Notice was successfully dismissed.', 'wp-mail-smtp' );
+		}
 	}
 
 	/**
@@ -1401,7 +1408,7 @@ class Area {
 			array_filter(
 				$submenu[ self::SLUG ],
 				function ( $item ) {
-					return strpos( $item[2], 'https://wpmailsmtp.com/lite-upgrade' ) !== false;
+					return strpos( urldecode( $item[2] ), 'wpmailsmtp.com/lite-upgrade' ) !== false;
 				}
 			)
 		);
@@ -1418,6 +1425,15 @@ class Area {
 		} else {
 			$submenu[ self::SLUG ][ $upgrade_link_position ][] = 'wp-mail-smtp-sidebar-upgrade-pro';
 		}
+
+		$current_screen      = get_current_screen();
+		$upgrade_utm_content = $current_screen === null ? 'Upgrade to Pro' : 'Upgrade to Pro - ' . $current_screen->base;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$upgrade_utm_content = empty( $_GET['tab'] ) ? $upgrade_utm_content : $upgrade_utm_content . ' -- ' . sanitize_key( $_GET['tab'] );
+
+		// Add the correct utm_content to the menu item.
+		$submenu[ self::SLUG ][ $upgrade_link_position ][2] =
+			esc_url( wp_mail_smtp()->get_upgrade_link( [ 'medium' => 'admin-menu', 'content' => $upgrade_utm_content ] ) ); // phpcs:ignore WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound
 		// phpcs:enable WordPress.WP.GlobalVariablesOverride.Prohibited
 
 		// Output inline styles.
