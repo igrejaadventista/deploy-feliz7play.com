@@ -7,6 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Elementor\Core\Kits\Documents\Tabs\Global_Colors;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
+use Elementor\Modules\ContentSanitizer\Interfaces\Sanitizable;
+use Elementor\Modules\Promotions\Controls\Promotion_Control;
 
 /**
  * Elementor heading widget.
@@ -15,7 +17,7 @@ use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
  *
  * @since 1.0.0
  */
-class Widget_Heading extends Widget_Base {
+class Widget_Heading extends Widget_Base implements Sanitizable {
 
 	/**
 	 * Get widget name.
@@ -89,25 +91,52 @@ class Widget_Heading extends Widget_Base {
 		return [ 'heading', 'title', 'text' ];
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	/**
-	 * Get widget upsale data.
+	 * Get style dependencies.
 	 *
-	 * Retrieve the widget promotion data.
+	 * Retrieve the list of style dependencies the widget requires.
 	 *
-	 * @since 3.18.0
-	 * @access protected
+	 * @since 3.24.0
+	 * @access public
 	 *
-	 * @return array Widget promotion data.
+	 * @return array Widget style dependencies.
 	 */
-	protected function get_upsale_data() {
-		return [
-			'condition' => ! Utils::has_pro(),
-			'image' => esc_url( ELEMENTOR_ASSETS_URL . 'images/go-pro.svg' ),
-			'image_alt' => esc_attr__( 'Upgrade', 'elementor' ),
-			'description' => esc_html__( 'Create captivating headings that rotate with the Animated Headline Widget.', 'elementor' ),
-			'upgrade_url' => esc_url( 'https://go.elementor.com/go-pro-heading-widget/' ),
-			'upgrade_text' => esc_html__( 'Upgrade Now', 'elementor' ),
-		];
+	public function get_style_depends(): array {
+		return [ 'widget-heading' ];
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
+	/**
+	 * Remove data attributes from the html.
+	 *
+	 * @param string $content Heading title.
+	 * @return string
+	 */
+	public function sanitize( $content ): string {
+		$allowed_tags = wp_kses_allowed_html( 'post' );
+		$allowed_tags_for_heading = [];
+		$non_allowed_tags = [ 'img' ];
+
+		foreach ( $allowed_tags as $tag => $attributes ) {
+			if ( in_array( $tag, $non_allowed_tags, true ) ) {
+				continue;
+			}
+
+			$filtered_attributes = array_filter( $attributes, function( $attribute ) {
+				return ! substr( $attribute, 0, 5 ) === 'data-';
+			}, ARRAY_FILTER_USE_KEY );
+
+			$allowed_tags_for_heading[ $tag ] = $filtered_attributes;
+		}
+
+		return wp_kses( $content, $allowed_tags_for_heading );
 	}
 
 	/**
@@ -196,6 +225,16 @@ class Widget_Heading extends Widget_Base {
 			]
 		);
 
+		if ( ! Utils::has_pro() ) {
+			$this->add_control(
+				Utils::ANIMATED_HEADLINE . '_promotion',
+				[
+					'label' => esc_html__( 'Animated Headline widget', 'elementor' ),
+					'type' => Promotion_Control::TYPE,
+				]
+			);
+		}
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -233,20 +272,7 @@ class Widget_Heading extends Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}}' => 'text-align: {{VALUE}};',
 				],
-			]
-		);
-
-		$this->add_control(
-			'title_color',
-			[
-				'label' => esc_html__( 'Text Color', 'elementor' ),
-				'type' => Controls_Manager::COLOR,
-				'global' => [
-					'default' => Global_Colors::COLOR_PRIMARY,
-				],
-				'selectors' => [
-					'{{WRAPPER}} .elementor-heading-title' => 'color: {{VALUE}};',
-				],
+				'separator' => 'after',
 			]
 		);
 
@@ -303,6 +329,75 @@ class Widget_Heading extends Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'separator',
+			[
+				'type' => Controls_Manager::DIVIDER,
+			]
+		);
+
+		$this->start_controls_tabs( 'title_colors' );
+
+		$this->start_controls_tab(
+			'title_colors_normal',
+			[
+				'label' => esc_html__( 'Normal', 'elementor' ),
+			]
+		);
+
+		$this->add_control(
+			'title_color',
+			[
+				'label' => esc_html__( 'Text Color', 'elementor' ),
+				'type' => Controls_Manager::COLOR,
+				'global' => [
+					'default' => Global_Colors::COLOR_PRIMARY,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .elementor-heading-title' => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->end_controls_tab();
+
+		$this->start_controls_tab(
+			'title_colors_hover',
+			[
+				'label' => esc_html__( 'Hover', 'elementor' ),
+			]
+		);
+
+		$this->add_control(
+			'title_hover_color',
+			[
+				'label' => esc_html__( 'Link Color', 'elementor' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .elementor-heading-title a:hover, {{WRAPPER}} .elementor-heading-title a:focus' => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'title_hover_color_transition_duration',
+			[
+				'label' => esc_html__( 'Transition Duration', 'elementor' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 's', 'ms', 'custom' ],
+				'default' => [
+					'unit' => 's',
+				],
+				'selectors' => [
+					'{{WRAPPER}} .elementor-heading-title a' => 'transition-duration: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->end_controls_tab();
+
+		$this->end_controls_tabs();
+
 		$this->end_controls_section();
 	}
 
@@ -331,7 +426,7 @@ class Widget_Heading extends Widget_Base {
 
 		$this->add_inline_editing_attributes( 'title' );
 
-		$title = $settings['title'];
+		$title = $this->should_sanitize( $settings ) ? wp_kses_post( $settings['title'] ) : $settings['title'];
 
 		if ( ! empty( $settings['link']['url'] ) ) {
 			$this->add_link_attributes( 'url', $settings['link'] );
@@ -356,10 +451,10 @@ class Widget_Heading extends Widget_Base {
 	protected function content_template() {
 		?>
 		<#
-		var title = settings.title;
+		let title = elementor.helpers.sanitize( settings.title, { ALLOW_DATA_ATTR: false } );
 
 		if ( '' !== settings.link.url ) {
-			title = '<a href="' + _.escape( settings.link.url ) + '">' + title + '</a>';
+			title = '<a href="' + elementor.helpers.sanitizeUrl( settings.link.url ) + '">' + title + '</a>';
 		}
 
 		view.addRenderAttribute( 'title', 'class', [ 'elementor-heading-title' ] );
@@ -378,5 +473,14 @@ class Widget_Heading extends Widget_Base {
 		print( title_html );
 		#>
 		<?php
+	}
+
+	/**
+	 * Check if the content should be sanitized. Sanitizing should be applied for non-admin users in the editor and for shortcodes.
+	 *
+	 * @return bool
+	 */
+	private function should_sanitize( array $settings ): bool {
+		return ( is_admin() && ! current_user_can( 'manage_options' ) ) || ! empty( $settings['isShortcode'] );
 	}
 }

@@ -81,6 +81,8 @@ class App extends BaseApp {
 
 		$this->enqueue_assets();
 
+		remove_action( 'wp_print_styles', 'print_emoji_styles' );
+
 		// Setup default heartbeat options
 		// TODO: Enable heartbeat.
 		add_filter( 'heartbeat_settings', function( $settings ) {
@@ -117,14 +119,14 @@ class App extends BaseApp {
 	}
 
 	/**
-	 * Get Elementor UI theme preference.
+	 * Get Elementor editor theme color preference.
 	 *
-	 * Retrieve the user UI theme preference as defined by editor preferences manager.
+	 * Retrieve the user theme color preference as defined by editor preferences manager.
 	 *
 	 * @since 3.0.0
 	 * @access private
 	 *
-	 * @return string Preferred UI theme.
+	 * @return string Preferred editor theme.
 	 */
 	private function get_elementor_ui_theme_preference() {
 		$editor_preferences = SettingsManager::get_settings_managers( 'editorPreferences' );

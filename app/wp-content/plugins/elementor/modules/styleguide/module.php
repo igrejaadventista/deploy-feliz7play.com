@@ -6,7 +6,7 @@ use Elementor\Plugin;
 use Elementor\Modules\Styleguide\Controls\Switcher;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Module extends Base_Module {
@@ -91,7 +91,7 @@ class Module extends Base_Module {
 	public function enqueue_styles() {
 		wp_enqueue_style(
 			static::ASSETS_HANDLE,
-			$this->get_css_assets_url( 'modules/' . static::ASSETS_SRC . '/' . static::ASSETS_SRC ),
+			$this->get_css_assets_url( 'modules/styleguide/editor' ),
 			[],
 			ELEMENTOR_VERSION
 		);
@@ -120,12 +120,12 @@ class Module extends Base_Module {
 		$element->add_control(
 			$control_name,
 			[
-				'label' => esc_html__( 'Style Guide Preview', 'elementor' ),
+				'label' => esc_html__( 'Show global settings', 'elementor' ),
 				'type' => Switcher::CONTROL_TYPE,
-				'description' => esc_html__( 'Switch between the content area and style guide to preview your changes to global colors.', 'elementor' ),
+				'description' => esc_html__( 'Temporarily overlay the canvas with the style guide to preview your changes to global colors and fonts.', 'elementor' ),
 				'separator' => 'after',
-				'label_off' => esc_html__( 'Off', 'elementor' ),
-				'label_on' => esc_html__( 'On', 'elementor' ),
+				'label_off' => esc_html__( 'No', 'elementor' ),
+				'label_on' => esc_html__( 'Yes', 'elementor' ),
 				'on_change_command' => true,
 			]
 		);

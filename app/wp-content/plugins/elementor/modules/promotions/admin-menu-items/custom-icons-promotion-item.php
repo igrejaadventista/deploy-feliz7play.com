@@ -3,7 +3,7 @@
 namespace Elementor\Modules\Promotions\AdminMenuItems;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Custom_Icons_Promotion_Item extends Base_Promotion_Template {
@@ -19,10 +19,10 @@ class Custom_Icons_Promotion_Item extends Base_Promotion_Template {
 		return esc_html__( 'Custom Icons', 'elementor' );
 	}
 
-	protected function get_promotion_title():string {
+	protected function get_promotion_title(): string {
 		return sprintf(
 			/* translators: %s: br  */
-			esc_html( 'Enjoy creative freedom %s with Custom Icons', 'elementor' ),
+			esc_html__( 'Enjoy creative freedom %s with Custom Icons', 'elementor' ),
 			'<br />'
 		);
 	}

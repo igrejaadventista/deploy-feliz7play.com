@@ -11,7 +11,7 @@ use Elementor\Utils;
 use WP_User_Query;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Module extends BaseModule {
@@ -25,6 +25,7 @@ class Module extends BaseModule {
 	const ACCESS_TIER_ADVANCED = 'advanced';
 	const ACCESS_TIER_EXPERT = 'expert';
 	const ACCESS_TIER_AGENCY = 'agency';
+	const ACCESS_TIER_PRO_LEGACY = 'pro';
 
 	/**
 	 * @since 2.3.0
@@ -116,15 +117,6 @@ class Module extends BaseModule {
 		foreach ( $this->registered_apps as $slug => $class ) {
 			$this->apps[ $slug ] = new $class();
 		}
-	}
-
-	/**
-	 * @deprecated 3.1.0
-	 */
-	public function localize_settings() {
-		Plugin::$instance->modules_manager->get_modules( 'dev-tools' )->deprecation->deprecated_function( __METHOD__, '3.1.0' );
-
-		return [];
 	}
 
 	/**
