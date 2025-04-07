@@ -1,5 +1,5 @@
 <?php
-  
+
   add_action( 'rest_api_init', function(){
 	register_rest_route( 'wp/v3', '/genre/(?P<id>\d+)', array(
 	'methods' => 'GET',
@@ -28,10 +28,10 @@ function get_rest_genre($data) {
             ),
         ),
     );
-    
+
     $items = get_line_post_genre($args);
-       
-    $infos = pagination_array($items, $page, $per_page);
+
+    $infos = pagination_array($page, $per_page, $items);
     $final = $infos['paged'];
     $resposta = new WP_REST_Response($final, 200);
     $resposta->header('X-WP-Total', count($items));

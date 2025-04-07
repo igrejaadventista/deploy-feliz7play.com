@@ -1,5 +1,5 @@
 export function readCookie(name) {
-    var nameEQ = name + "=";
+  var nameEQ = name + '=';
     var ca = document.cookie.split(';');
     for (var i = 0; i < ca.length; i++) {
       var c = ca[i];

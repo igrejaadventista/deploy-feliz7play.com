@@ -456,7 +456,7 @@ function get_recentes() {
     return $line;
 }
 
-function pagination_array($items = array(), $page, $per_page)
+function pagination_array($page, $per_page, $items = array())
 {
 
     $page = is_null($page) ? 1 : $page;
@@ -603,11 +603,15 @@ function get_link_site_next($slug, $video_type, $collection)
 
         case 'Episode':
 
-            if ($collection->parent) {
-                $parent = get_term($collection->parent, 'collection');
-                $link = get_site_url() . "/c/" . $parent->slug . "/" . $collection->slug . '?target=' . $slug;
+            if (is_object($collection)) {
+                if ($collection->parent) {
+                    $parent = get_term($collection->parent, 'collection');
+                    $link = get_site_url() . "/c/" . $parent->slug . "/" . $collection->slug . '?target=' . $slug;
+                } else {
+                    $link = get_site_url() . "/c/" . $collection->slug . '?target=' . $slug;
+                }
             } else {
-                $link = get_site_url() . "/c/" . $collection->slug . '?target=' . $slug;
+                $link = get_site_url() . "/" . $slug;
             }
 
             break;

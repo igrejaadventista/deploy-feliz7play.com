@@ -83,9 +83,11 @@ class Algolia {
 		if (!empty($terms)) {
 			foreach ($terms as $term) {
 				$term_language = get_field('languages', $term);
-				foreach ($term_language as $lang) {
-					if ($lang['language'] === $current_language) {
-						array_push($sorted_terms, $lang['title']);
+				if (is_array($term_language)) {
+					foreach ($term_language as $lang) {
+						if ($lang['language'] === $current_language) {
+							array_push($sorted_terms, $lang['title']);
+						}
 					}
 				}
 			}
@@ -102,9 +104,12 @@ class Algolia {
 			return $data;
 		}
 
+		$collection_data = [];
 		$collection = get_the_terms($video_id, 'collection');
-		if (is_array($collection) && !empty($collection)) {
-			$collection[0]->parent_slug = get_term($collection->parent, 'collection')->slug;
+		if (is_array($collection)) {
+			foreach ($collection as $collection_term) {
+				$collection_data[] = self::get_term_data($collection_term, 'collection');
+			}
 		}
 
 		$language_taxonomies = [
@@ -125,21 +130,34 @@ class Algolia {
 		foreach ($languages as $language) {
 			$current_language = $language['language'];
 
-			array_push($data, [
-				'type' => 'video',
-				'id' => $video_id,
-				'title' => $language['title'],
-				'slug' => $language['slug'],
-				'language' => $current_language,
-				'subtitle' => $language['post_subtitle'],
-				'description' => $language['post_blurb'],
-				'thumbnail' => !empty($language['video_thumbnail'])? $language['video_thumbnail']['url'] : '',
-				'genre' => self::get_terms_names(get_the_terms($video_id, 'genre'), $current_language),
-				'collection' => self::get_terms_names(get_the_terms($video_id, 'collection'), $current_language),
-				'audio' => $language_taxonomies['audio'],
-				'subtitles' => $language_taxonomies['subtitle'],
-				'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection),
-			]);
+			if ($language['post_video_type'] === 'Single') {
+				$current_collection = '';
+				if (!empty($collection_data)) {
+					foreach ($collection_data as $collection_terms) {
+						foreach ($collection_terms as $term) {
+							if ($term['language'] === $current_language) {
+								$current_collection = $term;
+							}
+						}
+					}
+				}
+
+				array_push($data, [
+					'type' => 'video',
+					'id' => $video_id,
+					'title' => $language['title'],
+					'slug' => $language['slug'],
+					'language' => $current_language,
+					'subtitle' => $language['post_subtitle'],
+					'description' => $language['post_blurb'],
+					'thumbnail' => $language['video_thumbnail'] !== false ? $language['video_thumbnail']['url'] : '',
+					'genre' => self::get_terms_names(get_the_terms($video_id, 'genre'), $current_language),
+					'collection' => $current_collection,
+					'audio' => $language_taxonomies['audio'],
+					'subtitles' => $language_taxonomies['subtitle'],
+					'link' => get_link_site_next($language['slug'], $language['post_video_type'], !empty($collection) ? $collection[0] : ''),
+				]);
+			}
 		}
 
 		return $data;
@@ -164,11 +182,47 @@ class Algolia {
 				];
 
 				if ($taxonomy === 'collection') {
+					$parent_data = 0;
+					if ($term->parent !== 0) {
+						$parent = self::get_term_data(get_term($term->parent), $taxonomy);
+						foreach ($parent as $parent_term) {
+							if ($parent_term['language'] === $current_language) {
+								$parent_data = $parent_term;
+							}
+						}
+					}
+
+					$episodes = get_posts([
+						'post_type' => 'video',
+						'posts_per_page' => -1,
+						'post_status' => 'publish',
+						'fields' => 'ids',
+						'tax_query' => [
+							[
+								'taxonomy' => $taxonomy,
+								'field' => 'term_id',
+								'terms' => $term->term_id,
+							],
+						],
+					]);
+
+					if (!empty($episodes)) {
+						foreach ($episodes as $episode_key => $episode_id) {
+							$episode_languages = get_field('languages', $episode_id);
+							foreach ($episode_languages as $episode_language) {
+								$episodes[$episode_key] = $episode_language['language'] === $current_language ? $episode_language['title'] : get_the_title($episode_id);
+							}
+						}
+					}
+
 					$term_data = array_merge($term_data, [
 						'link' => get_link_site_next($language['slug'], 'Episode', $term),
 						'genre' => self::get_terms_names([$language['collection_genre']], $current_language),
 						'category' => self::get_terms_names($language['collection_category'], $current_language),
-						'thumbnail' => $language['collection_image']['url'],
+						'thumbnail' => $language['collection_image'] !== false ? $language['collection_image']['url'] : '',
+						'parent' => $parent_data,
+						'episodes' => implode(', ', $episodes),
+						'episodes_count' => count($episodes),
 					]);
 				}
 
@@ -212,6 +266,7 @@ class Algolia {
 			$terms = get_terms([
 				'taxonomy' => $taxonomy,
 				'hide_empty' => false,
+				'parent' => 0
 			]);
 
 			foreach ($terms as $term) {
@@ -233,7 +288,13 @@ class Algolia {
 		$item = isset($_POST['item']) ? $_POST['item'] : $item_to_index;
 
 		foreach ($item as $key => $value) {
-			$item[$key] = stripslashes($value);
+			if (is_array($value)) {
+				$item[$key] = array_map(function($v) {
+					return is_array($v) ? array_map('stripslashes', $v) : stripslashes($v);
+				}, $value);
+			} else {
+				$item[$key] = stripslashes($value);
+			}
 		}
 
 		$client = SearchClient::create(self::$app_id, self::$api_key_write);

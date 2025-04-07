@@ -23,6 +23,7 @@ require_once (dirname(__FILE__) . '/classes/rotas_api/rest_recent.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_grid.php');
 
 require_once (dirname(__FILE__) . '/classes/controllers/F7P_Algolia.class.php');
+require_once (dirname(__FILE__) . '/classes/controllers/F7P_Deepl.class.php');
 
 function curl_error_60_workaround( $handle, $r, $url ) {
 
@@ -108,8 +109,8 @@ add_action('acf/save_post', function($post_id) {
 		}
 
 		if (empty($language_data['post_video_length']) || empty($language_data['post_year'])) {
-			$video_id = $language_data['post_video_id'];
-			if (!empty($video_id)) {
+			$video_id = isset($language_data['post_video_id']) ? $language_data['post_video_id'] : null;
+			if ($video_id !== null) {
 				$video_host = $language_data['post_video_host'];
 				$response = wp_remote_get('https://api.feliz7play.com/v4/' . ($video_host === 'Youtube' ? 'youtubeinfo' : 'vimeoinfo') . '/?video_id=' . $video_id);
 				if (!is_wp_error($response)) {
@@ -240,6 +241,24 @@ function filter_rest_api_response($response, $post, $request) {
 		$response->data['acf']['image'] = wp_get_attachment_url($response->data['acf']['image']);
 	}
 
+	// Retorna o objeto da taxonomia de acordo com o idioma ao invés do ID
+	foreach (['collection_audio', 'collection_subtitle'] as $taxonomy_field) {
+		if (isset($response->data['acf'][$taxonomy_field]) && !empty($response->data['acf'][$taxonomy_field])) {
+			$taxonomy_data = [];
+
+			if (is_array($response->data['acf'][$taxonomy_field])) {
+				foreach ($response->data['acf'][$taxonomy_field] as $term_id) {
+					$taxonomy_data[] = get_term($term_id);
+				}
+			} else {
+				$term = get_term($response->data['acf'][$taxonomy_field]);
+				$taxonomy_data = $term;
+			}
+
+			$response->data['acf'][$taxonomy_field] = $taxonomy_data;
+		}
+	}
+
 	$languages = $response->data['acf']['languages'];
 	if (isset($languages) && !empty($languages)) {
 		$filtered_languages = [];
@@ -255,7 +274,6 @@ function filter_rest_api_response($response, $post, $request) {
 				}
 			}
 
-			// Retorna o objeto da taxonomia de acordo com o idioma ao invés do ID
 			foreach (['collection_category', 'collection_genre'] as $taxonomy_field) {
 				if (isset($language[$taxonomy_field]) && !empty($language[$taxonomy_field])) {
 					$taxonomy_data = [];

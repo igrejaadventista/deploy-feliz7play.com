@@ -11,9 +11,8 @@
 require_once __DIR__ . '/admin.php';
 
 if ( ! current_user_can( 'manage_network_users' ) ) {
-wp_die( __( 'Sorry, you are not allowed to access this page.' ), 403 );
+	wp_die( __( 'Sorry, you are not allowed to access this page.' ), 403 );
 }
-
 
 if ( isset( $_GET['action'] ) ) {
 	/** This action is documented in wp-admin/network/edit.php */

@@ -14,7 +14,7 @@ use Elementor\App\Modules\KitLibrary\Data\Taxonomies\Controller as Taxonomies_Co
 use Elementor\Core\Utils\Promotions\Filtered_Promotions_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Module extends BaseModule {
@@ -60,7 +60,7 @@ class Module extends BaseModule {
 		$kit_library = $connect->get_app( 'kit-library' );
 
 		Plugin::$instance->app->set_settings( 'kit-library', [
-			'has_access_to_module' => current_user_can( 'administrator' ),
+			'has_access_to_module' => current_user_can( 'manage_options' ),
 			'subscription_plans' => $this->apply_filter_subscription_plans( $connect->get_subscription_plans( 'kit-library' ) ),
 			'is_pro' => false,
 			'is_library_connected' => $kit_library->is_connected(),
@@ -102,15 +102,9 @@ class Module extends BaseModule {
 		// Assigning this action here since the repository is being loaded by demand.
 		add_action( 'elementor/experiments/feature-state-change/container', [ Repository::class, 'clear_cache' ], 10, 0 );
 
-		if ( Plugin::$instance->experiments->is_feature_active( 'admin_menu_rearrangement' ) ) {
-			add_action( 'elementor/admin/menu_registered/elementor', function( MainMenu $menu ) {
-				$this->register_admin_menu( $menu );
-			} );
-		} else {
-			add_action( 'elementor/admin/menu/register', function( Admin_Menu_Manager $admin_menu ) {
-				$this->register_admin_menu_legacy( $admin_menu );
-			}, Source_Local::ADMIN_MENU_PRIORITY + 30 );
-		}
+		add_action( 'elementor/admin/menu/register', function( Admin_Menu_Manager $admin_menu ) {
+			$this->register_admin_menu_legacy( $admin_menu );
+		}, Source_Local::ADMIN_MENU_PRIORITY + 30 );
 
 		add_action( 'elementor/connect/apps/register', function ( ConnectModule $connect_module ) {
 			$connect_module->register_app( 'kit-library', Kit_Library::get_class_name() );
@@ -118,6 +112,6 @@ class Module extends BaseModule {
 
 		add_action( 'elementor/init', function () {
 			$this->set_kit_library_settings();
-		}, 12 /** after the initiation of the connect kit library */ );
+		}, 12 /** After the initiation of the connect kit library */ );
 	}
 }
