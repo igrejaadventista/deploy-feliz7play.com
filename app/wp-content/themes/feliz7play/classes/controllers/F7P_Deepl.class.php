@@ -74,9 +74,13 @@ class Deepl {
 			$current_post_languages[] = $language_data['language'];
 		}
 
+		if (empty($default_language)) {
+			$default_language = $languages[0];
+		}
+
 		$languages_to_translate = array_diff(self::$required_languages, $current_post_languages);
 
-		if (empty($default_language) || empty($languages_to_translate)) {
+		if (empty($languages_to_translate)) {
 			return;
 		}
 
@@ -86,12 +90,14 @@ class Deepl {
 		];
 	}
 
-	function get_translation($language, $data) {
-		$translation = self::$deepl_client->translateText(
-			$data,
-			null,
-			$language === 'en' ? 'en-us' : $language
-		);
+	function get_translation($text, $target_lang, $source_lang) {
+		$language_map = [
+			'en' => 'en-us',
+			'pt' => 'pt-BR',
+			'es' => 'es',
+		];
+
+		$translation = self::$deepl_client->translateText($text, $source_lang, $language_map[$target_lang]);
 
 		if (is_array($translation)) {
 			return array_map(function($item) {
@@ -109,11 +115,11 @@ class Deepl {
 		}
 
 		foreach ($languages['languages_to_translate'] as $language_to_translate) {
-			$translations = self::get_translation($language_to_translate, [
+			$translations = self::get_translation([
 				$languages['default_language']['title'] ?? '',
 				$languages['default_language']['post_subtitle'] ?? '',
 				$languages['default_language']['post_blurb'] ?? '',
-			]);
+			], $language_to_translate, $languages['default_language']['language']);
 
 			$row = $languages['default_language'];
 			$row['language'] = $language_to_translate;
@@ -140,12 +146,12 @@ class Deepl {
 		];
 
 		foreach ($languages['languages_to_translate'] as $language_to_translate) {
-			$translations = self::get_translation($language_to_translate, [
+			$translations = self::get_translation([
 				$languages['default_language']['title'] ?? '',
 				$languages['default_language']['subtitle'] ?? '',
 				$languages['default_language']['description'] ?? '',
 				$languages['default_language']['collection_season_label'] ?? '',
-			]);
+			], $language_to_translate, $languages['default_language']['language']);
 
 			$row = $languages['default_language'];
 			$row['language'] = $language_to_translate;
