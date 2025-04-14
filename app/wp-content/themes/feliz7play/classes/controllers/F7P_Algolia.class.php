@@ -7,6 +7,7 @@ class Algolia {
 	static $api_key_search;
 	static $api_key_write;
 	static $auto_index;
+	static $client;
 
 	public function __construct() {
 		self::$index = get_option('algolia_index');
@@ -15,26 +16,30 @@ class Algolia {
 		self::$api_key_write = get_option('algolia_api_key_write');
 		self::$auto_index = get_option('algolia_api_auto_index');
 
-		add_action( 'init', function() {
-			add_action('admin_menu', [$this, 'register_algolia_page']);
+		add_action('admin_menu', [$this, 'register_algolia_page']);
 
-			add_action('wp_ajax_nopriv_index_data', [$this, 'index_data']);
-			add_action('wp_ajax_index_data', [$this, 'index_data']);
+		if (isset(self::$app_id) && isset(self::$api_key_write)) {
+			self::$client = SearchClient::create(self::$app_id, self::$api_key_write);
+		}
 
-			add_action('wp_ajax_nopriv_get_data_to_index', [$this, 'get_data_to_index']);
-			add_action('wp_ajax_get_data_to_index', [$this, 'get_data_to_index']);
+		add_action('wp_ajax_nopriv_index_data', [$this, 'index_data']);
+		add_action('wp_ajax_index_data', [$this, 'index_data']);
 
-			add_action('acf/save_post', function($post_id) {
-				if (get_post_type($post_id) !== 'video' || self::$auto_index !== 'on') {
-					return;
-				}
+		add_action('wp_ajax_nopriv_get_data_to_index', [$this, 'get_data_to_index']);
+		add_action('wp_ajax_get_data_to_index', [$this, 'get_data_to_index']);
 
-				$data_to_index = self::get_video_data($post_id);
-				foreach ($data_to_index as $item) {
-					self::index_data($item);
-				}
-			}, 10, 3);
+		add_action('acf/save_post', function($post_id) {
+			if (get_post_type($post_id) !== 'video' || self::$auto_index !== 'on') {
+				return;
+			}
 
+			$data_to_index = self::get_video_data($post_id);
+			foreach ($data_to_index as $item) {
+				self::index_data($item);
+			}
+		}, 10, 3);
+
+		add_action('init', function() {
 			foreach (['genre', 'collection', 'category'] as $taxonomy) {
 				foreach (['created', 'edited'] as $hook_prefix) {
 					add_action($hook_prefix . '_' . $taxonomy, function($term_id) {
@@ -70,7 +75,6 @@ class Algolia {
 			update_option('algolia_app_id', $_POST['algolia_app_id']);
 			update_option('algolia_api_key_search', $_POST['algolia_api_key_search']);
 			update_option('algolia_api_key_write', $_POST['algolia_api_key_write']);
-			update_option('algolia_api_batch', $_POST['algolia_api_batch']);
 			update_option('algolia_api_auto_index', $_POST['algolia_api_auto_index']);
 		}
 
@@ -197,6 +201,7 @@ class Algolia {
 						'posts_per_page' => -1,
 						'post_status' => 'publish',
 						'fields' => 'ids',
+						'no_found_rows' => true,
 						'tax_query' => [
 							[
 								'taxonomy' => $taxonomy,
@@ -247,11 +252,18 @@ class Algolia {
 			'posts_per_page' => -1,
 			'post_status' => 'publish',
 			'fields' => 'ids',
+			'no_found_rows' => true,
 			'meta_query' => [
+				'relation' => 'AND',
 				[
 					'key'     => 'languages_0_language',
 					'compare' => 'EXISTS',
-				]
+				],
+				[
+					'key'     => 'languages_0_post_video_type',
+					'value'   => 'Single',
+					'compare' => '=',
+				],
 			],
 		]);
 
@@ -281,7 +293,7 @@ class Algolia {
 			return $data;
 		}
 
-		wp_send_json($data);
+		wp_send_json(json_encode($data, JSON_UNESCAPED_UNICODE));
 	}
 
 	function index_data($item_to_index) {
@@ -297,8 +309,7 @@ class Algolia {
 			}
 		}
 
-		$client = SearchClient::create(self::$app_id, self::$api_key_write);
-		$response = $client->addOrUpdateObject(self::$index, $item['id'] . '_' . $item['language'], $item);
+		$response = self::$client->addOrUpdateObject(self::$index, $item['id'] . '_' . $item['language'], $item);
 
 		$data = array_merge($response, [
 			'title' => $item['title'],

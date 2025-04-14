@@ -45,14 +45,6 @@
                         </tr>
                         <tr>
                             <th scope="row">
-                                <label for="algolia_api_batch">Lote para indexação:</label>
-                            </th>
-                            <td>
-                                <input type="number" id="algolia_api_batch" name="algolia_api_batch" class="regular-text" value="<?php echo esc_attr(get_option('algolia_api_batch')); ?>" min="1">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
                                 Indexação automática
                             </th>
                             <td>
@@ -82,7 +74,6 @@
 (function($) {
     const url = new URL(location);
     const ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
-    const indexBatch = <?php echo get_option('algolia_api_batch') ?: 0; ?>;
     const buttonIndexData = $('.button__indexData');
 
     $('.nav-tab').click(event => {
@@ -102,8 +93,8 @@
         $('.nav-tab[href="#' + url.searchParams.get('tab') + '"]').click();
     }
 
-    const indexData = (items, item) => {
-        $.post(ajaxUrl, {
+    const indexData = (item) => {
+        return $.post(ajaxUrl, {
             action: 'index_data',
             item: item
         })
@@ -127,35 +118,17 @@
         $.post(ajaxUrl, {
             action: 'get_data_to_index'
         })
-        .done(items => {
-            if (indexBatch && indexBatch > 0) {
-                const queue = [];
-                for (let i = 0; i < items.length; i += indexBatch) {
-                    const batch = items.slice(i, i + indexBatch);
-                    queue.push(...batch);
-                }
+        .done(async items => {
+            items = JSON.parse(items, true);
 
-                const processQueue = () => {
-                    if (queue.length === 0 && $('.loader').length > 0) {
-                        $('.loader').remove();
-                        buttonIndexData.prop('disabled', false);
-                        buttonIndexData.text('Indexar dados');
-                        alert('Dados indexados com sucesso!');
-                        return;
-                    }
-
-                    const item = queue.shift();
-                    indexData(items, item);
-                    setTimeout(processQueue, 100); // Adjust the delay as needed
-                };
-
-                processQueue();
-                return;
+            for (const item of items) {
+                await indexData(item);
             }
 
-            items.forEach(item => {
-                indexData(items, item);
-            });
+            $('.loader').remove();
+            buttonIndexData.prop('disabled', false);
+            buttonIndexData.text('Indexar dados');
+            alert('Dados indexados com sucesso!');
         });
     });
 })(jQuery);
