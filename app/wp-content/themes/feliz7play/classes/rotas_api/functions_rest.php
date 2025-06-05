@@ -62,10 +62,11 @@ function get_line_post($args, $limited = false) {
     $controle = [];
 
     foreach (get_posts($args) as $post) {
-        $collection = get_the_terms($id, 'collection')[0];
+        $collection = get_the_terms($post->ID, 'collection');
 
-        if ($collection) {
-            $collection->parent_slug = get_term($collection->parent, 'collection')->slug;
+        if ($collection !== false && !is_wp_error($collection)) {
+            $collection = $collection[0];
+            $collection->parent_slug = $collection->parent ? get_term($collection->parent, 'collection')->slug : '';
         }
 
         $values = get_post_infos($post);
@@ -108,12 +109,16 @@ function get_line_post_genre($args, $limited = false)
         $video_type = $meta['languages_0_post_video_type'][0];
 
 
-
-        $collection = return_parent_collection(get_the_terms($id, 'collection')[0]);
+        $collection = get_the_terms($id, 'collection');
+        $collection = ($collection !== false && !is_wp_error($collection)) ? return_parent_collection($collection[0]) : null;
 
         if ($video_type == 'Single') {
             $id_check =  $id;
         } else {
+
+            if ($collection == null) {
+                continue;
+            }
 
             $meta = get_term_meta($collection->term_id);
 
@@ -145,8 +150,7 @@ function get_line_post_genre($args, $limited = false)
 
 function return_parent_collection($collection)
 {
-
-    if ($collection->parent) {
+    if (is_object($collection) && $collection->parent) {
         return get_term($collection->parent, 'collection');
     }
 
@@ -158,7 +162,7 @@ function get_collection_infos($collection) {
 
     if (!empty($languages)) {
         foreach ($languages as $key => $language) {
-            $languages[$key]['video_thumbnail'] = wp_get_attachment_image_src($language['collection_image'][0])[0];
+            $languages[$key]['video_thumbnail'] = isset($language['collection_image']) && is_array($language['collection_image']) ? $language['collection_image']['url'] : '';
             $languages[$key]['video_type'] = $collection->taxonomy;
         }
     }
@@ -170,9 +174,11 @@ function get_collection_infos($collection) {
 }
 
 function get_post_infos($post) {
-    $collection = get_the_terms($post->ID, 'collection')[0];
-    if ($collection) {
-        $collection->parent_slug = get_term($collection->parent, 'collection')->slug;
+    $collection = get_the_terms($post->ID, 'collection');
+
+    if ($collection !== false && !is_wp_error($collection)) {
+        $collection = $collection[0];
+        $collection->parent_slug = $collection->parent ? get_term($collection->parent, 'collection')->slug : '';
         $collection_data = get_collection_infos($collection);
     }
 
@@ -195,9 +201,9 @@ function get_post_infos($post) {
                 'description' => wp_strip_all_tags($language['post_blurb']),
                 'video_host' => $language['post_video_host'],
                 'video_id' => $language['post_video_id'],
-                'video_thumbnail' => $language['video_thumbnail']['url'],
-                'video_image_hover' => $language['video_image_hover']['url'],
-                'image_content_header' => $language['image_content_header']['url'],
+                'video_thumbnail' => is_array($language['video_thumbnail']) ? $language['video_thumbnail']['url'] : '',
+                'video_image_hover' => is_array($language['video_image_hover']) ? $language['video_image_hover']['url'] : '',
+                'image_content_header' => is_array($language['image_content_header']) ? $language['image_content_header']['url'] : '',
                 'link' => get_link_site_next($language['slug'], $language['post_video_type'], $collection),
                 'collection' => isset($collection_data['languages'][$key]) ? ['id' => $collection_data['id'], ...$collection_data['languages'][$key]] : [],
                 'category' => isset($category_data['languages'][$key]) ? ['id' => $category_data['id'], ...$category_data['languages'][$key]] : [],
@@ -302,9 +308,9 @@ function get_collection_seasons($collection_id) {
 							foreach ($sub_term_languages as $language) {
 								if ($language['language'] === $key) {
 									unset($language['language']);
-									$term->name = $language['title'];
-									$term->slug = $language['slug'];
-									$term->description = $language['description'];
+									$term->name = isset($language['title']) ? $language['title'] : '';
+									$term->slug = isset($language['slug']) ? $language['slug'] : '';
+									$term->description = isset($language['description']) ? $language['description'] : '';
 									$taxonomy_data[] = $term;
 								}
 							}
@@ -315,9 +321,9 @@ function get_collection_seasons($collection_id) {
                         foreach ($sub_term_languages as $language) {
                             if ($language['language'] === $key) {
                                 unset($language['language']);
-                                $term->name = $language['title'];
-                                $term->slug = $language['slug'];
-                                $term->description = $language['description'];
+                                $term->name = isset($language['title']) ? $language['title'] : '';;
+                                $term->slug = isset($language['slug']) ? $language['slug'] : '';;
+                                $term->description = isset($language['description']) ? $language['description'] : '';
                                 $taxonomy_data = $term;
                             }
                         }
@@ -432,9 +438,10 @@ function get_recentes() {
         $id = $post->ID;
         $meta = get_post_meta($id);
 
-        $video_type = $meta['post_video_type'][0];
+        $video_type = is_array($meta['languages_0_post_video_type']) ? $meta['languages_0_post_video_type'][0] : $meta['languages_0_post_video_type'];
 
-        $collection = return_parent_collection(get_the_terms($id, 'collection')[0]);
+        $collection = get_the_terms($id, 'collection');
+        $collection = ($collection !== false && !is_wp_error($collection)) ? return_parent_collection($collection[0]) : null;
         $id_check = ($video_type == 'Single') ? $id : $collection->term_id;
 
         if (!in_array($id_check, $controle)) {
@@ -575,8 +582,10 @@ function taxonomy_meta_callback($video) {
     foreach (['category', 'genre', 'collection', 'language_audio', 'language_subtitle'] as $tax) {
         $terms = get_the_terms($video['id'], $tax);
 
-        foreach ($terms as $key => $term) {
-            $terms[$key]->languages = get_sorted_languages($term);
+        if (is_array($terms)) {
+            foreach ($terms as $key => $term) {
+                $terms[$key]->languages = get_sorted_languages($term);
+            }
         }
 
         $taxonomy[$tax] = $terms;

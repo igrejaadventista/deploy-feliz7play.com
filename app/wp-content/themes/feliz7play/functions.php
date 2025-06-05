@@ -282,9 +282,9 @@ function filter_rest_api_response($response, $post, $request) {
 							foreach ($term_languages as $term_language) {
 								if ($term_language['language'] === $current_language) {
 									unset($term_language['language']);
-									$term->name = $term_language['title'];
-									$term->slug = $term_language['slug'];
-									$term->description = $term_language['description'];
+									$term->name = isset($term_language['title']) ? $term_language['title'] : '';
+									$term->slug = isset($term_language['slug']) ? $term_language['slug'] : '';
+									$term->description = isset($term_language['description']) ? $term_language['description'] : '';
 									$taxonomy_data[] = $term;
 								}
 							}
@@ -295,9 +295,9 @@ function filter_rest_api_response($response, $post, $request) {
 						foreach ($term_languages as $term_language) {
 							if ($term_language['language'] === $current_language) {
 								unset($term_language['language']);
-								$term->name = $term_language['title'];
-								$term->slug = $term_language['slug'];
-								$term->description = $term_language['description'];
+								$term->name = isset($term_language['title']) ? $term_language['title'] : '';
+								$term->slug = isset($term_language['slug']) ? $term_language['slug'] : '';
+								$term->description = isset($term_language['description']) ? $term_language['description'] : '';
 								$taxonomy_data = $term;
 							}
 						}
@@ -355,7 +355,7 @@ function filter_rest_api_response($response, $post, $request) {
 				}
 			}
 
-			$filtered_languages[$current_language]['social_media'] = $filtered_languages[$current_language]['redes'];
+			$filtered_languages[$current_language]['social_media'] = isset($filtered_languages[$current_language]['redes']) ? $filtered_languages[$current_language]['redes'] : [];
 			unset($filtered_languages[$current_language]['redes']);
 		}
 
