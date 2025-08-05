@@ -384,9 +384,14 @@ function get_custom($items) {
 
     foreach ($items as $item) {
         if ($item['acf_fc_layout'] === 'collection') {
+            $languages = get_sorted_languages($item['to_custom_collection']);
+            foreach ($languages as $key => $language) {
+                $languages[$key]['video_type'] = $item['to_custom_collection']->taxonomy;
+            }
+
             $collection = [
                 'id' => $item['to_custom_collection']->term_id,
-                'languages' => get_sorted_languages($item['to_custom_collection']),
+                'languages' => $languages,
             ];
 
             if (in_array($line['model'], ['circle', 'vertical', 'highlight'])) {
@@ -402,7 +407,7 @@ function get_custom($items) {
 
             if (in_array($line['model'], ['circle', 'vertical', 'highlight'])) {
                 $sufix = $line['model'] === 'circle' ? 'circle' : 'vertical';
-                $collection['video_thumbnail_' . $sufix] = $item['image']['url'];
+                $video['video_thumbnail_' . $sufix] = $item['image']['url'];
             }
 
             array_push($line['items'], $video);
