@@ -407,7 +407,7 @@ function get_custom($items) {
 
             if (in_array($line['model'], ['circle', 'vertical', 'highlight'])) {
                 $sufix = $line['model'] === 'circle' ? 'circle' : 'vertical';
-                $collection['video_thumbnail_' . $sufix] = $item['image']['url'];
+                $video['video_thumbnail_' . $sufix] = $item['image']['url'];
             }
 
             array_push($line['items'], $video);
