@@ -93,36 +93,35 @@ function getVideoInfo($post_id, $video_host, $video_id){
 	// SET VIDEO LENGHT BY VIEMO/YOUTUBE API
 	switch ($video_host) {
 		case "Youtube":
-			$json = file_get_contents("https://api.feliz7play.com/v4/youtubeinfo?video_id=". $video_id );
+			$json = file_get_contents("https://api.feliz7play.com/v4/youtubeinfo?video_id={$video_id}");
 			$obj = json_decode($json);
-			
-			$time = $obj->time;
-			$release_year = date('Y', strtotime($obj->release_date));
 
-			if ($obj) {
+			if ($obj && isset($obj->time) && isset($obj->release_date)) {
+				$time = $obj->time;
+				$release_year = date('Y', strtotime($obj->release_date));
+
 				update_field( 'post_video_length', $time, $post_id );
 				update_field( 'post_video_year', $release_year, $post_id );
-			} 
+			}
 
 			unset($json, $obj, $time, $size, $release_year);
 			break;
-			
+
 		case "Vimeo":
-			$json = file_get_contents("https://api.feliz7play.com/v4/vimeoinfo?video_id=". $video_id);
+			$json = file_get_contents("https://api.feliz7play.com/v4/vimeoinfo?video_id={$video_id}");
 			$obj = json_decode($json);
 
-			$time = $obj->time;
-			$release_year = date('Y', strtotime($obj->release_date));
+			if ($obj && isset($obj->time) && isset($obj->release_date)) {
+				$time = $obj->time;
+				$release_year = date('Y', strtotime($obj->release_date));
 
-			if ($time) {
 				update_field( 'post_video_length', $time, $post_id );
 				update_field( 'post_video_year', $release_year, $post_id );
-			} 
-			
+			}
+
 			unset($json, $obj, $time, $release_year);
 			break;
 	}
-
 	
 }
 
