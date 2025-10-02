@@ -1,6 +1,7 @@
 <?php
 namespace Elementor;
 
+use Elementor\Core\Files\Fonts\Google_Font;
 use Elementor\Core\Utils\Collection;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,7 +23,7 @@ class Utils {
 	const EDITOR_BREAK_LINES_OPTION_KEY = 'elementor_editor_break_lines';
 
 	/**
-	 * A list of safe tage for `validate_html_tag` method.
+	 * A list of safe tags for `validate_html_tag` method.
 	 */
 	const ALLOWED_HTML_WRAPPER_TAGS = [
 		'a',
@@ -91,7 +92,24 @@ class Utils {
 	];
 
 	/**
-	 * Is WP CLI.
+	 * Variables for free to pro upsale modal promotions
+	 */
+
+	const ANIMATED_HEADLINE = 'animated_headline';
+
+	const CTA = 'cta';
+
+	const VIDEO_PLAYLIST = 'video_playlist';
+
+	const TESTIMONIAL_WIDGET = 'testimonial_widget';
+
+	const IMAGE_CAROUSEL = 'image_carousel';
+
+	/**
+	 * Whether WordPress CLI mode is enabled or not.
+	 *
+	 * @access public
+	 * @static
 	 *
 	 * @return bool
 	 */
@@ -100,22 +118,35 @@ class Utils {
 	}
 
 	/**
-	 * Is script debug.
-	 *
 	 * Whether script debug is enabled or not.
 	 *
 	 * @since 1.0.0
 	 * @access public
 	 * @static
 	 *
-	 * @return bool True if it's a script debug is active, false otherwise.
+	 * @return bool
 	 */
 	public static function is_script_debug() {
 		return defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
 	}
 
 	/**
-	 * Whether elementor test mode is enabled or not.
+	 * Whether Elementor debug is enabled or not.
+	 *
+	 * @access public
+	 * @static
+	 *
+	 * @return bool
+	 */
+	public static function is_elementor_debug() {
+		return defined( 'ELEMENTOR_DEBUG' ) && ELEMENTOR_DEBUG;
+	}
+
+	/**
+	 * Whether Elementor test mode is enabled or not.
+	 *
+	 * @access public
+	 * @static
 	 *
 	 * @return bool
 	 */
@@ -164,11 +195,11 @@ class Utils {
 	 * @static
 	 * @access public
 	 *
-	 * @param $from
-	 * @param $to
+	 * @param string $from
+	 * @param string $to
 	 *
 	 * @return string
-	 * @throws \Exception
+	 * @throws \Exception Replace URL exception.
 	 */
 	public static function replace_urls( $from, $to ) {
 		$from = trim( $from );
@@ -216,6 +247,7 @@ class Utils {
 		$rows_affected += (int) apply_filters( 'elementor/tools/replace-urls', 0, $from, $to );
 
 		Plugin::$instance->files_manager->clear_cache();
+		Google_Font::clear_cache();
 
 		return sprintf(
 			/* translators: %d: Number of rows. */
@@ -248,7 +280,7 @@ class Utils {
 		 * Filters whether the post type supports editing with Elementor.
 		 *
 		 * @since 1.0.0
-		 * @deprecated 2.2.0 Use `elementor/utils/is_post_support` Instead
+		 * @deprecated 2.2.0 Use `elementor/utils/is_post_support` hook Instead.
 		 *
 		 * @param bool $is_supported Whether the post type supports editing with Elementor.
 		 * @param int $post_id Post ID.
@@ -367,8 +399,8 @@ class Utils {
 			define( 'DONOTCDN', true );
 		}
 
-		if ( ! defined( 'DONOTCACHCEOBJECT' ) ) {
-			define( 'DONOTCACHCEOBJECT', true );
+		if ( ! defined( 'DONOTCACHEOBJECT' ) ) {
+			define( 'DONOTCACHEOBJECT', true );
 		}
 
 		// Set the headers to prevent caching for the different browsers.
@@ -409,10 +441,10 @@ class Utils {
 	 *
 	 * @since 1.9.0
 	 * @access public
-	 * @deprecated 3.3.0
+	 * @deprecated 3.3.0 Use `Plugin::$instance->documents->get_create_new_post_url()` instead.
 	 * @static
 	 *
-	 * @param string $post_type Optional. Post type slug. Default is 'page'.
+	 * @param string      $post_type Optional. Post type slug. Default is 'page'.
 	 * @param string|null $template_type Optional. Query arg 'template_type'. Default is null.
 	 *
 	 * @return string A URL for creating new post using Elementor.
@@ -532,7 +564,7 @@ class Utils {
 		 *
 		 * Filters the meta tag containing the viewport information.
 		 *
-		 * This hook can be used to change the intial viewport meta tag set by Elementor
+		 * This hook can be used to change the initial viewport meta tag set by Elementor
 		 * and replace it with a different viewport tag.
 		 *
 		 * @since 2.5.0
@@ -549,9 +581,10 @@ class Utils {
 	 * Add Elementor Config js vars to the relevant script handle,
 	 * WP will wrap it with <script> tag.
 	 * To make sure this script runs thru the `script_loader_tag` hook, use a known handle value.
+	 *
 	 * @param string $handle
 	 * @param string $js_var
-	 * @param mixed $config
+	 * @param mixed  $config
 	 */
 	public static function print_js_config( $handle, $js_var, $config ) {
 		$config = wp_json_encode( $config );
@@ -583,7 +616,7 @@ class Utils {
 	/**
 	 * Checks a control value for being empty, including a string of '0' not covered by PHP's empty().
 	 *
-	 * @param mixed $source
+	 * @param mixed       $source
 	 * @param bool|string $key
 	 *
 	 * @return bool
@@ -607,7 +640,7 @@ class Utils {
 	/**
 	 * Convert HTMLEntities to UTF-8 characters
 	 *
-	 * @param $string
+	 * @param string $string
 	 * @return string
 	 */
 	public static function urlencode_html_entities( $string ) {
@@ -702,8 +735,8 @@ class Utils {
 	 *
 	 * @since 3.1.0
 	 *
-	 * @param $menu_slug
-	 * @param $new_label
+	 * @param string $menu_slug
+	 * @param string $new_label
 	 * @access public
 	 */
 	public static function change_submenu_first_item_label( $menu_slug, $new_label ) {
@@ -724,7 +757,7 @@ class Utils {
 	 * @return string
 	 */
 	public static function validate_html_tag( $tag ) {
-		return in_array( strtolower( $tag ), self::ALLOWED_HTML_WRAPPER_TAGS ) ? $tag : 'div';
+		return $tag && in_array( strtolower( $tag ), self::ALLOWED_HTML_WRAPPER_TAGS ) ? $tag : 'div';
 	}
 
 	/**
@@ -804,15 +837,14 @@ class Utils {
 	}
 
 	/**
-	 * @param $file
-	 * @param mixed ...$args
+	 * @param string $file
+	 * @param mixed  ...$args
 	 * @return false|string
 	 */
 	public static function file_get_contents( $file, ...$args ) {
 		if ( ! is_file( $file ) || ! is_readable( $file ) ) {
 			return false;
 		}
-
 		return file_get_contents( $file, ...$args );
 	}
 
@@ -821,21 +853,33 @@ class Utils {
 			return null;
 		}
 
-		if ( $_FILES === $super_global ) {
-			$super_global[ $key ]['name'] = sanitize_file_name( $super_global[ $key ]['name'] );
-
-			return $super_global[ $key ];
+		if ( $_FILES === $super_global ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return isset( $super_global[ $key ]['name'] ) ?
+				self::sanitize_file_name( $super_global[ $key ] ) :
+				self::sanitize_multi_upload( $super_global[ $key ] );
 		}
 
 		return wp_kses_post_deep( wp_unslash( $super_global[ $key ] ) );
 	}
 
+	private static function sanitize_multi_upload( $fields ) {
+		return array_map( function( $field ) {
+			return array_map( 'self::sanitize_file_name', $field );
+		}, $fields );
+	}
+
+	private static function sanitize_file_name( $file ) {
+		$file['name'] = sanitize_file_name( $file['name'] );
+
+		return $file;
+	}
+
 	/**
 	 * Return specific object property value if exist from array of keys.
 	 *
-	 * @param $array
-	 * @param $keys
-	 * @return key|false
+	 * @param array $array
+	 * @param array $keys
+	 * @return mixed|null
 	 */
 	public static function get_array_value_by_keys( $array, $keys ) {
 		$keys = (array) $keys;
@@ -846,5 +890,59 @@ class Utils {
 			$array = $array[ $key ];
 		}
 		return $array;
+	}
+
+	public static function get_cached_callback( $callback, $cache_key, $cache_time = 24 * HOUR_IN_SECONDS ) {
+		$cache = get_site_transient( $cache_key );
+
+		if ( ! $cache ) {
+			$cache = call_user_func( $callback );
+
+			if ( ! is_wp_error( $cache ) ) {
+				set_site_transient( $cache_key, $cache, $cache_time );
+			}
+		}
+
+		return $cache;
+	}
+
+	public static function is_sale_time(): bool {
+		$sale_start_time = gmmktime( 12, 0, 0, 6, 10, 2025 );
+		$sale_end_time = gmmktime( 3, 59, 0, 6, 17, 2025 );
+
+		$now_time = gmdate( 'U' );
+
+		return $now_time >= $sale_start_time && $now_time <= $sale_end_time;
+	}
+
+	public static function safe_throw( string $message ) {
+		if ( ! static::is_elementor_debug() ) {
+			return;
+		}
+
+		throw new \Exception( esc_html( $message ) );
+	}
+
+	public static function has_invalid_post_permissions( $post ): bool {
+		$is_image_attachment = 'attachment' === $post->post_type && strpos( $post->post_mime_type, 'image/' ) === 0;
+
+		if ( $is_image_attachment ) {
+			return false;
+		}
+
+		$is_private = 'private' === $post->post_status
+			&& ! current_user_can( 'read_private_posts', $post->ID );
+
+		$not_allowed = 'publish' !== $post->post_status
+			&& ! current_user_can( 'edit_post', $post->ID );
+
+		$password_required = post_password_required( $post->ID )
+			&& ! current_user_can( 'edit_post', $post->ID );
+
+		return $is_private || $not_allowed || $password_required;
+	}
+
+	public static function is_custom_kit_applied() {
+		return (bool) Plugin::$instance->kits_manager->get_previous_id();
 	}
 }

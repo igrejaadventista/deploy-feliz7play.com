@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor\App\Modules\ImportExport;
 
 use Elementor\Core\Utils\Collection;
@@ -8,7 +7,7 @@ use Elementor\Plugin;
 use Elementor\App\Modules\KitLibrary\Connect\Kit_Library;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Wp_Cli extends \WP_CLI_Command {
@@ -98,7 +97,7 @@ class Wp_Cli extends \WP_CLI_Command {
 	 * @param array $assoc_args
 	 */
 	public function import( array $args, array $assoc_args ) {
-		if ( ! current_user_can( 'administrator' ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			\WP_CLI::error( 'You must run this command as an admin user' );
 		}
 
@@ -187,6 +186,12 @@ class Wp_Cli extends \WP_CLI_Command {
 
 			\WP_CLI::success( 'Kit imported successfully' );
 		} catch ( \Error $error ) {
+			Plugin::$instance->logger->get_logger()->error( $error->getMessage(), [
+				'meta' => [
+					'trace' => $error->getTraceAsString(),
+				],
+			] );
+
 			if ( $url ) {
 				Plugin::$instance->uploads_manager->remove_file_or_dir( dirname( $zip_path ) );
 			}
@@ -272,14 +277,4 @@ class Wp_Cli extends \WP_CLI_Command {
 
 		return $file;
 	}
-
-	/**
-	 * Handle the import process of plugins.
-	 *
-	 * Returns a string contains the successfully installed and activated plugins.
-	 *
-	 * @param array $plugins
-	 * @return string
-	 */
-
 }

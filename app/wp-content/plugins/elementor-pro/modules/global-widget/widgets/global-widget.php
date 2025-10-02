@@ -54,7 +54,7 @@ class Global_Widget extends Base_Widget {
 			);
 
 			if ( ! $original_widget_type ) {
-				throw new \Exception( 'Original Widget Type not found.' );
+				throw new \Exception( 'Original widget type not found.' );
 			}
 
 			// If it saved as draft it already have the recent settings.
@@ -100,6 +100,12 @@ class Global_Widget extends Base_Widget {
 			// If: Item saved as draft
 			// Then: the the `$raw_data` hold recently saved draft template, with original widget type.
 			$raw_data['widgetType'] = $this->get_template_widget_type();
+
+			return $raw_data;
+		}
+
+		if ( apply_filters( 'elementor/element/should_render_shortcode', false ) ) {
+			$raw_data['widgetType'] = $this->get_name();
 
 			return $raw_data;
 		}

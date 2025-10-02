@@ -37,6 +37,24 @@ class ProgressTracker extends Base_Widget {
 		return [ 'progress', 'tracker', 'read', 'scroll' ];
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-progress-tracker' ];
+	}
+
 	private function register_content_controls() {
 		$this->start_controls_section(
 			'section_content_scrolling_tracker',
@@ -82,6 +100,9 @@ class ProgressTracker extends Base_Widget {
 				'type' => Controls_Manager::TEXT,
 				'description' => esc_html__( 'Add the CSS ID or Class of a specific element on this page to track its progress separately', 'elementor-pro' ),
 				'frontend_available' => true,
+				'ai' => [
+					'active' => false,
+				],
 				'condition' => [
 					'relative_to' => 'selector',
 				],
@@ -94,7 +115,6 @@ class ProgressTracker extends Base_Widget {
 			[
 				'type' => Controls_Manager::RAW_HTML,
 				'raw' => esc_html__( 'Note: You can only track progress relative to Post Content on a single post template.', 'elementor-pro' ),
-				'separator' => 'none',
 				'content_classes' => 'elementor-descriptor',
 				'condition' => [
 					'relative_to' => 'post_content',
@@ -179,13 +199,18 @@ class ProgressTracker extends Base_Widget {
 			[
 				'label' => esc_html__( 'Size', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 200,
 					],
+					'em' => [
+						'max' => 20,
+					],
+					'rem' => [
+						'max' => 20,
+					],
 				],
-				'size_units' => [ 'px' ],
 				'selectors' => [
 					'{{WRAPPER}}' => '--circular-width: {{SIZE}}{{UNIT}}; --circular-height: {{SIZE}}{{UNIT}};',
 				],
@@ -222,13 +247,18 @@ class ProgressTracker extends Base_Widget {
 			[
 				'label' => esc_html__( 'Width', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 400,
 					],
+					'em' => [
+						'max' => 40,
+					],
+					'rem' => [
+						'max' => 40,
+					],
 				],
-				'size_units' => [ 'px' ],
 				'selectors' => [
 					'{{WRAPPER}}' => '--circular-progress-width: {{SIZE}}{{UNIT}};',
 				],
@@ -309,7 +339,7 @@ class ProgressTracker extends Base_Widget {
 			[
 				'label' => esc_html__( 'Width', 'elementor-pro' ),
 				'type' => Controls_Manager::DIMENSIONS,
-				'size_units' => [ 'px', 'em', '%' ],
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'selectors' => [
 					'{{WRAPPER}}' => '--horizontal-progress-border-top-width: {{TOP}}{{UNIT}}; --horizontal-progress-border-right-width: {{RIGHT}}{{UNIT}}; --horizontal-progress-border-bottom-width: {{BOTTOM}}{{UNIT}}; --horizontal-progress-border-left-width: {{LEFT}}{{UNIT}};',
 				],
@@ -340,7 +370,7 @@ class ProgressTracker extends Base_Widget {
 			[
 				'label' => esc_html__( 'Border Radius', 'elementor-pro' ),
 				'type' => Controls_Manager::DIMENSIONS,
-				'size_units' => [ 'px', '%', 'em' ],
+				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
 				'selectors' => [
 					'{{WRAPPER}}' => '--progress-border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -378,13 +408,18 @@ class ProgressTracker extends Base_Widget {
 			[
 				'label' => esc_html__( 'Width', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 400,
 					],
+					'em' => [
+						'max' => 40,
+					],
+					'rem' => [
+						'max' => 40,
+					],
 				],
-				'size_units' => [ 'px' ],
 				'selectors' => [
 					'{{WRAPPER}}' => '--circular-background-width: {{SIZE}}{{UNIT}};',
 				],
@@ -417,17 +452,18 @@ class ProgressTracker extends Base_Widget {
 			[
 				'label' => esc_html__( 'Height', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'vh', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
 					],
-					'vh' => [
-						'min' => 0,
-						'max' => 100,
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
-				'size_units' => [ 'px', 'vh' ],
 				'selectors' => [
 					'{{WRAPPER}}' => '--horizontal-height: {{SIZE}}{{UNIT}}',
 				],
@@ -465,7 +501,7 @@ class ProgressTracker extends Base_Widget {
 			[
 				'label' => esc_html__( 'Width', 'elementor-pro' ),
 				'type' => Controls_Manager::DIMENSIONS,
-				'size_units' => [ 'px', 'em', '%' ],
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'selectors' => [
 					'{{WRAPPER}}' => '--horizontal-border-top-width: {{TOP}}{{UNIT}}; --horizontal-border-right-width: {{RIGHT}}{{UNIT}}; --horizontal-border-bottom-width: {{BOTTOM}}{{UNIT}}; --horizontal-border-left-width: {{LEFT}}{{UNIT}};',
 				],
@@ -496,7 +532,7 @@ class ProgressTracker extends Base_Widget {
 			[
 				'label' => esc_html__( 'Border Radius', 'elementor-pro' ),
 				'type' => Controls_Manager::DIMENSIONS,
-				'size_units' => [ 'px', '%', 'em' ],
+				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
 				'selectors' => [
 					'{{WRAPPER}}' => '--border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -522,7 +558,7 @@ class ProgressTracker extends Base_Widget {
 			[
 				'label' => esc_html__( 'Padding', 'elementor-pro' ),
 				'type' => Controls_Manager::DIMENSIONS,
-				'size_units' => [ 'px', '%', 'em' ],
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'selectors' => [
 					'{{WRAPPER}}' => '--tracker-padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -584,11 +620,6 @@ class ProgressTracker extends Base_Widget {
 			[
 				'name' => 'percentage_text_shadow',
 				'selector' => '{{WRAPPER}} .current-progress-percentage',
-				'fields_options' => [
-					'text_shadow_type' => [
-						'label' => esc_html__( 'Text Shadow', 'elementor-pro' ),
-					],
-				],
 			]
 		);
 

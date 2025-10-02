@@ -37,12 +37,16 @@ class Lottie extends Base_Widget {
 		return [ 'lottie' ];
 	}
 
-	public function get_style_depends() {
-		return [ 'e-lottie' ];
-	}
-
 	public function get_icon() {
 		return 'eicon-lottie';
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function get_style_depends(): array {
+		return [ 'widget-lottie', 'e-lottie' ];
 	}
 
 	protected function register_controls() {
@@ -85,7 +89,7 @@ class Lottie extends Base_Widget {
 			[
 				'label' => esc_html__( 'Upload JSON File', 'elementor-pro' ),
 				'type' => Controls_Manager::MEDIA,
-				'media_type' => 'application/json',
+				'media_types' => [ 'application/json' ],
 				'frontend_available' => true,
 				'condition' => [
 					'source' => 'media_file',
@@ -388,6 +392,7 @@ class Lottie extends Base_Widget {
 					'animation' => esc_html__( 'Animation', 'elementor-pro' ),
 					'column' => esc_html__( 'Column', 'elementor-pro' ),
 					'section' => esc_html__( 'Section', 'elementor-pro' ),
+					'container' => esc_html__( 'Container', 'elementor-pro' ),
 				],
 				'frontend_available' => true,
 			]
@@ -403,7 +408,6 @@ class Lottie extends Base_Widget {
 					'trigger!' => 'bind_to_scroll',
 				],
 				'default' => [
-					'unit' => 'px',
 					'size' => 1,
 				],
 				'range' => [
@@ -429,7 +433,7 @@ class Lottie extends Base_Widget {
 				'frontend_available' => true,
 				'render_type' => 'none',
 				'default' => [
-					'size' => '0',
+					'size' => 0,
 					'unit' => '%',
 				],
 				'size_units' => [ '%' ],
@@ -444,7 +448,7 @@ class Lottie extends Base_Widget {
 				'frontend_available' => true,
 				'render_type' => 'none',
 				'default' => [
-					'size' => '100',
+					'size' => 100,
 					'unit' => '%',
 				],
 				'size_units' => [ '%' ],
@@ -520,6 +524,7 @@ class Lottie extends Base_Widget {
 			[
 				'label' => esc_html__( 'Width', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'default' => [
 					'unit' => '%',
 				],
@@ -529,7 +534,6 @@ class Lottie extends Base_Widget {
 				'mobile_default' => [
 					'unit' => '%',
 				],
-				'size_units' => [ '%', 'px', 'vw' ],
 				'range' => [
 					'%' => [
 						'min' => 1,
@@ -538,6 +542,12 @@ class Lottie extends Base_Widget {
 					'px' => [
 						'min' => 1,
 						'max' => 1000,
+					],
+					'em' => [
+						'max' => 100,
+					],
+					'rem' => [
+						'max' => 100,
 					],
 					'vw' => [
 						'min' => 1,
@@ -555,6 +565,7 @@ class Lottie extends Base_Widget {
 			[
 				'label' => esc_html__( 'Max Width', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'default' => [
 					'unit' => '%',
 				],
@@ -564,7 +575,6 @@ class Lottie extends Base_Widget {
 				'mobile_default' => [
 					'unit' => '%',
 				],
-				'size_units' => [ '%', 'px', 'vw' ],
 				'range' => [
 					'%' => [
 						'min' => 1,
@@ -574,6 +584,12 @@ class Lottie extends Base_Widget {
 						'min' => 1,
 						'max' => 1000,
 					],
+					'em' => [
+						'max' => 100,
+					],
+					'rem' => [
+						'max' => 100,
+					],
 					'vw' => [
 						'min' => 1,
 						'max' => 100,
@@ -582,14 +598,7 @@ class Lottie extends Base_Widget {
 				'selectors' => [
 					'{{WRAPPER}}' => '--lottie-container-max-width: {{SIZE}}{{UNIT}};',
 				],
-			]
-		);
-
-		$this->add_control(
-			'separator_panel_style',
-			[
-				'type' => Controls_Manager::DIVIDER,
-				'style' => 'thick',
+				'separator' => 'after',
 			]
 		);
 
@@ -665,10 +674,11 @@ class Lottie extends Base_Widget {
 			$this->add_control(
 				'background_hover_transition',
 				[
-					'label' => esc_html__( 'Transition Duration', 'elementor-pro' ),
+					'label' => esc_html__( 'Transition Duration', 'elementor-pro' ) . ' (s)',
 					'type' => Controls_Manager::SLIDER,
 					'range' => [
 						'px' => [
+							'min' => 0,
 							'max' => 3,
 							'step' => 0.1,
 						],
@@ -756,10 +766,16 @@ class Lottie extends Base_Widget {
 			[
 				'label' => esc_html__( 'Spacing', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -853,7 +869,7 @@ class Lottie extends Base_Widget {
 		var widget_container = '<div class="e-lottie__container"><div class="e-lottie__animation"></div>' + widget_caption + '</div>';
 
 		if ( settings.custom_link.url && 'custom' === settings.link_to ) {
-			widget_container = '<a class="e-lottie__container__link" href="' + settings.custom_link.url + '">' + widget_container + '</a>';
+			widget_container = '<a class="e-lottie__container__link" href="' + elementor.helpers.sanitizeUrl( settings.custom_link.url ) + '">' + widget_container + '</a>';
 		}
 
 		print( widget_container );

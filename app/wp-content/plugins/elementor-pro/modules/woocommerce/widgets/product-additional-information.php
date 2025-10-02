@@ -22,6 +22,20 @@ class Product_Additional_Information extends Base_Widget {
 		return ' eicon-product-info';
 	}
 
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-woocommerce-product-additional-information' ];
+	}
+
 	protected function register_controls() {
 
 		$this->start_controls_section( 'section_additional_info_style', [
@@ -61,7 +75,6 @@ class Product_Additional_Information extends Base_Widget {
 			Group_Control_Typography::get_type(),
 			[
 				'name' => 'heading_typography',
-				'label' => esc_html__( 'Typography', 'elementor-pro' ),
 				'selector' => '.woocommerce {{WRAPPER}} h2',
 				'condition' => [
 					'show_heading!' => '',
@@ -85,7 +98,6 @@ class Product_Additional_Information extends Base_Widget {
 			Group_Control_Typography::get_type(),
 			[
 				'name' => 'content_typography',
-				'label' => esc_html__( 'Typography', 'elementor-pro' ),
 				'selector' => '.woocommerce {{WRAPPER}} .shop_attributes',
 			]
 		);
@@ -95,9 +107,9 @@ class Product_Additional_Information extends Base_Widget {
 
 	protected function render() {
 		global $product;
-		$product = wc_get_product();
+		$product = $this->get_product();
 
-		if ( empty( $product ) ) {
+		if ( ! $product ) {
 			return;
 		}
 

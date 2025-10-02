@@ -10,10 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 trait Base_Widget_Trait {
 	public function is_editable() {
-		if ( License_API::is_license_active() ) {
-			return true;
-		}
-		return License_API::is_license_expired() && ! License_API::is_licence_pro_trial();
+		return License_API::is_license_active();
 	}
 
 	public function get_categories() {
@@ -33,12 +30,14 @@ trait Base_Widget_Trait {
 		// The local path of the widget's CSS file that is being read and saved in the DB when the CSS content should be printed inline.
 		$file_path = Plugin::instance()->get_frontend_file_path( $file_name, $has_custom_breakpoints );
 
+		$file_timestamp = file_exists( $file_path ) ? filemtime( $file_path ) : '';
+
 		return [
 			'key' => $widget_name,
 			'version' => ELEMENTOR_PRO_VERSION,
 			'file_path' => $file_path,
 			'data' => [
-				'file_url' => $file_url,
+				'file_url' => $file_url . '?ver=' . $file_timestamp,
 			],
 		];
 	}

@@ -4,8 +4,8 @@ namespace Elementor\Core\Editor;
 use Elementor\Core\Breakpoints\Manager as Breakpoints_Manager;
 use Elementor\Core\Common\Modules\Ajax\Module;
 use Elementor\Core\Debug\Loading_Inspection_Manager;
-use Elementor\Core\Editor\Config_Providers\Config_Provider_Factory;
-use Elementor\Core\Experiments\Manager as Experiments_Manager;
+use Elementor\Core\Editor\Loader\Editor_Loader_Factory;
+use Elementor\Core\Editor\Loader\Editor_Loader_Interface;
 use Elementor\Core\Settings\Manager as SettingsManager;
 use Elementor\Plugin;
 use Elementor\TemplateLibrary\Source_Local;
@@ -30,8 +30,6 @@ class Editor {
 	 * User capability required to access Elementor editor.
 	 */
 	const EDITING_CAPABILITY = 'edit_posts';
-
-	const EDITOR_V2_EXPERIMENT_NAME = 'editor_v2';
 
 	/**
 	 * Post ID.
@@ -68,7 +66,7 @@ class Editor {
 	public $promotion;
 
 	/**
-	 * @var Editor_Loader
+	 * @var Editor_Loader_Interface
 	 */
 	private $loader;
 
@@ -354,9 +352,7 @@ class Editor {
 		// Tweak for WP Admin menu icons
 		wp_print_styles( 'editor-buttons' );
 
-		$this->get_loader()->print_client_settings();
 		$this->get_loader()->enqueue_scripts();
-		$this->get_loader()->load_scripts_translations();
 
 		Plugin::$instance->controls_manager->enqueue_control_scripts();
 
@@ -491,8 +487,6 @@ class Editor {
 		$plugin->widgets_manager->render_widgets_content();
 		$plugin->elements_manager->render_elements_content();
 
-		$plugin->schemes_manager->print_schemes_templates();
-
 		$plugin->dynamic_tags->print_templates();
 
 		$this->get_loader()->register_additional_templates();
@@ -541,8 +535,6 @@ class Editor {
 		add_action( 'admin_action_elementor', [ $this, 'init' ] );
 		add_action( 'template_redirect', [ $this, 'redirect_to_new_url' ] );
 
-		$this->register_editor_v2_experiment();
-
 		// Handle autocomplete feature for URL control.
 		add_filter( 'wp_link_query_args', [ $this, 'filter_wp_link_query_args' ] );
 		add_filter( 'wp_link_query', [ $this, 'filter_wp_link_query' ] );
@@ -589,36 +581,63 @@ class Editor {
 	/**
 	 * Get loader.
 	 *
-	 * @return Editor_Loader
+	 * @return Editor_Loader_Interface
 	 */
 	private function get_loader() {
 		if ( ! $this->loader ) {
-			$this->loader = new Editor_Loader( Config_Provider_Factory::create() );
-			$this->loader->register_hooks();
+			$this->loader = Editor_Loader_Factory::create();
+
+			$this->loader->init();
 		}
 
 		return $this->loader;
 	}
 
 	/**
-	 * Adding Editor V2 experiment.
+	 * Get elements presets.
 	 *
-	 * @return void
-	 * @throws \Exception
+	 * @return array
 	 */
-	private function register_editor_v2_experiment() {
-		Plugin::$instance->experiments->add_feature( [
-			'name' => static::EDITOR_V2_EXPERIMENT_NAME,
-			'title' => esc_html__( 'Editor Top Bar', 'elementor' ),
-			'description' => sprintf(
-				esc_html__(
-					'Get a sneak peek of the new Editor powered by React. The beautiful design and experimental layout of the Top bar are just some of the exciting tools on their way. %s',
-					'elementor'
-				),
-				'<a href="https://go.elementor.com/wp-dash-elementor-top-bar/" target="_blank">' . esc_html__( 'Learn more', 'elementor' ) . '</a>'
-			),
-			'default' => Experiments_Manager::STATE_INACTIVE,
-			'status' => Experiments_Manager::RELEASE_STATUS_ALPHA,
-		] );
+	public function get_elements_presets() {
+		$element_types = Plugin::$instance->elements_manager->get_element_types();
+		$presets = [];
+
+		foreach ( $element_types as $el_type => $element ) {
+			$this->check_element_for_presets( $element, $el_type, $presets );
+		}
+
+		return $presets;
+	}
+
+	/**
+	 * @return void
+	 */
+	private function check_element_for_presets( $element, $el_type, &$presets ) {
+		$element_presets = $element->get_panel_presets();
+
+		if ( empty( $element_presets ) ) {
+			return;
+		}
+
+		foreach ( $element_presets as $key => $preset ) {
+			$this->maybe_add_preset( $el_type, $preset, $key, $presets );
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	private function maybe_add_preset( $el_type, $preset, $key, &$presets ) {
+		if ( $this->is_valid_preset( $el_type, $preset ) ) {
+			$presets[ $key ] = $preset;
+		}
+	}
+
+	/**
+	 * @return boolean
+	 */
+	private function is_valid_preset( $el_type, $preset ) {
+		return isset( $preset['replacements']['custom']['originalWidget'] )
+			&& $el_type === $preset['replacements']['custom']['originalWidget'];
 	}
 }

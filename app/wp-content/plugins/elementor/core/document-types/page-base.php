@@ -8,15 +8,21 @@ use Elementor\Plugin;
 use Elementor\Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 abstract class PageBase extends Document {
 
 	/**
+	 * Get Properties
+	 *
+	 * Return the document configuration properties.
+	 *
 	 * @since 2.0.8
 	 * @access public
 	 * @static
+	 *
+	 * @return array
 	 */
 	public static function get_properties() {
 		$properties = parent::get_properties();
@@ -40,6 +46,9 @@ abstract class PageBase extends Document {
 				'theme-elements-single' => [
 					'title' => esc_html__( 'Single', 'elementor' ),
 					'active' => false,
+					'promotion' => [
+						'url' => esc_url( 'https://go.elementor.com/go-pro-section-single-widget-panel/' ),
+					],
 				],
 			]
 		);
@@ -60,11 +69,11 @@ abstract class PageBase extends Document {
 	protected function register_controls() {
 		parent::register_controls();
 
-		self::register_hide_title_control( $this );
+		static::register_hide_title_control( $this );
 
-		self::register_post_fields_control( $this );
+		static::register_post_fields_control( $this );
 
-		self::register_style_controls( $this );
+		static::register_style_controls( $this );
 	}
 
 	/**
@@ -92,6 +101,7 @@ abstract class PageBase extends Document {
 					'<a href="javascript: $e.run( \'panel/global/open\' ).then( () => $e.route( \'panel/global/settings-layout\' ) )">',
 					'</a>'
 				),
+				'separator' => 'before',
 				'selectors' => [
 					':root' => '--page-title-display: none',
 				],
@@ -161,6 +171,29 @@ abstract class PageBase extends Document {
 		Plugin::$instance->controls_manager->add_custom_css_controls( $document );
 	}
 
+	public static function get_labels(): array {
+		$plural_label   = static::get_plural_title();
+		$singular_label = static::get_title();
+
+		$labels = [
+			'name' => $plural_label, // Already translated.
+			'singular_name' => $singular_label, // Already translated.
+			'all_items' => sprintf( __( 'All %s', 'elementor' ), $plural_label ),
+			'add_new' => esc_html__( 'Add New', 'elementor' ),
+			'add_new_item' => sprintf( __( 'Add New %s', 'elementor' ), $singular_label ),
+			'edit_item' => sprintf( __( 'Edit %s', 'elementor' ), $singular_label ),
+			'new_item' => sprintf( __( 'New %s', 'elementor' ), $singular_label ),
+			'view_item' => sprintf( __( 'View %s', 'elementor' ), $singular_label ),
+			'search_items' => sprintf( __( 'Search %s', 'elementor' ), $plural_label ),
+			'not_found' => sprintf( __( 'No %s found.', 'elementor' ), strtolower( $plural_label ) ),
+			'not_found_in_trash' => sprintf( __( 'No %s found in Trash.', 'elementor' ), strtolower( $plural_label ) ),
+			'parent_item_colon' => '',
+			'menu_name' => $plural_label,
+		];
+
+		return $labels;
+	}
+
 	/**
 	 * @since 2.0.0
 	 * @access public
@@ -182,6 +215,10 @@ abstract class PageBase extends Document {
 					'label' => esc_html__( 'Excerpt', 'elementor' ),
 					'type' => Controls_Manager::TEXTAREA,
 					'default' => $document->post->post_excerpt,
+					'separator' => 'before',
+					'ai' => [
+						'type' => 'excerpt',
+					],
 				]
 			);
 		}
@@ -196,6 +233,32 @@ abstract class PageBase extends Document {
 						'id' => get_post_thumbnail_id(),
 						'url' => (string) get_the_post_thumbnail_url( $document->post->ID ),
 					],
+					'separator' => 'before',
+				]
+			);
+		}
+
+		if ( is_post_type_hierarchical( $document->post->post_type ) ) {
+			$document->add_control(
+				'menu_order',
+				[
+					'label' => esc_html__( 'Order', 'elementor' ),
+					'type' => Controls_Manager::NUMBER,
+					'default' => $document->post->menu_order,
+					'separator' => 'before',
+				]
+			);
+		}
+
+		if ( post_type_supports( $document->post->post_type, 'comments' ) ) {
+			$document->add_control(
+				'comment_status',
+				[
+					'label' => esc_html__( 'Allow Comments', 'elementor' ),
+					'type' => Controls_Manager::SWITCHER,
+					'return_value' => 'open',
+					'default' => $document->post->comment_status,
+					'separator' => 'before',
 				]
 			);
 		}
@@ -209,7 +272,7 @@ abstract class PageBase extends Document {
 	 *
 	 * @param array $data
 	 *
-	 * @throws \Exception
+	 * @throws \Exception Exception If the post ID is not set.
 	 */
 	public function __construct( array $data = [] ) {
 		if ( $data ) {

@@ -2,6 +2,7 @@
 namespace Elementor\Core\Experiments;
 
 use Elementor\Core\Base\Base_Object;
+use Elementor\Core\Experiments\Exceptions\Dependency_Exception;
 use Elementor\Core\Upgrade\Manager as Upgrade_Manager;
 use Elementor\Core\Utils\Collection;
 use Elementor\Modules\System_Info\Module as System_Info;
@@ -11,7 +12,7 @@ use Elementor\Tracker;
 use Elementor\Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Manager extends Base_Object {
@@ -21,8 +22,6 @@ class Manager extends Base_Object {
 	const RELEASE_STATUS_ALPHA = 'alpha';
 
 	const RELEASE_STATUS_BETA = 'beta';
-
-	const RELEASE_STATUS_RC = 'rc';
 
 	const RELEASE_STATUS_STABLE = 'stable';
 
@@ -34,6 +33,8 @@ class Manager extends Base_Object {
 
 	const TYPE_HIDDEN = 'hidden';
 
+	const OPTION_PREFIX = 'elementor_experiment-';
+
 	private $states;
 
 	private $release_statuses;
@@ -43,65 +44,36 @@ class Manager extends Base_Object {
 	/**
 	 * Add Feature
 	 *
+	 * Each feature has to provide the following information:
+	 *     [
+	 *         'name' => string,
+	 *         'title' => string,
+	 *         'description' => string,
+	 *         'tag' => string,
+	 *         'release_status' => string,
+	 *         'default' => string,
+	 *         'new_site' => array,
+	 *     ]
+	 *
 	 * @since 3.1.0
 	 * @access public
 	 *
-	 * @param array $options {
-	 *     @type string $name
-	 *     @type string $title
-	 *     @type string $tag
-	 *     @type array $tags
-	 *     @type string $description
-	 *     @type string $release_status
-	 *     @type string $default
-	 *     @type callable $on_state_change
-	 * }
-	 *
+	 * @param array $options Feature options.
 	 * @return array|null
-	 * @throws \Exception
+	 *
+	 * @throws Dependency_Exception If can't change feature state.
 	 */
 	public function add_feature( array $options ) {
 		if ( isset( $this->features[ $options['name'] ] ) ) {
 			return null;
 		}
 
-		$default_experimental_data = [
-			'tag' => '', // Deprecated, use 'tags' instead.
-			'tags' => [],
-			'description' => '',
-			'release_status' => self::RELEASE_STATUS_ALPHA,
-			'default' => self::STATE_INACTIVE,
-			'mutable' => true,
-			static::TYPE_HIDDEN => false,
-			'new_site' => [
-				'default_active' => false,
-				'always_active' => false,
-				'minimum_installation_version' => null,
-			],
-			'on_state_change' => null,
-			'generator_tag' => false,
-		];
-
-		$allowed_options = [ 'name', 'title', 'tag', 'tags', 'description', 'release_status', 'default', 'mutable', static::TYPE_HIDDEN, 'new_site', 'on_state_change', 'dependencies', 'generator_tag', 'messages' ];
-
-		$experimental_data = $this->merge_properties( $default_experimental_data, $options, $allowed_options );
-
-		$experimental_data = $this->unify_feature_tags( $experimental_data );
+		$experimental_data = $this->set_feature_initial_options( $options );
 
 		$new_site = $experimental_data['new_site'];
 
-		if ( $new_site['default_active'] || $new_site['always_active'] ) {
-			$is_new_installation = Upgrade_Manager::install_compare( $new_site['minimum_installation_version'], '>=' );
-
-			if ( $is_new_installation ) {
-				if ( $new_site['always_active'] ) {
-					$experimental_data['state'] = self::STATE_ACTIVE;
-
-					$experimental_data['mutable'] = false;
-				} elseif ( $new_site['default_active'] ) {
-					$experimental_data['default'] = self::STATE_ACTIVE;
-				}
-			}
+		if ( $new_site['default_active'] || $new_site['always_active'] || $new_site['default_inactive'] ) {
+			$experimental_data = $this->set_new_site_default_state( $new_site, $experimental_data );
 		}
 
 		if ( $experimental_data['mutable'] ) {
@@ -113,15 +85,7 @@ class Manager extends Base_Object {
 		}
 
 		if ( ! empty( $experimental_data['dependencies'] ) ) {
-			foreach ( $experimental_data['dependencies'] as $key => $dependency ) {
-				$feature = $this->get_features( $dependency );
-
-				if ( ! empty( $feature[ static::TYPE_HIDDEN ] ) ) {
-					throw new Exceptions\Dependency_Exception( 'Depending on a hidden experiment is not allowed.' );
-				}
-
-				$experimental_data['dependencies'][ $key ] = $this->create_dependency_class( $dependency, $feature );
-			}
+			$experimental_data = $this->initialize_feature_dependencies( $experimental_data );
 		}
 
 		$this->features[ $options['name'] ] = $experimental_data;
@@ -136,7 +100,7 @@ class Manager extends Base_Object {
 					$message = sprintf(
 						'<p>%s</p><p><a href="#" onclick="location.href=\'%s\'">%s</a></p>',
 						esc_html( $e->getMessage() ),
-						site_url( 'wp-admin/admin.php?page=elementor#tab-experiments' ),
+						Settings::get_settings_tab_url( 'experiments' ),
 						esc_html__( 'Back', 'elementor' )
 					);
 
@@ -153,6 +117,22 @@ class Manager extends Base_Object {
 		return $experimental_data;
 	}
 
+	private function install_compare( $version ) {
+		$installs_history = Upgrade_Manager::get_installs_history();
+
+		if ( empty( $installs_history ) ) {
+			return false;
+		}
+
+		$cleaned_version = preg_replace( '/-(beta|cloud|dev)\d*$/', '', key( $installs_history ) );
+
+		return version_compare(
+			$cleaned_version,
+			$version,
+			'>='
+		);
+	}
+
 	/**
 	 * Combine 'tag' and 'tags' into one property.
 	 *
@@ -160,7 +140,7 @@ class Manager extends Base_Object {
 	 *
 	 * @return array
 	 */
-	private function unify_feature_tags( array $experimental_data ) : array {
+	private function unify_feature_tags( array $experimental_data ): array {
 		foreach ( [ 'tag', 'tags' ] as $key ) {
 			if ( empty( $experimental_data[ $key ] ) ) {
 				continue;
@@ -179,16 +159,19 @@ class Manager extends Base_Object {
 	/**
 	 * Format feature tags into the right format.
 	 *
-	 * @param string|array[
-	 *    [
-	 *       'type' => string,
-	 *       'label' => string
-	 *    ]
-	 * ] $tag
+	 * If an array of tags provided, each tag has to provide the following information:
+	 *     [
+	 *         [
+	 *             'type' => string,
+	 *             'label' => string,
+	 *         ]
+	 *     ]
+	 *
+	 * @param string|array $tags A string of comma separated tags, or an array of tags.
 	 *
 	 * @return array
 	 */
-	private function format_feature_tags( $tags ) : array {
+	private function format_feature_tags( $tags ): array {
 		if ( ! is_string( $tags ) && ! is_array( $tags ) ) {
 			return [];
 		}
@@ -239,7 +222,7 @@ class Manager extends Base_Object {
 	 * @since 3.1.0
 	 * @access public
 	 *
-	 * @param string $feature_name Optional. Default is null
+	 * @param string $feature_name Optional. Default is null.
 	 *
 	 * @return array|null
 	 */
@@ -269,14 +252,25 @@ class Manager extends Base_Object {
 	 *
 	 * @return bool
 	 */
-	public function is_feature_active( $feature_name ) {
+	public function is_feature_active( $feature_name, $check_dependencies = false ) {
 		$feature = $this->get_features( $feature_name );
 
-		if ( ! $feature ) {
+		if ( ! $feature || self::STATE_ACTIVE !== $this->get_feature_actual_state( $feature ) ) {
 			return false;
 		}
 
-		return self::STATE_ACTIVE === $this->get_feature_actual_state( $feature );
+		if ( $check_dependencies && isset( $feature['dependencies'] ) && is_array( $feature['dependencies'] ) ) {
+			foreach ( $feature['dependencies'] as $dependency ) {
+				$dependent_feature = $this->get_features( $dependency->get_name() );
+				$feature_state = self::STATE_ACTIVE === $this->get_feature_actual_state( $dependent_feature );
+
+				if ( ! $feature_state ) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -309,142 +303,77 @@ class Manager extends Base_Object {
 	 * @return string
 	 */
 	public function get_feature_option_key( $feature_name ) {
-		return 'elementor_experiment-' . $feature_name;
+		return static::OPTION_PREFIX . $feature_name;
 	}
 
 	private function add_default_features() {
 		$this->add_feature( [
-			'name' => 'e_dom_optimization',
-			'title' => esc_html__( 'Optimized DOM Output', 'elementor' ),
-			'tag' => esc_html__( 'Performance', 'elementor' ),
-			'description' => esc_html__( 'Developers, Please Note! This experiment includes some markup changes. If you\'ve used custom code in Elementor, you might have experienced a snippet of code not running. Turning this experiment off allows you to keep prior Elementor markup output settings, and have that lovely code running again.', 'elementor' )
-				. ' <a href="https://go.elementor.com/wp-dash-legacy-optimized-dom/" target="_blank">'
-				. esc_html__( 'Learn More', 'elementor' ) . '</a>',
-			'release_status' => self::RELEASE_STATUS_STABLE,
-			'new_site' => [
-				'default_active' => true,
-				'minimum_installation_version' => '3.1.0-beta',
-			],
-			'generator_tag' => true,
-		] );
-
-		$this->add_feature( [
-			'name' => 'e_optimized_assets_loading',
-			'title' => esc_html__( 'Improved Asset Loading', 'elementor' ),
-			'tag' => esc_html__( 'Performance', 'elementor' ),
-			'description' => esc_html__( 'Please Note! The "Improved Asset Loading" mode reduces the amount of code that is loaded on the page by default. When activated, parts of the infrastructure code will be loaded dynamically, only when needed. Keep in mind that activating this experiment may cause conflicts with incompatible plugins.', 'elementor' )
-				. ' <a href="https://go.elementor.com/wp-dash-improved-asset-loading/" target="_blank">'
-				. esc_html__( 'Learn More', 'elementor' ) . '</a>',
-			'release_status' => self::RELEASE_STATUS_STABLE,
-			'new_site' => [
-				'default_active' => true,
-				'minimum_installation_version' => '3.2.0-beta',
-			],
-			'generator_tag' => true,
-		] );
-
-		$this->add_feature( [
-			'name' => 'e_optimized_css_loading',
-			'title' => esc_html__( 'Improved CSS Loading', 'elementor' ),
-			'tag' => esc_html__( 'Performance', 'elementor' ),
-			'description' => esc_html__( 'Please Note! The “Improved CSS Loading” mode reduces the amount of CSS code that is loaded on the page by default. When activated, the CSS code will be loaded, rather inline or in a dedicated file, only when needed. Activating this experiment may cause conflicts with incompatible plugins.', 'elementor' )
-				. ' <a href="https://go.elementor.com/wp-dash-improved-css-loading/" target="_blank">'
-				. esc_html__( 'Learn More', 'elementor' ) . '</a>',
-			'release_status' => self::RELEASE_STATUS_STABLE,
-			'new_site' => [
-				'default_active' => true,
-				'minimum_installation_version' => '3.3.0-beta',
-			],
-			'generator_tag' => true,
-		] );
-
-		$this->add_feature( [
 			'name' => 'e_font_icon_svg',
 			'title' => esc_html__( 'Inline Font Icons', 'elementor' ),
 			'tag' => esc_html__( 'Performance', 'elementor' ),
-			'description' => esc_html__( 'The “Inline Font Icons” will render the icons as inline SVG without loading the Font-Awesome and the eicons libraries and its related CSS files and fonts.', 'elementor' )
-				. ' <a href="https://go.elementor.com/wp-dash-inline-font-awesome/" target="_blank">'
-				. esc_html__( 'Learn More', 'elementor' ) . '</a>',
-			'release_status' => self::RELEASE_STATUS_BETA,
-			'generator_tag' => true,
-		] );
-
-		$this->add_feature( [
-			'name' => 'a11y_improvements',
-			'title' => esc_html__( 'Accessibility Improvements', 'elementor' ),
-			'tag' => esc_html__( 'Performance', 'elementor' ),
-			'description' => esc_html__( 'An array of accessibility enhancements in Elementor pages.', 'elementor' )
-				. '<br><strong>' . esc_html__( 'Please note!', 'elementor' ) . '</strong> ' . esc_html__( 'These enhancements may include some markup changes to existing elementor widgets', 'elementor' )
-				. ' <a href="https://go.elementor.com/wp-dash-a11y-improvements/" target="_blank">'
-				. esc_html__( 'Learn More', 'elementor' ) . '</a>',
+			'description' => sprintf(
+				'%1$s <a href="https://go.elementor.com/wp-dash-inline-font-awesome/" target="_blank">%2$s</a>',
+				esc_html__( 'The “Inline Font Icons” will render the icons as inline SVG without loading the Font-Awesome and the eicons libraries and its related CSS files and fonts.', 'elementor' ),
+				esc_html__( 'Learn more', 'elementor' )
+			),
 			'release_status' => self::RELEASE_STATUS_STABLE,
-			'default' => self::STATE_ACTIVE,
+			'new_site' => [
+				'default_active' => true,
+				'minimum_installation_version' => '3.17.0',
+			],
 			'generator_tag' => true,
 		] );
 
 		$this->add_feature( [
 			'name' => 'additional_custom_breakpoints',
 			'title' => esc_html__( 'Additional Custom Breakpoints', 'elementor' ),
-			'tag' => esc_html__( 'Performance', 'elementor' ),
-			'description' => esc_html__( 'Get pixel-perfect design for every screen size. You can now add up to 6 customizable breakpoints beyond the default desktop setting: mobile, mobile extra, tablet, tablet extra, laptop, and widescreen.', 'elementor' )
-						. ' <a href="https://go.elementor.com/wp-dash-additional-custom-breakpoints/" target="_blank">'
-						. esc_html__( 'Learn More', 'elementor' ) . '</a>',
+			'description' => sprintf(
+				'%1$s <a href="https://go.elementor.com/wp-dash-additional-custom-breakpoints/" target="_blank">%2$s</a>',
+				esc_html__( 'Get pixel-perfect design for every screen size. You can now add up to 6 customizable breakpoints beyond the default desktop setting: mobile, mobile extra, tablet, tablet extra, laptop, and widescreen.', 'elementor' ),
+				esc_html__( 'Learn more', 'elementor' )
+			),
 			'release_status' => self::RELEASE_STATUS_STABLE,
 			'default' => self::STATE_ACTIVE,
 			'generator_tag' => true,
 		] );
 
 		$this->add_feature( [
-			'name' => 'admin_menu_rearrangement',
-			'mutable' => false,
-		] );
-
-		$this->add_feature( [
 			'name' => 'container',
-			'title' => esc_html__( 'Flexbox Container', 'elementor' ),
-			'description' => sprintf( esc_html__(
-				'Create advanced layouts and responsive designs with the new %1$sFlexbox Container element%2$s.
-				This experiment replaces the current section/column structure, but you\'ll still keep your existing
-				Sections, Inner Sections and Columns and be able to edit them. Ready to give it a try? Check out the %3$sFlexbox playground%4$s.',
-				'elementor'
-			), '<a target="_blank" href="https://go.elementor.com/wp-dash-flex-container/">', '</a>', '<a target="_blank" href="https://go.elementor.com/wp-dash-flex-container-playground/">', '</a>'),
-			'release_status' => self::RELEASE_STATUS_RC,
+			'title' => esc_html__( 'Container', 'elementor' ),
+			'description' => sprintf(
+				esc_html__( 'Create advanced layouts and responsive designs with %1$sFlexbox%2$s and %3$sGrid%4$s container elements. Give it a try using the %5$sContainer playground%6$s.', 'elementor' ),
+				'<a target="_blank" href="https://go.elementor.com/wp-dash-flex-container/">',
+				'</a>',
+				'<a target="_blank" href="https://go.elementor.com/wp-dash-grid-container/">',
+				'</a>',
+				'<a target="_blank" href="https://go.elementor.com/wp-dash-flex-container-playground/">',
+				'</a>'
+			),
+			'release_status' => self::RELEASE_STATUS_STABLE,
 			'default' => self::STATE_INACTIVE,
+			'new_site' => [
+				'default_active' => true,
+				'minimum_installation_version' => '3.16.0',
+			],
 			'messages' => [
-				'on_deactivate' => esc_html__(
-					'If you deactivate Flexbox Container, you will permanently delete all content created with containers and lose access to container-based features like Tabs and Menu widgets',
-					'elementor'
+				'on_deactivate' => sprintf(
+					'%1$s <a target="_blank" href="https://go.elementor.com/wp-dash-deactivate-container/">%2$s</a>',
+					esc_html__( 'Container-based content will be hidden from your site and may not be recoverable in all cases.', 'elementor' ),
+					esc_html__( 'Learn more', 'elementor' ),
 				),
 			],
 		] );
 
 		$this->add_feature( [
-			'name' => 'e_swiper_latest',
-			'title' => esc_html__( 'Upgrade Swiper Library', 'elementor' ),
-			'description' => esc_html__( 'Prepare your website for future improvements to carousel features by upgrading the Swiper library integrated into your site from v5.36 to v8.45. This experiment includes markup changes so it might require updating custom code and cause compatibility issues with third party plugins.', 'elementor' ),
-			'release_status' => self::RELEASE_STATUS_STABLE,
+			'name' => 'e_optimized_markup',
+			'title' => esc_html__( 'Optimized Markup', 'elementor' ),
+			'tag' => esc_html__( 'Performance', 'elementor' ),
+			'description' => esc_html__( 'Reduce the DOM size by eliminating HTML tags in various elements and widgets. This experiment includes markup changes so it might require updating custom CSS/JS code and cause compatibility issues with third party plugins.', 'elementor' ),
+			'release_status' => self::RELEASE_STATUS_BETA,
+			'default' => self::STATE_INACTIVE,
 			'new_site' => [
 				'default_active' => true,
-				'minimum_installation_version' => '3.11.0',
-			],
-			'default' => self::STATE_INACTIVE,
-		] );
-
-		$this->add_feature( [
-			'name' => 'container_grid',
-			'title' => esc_html__( 'Grid Container', 'elementor' ),
-			'tag' => esc_html__( 'Feature', 'elementor' ),
-			/* translators: %1$s Link open tag, %2$s: Link close tag. */
-			'description' => sprintf( esc_html__(
-				'Create pixel perfect layouts by placing elements in a customizable grid. Activate to add the CSS Grid option to container elements. %1$sLearn more%2$s',
-				'elementor'
-			), '<a target="_blank" href="https://go.elementor.com/wp-dash-grid-container/">', '</a>'),
-
-			'release_status' => self::RELEASE_STATUS_ALPHA,
-			'default' => self::STATE_INACTIVE,
-			'hidden' => false,
-			'dependencies' => [
-				'container',
+				'minimum_installation_version' => '3.30.0',
 			],
 		] );
 	}
@@ -474,7 +403,6 @@ class Manager extends Base_Object {
 			self::RELEASE_STATUS_DEV => esc_html__( 'Development', 'elementor' ),
 			self::RELEASE_STATUS_ALPHA => esc_html__( 'Alpha', 'elementor' ),
 			self::RELEASE_STATUS_BETA => esc_html__( 'Beta', 'elementor' ),
-			self::RELEASE_STATUS_RC => esc_html__( 'Release Candidate', 'elementor' ),
 			self::RELEASE_STATUS_STABLE => esc_html__( 'Stable', 'elementor' ),
 		];
 	}
@@ -500,7 +428,6 @@ class Manager extends Base_Object {
 	 *
 	 * @since 3.1.0
 	 * @access private
-	 *
 	 */
 	private function register_settings_fields( Settings $settings ) {
 		$features = $this->get_features();
@@ -591,7 +518,7 @@ class Manager extends Base_Object {
 		<p class="e-experiment__description">
 			<?php
 			printf(
-			/* translators: %1$s Link open tag, %2$s: Link close tag. */
+				/* translators: %1$s Link open tag, %2$s: Link close tag. */
 				esc_html__( 'Personalize your Elementor experience by controlling which features and experiments are active on your site. Help make Elementor better by %1$ssharing your experience and feedback with us%2$s.', 'elementor' ),
 				'<a href="https://go.elementor.com/wp-dash-experiments-report-an-issue/" target="_blank">',
 				'</a>'
@@ -600,12 +527,11 @@ class Manager extends Base_Object {
 		</p>
 		<p class="e-experiment__description">
 			<?php
-				printf(
-					/* translators: %1$s Link open tag, %2$s: Link close tag. */
-					esc_html__( 'To use an experiment or feature on your site, simply click on the dropdown next to it and switch to Active. You can always deactivate them at any time. %1$sLearn More.%2$s', 'elementor' ),
-					'<a href="https://go.elementor.com/wp-dash-experiments/" target="_blank">',
-					'</a>'
-				);
+			printf(
+				'%1$s <a href="https://go.elementor.com/wp-dash-experiments/" target="_blank">%2$s</a>',
+				esc_html__( 'To use an experiment or feature on your site, simply click on the dropdown next to it and switch to Active. You can always deactivate them at any time.', 'elementor' ),
+				esc_html__( 'Learn more', 'elementor' ),
+			);
 			?>
 		</p>
 
@@ -634,6 +560,7 @@ class Manager extends Base_Object {
 		$control_name = $this->get_feature_option_key( $feature['name'] );
 
 		$status = sprintf(
+			/* translators: %s Release status. */
 			esc_html__( 'Status: %s', 'elementor' ),
 			$this->release_statuses[ $feature['release_status'] ]
 		);
@@ -694,11 +621,11 @@ class Manager extends Base_Object {
 				return $dependency instanceof Non_Existing_Dependency;
 			} );
 
-		return ! ! $non_existing_dep;
+		return (bool) $non_existing_dep;
 	}
 
 	/**
-	 * Get Feature Settings Label HTML
+	 * Get Feature Settings Label HTML.
 	 *
 	 * @since 3.1.0
 	 * @access private
@@ -726,6 +653,9 @@ class Manager extends Base_Object {
 			<label class="e-experiment__title__label" for="e-experiment-<?php echo $feature['name']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>"><?php echo $feature['title']; ?></label>
 			<?php foreach ( $feature['tags'] as $tag ) { ?>
 				<span class="e-experiment__title__tag e-experiment__title__tag__<?php echo $tag['type']; ?>"><?php echo $tag['label']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+			<?php } ?>
+			<?php if ( $feature['deprecated'] ) { ?>
+				<span class="e-experiment__title__tag e-experiment__title__tag__deprecated"><?php echo esc_html__( 'Deprecated', 'elementor' ); ?></span>
 			<?php } ?>
 		</div>
 		<?php
@@ -792,10 +722,11 @@ class Manager extends Base_Object {
 	 * @since 3.1.0
 	 * @access private
 	 *
-	 * @param array $old_feature_data
+	 * @param array  $old_feature_data
 	 * @param string $new_state
+	 * @param string $old_state
 	 *
-	 * @throws \Elementor\Core\Experiments\Exceptions\Dependency_Exception
+	 * @throws Dependency_Exception If the feature dependency is not available or not active.
 	 */
 	private function on_feature_state_change( array $old_feature_data, $new_state, $old_state ) {
 		$new_feature_data = $this->get_features( $old_feature_data['name'] );
@@ -814,7 +745,7 @@ class Manager extends Base_Object {
 	}
 
 	/**
-	 * @throws \Elementor\Core\Experiments\Exceptions\Dependency_Exception
+	 * @throws Dependency_Exception If the feature dependency is not available or not active.
 	 */
 	private function validate_dependency( array $feature, $new_state ) {
 		$rollback = function ( $feature_option_key, $state ) {
@@ -845,8 +776,8 @@ class Manager extends Base_Object {
 					throw new Exceptions\Dependency_Exception(
 						sprintf(
 							'The feature `%s` has a dependency `%s` that is not available.',
-							$feature['name'],
-							$dependency->get_name()
+							esc_html( $feature['name'] ),
+							esc_html( $dependency->get_name() )
 						)
 					);
 				}
@@ -860,8 +791,8 @@ class Manager extends Base_Object {
 					throw new Exceptions\Dependency_Exception(
 						sprintf(
 							'To turn on `%1$s`, Experiment: `%2$s` activity is required!',
-							$feature['name'],
-							$dependency_feature['name']
+							esc_html( $feature['name'] ),
+							esc_html( $dependency_feature['name'] )
 						)
 					);
 				}
@@ -900,6 +831,72 @@ class Manager extends Base_Object {
 		return new Non_Existing_Dependency( $dependency_name );
 	}
 
+	/**
+	 * The experiments page is a WordPress options page, which means all the experiments are registered via WordPress' register_settings(),
+	 * and their states are being sent in the POST request when saving.
+	 * The options are being updated in a chronological order based on the POST data.
+	 * This behavior interferes with the experiments dependency mechanism because the data that's being sent can be in any order,
+	 * while the dependencies mechanism expects it to be in a specific order (dependencies should be activated before their dependents can).
+	 * In order to solve this issue, we sort the experiments in the POST data based on their dependencies tree.
+	 *
+	 * @param array $allowed_options
+	 */
+	private function sort_allowed_options_by_dependencies( $allowed_options ) {
+		if ( ! isset( $allowed_options['elementor'] ) ) {
+			return $allowed_options;
+		}
+
+		$sorted = Collection::make();
+		$visited = Collection::make();
+
+		$sort = function ( $item ) use ( &$sort, $sorted, $visited ) {
+			if ( $visited->contains( $item ) ) {
+				return;
+			}
+
+			$visited->push( $item );
+
+			$feature = $this->get_features( $item );
+
+			if ( ! $feature ) {
+				return;
+			}
+
+			foreach ( $feature['dependencies'] ?? [] as $dep ) {
+				$name = is_string( $dep ) ? $dep : $dep->get_name();
+
+				$sort( $name );
+			}
+
+			$sorted->push( $item );
+		};
+
+		foreach ( $allowed_options['elementor'] as $option ) {
+			$is_experiment_option = strpos( $option, static::OPTION_PREFIX ) === 0;
+
+			if ( ! $is_experiment_option ) {
+				continue;
+			}
+
+			$sort(
+				str_replace( static::OPTION_PREFIX, '', $option )
+			);
+		}
+
+		$allowed_options['elementor'] = Collection::make( $allowed_options['elementor'] )
+			->filter( function ( $option ) {
+				return 0 !== strpos( $option, static::OPTION_PREFIX );
+			} )
+			->merge(
+				$sorted->map( function ( $item ) {
+					return static::OPTION_PREFIX . $item;
+				} )
+			)
+			->values();
+
+		return $allowed_options;
+	}
+
 	public function __construct() {
 		$this->init_states();
 
@@ -922,11 +919,123 @@ class Manager extends Base_Object {
 			add_action( "elementor/admin/after_create_settings/{$page_id}", function( Settings $settings ) {
 				$this->register_settings_fields( $settings );
 			}, 11 );
+
+			add_filter( 'allowed_options', function ( $allowed_options ) {
+				return $this->sort_allowed_options_by_dependencies( $allowed_options );
+			}, 11 );
 		}
 
 		// Register CLI commands.
 		if ( Utils::is_wp_cli() ) {
 			\WP_CLI::add_command( 'elementor experiments', WP_CLI::class );
 		}
+	}
+
+	/**
+	 * @param array $experimental_data
+	 * @return array
+	 *
+	 * @throws Dependency_Exception If the feature dependency is not initialized or depends on a hidden experiment.
+	 */
+	private function initialize_feature_dependencies( array $experimental_data ): array {
+		foreach ( $experimental_data['dependencies'] as $key => $dependency ) {
+			$feature = $this->get_features( $dependency );
+
+			if ( ! isset( $feature ) ) {
+				// since we must validate the state of each dependency, we have to make sure that dependencies are initialized in the correct order, otherwise, error.
+				throw new Exceptions\Dependency_Exception(
+					sprintf(
+						'Feature %s cannot be initialized before dependency feature: %s.',
+						esc_html( $experimental_data['name'] ),
+						esc_html( $dependency )
+					)
+				);
+			}
+
+			if ( ! empty( $feature[ static::TYPE_HIDDEN ] ) ) {
+				throw new Exceptions\Dependency_Exception( 'Depending on a hidden experiment is not allowed.' );
+			}
+
+			$experimental_data['dependencies'][ $key ] = $this->create_dependency_class( $dependency, $feature );
+			$experimental_data = $this->set_feature_default_state_to_match_dependencies( $feature, $experimental_data );
+		}
+
+		return $experimental_data;
+	}
+
+	/**
+	 * @param array $feature
+	 * @param array $experimental_data
+	 * @return array
+	 *
+	 * we must validate the state:
+	 * * A user can set a dependant feature to inactive and in upgrade we don't change users settings.
+	 * * A developer can set the default state to be invalid (e.g. dependant feature is inactive).
+	 * if one of the dependencies is inactive, the main feature should be inactive as well.
+	 */
+	private function set_feature_default_state_to_match_dependencies( array $feature, array $experimental_data ): array {
+		if ( self::STATE_INACTIVE !== $this->get_feature_actual_state( $feature ) ) {
+			return $experimental_data;
+		}
+
+		if ( self::STATE_ACTIVE === $experimental_data['state'] ) {
+			$experimental_data['state'] = self::STATE_INACTIVE;
+		} elseif ( self::STATE_DEFAULT === $experimental_data['state'] ) {
+			$experimental_data['default'] = self::STATE_INACTIVE;
+		}
+
+		return $experimental_data;
+	}
+
+	/**
+	 * @param array $new_site
+	 * @param array $experimental_data
+	 * @return array
+	 */
+	private function set_new_site_default_state( $new_site, array $experimental_data ): array {
+		if ( ! $this->install_compare( $new_site['minimum_installation_version'] ) ) {
+			return $experimental_data;
+		}
+
+		if ( $new_site['always_active'] ) {
+			$experimental_data['state'] = self::STATE_ACTIVE;
+			$experimental_data['mutable'] = false;
+		} elseif ( $new_site['default_active'] ) {
+			$experimental_data['default'] = self::STATE_ACTIVE;
+		} elseif ( $new_site['default_inactive'] ) {
+			$experimental_data['default'] = self::STATE_INACTIVE;
+		}
+
+		return $experimental_data;
+	}
+
+	/**
+	 * @param array $options
+	 * @return array
+	 */
+	private function set_feature_initial_options( array $options ): array {
+		$default_experimental_data = [
+			'tag' => '', // Deprecated, use 'tags' instead.
+			'tags' => [],
+			'description' => '',
+			'release_status' => self::RELEASE_STATUS_ALPHA,
+			'default' => self::STATE_INACTIVE,
+			'mutable' => true,
+			static::TYPE_HIDDEN => false,
+			'new_site' => [
+				'always_active' => false,
+				'default_active' => false,
+				'default_inactive' => false,
+				'minimum_installation_version' => null,
+			],
+			'on_state_change' => null,
+			'generator_tag' => false,
+			'deprecated' => false,
+		];
+
+		$allowed_options = [ 'name', 'title', 'tag', 'tags', 'description', 'release_status', 'default', 'mutable', static::TYPE_HIDDEN, 'new_site', 'on_state_change', 'dependencies', 'generator_tag', 'messages', 'deprecated' ];
+		$experimental_data = $this->merge_properties( $default_experimental_data, $options, $allowed_options );
+
+		return $this->unify_feature_tags( $experimental_data );
 	}
 }

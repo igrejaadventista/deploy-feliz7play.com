@@ -2,18 +2,23 @@
 namespace ElementorPro\Modules\Forms;
 
 use Elementor\Controls_Manager;
-use ElementorPro\Modules\Forms\Data\Controller;
-use Elementor\Core\Experiments\Manager;
+use Elementor\Settings;
+use Elementor\Core\Admin\Admin_Notices;
 use Elementor\Core\Common\Modules\Ajax\Module as Ajax;
+use ElementorPro\Core\Upgrade\Manager as Upgrade_Manager;
+
+use Elementor\User;
+use ElementorPro\Core\Utils;
+use ElementorPro\Modules\Forms\Data\Controller;
 use ElementorPro\Base\Module_Base;
-use ElementorPro\Modules\Forms\Actions;
-use ElementorPro\Modules\Forms\Classes;
 use ElementorPro\Modules\Forms\Controls\Fields_Map;
 use ElementorPro\Modules\Forms\Registrars\Form_Actions_Registrar;
 use ElementorPro\Modules\Forms\Registrars\Form_Fields_Registrar;
 use ElementorPro\Modules\Forms\Submissions\Component as Form_Submissions_Component;
 use ElementorPro\Modules\Forms\Controls\Fields_Repeater;
 use ElementorPro\Plugin;
+use ElementorPro\License\API;
+use ElementorPro\Modules\Forms\Submissions\AdminMenuItems\Submissions_Promotion_Menu_Item;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -30,24 +35,58 @@ class Module extends Module_Base {
 	 */
 	public $fields_registrar;
 
+	const ACTIVITY_LOG_LICENSE_FEATURE_NAME = 'activity-log';
+	const CF7DB_LICENSE_FEATURE_NAME = 'cf7db';
+	const AKISMET_LICENSE_FEATURE_NAME = 'akismet';
+
+	const WIDGET_NAME_CLASS_NAME_MAP = [
+		'form' => 'Form',
+		'login' => 'Login',
+	];
+
 	public function get_name() {
 		return 'forms';
 	}
 
 	public function get_widgets() {
-		return [
-			'Form',
-			'Login',
-		];
+		return API::filter_active_features( static::WIDGET_NAME_CLASS_NAME_MAP );
 	}
 
 	/**
-	 * @deprecated 3.1.0
+	 * Get the base URL for assets.
+	 *
+	 * @return string
 	 */
-	public function localize_settings() {
-		Plugin::elementor()->modules_manager->get_modules( 'dev-tools' )->deprecation->deprecated_function( __METHOD__, '3.1.0' );
+	public function get_assets_base_url(): string {
+		return ELEMENTOR_PRO_URL;
+	}
 
-		return [];
+	/**
+	 * Register styles.
+	 *
+	 * At build time, Elementor compiles `/modules/forms/assets/scss/frontend.scss`
+	 * to `/assets/css/widget-forms.min.css`.
+	 *
+	 * @return void
+	 */
+	public function register_styles() {
+		$widget_styles = $this->get_widgets_style_list();
+
+		foreach ( $widget_styles as $widget_style_name ) {
+			wp_register_style(
+				$widget_style_name,
+				$this->get_css_assets_url( $widget_style_name, null, true, true ),
+				[ 'elementor-frontend' ],
+				ELEMENTOR_PRO_VERSION
+			);
+		}
+	}
+
+	private function get_widgets_style_list(): array {
+		return [
+			'widget-form',
+			'widget-login',
+		];
 	}
 
 	public static function find_element_recursive( $elements, $form_id ) {
@@ -80,22 +119,24 @@ class Module extends Module_Base {
 	 * @throws \Exception
 	 */
 	public function forms_panel_action_data( array $data ) {
+		$document = Utils::_unstable_get_document_for_edit( $data['editor_post_id'] );
+
 		if ( empty( $data['service'] ) ) {
-			throw new \Exception( 'service_required' );
+			throw new \Exception( 'Service required.' );
 		}
 
 		/** @var \ElementorPro\Modules\Forms\Classes\Integration_Base $integration */
 		$integration = $this->actions_registrar->get( $data['service'] );
 
 		if ( ! $integration ) {
-			throw new \Exception( 'action_not_found' );
+			throw new \Exception( 'Action not found.' );
 		}
 
 		return $integration->handle_panel_request( $data );
 	}
 
 	/**
-	 * @deprecated 3.5.0 - Use `fields_registrar->register()`.
+	 * @deprecated 3.5.0 Use `fields_registrar->register()` instead.
 	 */
 	public function add_form_field_type( $type, $instance ) {
 		Plugin::elementor()->modules_manager->get_modules( 'dev-tools' )->deprecation->deprecated_function(
@@ -108,7 +149,7 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * @deprecated 3.5.0 - Use `actions_registrar->register()`.
+	 * @deprecated 3.5.0 Use `actions_registrar->register()` instead.
 	 */
 	public function add_form_action( $id, $instance ) {
 		Plugin::elementor()->modules_manager->get_modules( 'dev-tools' )->deprecation->deprecated_function(
@@ -121,7 +162,7 @@ class Module extends Module_Base {
 	}
 
 	/**
-	 * @deprecated 3.5.0 - Use `actions_registrar->get()`.
+	 * @deprecated 3.5.0 Use `actions_registrar->get()` instead.
 	 */
 	public function get_form_actions( $id = null ) {
 		Plugin::elementor()->modules_manager->get_modules( 'dev-tools' )->deprecation->deprecated_function(
@@ -141,22 +182,79 @@ class Module extends Module_Base {
 	 * Register submissions
 	 */
 	private function register_submissions_component() {
-		$experiments_manager = Plugin::elementor()->experiments;
 		$name = Form_Submissions_Component::NAME;
 
-		$experiments_manager->add_feature( [
-			'name' => $name,
-			'title' => esc_html__( 'Form Submissions', 'elementor-pro' ),
-			'description' => esc_html__( 'Never lose another submission! Using “Actions After Submit” you can now choose to save all submissions to an internal database.', 'elementor-pro' ),
-			'release_status' => Manager::RELEASE_STATUS_STABLE,
-			'default' => Manager::STATE_ACTIVE,
-		] );
+		if ( is_admin() ) {
+			add_action( 'elementor/admin/after_create_settings/' . Settings::PAGE_ID, [ $this, 'register_submissions_admin_fields' ] );
+		}
 
-		if ( ! $experiments_manager->is_feature_active( $name ) ) {
+		if ( '1' === get_option( 'elementor_' . $name ) ) {
 			return;
 		}
 
+		if ( current_user_can( 'manage_options' ) ) {
+			add_action( 'admin_notices', [ $this, 'register_submissions_admin_notice' ] );
+		}
+
 		$this->add_component( $name, new Form_Submissions_Component() );
+	}
+
+	public function register_submissions_admin_fields( Settings $settings ) {
+		$settings->add_field(
+			Settings::TAB_ADVANCED,
+			Settings::TAB_ADVANCED,
+			Form_Submissions_Component::NAME,
+			[
+				'label' => esc_html__( 'Form Submissions', 'elementor-pro' ),
+				'field_args' => [
+					'type' => 'select',
+					'std' => '',
+					'options' => [
+						'' => esc_html__( 'Enable', 'elementor-pro' ),
+						'1' => esc_html__( 'Disable', 'elementor-pro' ),
+					],
+					'desc' => esc_html__( 'Never lose another submission! Using “Actions After Submit” you can now choose to save all submissions to an internal database.', 'elementor-pro' ),
+				],
+			],
+		);
+	}
+
+	public function register_submissions_admin_notice() {
+		$notice_id = 'elementor-pro-forms-submissions';
+		if ( User::is_user_notice_viewed( $notice_id ) ) {
+			return;
+		}
+
+		$is_new_site = Upgrade_Manager::install_compare( '3.25.0', '>=' );
+		if ( $is_new_site ) {
+			return;
+		}
+
+		/**
+		 * @var Admin_Notices $admin_notices
+		 */
+		$admin_notices = Plugin::elementor()->admin->get_component( 'admin-notices' );
+
+		$dismiss_url = add_query_arg( [
+			'action' => 'elementor_set_admin_notice_viewed',
+			'notice_id' => esc_attr( $notice_id ),
+		], admin_url( 'admin-post.php' ) );
+
+		$admin_notices->print_admin_notice( [
+			'id' => $notice_id,
+			'title' => esc_html__( 'Form Submissions now activated by default on all websites', 'elementor-pro' ),
+			'description' => sprintf(
+				esc_html__( 'The Form Submissions feature, previously located under the Features tab in Elementor, is now enabled by default on all websites. If you prefer to disable this feature, you can do so by navigating to %1$sSettings → Advanced%2$s.', 'elementor-pro' ),
+				'<a href="' . esc_url( admin_url( 'admin.php?page=elementor-settings#tab-' . Settings::TAB_ADVANCED ) ) . '"><strong>',
+				'</strong></a>'
+			),
+			'button' => [
+				'text' => esc_html__( 'Got it! Keep it enabled', 'elementor-pro' ),
+				'classes' => [ 'e-notice-dismiss' ],
+				'url' => esc_url_raw( $dismiss_url ),
+				'type' => 'cta',
+			],
+		] );
 	}
 
 	/**
@@ -165,6 +263,7 @@ class Module extends Module_Base {
 	public function __construct() {
 		parent::__construct();
 
+		add_action( 'elementor/frontend/after_register_styles', [ $this, 'register_styles' ] );
 		add_action( 'elementor/controls/register', [ $this, 'register_controls' ] );
 		add_action( 'elementor/ajax/register_actions', [ $this, 'register_ajax_actions' ] );
 
@@ -172,7 +271,18 @@ class Module extends Module_Base {
 		$this->add_component( 'recaptcha_v3', new Classes\Recaptcha_V3_Handler() );
 		$this->add_component( 'honeypot', new Classes\Honeypot_Handler() );
 
-		$this->register_submissions_component();
+		// Akismet
+		if ( class_exists( '\Akismet' ) && API::is_licence_has_feature( static::AKISMET_LICENSE_FEATURE_NAME, API::BC_VALIDATION_CALLBACK ) ) {
+			$this->add_component( 'akismet', new Classes\Akismet() );
+		}
+
+		if ( API::is_licence_has_feature( Form_Submissions_Component::NAME, API::BC_VALIDATION_CALLBACK ) ) {
+			$this->register_submissions_component();
+		} else {
+			add_action( 'elementor/admin/menu/register', function( $admin_menu ) {
+				$admin_menu->register( Form_Submissions_Component::PAGE_ID, new Submissions_Promotion_Menu_Item() );
+			}, 9 /* After "Settings" */ );
+		}
 
 		// Initialize registrars.
 		$this->actions_registrar = new Form_Actions_Registrar();
@@ -181,12 +291,12 @@ class Module extends Module_Base {
 		// Add Actions as components, that runs manually in the Ajax_Handler
 
 		// Activity Log
-		if ( function_exists( 'aal_insert_log' ) ) {
+		if ( function_exists( 'aal_insert_log' ) && API::is_licence_has_feature( static::ACTIVITY_LOG_LICENSE_FEATURE_NAME, API::BC_VALIDATION_CALLBACK ) ) {
 			$this->add_component( 'activity_log', new Actions\Activity_Log() );
 		}
 
 		// Contact Form to Database
-		if ( function_exists( 'CF7DBPlugin_init' ) ) {
+		if ( function_exists( 'CF7DBPlugin_init' ) && API::is_licence_has_feature( static::CF7DB_LICENSE_FEATURE_NAME, API::BC_VALIDATION_CALLBACK ) ) {
 			$this->add_component( 'cf7db', new Actions\CF7DB() );
 		}
 

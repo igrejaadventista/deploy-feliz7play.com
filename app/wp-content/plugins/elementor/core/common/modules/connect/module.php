@@ -9,15 +9,24 @@ use Elementor\Core\Common\Modules\Connect\Apps\Library;
 use Elementor\Plugin;
 use Elementor\Utils;
 use WP_User_Query;
+use Elementor\Core\Common\Modules\Connect\Rest\Rest_Api;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Module extends BaseModule {
 	const ACCESS_LEVEL_CORE = 0;
 	const ACCESS_LEVEL_PRO = 1;
 	const ACCESS_LEVEL_EXPERT = 20;
+
+	const ACCESS_TIER_FREE = 'free';
+	const ACCESS_TIER_ESSENTIAL = 'essential';
+	const ACCESS_TIER_ESSENTIAL_OCT_2023 = 'essential-oct2023';
+	const ACCESS_TIER_ADVANCED = 'advanced';
+	const ACCESS_TIER_EXPERT = 'expert';
+	const ACCESS_TIER_AGENCY = 'agency';
+	const ACCESS_TIER_PRO_LEGACY = 'pro';
 
 	/**
 	 * @since 2.3.0
@@ -77,6 +86,8 @@ class Module extends BaseModule {
 			add_action( 'elementor/init', [ $this, 'init' ], 11 );
 		}
 
+		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
+
 		add_filter( 'elementor/tracker/send_tracking_data_params', function ( $params ) {
 			return $this->add_tracking_data( $params );
 		} );
@@ -109,15 +120,6 @@ class Module extends BaseModule {
 		foreach ( $this->registered_apps as $slug => $class ) {
 			$this->apps[ $slug ] = new $class();
 		}
-	}
-
-	/**
-	 * @deprecated 3.1.0
-	 */
-	public function localize_settings() {
-		Plugin::$instance->modules_manager->get_modules( 'dev-tools' )->deprecation->deprecated_function( __METHOD__, '3.1.0' );
-
-		return [];
 	}
 
 	/**
@@ -191,15 +193,38 @@ class Module extends BaseModule {
 	 * @return array
 	 */
 	public function get_subscription_plans( $context = '' ) {
+		$base_url = Utils::has_pro() ? 'https://my.elementor.com/upgrade-subscription' : 'https://elementor.com/pro';
+		$promotion_url = $base_url . '/?utm_source=' . $context . '&utm_medium=wp-dash&utm_campaign=gopro';
+
 		return [
-			static::ACCESS_LEVEL_CORE => [
+			static::ACCESS_TIER_FREE => [
 				'label' => null,
 				'promotion_url' => null,
 				'color' => null,
 			],
-			static::ACCESS_LEVEL_PRO => [
+			static::ACCESS_TIER_ESSENTIAL => [
 				'label' => 'Pro',
-				'promotion_url' => 'https://elementor.com/pro/?utm_source=' . $context . '&utm_medium=wp-dash&utm_campaign=gopro',
+				'promotion_url' => $promotion_url,
+				'color' => '#92003B',
+			],
+			static::ACCESS_TIER_ESSENTIAL_OCT_2023 => [
+				'label' => 'Advanced', // Should be the same label as "Advanced".
+				'promotion_url' => $promotion_url,
+				'color' => '#92003B',
+			],
+			static::ACCESS_TIER_ADVANCED => [
+				'label' => 'Advanced',
+				'promotion_url' => $promotion_url,
+				'color' => '#92003B',
+			],
+			static::ACCESS_TIER_EXPERT => [
+				'label' => 'Expert',
+				'promotion_url' => $promotion_url,
+				'color' => '#92003B',
+			],
+			static::ACCESS_TIER_AGENCY => [
+				'label' => 'Agency',
+				'promotion_url' => $promotion_url,
 				'color' => '#92003B',
 			],
 		];
@@ -235,5 +260,10 @@ class Module extends BaseModule {
 		];
 
 		return $params;
+	}
+
+	public function register_rest_routes() {
+		$rest_api = new Rest_Api();
+		$rest_api->register_routes();
 	}
 }

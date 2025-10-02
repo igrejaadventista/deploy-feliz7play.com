@@ -23,7 +23,9 @@ use Elementor\App\Modules\KitLibrary\Connect\Kit_Library as Kit_Library_Api;
 class Import {
 	const MANIFEST_ERROR_KEY = 'manifest-error';
 
-	const ZIP_FILE_ERROR_KEY = 'zip-file-error';
+	const ZIP_FILE_ERROR_KEY = 'invalid-zip-file';
+
+	const ZIP_ARCHIVE_ERROR_KEY = 'zip-archive-module-missing';
 
 	/**
 	 * @var Import_Runner_Base[]
@@ -143,7 +145,7 @@ class Import {
 	 *      (e.g: include, selected_plugins, selected_cpt, selected_override_conditions, etc.)
 	 * @param array|null $old_instance An array of old instance parameters that will be used for creating new instance.
 	 *      We are using it for quick creation of the instance when the import process is being split into chunks.
-	 * @throws \Exception
+	 * @throws \Exception If the import session does not exist.
 	 */
 	public function __construct( string $path, array $settings = [], array $old_instance = null ) {
 		if ( ! empty( $old_instance ) ) {
@@ -177,6 +179,10 @@ class Import {
 
 			$this->set_default_settings();
 		}
+
+		add_filter( 'wp_php_error_args', function ( $args, $error ) {
+			return $this->filter_php_error_args( $args, $error );
+		}, 10, 2 );
 	}
 
 	/**
@@ -215,10 +221,10 @@ class Import {
 	 * @param string $session_id
 	 *
 	 * @return Import
-	 * @throws \Exception
+	 * @throws \Exception If the import session does not exist.
 	 */
 	public static function from_session( string $session_id ): Import {
-		$import_sessions = get_option( Module::OPTION_KEY_ELEMENTOR_IMPORT_SESSIONS );
+		$import_sessions = Utils::get_import_sessions();
 
 		if ( ! $import_sessions || ! isset( $import_sessions[ $session_id ] ) ) {
 			throw new \Exception( 'Couldn’t execute the import process because the import session does not exist.' );
@@ -297,6 +303,7 @@ class Import {
 
 		$this->init_import_session();
 
+		remove_filter( 'elementor/document/save/data', [ Plugin::$instance->modules_manager->get_modules( 'content-sanitizer' ), 'sanitize_content' ] );
 		add_filter( 'elementor/document/save/data', [ $this, 'prevent_saving_elements_on_post_creation' ], 10, 2 );
 
 		// Set the Request's state as an Elementor upload request, in order to support unfiltered file uploads.
@@ -391,7 +398,7 @@ class Import {
 	 * @return void
 	 */
 	public function init_import_session( $save_instance_data = false ) {
-		$import_sessions = get_option( Module::OPTION_KEY_ELEMENTOR_IMPORT_SESSIONS );
+		$import_sessions = Utils::get_import_sessions( true );
 
 		$import_sessions[ $this->session_id ] = [
 			'session_id' => $this->session_id,
@@ -438,18 +445,7 @@ class Import {
 			return $this->manifest['thumbnail'];
 		}
 
-		if ( empty( $this->kit_id ) ) {
-			return '';
-		}
-
-		$api = new Kit_Library_Api();
-		$kit = $api->get_by_id( $this->kit_id );
-
-		if ( is_wp_error( $kit ) ) {
-			return '';
-		}
-
-		return $kit->thumbnail;
+		return apply_filters( 'elementor/import/kit_thumbnail', '', $this->kit_id, $this->settings_referrer );
 	}
 
 	public function get_runners_name(): array {
@@ -594,7 +590,11 @@ class Import {
 		$extraction_result = Plugin::$instance->uploads_manager->extract_and_validate_zip( $zip_path, [ 'json', 'xml' ] );
 
 		if ( is_wp_error( $extraction_result ) ) {
-			throw new \Error( static::ZIP_FILE_ERROR_KEY );
+			if ( isset( $extraction_result->errors['zip_error'] ) ) {
+				throw new \Error( static::ZIP_ARCHIVE_ERROR_KEY ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			}
+
+			throw new \Error( static::ZIP_FILE_ERROR_KEY ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		}
 
 		return $extraction_result['extraction_directory'];
@@ -609,7 +609,8 @@ class Import {
 		$manifest = Utils::read_json_file( $this->extracted_directory_path . 'manifest' );
 
 		if ( ! $manifest ) {
-			throw new \Error( static::MANIFEST_ERROR_KEY );
+			Plugin::$instance->logger->get_logger()->error( static::MANIFEST_ERROR_KEY );
+			throw new \Error( static::ZIP_FILE_ERROR_KEY ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		}
 
 		$this->init_adapters( $manifest );
@@ -718,7 +719,7 @@ class Import {
 	 *
 	 * @return array{post_ids: array, term_ids: array}
 	 */
-	private function get_imported_data_replacements() : array {
+	private function get_imported_data_replacements(): array {
 		return [
 			'post_ids' => Utils::map_old_new_post_ids( $this->imported_data ),
 			'term_ids' => Utils::map_old_new_term_ids( $this->imported_data ),
@@ -754,7 +755,7 @@ class Import {
 	}
 
 	private function update_instance_data_in_import_session_option() {
-		$import_sessions = get_option( Module::OPTION_KEY_ELEMENTOR_IMPORT_SESSIONS );
+		$import_sessions = Utils::get_import_sessions();
 
 		$import_sessions[ $this->session_id ]['instance_data']['documents_data'] = $this->documents_data;
 		$import_sessions[ $this->session_id ]['instance_data']['imported_data'] = $this->imported_data;
@@ -763,8 +764,12 @@ class Import {
 		update_option( Module::OPTION_KEY_ELEMENTOR_IMPORT_SESSIONS, $import_sessions, false );
 	}
 
-	private function finalize_import_session_option() {
-		$import_sessions = get_option( Module::OPTION_KEY_ELEMENTOR_IMPORT_SESSIONS );
+	public function finalize_import_session_option() {
+		$import_sessions = Utils::get_import_sessions();
+
+		if ( ! isset( $import_sessions[ $this->session_id ] ) ) {
+			return;
+		}
 
 		unset( $import_sessions[ $this->session_id ]['instance_data'] );
 
@@ -772,5 +777,20 @@ class Import {
 		$import_sessions[ $this->session_id ]['runners'] = $this->runners_import_metadata;
 
 		update_option( Module::OPTION_KEY_ELEMENTOR_IMPORT_SESSIONS, $import_sessions, false );
+	}
+
+	/**
+	 * Filter the php error args and return 408 status code if the error is a timeout.
+	 *
+	 * @param array $args
+	 * @param array $error
+	 * @return array
+	 */
+	private function filter_php_error_args( $args, $error ) {
+		if ( strpos( $error['message'], 'Maximum execution time' ) !== false ) {
+			$args['response'] = 408;
+		}
+
+		return $args;
 	}
 }

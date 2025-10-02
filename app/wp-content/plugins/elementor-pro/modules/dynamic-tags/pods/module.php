@@ -17,6 +17,10 @@ class Module extends DynamicTags\Module {
 	 * @return array
 	 */
 	public static function get_control_options( $types ) {
+		if ( ! function_exists( 'pods_api' ) ) {
+			return [];
+		}
+
 		$all_pods = pods_api()->load_pods( [
 			'table_info' => true,
 			'fields' => true,
@@ -110,6 +114,7 @@ class Module extends DynamicTags\Module {
 		return [
 			'Pods_Text',
 			'Pods_Date',
+			'Pods_Date_Time',
 			'Pods_Image',
 			'Pods_Gallery',
 			'Pods_URL',

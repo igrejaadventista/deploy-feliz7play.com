@@ -92,6 +92,10 @@ class Element_Section extends Element_Base {
 		return 'eicon-columns';
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	/**
 	 * Get presets.
 	 *
@@ -229,7 +233,7 @@ class Element_Section extends Element_Base {
 			]
 		);
 
-		// Element Name for the Navigator
+		// Element Name for the Navigator.
 		$this->add_control(
 			'_title',
 			[
@@ -270,7 +274,6 @@ class Element_Section extends Element_Base {
 				'condition' => [
 					'layout' => [ 'boxed' ],
 				],
-				'separator' => 'none',
 			]
 		);
 
@@ -299,20 +302,7 @@ class Element_Section extends Element_Base {
 				'type' => Controls_Manager::SLIDER,
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 500,
-					],
-					'%' => [
-						'min' => 0,
-						'max' => 100,
-					],
-					'vh' => [
-						'min' => 0,
-						'max' => 100,
-					],
-					'vw' => [
-						'min' => 0,
-						'max' => 100,
 					],
 				],
 				'size_units' => [ 'px', '%', 'em', 'rem', 'vh', 'vw', 'custom' ],
@@ -351,16 +341,7 @@ class Element_Section extends Element_Base {
 				],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 1440,
-					],
-					'vh' => [
-						'min' => 0,
-						'max' => 100,
-					],
-					'vw' => [
-						'min' => 0,
-						'max' => 100,
 					],
 				],
 				'size_units' => [ 'px', 'em', 'rem', 'vh', 'vw', 'custom' ],
@@ -400,7 +381,6 @@ class Element_Section extends Element_Base {
 				],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 1440,
 					],
 				],
@@ -434,10 +414,6 @@ class Element_Section extends Element_Base {
 			]
 		);
 
-		$content_position_selector = Plugin::$instance->experiments->is_feature_active( 'e_dom_optimization' ) ?
-				'{{WRAPPER}} > .elementor-container > .elementor-column > .elementor-widget-wrap' :
-				'{{WRAPPER}} > .elementor-container > .elementor-row > .elementor-column > .elementor-column-wrap > .elementor-widget-wrap';
-
 		$this->add_control(
 			'content_position',
 			[
@@ -459,9 +435,9 @@ class Element_Section extends Element_Base {
 					'bottom' => 'flex-end',
 				],
 				'selectors' => [
-					$content_position_selector => 'align-content: {{VALUE}}; align-items: {{VALUE}};',
+					'{{WRAPPER}} > .elementor-container > .elementor-column > .elementor-widget-wrap' => 'align-content: {{VALUE}}; align-items: {{VALUE}};',
 				],
-				// TODO: The following line is for BC since 2.7.0
+				// TODO: The following line is for BC since 2.7.0.
 				'prefix_class' => 'elementor-section-content-',
 			]
 		);
@@ -491,7 +467,11 @@ class Element_Section extends Element_Base {
 				'return_value' => 'section-stretched',
 				'prefix_class' => 'elementor-',
 				'hide_in_inner' => true,
-				'description' => esc_html__( 'Stretch the section to the full width of the page using JS.', 'elementor' ) . sprintf( ' <a href="%1$s" target="_blank">%2$s</a>', 'https://go.elementor.com/stretch-section/', esc_html__( 'Learn more.', 'elementor' ) ),
+				'description' => sprintf(
+					'%1$s <a href="https://go.elementor.com/stretch-section/" target="_blank">%2$s</a>',
+					esc_html__( 'Stretch the section to the full width of the page using JS.', 'elementor' ),
+					esc_html__( 'Learn more', 'elementor' )
+				),
 				'render_type' => 'none',
 				'frontend_available' => true,
 			]
@@ -524,7 +504,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section Structure
+		// Section Structure.
 		$this->start_controls_section(
 			'section_structure',
 			[
@@ -546,7 +526,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section background
+		// Section background.
 		$this->start_controls_section(
 			'section_background',
 			[
@@ -573,10 +553,41 @@ class Element_Section extends Element_Base {
 					'background' => [
 						'frontend_available' => true,
 					],
-					'image' => [
-						'background_lazyload' => [
-							'active' => true,
-							'keys' => [ 'background_image', 'url' ],
+				],
+			]
+		);
+
+		$this->add_control(
+			'handle_slideshow_asset_loading',
+			[
+				'type' => Controls_Manager::HIDDEN,
+				'assets' => [
+					'styles' => [
+						[
+							'name' => 'e-swiper',
+							'conditions' => [
+								'terms' => [
+									[
+										'name' => 'background_background',
+										'operator' => '===',
+										'value' => 'slideshow',
+									],
+								],
+							],
+						],
+					],
+					'scripts' => [
+						[
+							'name' => 'swiper',
+							'conditions' => [
+								'terms' => [
+									[
+										'name' => 'background_background',
+										'operator' => '===',
+										'value' => 'slideshow',
+									],
+								],
+							],
 						],
 					],
 				],
@@ -603,13 +614,14 @@ class Element_Section extends Element_Base {
 		$this->add_control(
 			'background_hover_transition',
 			[
-				'label' => esc_html__( 'Transition Duration', 'elementor' ),
+				'label' => esc_html__( 'Transition Duration', 'elementor' ) . ' (s)',
 				'type' => Controls_Manager::SLIDER,
 				'default' => [
 					'size' => 0.3,
 				],
 				'range' => [
 					'px' => [
+						'min' => 0,
 						'max' => 3,
 						'step' => 0.1,
 					],
@@ -625,7 +637,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Background Overlay
+		// Background Overlay.
 		$this->start_controls_section(
 			'section_background_overlay',
 			[
@@ -648,15 +660,6 @@ class Element_Section extends Element_Base {
 			[
 				'name' => 'background_overlay',
 				'selector' => '{{WRAPPER}} > .elementor-background-overlay',
-				'fields_options' => [
-					'image' => [
-						'background_lazyload' => [
-							'active' => true,
-							'keys' => [ 'background_overlay_image', 'url' ],
-							'selector' => '.elementor-background-overlay',
-						],
-					],
-				],
 			]
 		);
 
@@ -798,13 +801,14 @@ class Element_Section extends Element_Base {
 		$this->add_control(
 			'background_overlay_hover_transition',
 			[
-				'label' => esc_html__( 'Transition Duration', 'elementor' ),
+				'label' => esc_html__( 'Transition Duration', 'elementor' ) . ' (s)',
 				'type' => Controls_Manager::SLIDER,
 				'default' => [
 					'size' => 0.3,
 				],
 				'range' => [
 					'px' => [
+						'min' => 0,
 						'max' => 3,
 						'step' => 0.1,
 					],
@@ -820,7 +824,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section border
+		// Section border.
 		$this->start_controls_section(
 			'section_border',
 			[
@@ -904,7 +908,7 @@ class Element_Section extends Element_Base {
 		$this->add_control(
 			'border_hover_transition',
 			[
-				'label' => esc_html__( 'Transition Duration', 'elementor' ),
+				'label' => esc_html__( 'Transition Duration', 'elementor' ) . ' (s)',
 				'type' => Controls_Manager::SLIDER,
 				'separator' => 'before',
 				'default' => [
@@ -912,6 +916,7 @@ class Element_Section extends Element_Base {
 				],
 				'range' => [
 					'px' => [
+						'min' => 0,
 						'max' => 3,
 						'step' => 0.1,
 					],
@@ -925,7 +930,7 @@ class Element_Section extends Element_Base {
 							'value' => '',
 						],
 						[
-							'name' => 'border_border',
+							'name' => 'border_hover_border',
 							'operator' => '!==',
 							'value' => '',
 						],
@@ -944,7 +949,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section Shape Divider
+		// Section Shape Divider.
 		$this->start_controls_section(
 			'section_shape_divider',
 			[
@@ -984,6 +989,22 @@ class Element_Section extends Element_Base {
 					'options' => $shapes_options,
 					'render_type' => 'none',
 					'frontend_available' => true,
+					'assets' => [
+						'styles' => [
+							[
+								'name' => 'e-shapes',
+								'conditions' => [
+									'terms' => [
+										[
+											'name' => $base_control_key,
+											'operator' => '!==',
+											'value' => '',
+										],
+									],
+								],
+							],
+						],
+					],
 				]
 			);
 
@@ -1006,6 +1027,7 @@ class Element_Section extends Element_Base {
 				[
 					'label' => esc_html__( 'Width', 'elementor' ),
 					'type' => Controls_Manager::SLIDER,
+					'size_units' => [ '%', 'vw', 'custom' ],
 					'default' => [
 						'unit' => '%',
 					],
@@ -1017,6 +1039,10 @@ class Element_Section extends Element_Base {
 					],
 					'range' => [
 						'%' => [
+							'min' => 100,
+							'max' => 300,
+						],
+						'vw' => [
 							'min' => 100,
 							'max' => 300,
 						],
@@ -1035,9 +1061,16 @@ class Element_Section extends Element_Base {
 				[
 					'label' => esc_html__( 'Height', 'elementor' ),
 					'type' => Controls_Manager::SLIDER,
+					'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 					'range' => [
 						'px' => [
 							'max' => 500,
+						],
+						'em' => [
+							'max' => 50,
+						],
+						'rem' => [
+							'max' => 50,
 						],
 					],
 					'condition' => [
@@ -1097,7 +1130,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section Typography
+		// Section Typography.
 		$this->start_controls_section(
 			'section_typo',
 			[
@@ -1115,7 +1148,6 @@ class Element_Section extends Element_Base {
 				'selectors' => [
 					'{{WRAPPER}} .elementor-heading-title' => 'color: {{VALUE}};',
 				],
-				'separator' => 'none',
 			]
 		);
 
@@ -1186,7 +1218,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section Advanced
+		// Section Advanced.
 		$this->start_controls_section(
 			'section_advanced',
 			[
@@ -1274,6 +1306,8 @@ class Element_Section extends Element_Base {
 			]
 		);
 
+		Plugin::$instance->controls_manager->add_display_conditions_controls( $this );
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -1283,6 +1317,8 @@ class Element_Section extends Element_Base {
 				'tab' => Controls_Manager::TAB_ADVANCED,
 			]
 		);
+
+		Plugin::$instance->controls_manager->add_motion_effects_promotion_control( $this );
 
 		$this->add_responsive_control(
 			'animation',
@@ -1329,7 +1365,7 @@ class Element_Section extends Element_Base {
 
 		$this->end_controls_section();
 
-		// Section Responsive
+		// Section Responsive.
 		$this->start_controls_section(
 			'_section_responsive',
 			[
@@ -1412,17 +1448,13 @@ class Element_Section extends Element_Base {
 		#>
 			<div {{{ view.getRenderAttributeString( 'background-video-container' ) }}}>
 				<div class="elementor-background-video-embed"></div>
-				<video class="elementor-background-video-hosted elementor-html5-video" {{ videoAttributes }}></video>
+				<video class="elementor-background-video-hosted" {{ videoAttributes }}></video>
 			</div>
 		<# } #>
 		<div class="elementor-background-overlay"></div>
-		<div class="elementor-shape elementor-shape-top"></div>
-		<div class="elementor-shape elementor-shape-bottom"></div>
-		<div class="elementor-container elementor-column-gap-{{ settings.gap }}">
-			<?php if ( ! Plugin::$instance->experiments->is_feature_active( 'e_dom_optimization' ) ) { ?>
-				<div class="elementor-row"></div>
-			<?php } ?>
-		</div>
+		<div class="elementor-shape elementor-shape-top" aria-hidden="true"></div>
+		<div class="elementor-shape elementor-shape-bottom" aria-hidden="true"></div>
+		<div class="elementor-container elementor-column-gap-{{ settings.gap }}"></div>
 		<?php
 	}
 
@@ -1449,7 +1481,7 @@ class Element_Section extends Element_Base {
 					$this->add_render_attribute( 'background-video-container', 'class', 'elementor-background-video-container' );
 
 					if ( ! $settings['background_play_on_mobile'] ) {
-						$this->add_render_attribute( 'background-video-container', 'class', 'elementor-hidden-phone' );
+						$this->add_render_attribute( 'background-video-container', 'class', 'elementor-hidden-mobile' );
 					}
 					?>
 					<div <?php $this->print_render_attribute_string( 'background-video-container' ); ?>>
@@ -1462,7 +1494,7 @@ class Element_Section extends Element_Base {
 								$video_tag_attributes .= ' loop';
 							endif;
 							?>
-							<video class="elementor-background-video-hosted elementor-html5-video" <?php
+							<video class="elementor-background-video-hosted" <?php
 								// PHPCS - the variable $video_tag_attributes is a plain string.
 								echo $video_tag_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 							?>></video>
@@ -1472,8 +1504,11 @@ class Element_Section extends Element_Base {
 				endif;
 			endif;
 
-			$has_background_overlay = in_array( $settings['background_overlay_background'], [ 'classic', 'gradient' ], true ) ||
-									in_array( $settings['background_overlay_hover_background'], [ 'classic', 'gradient' ], true );
+			$overlay_background = $settings['background_overlay_background'] ?? '';
+			$overlay_hover_background = $settings['background_overlay_hover_background'] ?? '';
+
+			$has_background_overlay = in_array( $overlay_background, [ 'classic', 'gradient' ], true ) ||
+									in_array( $overlay_hover_background, [ 'classic', 'gradient' ], true );
 
 			if ( $has_background_overlay ) :
 				?>
@@ -1490,9 +1525,7 @@ class Element_Section extends Element_Base {
 			}
 			?>
 			<div class="elementor-container elementor-column-gap-<?php echo esc_attr( $settings['gap'] ); ?>">
-			<?php if ( ! Plugin::$instance->experiments->is_feature_active( 'e_dom_optimization' ) ) { ?>
-				<div class="elementor-row">
-			<?php }
+			<?php
 	}
 
 	/**
@@ -1505,9 +1538,6 @@ class Element_Section extends Element_Base {
 	 */
 	public function after_render() {
 		?>
-		<?php if ( ! Plugin::$instance->experiments->is_feature_active( 'e_dom_optimization' ) ) { ?>
-				</div>
-		<?php } ?>
 			</div>
 		</<?php
 			// PHPCS - the method get_html_tag is safe.
@@ -1594,7 +1624,7 @@ class Element_Section extends Element_Base {
 		}
 
 		?>
-		<div class="elementor-shape elementor-shape-<?php echo esc_attr( $side ); ?>" data-negative="<?php
+		<div class="elementor-shape elementor-shape-<?php echo esc_attr( $side ); ?>" aria-hidden="true" data-negative="<?php
 			Utils::print_unescaped_internal_string( $negative ? 'true' : 'false' );
 		?>">
 			<?php

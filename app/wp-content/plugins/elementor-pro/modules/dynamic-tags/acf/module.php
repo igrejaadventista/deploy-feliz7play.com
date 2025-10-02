@@ -2,8 +2,11 @@
 namespace ElementorPro\Modules\DynamicTags\ACF;
 
 use Elementor\Controls_Manager;
+use Elementor\Core\Base\Document;
 use Elementor\Core\DynamicTags\Base_Tag;
 use Elementor\Modules\DynamicTags;
+use ElementorPro\Plugin;
+use WP_Post;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -12,6 +15,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Module extends DynamicTags\Module {
 
 	const ACF_GROUP = 'acf';
+
+	/**
+	 * @var Dynamic_Value_Provider
+	 */
+	private static $dynamic_value_provider;
+
+	public function __construct() {
+		parent::__construct();
+
+		add_filter( 'acf/pre_load_post_id', [ $this, 'filter_post_in_preview' ], 10, 2 );
+	}
+
+	/**
+	 * ACF meta values are not copying to post revisions. This fix is for replacing revision post_id to actual one
+	 *
+	 * @param $null
+	 * @param $post_id
+	 * @return mixed
+	 */
+	public function filter_post_in_preview( $null, $post_id ) {
+		if ( ! $post_id || ! is_preview() ) {
+			return $null;
+		}
+
+		if ( $post_id instanceof WP_Post ) {
+			return $post_id->ID;
+		}
+
+		return $post_id;
+	}
 
 	/**
 	 * @param array $types
@@ -119,6 +152,7 @@ class Module extends DynamicTags\Module {
 			'ACF_File',
 			'ACF_Number',
 			'ACF_Color',
+			'ACF_Date_Time',
 		];
 	}
 
@@ -126,19 +160,14 @@ class Module extends DynamicTags\Module {
 	public static function get_tag_value_field( Base_Tag $tag ) {
 		$key = $tag->get_settings( 'key' );
 
-		if ( ! empty( $key ) ) {
-			list( $field_key, $meta_key ) = explode( ':', $key );
+		// TODO: The tags should use the `Dynamic_Value_Provider::get_value()` method, but it involves
+		//  heavily refactoring them, so currently this method is just a proxy and also kept for BC.
 
-			if ( 'options' === $field_key ) {
-				$field = get_field_object( $meta_key, $field_key );
-			} else {
-				$field = get_field_object( $field_key, get_queried_object() );
-			}
-
-			return [ $field, $meta_key ];
+		if ( ! static::$dynamic_value_provider ) {
+			static::$dynamic_value_provider = new Dynamic_Value_Provider();
 		}
 
-		return [];
+		return static::$dynamic_value_provider->get_value( $key );
 	}
 
 	public function get_groups() {

@@ -4,16 +4,19 @@ import { Select2 } from '@elementor/app-ui';
  * Main component.
  *
  * @param {any} props
- * @return {any} -
+ * @return {any} Element
  * @class
  */
 export default function ConditionSubId( props ) {
-	if ( ! props.sub || ! Object.keys( props.subIdAutocomplete ).length ) {
+	const settings = React.useMemo( () => (
+		Object.keys( props.subIdAutocomplete ).length
+			? getSettings( props.subIdAutocomplete )
+			: null
+	), [ props.subIdAutocomplete ] );
+
+	if ( ! props.sub || ! settings ) {
 		return '';
 	}
-
-	// eslint-disable-next-line react-hooks/rules-of-hooks
-	const settings = React.useMemo( () => getSettings( props.subIdAutocomplete ), [ props.subIdAutocomplete ] );
 
 	const onChange = ( e ) => props.updateConditions( props.id, { subId: e.target.value } );
 
@@ -34,7 +37,7 @@ export default function ConditionSubId( props ) {
  * that passes as a prop
  *
  * @param {any} autocomplete
- * @return {Object} -
+ * @return {Object} Settings
  */
 function getSettings( autocomplete ) {
 	return {

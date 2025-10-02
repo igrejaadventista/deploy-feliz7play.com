@@ -65,15 +65,18 @@ class Control_URL extends Control_Base_Multiple {
 	protected function get_default_settings() {
 		return [
 			'label_block' => true,
-			'placeholder' => esc_html__( 'Paste URL or type', 'elementor' ),
+			'placeholder' => esc_html__( 'Type or paste your URL', 'elementor' ),
 			'autocomplete' => true,
 			'options' => [ 'is_external', 'nofollow', 'custom_attributes' ],
 			'dynamic' => [
 				'categories' => [ TagsModule::URL_CATEGORY ],
 				'property' => 'url',
 			],
-			'custom_attributes_description' => esc_html__( 'Set custom attributes for the link element. Separate attribute keys from values using the | (pipe) character. Separate key-value pairs with a comma.', 'elementor' )
-			. ' <a href="https://go.elementor.com/panel-link-custom-attributes/" target="_blank">' . esc_html__( 'Learn More', 'elementor' ) . '</a>',
+			'custom_attributes_description' => sprintf(
+				'%1$s <a target="_blank" href="https://go.elementor.com/panel-link-custom-attributes/">%2$s</a>',
+				esc_html__( 'Set custom attributes for the link element. Separate attribute keys from values using the | (pipe) character. Separate key-value pairs with a comma.', 'elementor' ),
+				esc_html__( 'Learn more', 'elementor' )
+			),
 		];
 	}
 
@@ -96,11 +99,13 @@ class Control_URL extends Control_Base_Multiple {
 				<input id="<?php $this->print_control_uid(); ?>" class="elementor-control-tag-area elementor-input" data-setting="url" placeholder="{{ view.getControlPlaceholder() }}" />
 				<?php // PHPCS - Nonces don't require escaping. ?>
 				<input id="_ajax_linking_nonce" type="hidden" value="<?php echo wp_create_nonce( 'internal-linking' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" />
-				<button class="elementor-control-url-more tooltip-target elementor-control-unit-1" data-tooltip="<?php echo esc_attr__( 'Link Options', 'elementor' ); ?>">
+				<# if ( !! data.options ) { #>
+				<button class="elementor-control-url-more tooltip-target elementor-control-unit-1" data-tooltip="<?php echo esc_attr__( 'Link Options', 'elementor' ); ?>" aria-label="<?php echo esc_attr__( 'Link Options', 'elementor' ); ?>">
 					<i class="eicon-cog" aria-hidden="true"></i>
-					<span class="elementor-screen-only"><?php echo esc_html__( 'Link Options', 'elementor' ); ?></span>
 				</button>
+				<# } #>
 			</div>
+			<# if ( !! data.options ) { #>
 			<div class="elementor-control-url-more-options">
 				<div class="elementor-control-url-option">
 					<input id="<?php $this->print_control_uid( 'is_external' ); ?>" type="checkbox" class="elementor-control-url-option-input" data-setting="is_external">
@@ -110,7 +115,7 @@ class Control_URL extends Control_Base_Multiple {
 					<input id="<?php $this->print_control_uid( 'nofollow' ); ?>" type="checkbox" class="elementor-control-url-option-input" data-setting="nofollow">
 					<label for="<?php $this->print_control_uid( 'nofollow' ); ?>"><?php echo esc_html__( 'Add nofollow', 'elementor' ); ?></label>
 				</div>
-				<div class="elementor-control-url__custom-attributes">
+				<div class="elementor-control-url__custom-attributes elementor-control-direction-ltr">
 					<label for="<?php $this->print_control_uid( 'custom_attributes' ); ?>" class="elementor-control-url__custom-attributes-label"><?php echo esc_html__( 'Custom Attributes', 'elementor' ); ?></label>
 					<input type="text" id="<?php $this->print_control_uid( 'custom_attributes' ); ?>" class="elementor-control-unit-5" placeholder="key|value" data-setting="custom_attributes">
 				</div>
@@ -118,6 +123,7 @@ class Control_URL extends Control_Base_Multiple {
 				<div class="elementor-control-field-description">{{{ data.custom_attributes_description }}}</div>
 				<# } #>
 			</div>
+			<# } #>
 		</div>
 		<# if ( data.description ) { #>
 		<div class="elementor-control-field-description">{{{ data.description }}}</div>

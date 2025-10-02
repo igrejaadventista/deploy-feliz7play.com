@@ -29,6 +29,20 @@ class Breadcrumbs extends Base {
 		return [ 'breadcrumbs' ];
 	}
 
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-breadcrumbs' ];
+	}
+
 	public function get_keywords() {
 		return [ 'yoast', 'seo', 'breadcrumbs', 'internal links' ];
 	}
@@ -83,7 +97,12 @@ class Breadcrumbs extends Base {
 		$this->add_control(
 			'html_description',
 			[
-				'raw' => esc_html__( 'Additional settings are available in the Yoast SEO', 'elementor-pro' ) . ' ' . sprintf( '<a href="%s" target="_blank">%s</a>', admin_url( 'admin.php?page=wpseo_titles#top#breadcrumbs' ), esc_html__( 'Breadcrumbs Panel', 'elementor-pro' ) ),
+				'raw' => sprintf(
+					/* translators: 1: Link opening tag, 2: Link closing tag. */
+					esc_html__( 'Additional settings are available in the Yoast SEO %1$sBreadcrumbs Panel%2$s', 'elementor-pro' ),
+					sprintf( '<a href="%s" target="_blank">', admin_url( 'admin.php?page=wpseo_titles#top#breadcrumbs' ) ),
+					'</a>'
+				),
 				'type' => Controls_Manager::RAW_HTML,
 				'content_classes' => 'elementor-descriptor',
 			]

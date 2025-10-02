@@ -40,15 +40,6 @@ class Manager {
 	}
 
 	/**
-	 * @deprecated 3.1.0
-	 */
-	public function localize_settings() {
-		Plugin::$instance->modules_manager->get_modules( 'dev-tools' )->deprecation->deprecated_function( __METHOD__, '3.1.0' );
-
-		return [];
-	}
-
-	/**
 	 * Parse dynamic tags text.
 	 *
 	 * Receives the dynamic tag text, and returns a single value or multiple values
@@ -277,7 +268,7 @@ class Manager {
 	/**
 	 * @since 2.0.0
 	 * @access public
-	 * @deprecated 3.5.0 Use `$this->register()` instead.
+	 * @deprecated 3.5.0 Use `register()` method instead.
 	 *
 	 * @param string $class
 	 */
@@ -285,7 +276,7 @@ class Manager {
 		Plugin::$instance->modules_manager->get_modules( 'dev-tools' )->deprecation->deprecated_function(
 			__METHOD__,
 			'3.5.0',
-			'register'
+			'register()'
 		);
 
 		/** @var Base_Tag $tag */
@@ -302,7 +293,6 @@ class Manager {
 	 * @return void
 	 * @since  3.5.0
 	 * @access public
-	 *
 	 */
 	public function register( Base_Tag $dynamic_tag_instance ) {
 		$this->tags_info[ $dynamic_tag_instance->get_name() ] = [
@@ -314,7 +304,7 @@ class Manager {
 	/**
 	 * @since 2.0.9
 	 * @access public
-	 * @deprecated 3.5.0 Use `$this->unregister()` instead.
+	 * @deprecated 3.5.0 Use `unregister()` method instead.
 	 *
 	 * @param string $tag_name
 	 */
@@ -322,7 +312,7 @@ class Manager {
 		Plugin::$instance->modules_manager->get_modules( 'dev-tools' )->deprecation->deprecated_function(
 			__METHOD__,
 			'3.5.0',
-			'unregister'
+			'unregister()'
 		);
 
 		$this->unregister( $tag_name );

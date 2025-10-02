@@ -8,7 +8,7 @@ use Elementor\Plugin;
 use Elementor\Modules\KitElementsDefaults\ImportExport\Import_Export;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Module extends BaseModule {
@@ -27,10 +27,13 @@ class Module extends BaseModule {
 				'elementor-common',
 				'elementor-editor-modules',
 				'elementor-editor-document',
+				'wp-i18n',
 			],
 			ELEMENTOR_VERSION,
 			true
 		);
+
+		wp_set_script_translations( 'elementor-kit-elements-defaults-editor', 'elementor' );
 	}
 
 	public function __construct() {

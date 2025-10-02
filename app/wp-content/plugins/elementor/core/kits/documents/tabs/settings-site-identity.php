@@ -7,7 +7,7 @@ use Elementor\Core\Base\Document;
 use Elementor\Core\Files\Uploads_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Settings_Site_Identity extends Tab_Base {
@@ -53,9 +53,15 @@ class Settings_Site_Identity extends Tab_Base {
 		$this->add_control(
 			$this->get_id() . '_refresh_notice',
 			[
-				'type' => Controls_Manager::RAW_HTML,
-				'raw' => esc_html__( 'Changes will be reflected in the preview only after the page reloads.', 'elementor' ),
-				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				'type' => Controls_Manager::ALERT,
+				'alert_type' => 'info',
+				'content' => sprintf(
+					/* translators: 1: Link open tag, 2: Link open tag, 3: Link close tag. */
+					esc_html__( 'Changes will be reflected only after %1$s saving %3$s and %2$s reloading %3$s preview.', 'elementor' ),
+					'<a href="javascript: $e.run( \'document/save/default\' )">',
+					'<a href="javascript: $e.run( \'preview/reload\' )">',
+					'</a>'
+				),
 			]
 		);
 
@@ -98,6 +104,11 @@ class Settings_Site_Identity extends Tab_Base {
 					'100'
 				),
 				'export' => false,
+				'ai' => [
+					'active' => true,
+					'type' => 'media',
+					'category' => 'vector',
+				],
 			]
 		);
 

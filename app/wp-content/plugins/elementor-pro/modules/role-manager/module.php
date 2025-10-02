@@ -2,6 +2,7 @@
 namespace ElementorPro\Modules\RoleManager;
 
 use ElementorPro\Plugin;
+use ElementorPro\License\API;
 use ElementorPro\Base\Module_Base;
 use Elementor\Core\RoleManager\Role_Manager as RoleManagerBase;
 
@@ -31,6 +32,14 @@ class Module extends Module_Base {
 
 	public function display_role_controls( $role_slug, $role_data ) {
 		static $options = false;
+
+		if ( ! API::is_license_active() || ! API::is_licence_has_feature( static::ROLE_MANAGER_OPTION_NAME, API::BC_VALIDATION_CALLBACK ) ) {
+			// Promotions for PRO when the license not active.
+			$this->print_role_controls_promotion();
+
+			return;
+		}
+
 		if ( ! $options ) {
 			$options = [
 				'excluded_options' => Plugin::elementor()->role_manager->get_role_manager_options(),
@@ -62,6 +71,53 @@ class Module extends Module_Base {
 					],
 				],
 			],
+		] );
+	}
+
+	private function print_role_controls_promotion() {
+		?>
+		<div class="elementor-role-go-pro">
+			<div class="elementor-role-go-pro__desc">
+				<?php echo esc_html__( 'Want to give access only to content?', 'elementor-pro' ); ?>
+			</div>
+			<div class="elementor-role-go-pro__link ">
+				<a
+					class="elementor-button go-pro"
+					target="_blank"
+					href="<?php echo esc_url( $this->get_cta_url() ); ?>"
+				>
+					<?php echo esc_html( $this->get_cta_label() ); ?>
+				</a>
+			</div>
+		</div>
+		<?php
+	}
+
+	private function get_cta_label() {
+		if ( ! API::active_licence_has_feature( static::ROLE_MANAGER_OPTION_NAME ) ) {
+			return esc_html__( 'Upgrade', 'elementor-pro' );
+		}
+
+		return API::is_license_expired()
+			? esc_html__( 'Renew now', 'elementor-pro' )
+			: esc_html__( 'Connect & Activate', 'elementor-pro' );
+	}
+
+	private function get_cta_url() {
+		if ( ! API::active_licence_has_feature( static::ROLE_MANAGER_OPTION_NAME ) ) {
+			return 'https://go.elementor.com/go-pro-advanced-role-manager/';
+		}
+
+		return API::is_license_expired()
+			? 'https://go.elementor.com/renew-role-manager/'
+			: $this->get_connect_url();
+	}
+
+	private function get_connect_url() {
+		return Plugin::instance()->license_admin->get_connect_url( [
+			'utm_source' => 'wp-role-manager',
+			'utm_medium' => 'wp-dash',
+			'utm_campaign' => 'connect-and-activate-license',
 		] );
 	}
 

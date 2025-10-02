@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class Products_Deprecated
  *
- * @deprecated 2.4.1 use Products
+ * @deprecated 2.4.1 Use `Products` class instead.
  */
 class Products_Deprecated extends Products_Base {
 
@@ -50,6 +50,20 @@ class Products_Deprecated extends Products_Base {
 	/* Deprecated Widget */
 	public function show_in_panel() {
 		return false;
+	}
+
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-woocommerce-products' ];
 	}
 
 	public function on_export( $element ) {

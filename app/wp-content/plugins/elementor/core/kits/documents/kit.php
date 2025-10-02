@@ -3,13 +3,12 @@ namespace Elementor\Core\Kits\Documents;
 
 use Elementor\Core\DocumentTypes\PageBase;
 use Elementor\Core\Files\CSS\Post as Post_CSS;
-use Elementor\Core\Kits\Documents\Tabs;
 use Elementor\Core\Settings\Manager as SettingsManager;
 use Elementor\Core\Settings\Page\Manager as PageManager;
 use Elementor\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Kit extends PageBase {
@@ -112,10 +111,10 @@ class Kit extends PageBase {
 	 * Register a kit settings menu.
 	 *
 	 * @param $id
-	 * @param $class
+	 * @param $class_name
 	 */
-	public function register_tab( $id, $class ) {
-		$this->tabs[ $id ] = new $class( $this );
+	public function register_tab( $id, $class_name ) {
+		$this->tabs[ $id ] = new $class_name( $this );
 	}
 
 	/**
@@ -126,6 +125,7 @@ class Kit extends PageBase {
 
 		foreach ( $this->tabs as $id => $tab ) {
 			$config['tabs'][ $id ] = [
+				'id' => $id,
 				'title' => $tab->get_title(),
 				'icon' => $tab->get_icon(),
 				'group' => $tab->get_group(),
@@ -142,24 +142,10 @@ class Kit extends PageBase {
 	 * @access protected
 	 */
 	protected function register_controls() {
-		$is_edit_mode = Plugin::$instance->editor->is_edit_mode();
-
-		if ( ! $is_edit_mode ) {
-			// In the Front End, the Kit is initialized before CSS is generated, so we always duplicate controls in
-			// the kit.
-			$initial_responsive_controls_duplication_mode = Plugin::$instance->breakpoints->get_responsive_control_duplication_mode();
-
-			Plugin::$instance->breakpoints->set_responsive_control_duplication_mode( 'on' );
-		}
-
 		$this->register_document_controls();
 
 		foreach ( $this->tabs as $tab ) {
 			$tab->register_controls();
-		}
-
-		if ( ! $is_edit_mode ) {
-			Plugin::$instance->breakpoints->set_responsive_control_duplication_mode( $initial_responsive_controls_duplication_mode );
 		}
 	}
 
@@ -187,7 +173,7 @@ class Kit extends PageBase {
 		$page_settings_manager = SettingsManager::get_settings_managers( 'page' );
 		$page_settings_manager->save_settings( $document_settings, $this->get_id() );
 
-		/** @var Kit $autosave **/
+		/** @var Kit $autosave */
 		$autosave = $this->get_autosave();
 
 		if ( $autosave ) {

@@ -73,11 +73,17 @@ class Module extends Module_Base {
 		'print' => [
 			'title' => 'Print',
 		],
+		'x-twitter' => [
+			'title' => 'X',
+		],
+		'threads' => [
+			'title' => 'Threads',
+		],
 	];
 
 	public static function get_networks( $network_name = null ) {
 		if ( $network_name ) {
-			return isset( self::$networks[ $network_name ] ) ? self::$networks[ $network_name ] : null;
+			return self::$networks[ $network_name ] ?? null;
 		}
 
 		return self::$networks;
@@ -94,17 +100,44 @@ class Module extends Module_Base {
 	}
 
 	public function add_localize_data( $settings ) {
-		$settings['shareButtonsNetworks'] = self::$networks;
+		$settings['shareButtonsNetworks'] = self::get_networks();
 
 		return $settings;
+	}
+
+	/**
+	 * Get the base URL for assets.
+	 *
+	 * @return string
+	 */
+	public function get_assets_base_url(): string {
+		return ELEMENTOR_PRO_URL;
+	}
+
+	/**
+	 * Register styles.
+	 *
+	 * At build time, Elementor compiles `/modules/share-buttons/assets/scss/frontend.scss`
+	 * to `/assets/css/widget-share-buttons.min.css`.
+	 *
+	 * @return void
+	 */
+	public function register_styles() {
+		wp_register_style(
+			'widget-share-buttons',
+			$this->get_css_assets_url( 'widget-share-buttons', null, true, true ),
+			[ 'elementor-frontend' ],
+			ELEMENTOR_PRO_VERSION
+		);
 	}
 
 	public function __construct() {
 		parent::__construct();
 
+		add_action( 'elementor/frontend/after_register_styles', [ $this, 'register_styles' ] );
+
 		add_filter( 'elementor_pro/frontend/localize_settings', [ $this, 'add_localize_data' ] );
 
 		add_filter( 'elementor_pro/editor/localize_settings', [ $this, 'add_localize_data' ] );
-
 	}
 }

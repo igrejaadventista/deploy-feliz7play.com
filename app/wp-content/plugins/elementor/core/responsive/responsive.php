@@ -22,6 +22,8 @@ class Responsive {
 
 	/**
 	 * The Elementor breakpoint prefix.
+	 *
+	 * @deprecated 3.2.0
 	 */
 	const BREAKPOINT_OPTION_PREFIX = 'viewport_';
 
@@ -31,6 +33,7 @@ class Responsive {
 	 * Holds the default responsive breakpoints.
 	 *
 	 * @since 1.0.0
+	 * @deprecated 3.2.0
 	 * @access private
 	 * @static
 	 *
@@ -51,6 +54,7 @@ class Responsive {
 	 * Holds the editable breakpoint keys.
 	 *
 	 * @since 1.0.0
+	 * @deprecated 3.2.0
 	 * @access private
 	 * @static
 	 *
@@ -67,7 +71,7 @@ class Responsive {
 	 * Retrieve the default responsive breakpoints.
 	 *
 	 * @since 1.0.0
-	 * @deprecated 3.2.0
+	 * @deprecated 3.2.0 Use `Elementor\Core\Breakpoints\Manager::get_default_config()` instead.
 	 * @access public
 	 * @static
 	 *
@@ -112,7 +116,7 @@ class Responsive {
 	public static function get_breakpoints() {
 		return array_reduce(
 			array_keys( self::$default_breakpoints ), function( $new_array, $breakpoint_key ) {
-				if ( ! in_array( $breakpoint_key, self::$editable_breakpoints_keys ) ) {
+				if ( ! in_array( $breakpoint_key, self::$editable_breakpoints_keys, true ) ) {
 					$new_array[ $breakpoint_key ] = self::$default_breakpoints[ $breakpoint_key ];
 				} else {
 					$saved_option = Plugin::$instance->kits_manager->get_current_settings( self::BREAKPOINT_OPTION_PREFIX . $breakpoint_key );
@@ -127,19 +131,19 @@ class Responsive {
 
 	/**
 	 * @since 2.1.0
-	 * @deprecated 3.2.0
+	 * @deprecated 3.2.0 Use `Plugin::$instance->breakpoints->has_custom_breakpoints()` instead.
 	 * @access public
 	 * @static
 	 */
 	public static function has_custom_breakpoints() {
 		Plugin::$instance->modules_manager->get_modules( 'dev-tools' )->deprecation->deprecated_function( __METHOD__, '3.2.0', 'Plugin::$instance->breakpoints->has_custom_breakpoints()' );
 
-		return ! ! array_diff( self::$default_breakpoints, self::get_breakpoints() );
+		return (bool) array_diff( self::$default_breakpoints, self::get_breakpoints() );
 	}
 
 	/**
 	 * @since 2.1.0
-	 * @deprecated 3.2.0
+	 * @deprecated 3.2.0 Use `Elementor\Core\Breakpoints\Manager::get_stylesheet_templates_path()` instead.
 	 * @access public
 	 * @static
 	 */
@@ -151,7 +155,7 @@ class Responsive {
 
 	/**
 	 * @since 2.1.0
-	 * @deprecated 3.2.0
+	 * @deprecated 3.2.0 Use `Elementor\Core\Breakpoints\Manager::compile_stylesheet_templates()` instead.
 	 * @access public
 	 * @static
 	 */

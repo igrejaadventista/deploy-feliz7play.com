@@ -41,6 +41,8 @@ export class ConditionsProvider extends BaseContext {
 		this.state = {
 			...this.state,
 
+			conditionsFetched: false,
+
 			conditions: {},
 
 			updateConditionItemState: this.updateConditionItemState.bind( this ),
@@ -60,13 +62,22 @@ export class ConditionsProvider extends BaseContext {
 		this.executeAction( ConditionsProvider.actions.FETCH_CONFIG, () => ConditionsConfig.create() )
 			.then( ( conditionsConfig ) => this.conditionsConfig = conditionsConfig )
 			.then( this.normalizeConditionsState.bind( this ) )
-			.then( this.setSubIdTitles.bind( this ) );
+			.then( () => {
+				this.setSubIdTitles.bind( this );
+				this.setState( { conditionsFetched: true } );
+			} );
+	}
+
+	componentDidUpdate( prevProps, prevState ) {
+		if ( ! prevState.conditionsFetched && this.state.conditionsFetched ) {
+			this.setSubIdTitles();
+		}
 	}
 
 	/**
 	 * Execute a request to save the template conditions.
 	 *
-	 * @return {any} -
+	 * @return {any} Saved conditions
 	 */
 	saveConditions() {
 		const conditions = Object.values( this.state.conditions )
@@ -109,7 +120,7 @@ export class ConditionsProvider extends BaseContext {
 	 * Fetching subId titles.
 	 *
 	 * @param {any} condition
-	 * @return {Promise<unknown>} -
+	 * @return {Promise<unknown>} Titles
 	 */
 	fetchSubIdsTitles( condition ) {
 		return new Promise( ( resolve ) => {
@@ -140,7 +151,7 @@ export class ConditionsProvider extends BaseContext {
 					options: this.conditionsConfig.getOptions(),
 					subOptions: this.conditionsConfig.getSubOptions( condition.name ),
 					subIdAutocomplete: this.conditionsConfig.getSubIdAutocomplete( condition.sub ),
-					supIdOptions: condition.subId ? [ { value: condition.subId, label: condition.subId } ] : [],
+					subIdOptions: condition.subId ? [ { value: condition.subId, label: '' } ] : [],
 				} );
 
 				return {
@@ -251,7 +262,7 @@ export class ConditionsProvider extends BaseContext {
 	 * Find a condition item from the conditions state.
 	 *
 	 * @param {any} id
-	 * @return {Condition|null} -
+	 * @return {Condition|null} Condition
 	 */
 	findConditionItemInState( id ) {
 		return Object.values( this.state.conditions ).find( ( c ) => c.id === id );
@@ -261,7 +272,7 @@ export class ConditionsProvider extends BaseContext {
 	 * Update the whole conditions state.
 	 *
 	 * @param {Function} callback
-	 * @return {Promise<any>} -
+	 * @return {Promise<undefined>} Conditions state
 	 */
 	updateConditionsState( callback ) {
 		return new Promise( ( resolve ) =>
@@ -272,7 +283,7 @@ export class ConditionsProvider extends BaseContext {
 	/**
 	 * Renders the provider.
 	 *
-	 * @return {any} -
+	 * @return {any} Element
 	 */
 	render() {
 		if ( this.state.action.current === ConditionsProvider.actions.FETCH_CONFIG ) {

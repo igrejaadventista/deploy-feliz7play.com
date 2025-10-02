@@ -2,15 +2,16 @@
 /**
  * The base configuration for WordPress
  *
- * The wp-config.php creation script uses this file during the
- * installation. You don't have to use the web site, you can
- * copy this file to "wp-config.php" and fill in the values.
+ * The wp-config.php creation script uses this file during the installation.
+ * You don't have to use the web site, you can copy this file to "wp-config.php"
+ * and fill in the values.
  *
  * This file contains the following configurations:
  *
- * * MySQL settings
+ * * Database settings
  * * Secret keys
  * * Database table prefix
+ * * Localized language
  * * ABSPATH
  *
  * @link https://wordpress.org/support/article/editing-wp-config-php/
@@ -18,9 +19,7 @@
  * @package WordPress
  */
 
-//$is_dev = false;
-
-// ** MySQL settings - You can get this info from your web host ** //
+// ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
 define( 'DB_NAME', $_ENV['WP_DB_NAME']);
 
@@ -33,70 +32,48 @@ define( 'DB_PASSWORD', $_ENV['WP_DB_PASSWORD']);
 /** MySQL hostname */
 define( 'DB_HOST', $_ENV['WP_DB_HOST'] . ':3306');
 
-/** Database Charset to use in creating database tables. */
-define( 'DB_CHARSET', 'utf8mb4' );
+/** Database charset to use in creating database tables. */
+define( 'DB_CHARSET', 'utf8' );
 
-/** The Database Collate type. Don't change this if in doubt. */
+/** The database collate type. Don't change this if in doubt. */
 define( 'DB_COLLATE', '' );
 
-define( 'DISALLOW_FILE_EDIT', true );
-
-define('AS3CF_SETTINGS', serialize(array(
-	'provider' => 'aws',
-	'region' => 'us-east-1',
-	'access-key-id' => $_ENV['WP_S3_ACCESS_KEY'],
-	'secret-access-key' => $_ENV['WP_S3_SECRET_KEY'],
-	'bucket' => $_ENV['WP_S3_BUCKET'],
-	'enable-delivery-domain' => true,
-	'delivery-domain' => $_ENV['WP_S3_BUCKET'],
-	'signed-urls-object-prefix' => 'noticias.adventistas.org',
-    'force-https' => true,
-	'remove-local-file' => true,
-)));
-
-if(!$is_dev):
-    define( 'FORCE_SSL', true );
-    define( 'FORCE_SSL_ADMIN',true );
-    $_SERVER['HTTPS']='on';
-endif;
-
-define('WP_ALLOW_MULTISITE', true);
-
-define('MULTISITE', true);
-define('SUBDOMAIN_INSTALL', false);
-define('DOMAIN_CURRENT_SITE', 'feliz7play.com');
-define('PATH_CURRENT_SITE', '/');
-define('SITE_ID_CURRENT_SITE', 1);
-define('BLOG_ID_CURRENT_SITE', 1);
-
 /**#@+
- * Authentication Unique Keys and Salts.
+ * Authentication unique keys and salts.
  *
- * Change these to different unique phrases!
- * You can generate these using the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
- * You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again.
+ * Change these to different unique phrases! You can generate these using
+ * the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}.
+ *
+ * You can change these at any point in time to invalidate all existing cookies.
+ * This will force all users to have to log in again.
  *
  * @since 2.6.0
  */
-define( 'AUTH_KEY',         '1W[T/!lx+!N>n+U!=T^]%N37vZKdXY7I*i^uxG)#%`R,bn;(sn<jz6!8zYGz*kkR' );
-define( 'SECURE_AUTH_KEY',  '9TkeZ;0;W k6~38eZ}M0Yz5rr`e)A=)f%;q4?H<:@7ajJ7m9jAFTGrT?<O3[3zpj' );
-define( 'LOGGED_IN_KEY',    'L5$up1dxDc^qC`yWdoUUC34:Sn;-Th!xBH[UbqG2ZGwF{Hkae#gB-dz! [totI8-' );
-define( 'NONCE_KEY',        'a;,>D?(Gv$GwJ;k!u1c!]Eh@J8^V_Q.WT?3:@:w?&4#TIM)c&2l,$w2:UJBbk%B%' );
-define( 'AUTH_SALT',        'R.r+0I%o+]r{`#iS)8,5ZW#8TPzi#7kV933w!=(bQz-.`m)EUS>7O.#uT{2Xg)Kl' );
-define( 'SECURE_AUTH_SALT', 'YWRq<if63(.#IgFpZqu}eUWFO3w2#G;N4T)Z>IJZ_xb/pw:TCTV?[=31-:dC;[Zj' );
-define( 'LOGGED_IN_SALT',   '~3SO@UEx%Y111%]!K>>vBOg]v##t8XgeCsNW{)$2^!eFS&dmXE?Mr$^nUh-*Fbjv' );
-define( 'NONCE_SALT',       '`IxT@]zkO!A@O1l6R@OeZ/:0@bn)4lUL3B[_6byZ5+adLw?qsqz!(vl_2Sz)0=po' );
+define( 'AUTH_KEY',          'pO9T7>_}LVnQ~BJGOHskFD/Ch(glf5h%N8%bg=5u_;bJ:107F%jsPl~XK<,[^J~l' );
+define( 'SECURE_AUTH_KEY',   'DS7o;7?N7/dgu[XM!OSCr1a`qbF)H8Eo:(h0b8cS3 6e#l9oCklRqL3ym]@*F4zE' );
+define( 'LOGGED_IN_KEY',     'kTuuGA>#,1cAF|sY21j3Xc7hX6{Z5VS8p.*=>(lUNu8#H4cDd#xyxDYHvP&z&BEv' );
+define( 'NONCE_KEY',         'lnQo/yr=rv@#N ~pl~3q#n:?GX,c`9Arhf<4B*fbqDDUD#xxeoGWl;72XDK[/t4,' );
+define( 'AUTH_SALT',         ' &uW0bXOiyj,tFw%`nHml[#VCin*$T-!lKA/$o``WPs;NB(i_+?HN~cMh_Fkn~kE' );
+define( 'SECURE_AUTH_SALT',  'E[Q3.5tA($;7fFKuoJZg[E<cXj*wJ=.3=]|/`F8i>.[}zl@I]M}LGV~&Yk Ue?dp' );
+define( 'LOGGED_IN_SALT',    'JXH%<{<Q`6X3QJ>omW1(QmCo nnsnARrI35tuwXe=I0KtsTnw+f|&&N@#!cwR3E>' );
+define( 'NONCE_SALT',        '.<&XyItgD~!|vyG7u W@WJv& &>AkS,Bg0eG?t%l#2Hafl2zmXd39pZ# EX3Q+~<' );
+define( 'WP_CACHE_KEY_SALT', 'fM-^MYVx5k,:LXN4*%B2!GBsK^Q7h`PWw]8)tdi%oRglxEp@s fs[=IG>/m>Wn#k' );
 
 
 /**#@-*/
 
 /**
- * WordPress Database Table prefix.
+ * WordPress database table prefix.
  *
  * You can have multiple installations in one database if you give each
  * a unique prefix. Only numbers, letters, and underscores please!
  */
 $table_prefix = 'wp_';
+
+
+/* Add any custom values between this line and the "stop editing" line. */
+
+
 
 /**
  * For developers: WordPress debugging mode.
@@ -110,7 +87,49 @@ $table_prefix = 'wp_';
  *
  * @link https://wordpress.org/support/article/debugging-in-wordpress/
  */
-define( 'WP_DEBUG', false );
+if ( ! defined( 'WP_DEBUG' ) ) {
+	define( 'WP_DEBUG', false );
+}
+
+define( 'WP_REDIS_PREFIX', 'v3.feliz7play.com:' );
+define( 'WP_MEMORY_LIMIT', '256M' );
+define( 'WP_MAX_MEMORY_LIMIT', '512M' );
+define( 'CONCATENATE_SCRIPTS', false );
+define( 'WP_POST_REVISIONS', '10' );
+define( 'MEDIA_TRASH', true );
+define( 'EMPTY_TRASH_DAYS', '15' );
+define( 'WP_AUTO_UPDATE_CORE', 'minor' );
+define( 'WP_REDIS_DISABLE_BANNERS', true );
+
+define('WP_SITEURL', 'https://v3.feliz7play.com');
+define('WP_HOME', 'https://v3.feliz7play.com');
+
+define('MULTISITE', true);
+define('SUBDOMAIN_INSTALL', false);          // subdiretórios
+define('DOMAIN_CURRENT_SITE', 'v3.feliz7play.com');
+define('PATH_CURRENT_SITE', '/');
+define('SITE_ID_CURRENT_SITE', 1);
+define('BLOG_ID_CURRENT_SITE', 1);
+
+// Se estiver atrás de ALB/CloudFront com TLS:
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+  $_SERVER['HTTPS'] = 'on';
+}
+define('FORCE_SSL_ADMIN', true);
+
+
+define('AS3CF_SETTINGS', serialize(array(
+	'provider' => 'aws',
+	'region' => 'us-east-1',
+	'access-key-id' => $_ENV['WP_S3_ACCESS_KEY'],
+	'secret-access-key' => $_ENV['WP_S3_SECRET_KEY'],
+	'bucket' => $_ENV['WP_S3_BUCKET'],
+    'enable-delivery-domain' => true,
+    'bucket' => $_ENV['WP_S3_BUCKET'],
+    'signed-urls-object-prefix' => 'feliz7play',
+    'force-https' => true,
+    'remove-local-file' => true,
+)));
 
 /* That's all, stop editing! Happy publishing. */
 

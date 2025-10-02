@@ -6,7 +6,7 @@ use Elementor\Core\Base\Base_Object;
 use Elementor\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**
@@ -33,6 +33,7 @@ abstract class Base_Category extends Base_Object {
 	 * TODO: Make abstract.
 	 *
 	 * @since 3.5.0
+	 * @deprecated 3.5.0
 	 * @access public
 	 *
 	 * @return string

@@ -6,6 +6,7 @@ use ElementorPro\Modules\Forms\Classes;
 use Elementor\Controls_Manager;
 use ElementorPro\Modules\Forms\Widgets\Form;
 use ElementorPro\Plugin;
+use ElementorPro\Core\Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -13,7 +14,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Upload extends Field_Base {
 
-	private $fixed_files_indices = false;
+	public $fixed_files_indices = false;
+
+	const MODE_LINK = 'link';
+	const MODE_ATTACH = 'attach';
+	const MODE_BOTH = 'both';
 
 	public function get_type() {
 		return 'upload';
@@ -36,6 +41,24 @@ class Upload extends Field_Base {
 		}
 
 		$field_controls = [
+			'attachment_type' => [
+				'name' => 'attachment_type',
+				'label' => esc_html__( 'Send files', 'elementor-pro' ),
+				'type' => Controls_Manager::SELECT,
+				'condition' => [
+					'field_type' => $this->get_type(),
+				],
+				'options' => [
+					self::MODE_LINK => esc_html__( 'Email with link', 'elementor-pro' ),
+					self::MODE_ATTACH => esc_html__( 'Email with attachment', 'elementor-pro' ),
+					self::MODE_BOTH => esc_html__( 'Email with both', 'elementor-pro' ),
+				],
+				'default' => self::MODE_LINK,
+				'description' => esc_html__( "Uploads you receive via link are stored on your server. However, uploads via attachment won't be saved on your server, and under Submissions", 'elementor-pro' ),
+				'tab' => 'content',
+				'inner_tab' => 'form_fields_content_tab',
+				'tabs_wrapper' => 'form_fields_tabs',
+			],
 			'file_sizes' => [
 				'name' => 'file_sizes',
 				'label' => esc_html__( 'Max. File Size', 'elementor-pro' ),
@@ -53,6 +76,9 @@ class Upload extends Field_Base {
 				'name' => 'file_types',
 				'label' => esc_html__( 'Allowed File Types', 'elementor-pro' ),
 				'type' => Controls_Manager::TEXT,
+				'ai' => [
+					'active' => false,
+				],
 				'condition' => [
 					'field_type' => $this->get_type(),
 				],
@@ -134,11 +160,11 @@ class Upload extends Field_Base {
 			'error',
 			'size',
 		];
-		$files = $_FILES['form_fields'];
+		$files = $_FILES['form_fields']; // phpcs:ignore -- escaped when processing the file later on.
 		// iterate over each uploaded file
 		foreach ( $files as $key => $part ) {
 			$key = (string) $key;
-			if ( in_array( $key, $names ) && is_array( $part ) ) {
+			if ( in_array( $key, $names, true ) && is_array( $part ) ) {
 				foreach ( $part as $position => $value ) {
 					if ( is_array( $value ) ) {
 						foreach ( $value as $index => $inner_val ) {
@@ -148,9 +174,10 @@ class Upload extends Field_Base {
 						$files[ $position ][0][ $key ] = $value;
 					}
 				}
-				// remove old key reference
-				unset( $files[ $key ] );
 			}
+
+			// remove original key reference
+			unset( $files[ $key ] );
 		}
 		$_FILES['form_fields'] = $files;
 		$this->fixed_files_indices = true;
@@ -205,7 +232,48 @@ class Upload extends Field_Base {
 	private function get_blacklist_file_ext() {
 		static $blacklist = false;
 		if ( ! $blacklist ) {
-			$blacklist = [ 'php', 'php3', 'php4', 'php5', 'php6', 'phps', 'php7', 'phtml', 'shtml', 'pht', 'swf', 'html', 'asp', 'aspx', 'cmd', 'csh', 'bat', 'htm', 'hta', 'jar', 'exe', 'com', 'js', 'lnk', 'htaccess', 'htpasswd', 'phtml', 'ps1', 'ps2', 'py', 'rb', 'tmp', 'cgi' ];
+			$blacklist = [
+				'php',
+				'php3',
+				'php4',
+				'php5',
+				'php6',
+				'phps',
+				'php7',
+				'phtml',
+				'shtml',
+				'pht',
+				'swf',
+				'html',
+				'asp',
+				'aspx',
+				'cmd',
+				'csh',
+				'bat',
+				'htm',
+				'hta',
+				'jar',
+				'exe',
+				'com',
+				'js',
+				'lnk',
+				'htaccess',
+				'htpasswd',
+				'phtml',
+				'ps1',
+				'ps2',
+				'py',
+				'rb',
+				'tmp',
+				'cgi',
+				'svg',
+				'php2',
+				'phtm',
+				'phar',
+				'hphp',
+				'phpt',
+				'svgz',
+			];
 
 			/**
 			 * Elementor forms blacklisted file extensions.
@@ -250,13 +318,15 @@ class Upload extends Field_Base {
 				/* translators: %s: phpinfo() */
 				UPLOAD_ERR_EXTENSION => sprintf( esc_html__( 'A PHP extension stopped the file upload. PHP does not provide a way to ascertain which extension caused the file upload to stop; examining the list of loaded extensions with %s may help.', 'elementor-pro' ), 'phpinfo()' ),
 			];
-			$this->fix_file_indices();
 		}
 
+		$this->fix_file_indices();
+
 		$id = $field['id'];
+		$files = Utils::_unstable_get_super_global_value( $_FILES, 'form_fields' );
 
 		if ( ! empty( $field['max_files'] ) ) {
-			if ( count( $_FILES['form_fields'][ $id ] ) > $field['max_files'] ) {
+			if ( count( $files[ $id ] ) > $field['max_files'] ) {
 				$error_message = sprintf(
 					/* translators: %d: The number of allowed files. */
 					_n( 'You can upload only %d file.', 'You can upload up to %d files.', intval( $field['max_files'] ), 'elementor-pro' ),
@@ -268,7 +338,7 @@ class Upload extends Field_Base {
 			}
 		}
 
-		foreach ( $_FILES['form_fields'][ $id ] as $index => $file ) {
+		foreach ( $files[ $id ] as $index => $file ) {
 			// not uploaded
 			if ( ! $field['required'] && UPLOAD_ERR_NO_FILE === $file['error'] ) {
 				return;
@@ -425,21 +495,26 @@ class Upload extends Field_Base {
 	 */
 	public function process_field( $field, Classes\Form_Record $record, Classes\Ajax_Handler $ajax_handler ) {
 		$id = $field['id'];
-		foreach ( $_FILES['form_fields'][ $id ] as $index => $file ) {
+		$files = Utils::_unstable_get_super_global_value( $_FILES, 'form_fields' );
+
+		foreach ( $files[ $id ] as $index => $file ) {
 			if ( UPLOAD_ERR_NO_FILE === $file['error'] ) {
 				continue;
 			}
+
 			$uploads_dir = $this->get_ensure_upload_dir();
 			$file_extension = pathinfo( $file['name'], PATHINFO_EXTENSION );
 			$filename = uniqid() . '.' . $file_extension;
 			$filename = wp_unique_filename( $uploads_dir, $filename );
 			$new_file = trailingslashit( $uploads_dir ) . $filename;
+
 			if ( is_dir( $uploads_dir ) && is_writable( $uploads_dir ) ) {
-				$move_new_file = @ move_uploaded_file( $file['tmp_name'], $new_file );
+				$move_new_file = Plugin::instance()->php_api->move_uploaded_file( $file['tmp_name'], $new_file );
 				if ( false !== $move_new_file ) {
 					// Set correct file permissions.
 					$perms = 0644;
 					@ chmod( $new_file, $perms );
+
 					$record->add_file( $id, $index,
 						[
 							'path' => $new_file,

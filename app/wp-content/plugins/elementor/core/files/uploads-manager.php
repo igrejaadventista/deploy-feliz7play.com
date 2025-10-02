@@ -7,7 +7,10 @@ use Elementor\Core\Files\File_Types\Base as File_Type_Base;
 use Elementor\Core\Files\File_Types\Json;
 use Elementor\Core\Files\File_Types\Svg;
 use Elementor\Core\Files\File_Types\Zip;
+use Elementor\Core\Files\Fonts\Google_Font;
 use Elementor\Core\Utils\Exceptions;
+use Elementor\Fonts;
+use Elementor\User;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -84,6 +87,10 @@ class Uploads_Manager extends Base_Object {
 		// Returns an array of file paths.
 		$extracted = $zip_handler->extract( $file_path, $allowed_file_types );
 
+		if ( is_wp_error( $extracted ) ) {
+			return $extracted;
+		}
+
 		// If there are no extracted file names, no files passed the extraction validation.
 		if ( empty( $extracted['files'] ) ) {
 			// TODO: Decide what to do if no files passed the extraction validation
@@ -115,29 +122,33 @@ class Uploads_Manager extends Base_Object {
 	 * @since 3.3.0
 	 * @access public
 	 *
-	 * @param array $file
+	 * @param array $data
 	 * @param array $allowed_file_extensions Optional. an array of file types that are allowed to pass validation for each
 	 * upload.
 	 * @return array|\WP_Error
 	 */
-	public function handle_elementor_upload( array $file, $allowed_file_extensions = null ) {
+	public function handle_elementor_upload( array $data, $allowed_file_extensions = null ) {
 		// If $file['fileData'] is set, it signals that the passed file is a Base64 string that needs to be decoded and
 		// saved to a temporary file.
-		if ( isset( $file['fileData'] ) ) {
-			$file = $this->save_base64_to_tmp_file( $file );
+		if ( isset( $data['fileData'] ) ) {
+			$data = $this->save_base64_to_tmp_file( $data, $allowed_file_extensions );
 		}
 
-		$validation_result = $this->validate_file( $file, $allowed_file_extensions );
+		if ( is_wp_error( $data ) ) {
+			return $data;
+		}
+
+		$validation_result = $this->validate_file( $data, $allowed_file_extensions );
 
 		if ( is_wp_error( $validation_result ) ) {
 			return $validation_result;
 		}
 
-		return $file;
+		return $data;
 	}
 
 	/**
-	 * are Unfiltered Uploads Enabled
+	 * Is Unfiltered Uploads Enabled
 	 *
 	 * @since 3.5.0
 	 * @access public
@@ -145,7 +156,9 @@ class Uploads_Manager extends Base_Object {
 	 * @return bool
 	 */
 	final public static function are_unfiltered_uploads_enabled() {
-		$enabled = ! ! get_option( self::UNFILTERED_FILE_UPLOADS_KEY ) && Svg::file_sanitizer_can_run();
+		$enabled = (bool) get_option( self::UNFILTERED_FILE_UPLOADS_KEY )
+			&& Svg::file_sanitizer_can_run()
+			&& User::is_current_user_can_upload_json();
 
 		/**
 		 * Allow Unfiltered Files Upload.
@@ -253,7 +266,7 @@ class Uploads_Manager extends Base_Object {
 	public function remove_file_or_dir( $path ) {
 		if ( is_dir( $path ) ) {
 			$this->remove_directory_with_files( $path );
-		} else {
+		} elseif ( is_file( $path ) ) {
 			unlink( $path );
 		}
 	}
@@ -271,6 +284,12 @@ class Uploads_Manager extends Base_Object {
 	 * @return string|\WP_Error
 	 */
 	public function create_temp_file( $file_content, $file_name ) {
+		$file_name = str_replace( ' ', '', sanitize_file_name( $file_name ) );
+
+		if ( empty( $file_name ) ) {
+			return new \WP_Error( 'invalid_file_name', esc_html__( 'Invalid file name.', 'elementor' ) );
+		}
+
 		$temp_filename = $this->create_unique_dir() . $file_name;
 
 		/**
@@ -355,6 +374,7 @@ class Uploads_Manager extends Base_Object {
 	 */
 	public function register_ajax_actions( Ajax $ajax ) {
 		$ajax->register_ajax_action( 'enable_unfiltered_files_upload', [ $this, 'enable_unfiltered_files_upload' ] );
+		$ajax->register_ajax_action( 'enqueue_google_fonts', [ $this, 'ajax_enqueue_google_fonts' ] );
 	}
 
 	/**
@@ -369,6 +389,22 @@ class Uploads_Manager extends Base_Object {
 		}
 
 		update_option( self::UNFILTERED_FILE_UPLOADS_KEY, 1 );
+	}
+
+	public function ajax_enqueue_google_fonts( $data ): bool {
+		if ( empty( $data['font_name'] ) ) {
+			return false;
+		}
+
+		$font_type = Fonts::get_font_type( $data['font_name'] );
+
+		if ( Fonts::GOOGLE !== $font_type ) {
+			return false;
+		}
+
+		Google_Font::enqueue( $data['font_name'] );
+
+		return true;
 	}
 
 	/**
@@ -479,9 +515,22 @@ class Uploads_Manager extends Base_Object {
 	 * @access private
 	 *
 	 * @param $file
+	 * @param array|null $allowed_file_extensions
+	 *
 	 * @return array|\WP_Error
 	 */
-	private function save_base64_to_tmp_file( $file ) {
+	private function save_base64_to_tmp_file( $file, $allowed_file_extensions = null ) {
+		if ( empty( $file['fileName'] ) || empty( $file['fileData'] ) ) {
+			return new \WP_Error( 'file_error', self::INVALID_FILE_CONTENT );
+		}
+
+		$file_extension = pathinfo( $file['fileName'], PATHINFO_EXTENSION );
+		$is_file_type_allowed = $this->is_file_type_allowed( $file_extension, $allowed_file_extensions );
+
+		if ( is_wp_error( $is_file_type_allowed ) ) {
+			return $is_file_type_allowed;
+		}
+
 		$file_content = base64_decode( $file['fileData'] ); // phpcs:ignore
 
 		// If the decode fails
@@ -536,7 +585,10 @@ class Uploads_Manager extends Base_Object {
 		// If there is a File Type Handler for the uploaded file, it means it is a non-standard file type. In this case,
 		// we check if unfiltered file uploads are enabled or not before allowing it.
 		if ( ! self::are_unfiltered_uploads_enabled() ) {
-			return new \WP_Error( Exceptions::FORBIDDEN, esc_html__( 'This file is not allowed for security reasons.', 'elementor' ) );
+			$error = 'json' === $file_extension
+				? esc_html__( 'You do not have permission to upload JSON files.', 'elementor' )
+				: esc_html__( 'This file is not allowed for security reasons.', 'elementor' );
+			return new \WP_Error( Exceptions::FORBIDDEN, $error );
 		}
 
 		// Here is each file type handler's chance to run its own specific validations
@@ -606,7 +658,7 @@ class Uploads_Manager extends Base_Object {
 		foreach ( new \RecursiveIteratorIterator( $dir_iterator, \RecursiveIteratorIterator::CHILD_FIRST ) as $name => $item ) {
 			if ( is_dir( $name ) ) {
 				rmdir( $name );
-			} else {
+			} elseif ( is_file( $name ) ) {
 				unlink( $name );
 			}
 		}

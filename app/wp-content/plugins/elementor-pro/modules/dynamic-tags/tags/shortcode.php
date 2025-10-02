@@ -28,6 +28,7 @@ class Shortcode extends Tag {
 			Module::NUMBER_CATEGORY,
 			Module::URL_CATEGORY,
 			Module::POST_META_CATEGORY,
+			Module::DATETIME_CATEGORY,
 		];
 	}
 
@@ -37,7 +38,10 @@ class Shortcode extends Tag {
 			[
 				'label' => esc_html__( 'Shortcode', 'elementor-pro' ),
 				'type'  => Controls_Manager::TEXTAREA,
-			]
+				'ai' => [
+					'active' => false,
+				],
+			],
 		);
 	}
 

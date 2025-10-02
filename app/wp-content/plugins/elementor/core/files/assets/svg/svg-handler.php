@@ -13,17 +13,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * SVG Handler
  *
- * Deprecated, use Elementor\Core\Files\File_Types\Svg instead, accessed by calling:
- * `Plugin::$instance->uploads_manager->get_file_type_handlers( 'svg' );`
- *
- * @deprecated 3.5.0
+ * @deprecated 3.5.0 Use `Elementor\Core\Files\File_Types\Svg` instead, accessed by calling: `Plugin::$instance->uploads_manager->get_file_type_handlers( 'svg' );`
  */
 class Svg_Handler extends Files_Upload_Handler {
+
 	/**
 	 * Inline svg attachment meta key
+	 *
+	 * @deprecated 3.5.0
 	 */
 	const META_KEY = '_elementor_inline_svg';
 
+	/**
+	 * @deprecated 3.5.0
+	 */
 	const SCRIPT_REGEX = '/(?:\w+script|data):/xi';
 
 	/**
@@ -31,16 +34,21 @@ class Svg_Handler extends Files_Upload_Handler {
 	 *
 	 * Holds the current attachment ID.
 	 *
+	 * @deprecated 3.5.0
+	 *
 	 * @var int
 	 */
 	private $attachment_id;
 
+	/**
+	 * @deprecated 3.5.0
+	 */
 	public static function get_name() {
 		return 'svg-handler';
 	}
 
 	/**
-	 * get_meta
+	 * Get meta
 	 *
 	 * @deprecated 3.5.0
 	 *
@@ -53,7 +61,7 @@ class Svg_Handler extends Files_Upload_Handler {
 	}
 
 	/**
-	 * update_meta
+	 * Update meta
 	 *
 	 * @deprecated 3.5.0
 	 *
@@ -66,7 +74,7 @@ class Svg_Handler extends Files_Upload_Handler {
 	}
 
 	/**
-	 * delete_meta
+	 * Delete meta
 	 *
 	 * @deprecated 3.5.0
 	 */
@@ -76,18 +84,28 @@ class Svg_Handler extends Files_Upload_Handler {
 		delete_post_meta( $this->attachment_id, self::META_KEY );
 	}
 
+	/**
+	 * Get mime type
+	 *
+	 * @deprecated 3.5.0
+	 */
 	public function get_mime_type() {
 		return 'image/svg+xml';
 	}
 
+	/**
+	 * Get file type
+	 *
+	 * @deprecated 3.5.0
+	 */
 	public function get_file_type() {
 		return 'svg';
 	}
 
 	/**
-	 * delete_meta_cache
+	 * Delete meta cache
 	 *
-	 * @deprecated 3.5.0
+	 * @deprecated 3.5.0 Use `Plugin::$instance->uploads_manager->get_file_type_handlers( 'svg' )->delete_meta_cache()` instead.
 	 */
 	public function delete_meta_cache() {
 		Plugin::$instance->modules_manager->get_modules( 'dev-tools' )->deprecation->deprecated_function( __METHOD__, '3.5.0', 'Plugin::$instance->uploads_manager->get_file_type_handlers( \'svg\' )->delete_meta_cache()' );
@@ -99,9 +117,9 @@ class Svg_Handler extends Files_Upload_Handler {
 	}
 
 	/**
-	 * get_inline_svg
+	 * Get inline svg
 	 *
-	 * @deprecated 3.5.0
+	 * @deprecated 3.5.0 Use `Elementor\Core\Files\File_Types\Svg::get_inline_svg()` instead.
 	 *
 	 * @param $attachment_id
 	 *
@@ -114,9 +132,9 @@ class Svg_Handler extends Files_Upload_Handler {
 	}
 
 	/**
-	 * sanitize_svg
+	 * Sanitize svg
 	 *
-	 * @deprecated 3.5.0
+	 * @deprecated 3.5.0 Use `Plugin::$instance->uploads_manager->get_file_type_handlers( 'svg' )->delete_meta_cache()->sanitize_svg()` instead.
 	 *
 	 * @param $filename
 	 *
@@ -132,9 +150,9 @@ class Svg_Handler extends Files_Upload_Handler {
 	}
 
 	/**
-	 * sanitizer
+	 * Sanitizer
 	 *
-	 * @deprecated 3.5.0
+	 * @deprecated 3.5.0 Use `Plugin::$instance->uploads_manager->get_file_type_handlers( 'svg' )->sanitizer()` instead.
 	 *
 	 * @param $content
 	 *
@@ -150,9 +168,9 @@ class Svg_Handler extends Files_Upload_Handler {
 	}
 
 	/**
-	 * wp_prepare_attachment_for_js
+	 * Prepare attachment for js
 	 *
-	 * @deprecated 3.5.0
+	 * @deprecated 3.5.0 Use `Plugin::$instance->uploads_manager->get_file_type_handlers( 'svg' )->wp_prepare_attachment_for_js()` instead.
 	 *
 	 * @param $attachment_data
 	 * @param $attachment
@@ -170,7 +188,7 @@ class Svg_Handler extends Files_Upload_Handler {
 	}
 
 	/**
-	 * set_attachment_id
+	 * Set attachment id
 	 *
 	 * @deprecated 3.5.0
 	 *
@@ -186,7 +204,7 @@ class Svg_Handler extends Files_Upload_Handler {
 	}
 
 	/**
-	 * get_attachment_id
+	 * Get attachment id
 	 *
 	 * @deprecated 3.5.0
 	 *
@@ -199,9 +217,9 @@ class Svg_Handler extends Files_Upload_Handler {
 	}
 
 	/**
-	 * set_svg_meta_data
+	 * Set svg meta data
 	 *
-	 * @deprecated 3.5.0
+	 * @deprecated 3.5.0 Use `Plugin::$instance->uploads_manager->get_file_type_handlers( 'svg' )->set_svg_meta_data()` instead.
 	 *
 	 * @return mixed
 	 */
@@ -215,9 +233,9 @@ class Svg_Handler extends Files_Upload_Handler {
 	}
 
 	/**
-	 * handle_upload_prefilter
+	 * Handle upload prefilter
 	 *
-	 * @deprecated 3.5.0
+	 * @deprecated 3.5.0 Use `Elementor\Plugin::$instance->uploads_manager->handle_elementor_wp_media_upload()` instead.
 	 *
 	 * @param $file
 	 *

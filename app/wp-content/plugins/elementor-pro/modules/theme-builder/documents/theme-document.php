@@ -2,10 +2,11 @@
 namespace ElementorPro\Modules\ThemeBuilder\Documents;
 
 use Elementor\Controls_Manager;
-use Elementor\Core\App\Modules\ImportExport\Module as Import_Export_Module;
+use Elementor\App\Modules\ImportExport\Module as Import_Export_Module;
 use Elementor\Modules\Library\Documents\Library_Document;
 use Elementor\TemplateLibrary\Source_Local;
 use Elementor\Utils;
+use ElementorPro\Core\Behaviors\Feature_Lock;
 use ElementorPro\Modules\QueryControl\Module as QueryModule;
 use ElementorPro\Modules\ThemeBuilder\Module;
 use ElementorPro\Plugin;
@@ -62,6 +63,7 @@ abstract class Theme_Document extends Library_Document {
 				'thumbnail' => static::get_site_editor_thumbnail_url(),
 			],
 			'tooltip_data' => static::get_site_editor_tooltip_data(),
+			'show_instances' => true,
 		];
 	}
 
@@ -103,6 +105,12 @@ abstract class Theme_Document extends Library_Document {
 
 	public function get_name() {
 		return static::get_type();
+	}
+
+	public static function get_lock_behavior_v2() {
+		return new Feature_Lock( [
+			'type' => static::get_type(),
+		] );
 	}
 
 	public function get_location_label() {
@@ -256,7 +264,7 @@ abstract class Theme_Document extends Library_Document {
 					$template_conditions = $theme_builder->get_conditions_manager()->get_document_conditions( $template_document );
 
 					foreach ( $template_conditions as $index => $template_condition ) {
-						if ( ! $template_condition['sub_id'] && ! $template_condition['sub_name'] ) {
+						if ( in_array( $template_condition, $conditions, true ) ) {
 							unset( $template_conditions[ $index ] );
 						}
 					}
@@ -300,7 +308,6 @@ abstract class Theme_Document extends Library_Document {
 				'autocomplete' => [
 					'object' => QueryModule::QUERY_OBJECT_JS,
 				],
-				'separator' => 'none',
 				'export' => false,
 				'condition' => [
 					'preview_type!' => [
@@ -330,7 +337,6 @@ abstract class Theme_Document extends Library_Document {
 				'label_block' => true,
 				'show_label' => false,
 				'text' => esc_html__( 'Apply & Preview', 'elementor-pro' ),
-				'separator' => 'none',
 				'event' => 'elementorThemeBuilder:ApplyPreview',
 			]
 		);
@@ -401,16 +407,9 @@ abstract class Theme_Document extends Library_Document {
 			$elements_data = $this->get_elements_data();
 		}
 
-		$is_dom_optimization_active = Plugin::elementor()->experiments->is_feature_active( 'e_dom_optimization' );
 		?>
 		<<?php Utils::print_validated_html_tag( $wrapper_tag ); ?> <?php Utils::print_html_attributes( $this->get_container_attributes() ); ?>>
-		<?php if ( ! $is_dom_optimization_active ) : ?>
-			<div class="elementor-section-wrap">
-		<?php endif; ?>
-				<?php $this->print_elements( $elements_data ); ?>
-		<?php if ( ! $is_dom_optimization_active ) : ?>
-			</div>
-		<?php endif; ?>
+			<?php $this->print_elements( $elements_data ); ?>
 		</<?php Utils::print_validated_html_tag( $wrapper_tag ); ?>>
 		<?php
 	}
@@ -580,14 +579,16 @@ abstract class Theme_Document extends Library_Document {
 				];
 				break;
 			case 'taxonomy':
-				$term = get_term( $preview_id );
+			case 'post_taxonomy':
+			case 'product_taxonomy':
+				$term = $this->get_taxonomy_term( $preview_id, $preview_object_type );
 
 				if ( $term && ! is_wp_error( $term ) ) {
 					$query_args = [
 						'tax_query' => [
 							[
 								'taxonomy' => $term->taxonomy,
-								'terms' => [ $preview_id ],
+								'terms' => [ $term->term_id ],
 								'field' => 'id',
 							],
 						],
@@ -621,15 +622,11 @@ abstract class Theme_Document extends Library_Document {
 				}
 				break;
 			case 'single':
-				$post = get_post( $preview_id );
-				if ( ! $post ) {
-					break;
-				}
-
 				$query_args = [
-					'p' => $post->ID,
-					'post_type' => $post->post_type,
+					'post_type' => $preview_object_type,
+					'p' => $preview_id,
 				];
+				break;
 		} // End switch().
 
 		if ( empty( $query_args ) ) {
@@ -664,5 +661,22 @@ abstract class Theme_Document extends Library_Document {
 		$config['support_site_editor'] = static::get_property( 'support_site_editor' );
 
 		return $config;
+	}
+
+	/**
+	 * @param $preview_id
+	 * @param $preview_object_type
+	 * @return \WP_Error|\WP_Term|null
+	 */
+	private function get_taxonomy_term( $preview_id, $preview_object_type ) {
+		if ( ! empty( $preview_id ) ) {
+			return get_term( $preview_id );
+		}
+
+		$terms = get_terms( [
+			'taxonomy' => $preview_object_type,
+		] );
+
+		return reset( $terms );
 	}
 }

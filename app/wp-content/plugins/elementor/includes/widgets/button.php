@@ -2,6 +2,7 @@
 namespace Elementor;
 
 use Elementor\Includes\Widgets\Traits\Button_Trait;
+use Elementor\Modules\Promotions\Controls\Promotion_Control;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -77,6 +78,14 @@ class Widget_Button extends Widget_Base {
 		return [ 'basic' ];
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
 	protected function register_controls() {
 		$this->start_controls_section(
 			'section_button',
@@ -86,6 +95,16 @@ class Widget_Button extends Widget_Base {
 		);
 
 		$this->register_button_content_controls();
+
+		if ( ! Utils::has_pro() ) {
+			$this->add_control(
+				Utils::CTA . '_promotion',
+				[
+					'label' => esc_html__( 'Call to Action widget', 'elementor' ),
+					'type' => Promotion_Control::TYPE,
+				]
+			);
+		}
 
 		$this->end_controls_section();
 

@@ -1,5 +1,5 @@
 /*!
- * Dialogs Manager v4.9.0
+ * Dialogs Manager v4.9.4
  * https://github.com/kobizz/dialogs-manager
  *
  * Copyright Kobi Zaltzberg
@@ -63,6 +63,8 @@
 		var self = this,
 			elements = {},
 			settings = {};
+		
+		self.openDialogs = [];
 
 		var initElements = function() {
 
@@ -103,7 +105,23 @@
 			return Object.create(settings);
 		};
 
-		this.init = function(settings) {
+		this.maybeLoadAssets = async function () {
+			const isFrontend = !! window.elementorFrontend?.utils?.assetsLoader;
+
+			if ( ! isFrontend ) {
+				return;
+			}
+
+			try {
+				await elementorFrontend.utils.assetsLoader.load( 'style', 'dialog' );
+			} catch ( error ) {
+				console.error( 'Failed to load assets:', error );
+			}
+		};
+
+		this.init = function (settings) {
+
+			this.maybeLoadAssets();
 
 			initSettings(settings);
 
@@ -163,7 +181,7 @@
 			var effect = settings.effects[intent],
 				$widget = elements.widget;
 
-			if ($.isFunction(effect)) {
+			if ('function' === typeof effect) {
 				effect.apply($widget, params);
 			} else {
 
@@ -336,10 +354,10 @@
 				classes: {
 					globalPrefix: parentSettings.classPrefix,
 					prefix: parentSettings.classPrefix + '-' + widgetName,
-					preventScroll: parentSettings.classPrefix + '-prevent-scroll'
+					preventScroll: parentSettings.classPrefix + '-prevent-scroll',
 				},
 				selectors: {
-					preventClose: '.' + parentSettings.classPrefix + '-prevent-close'
+					preventClose: '.' + parentSettings.classPrefix + '-prevent-close',
 				},
 				container: 'body',
 				preventScroll: false,
@@ -351,7 +369,7 @@
 						role: 'button',
 						'tabindex': 0,
 						'aria-label': 'Close',
-						href: 'javascript:void(0);',
+						href: '#',
 					},
 					iconElement: '<i>',
 				},
@@ -360,7 +378,7 @@
 					my: 'center',
 					at: 'center',
 					enable: true,
-					autoRefresh: false
+					autoRefresh: false,
 				},
 				hide: {
 					auto: false,
@@ -370,7 +388,7 @@
 					onOutsideContextMenu: false,
 					onBackgroundClick: true,
 					onEscKeyPress: true,
-					ignore: ''
+					ignore: '',
 				},
 			};
 
@@ -465,6 +483,12 @@
 		};
 
 		this.destroy = function() {
+			const widgetId = self.getElements('widget')?.attr('id'),
+				index = self.parent.openDialogs.lastIndexOf(widgetId);
+
+			if (index !== -1) {
+				self.parent.openDialogs.splice(index, 1);
+			}
 
 			unbindEvents();
 
@@ -497,6 +521,16 @@
 				return;
 			}
 
+			const widgetId = self.getElements('widget')?.attr('id'),
+				openDialogs = self.parent.openDialogs,
+				topDialogId = openDialogs[openDialogs.length - 1];
+
+			if (topDialogId !== widgetId) {
+				return;
+			}
+
+			openDialogs.pop();
+
 			clearTimeout(hideTimeOut);
 
 			callEffect('hide', arguments);
@@ -517,6 +551,8 @@
 			if (!(parent instanceof DialogsManager.Instance)) {
 				throw 'The ' + self.widgetName + ' must to be initialized from an instance of DialogsManager.Instance';
 			}
+
+			self.parent = parent;
 
 			ensureClosureMethods();
 
@@ -661,6 +697,10 @@
 
 			self.trigger('show');
 
+			const widgetId = self.getElements('widget')?.attr('id');
+
+			self.parent.openDialogs.push(widgetId);
+
 			return self;
 		};
 
@@ -711,7 +751,8 @@
 		var self = this;
 
 		if (self.getSettings('closeButton')) {
-			self.getElements('closeButton').on('click', function() {
+			self.getElements('closeButton').on('click', function(event) {
+				event.preventDefault();
 				self.hide();
 			});
 		}
@@ -784,7 +825,7 @@
 					}
 				}
 
-				this.focusedButton = this.buttons[nextButtonIndex].focus();
+				this.focusedButton = this.buttons[nextButtonIndex].trigger('focus');
 			}
 		},
 		addButton: function(options) {
@@ -807,7 +848,7 @@
 					self.hide();
 				}
 
-				if ($.isFunction(options.callback)) {
+				if ('function' === typeof options.callback) {
 					options.callback.call(this, self);
 				}
 			};
@@ -880,7 +921,7 @@
 			}
 
 			if (this.focusedButton) {
-				this.focusedButton.focus();
+				this.focusedButton.trigger('focus');
 			}
 		},
 		unbindHotKeys: function() {

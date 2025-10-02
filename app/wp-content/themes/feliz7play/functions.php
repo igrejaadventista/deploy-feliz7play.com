@@ -14,11 +14,14 @@ require_once (dirname(__FILE__) . '/classes/rotas_api/functions_rest.php');
 
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_slider.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_liners.php');
+require_once (dirname(__FILE__) . '/classes/rotas_api/rest_liners_v2.php');
+require_once (dirname(__FILE__) . '/classes/rotas_api/rest_category.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_collection.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_genre.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_timestamp.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_suggestion.php');
 require_once (dirname(__FILE__) . '/classes/rotas_api/rest_recent.php');
+require_once (dirname(__FILE__) . '/classes/rotas_api/rest_grid.php');
 
 function curl_error_60_workaround( $handle, $r, $url ) {
 
@@ -85,7 +88,6 @@ function my_acf_fields_post_result( $args) {
 	return $args;
 }
 
-
 function getVideoInfo($post_id, $video_host, $video_id){
 
 	$data =  array($post_id, $video_host, $video_id);
@@ -93,36 +95,35 @@ function getVideoInfo($post_id, $video_host, $video_id){
 	// SET VIDEO LENGHT BY VIEMO/YOUTUBE API
 	switch ($video_host) {
 		case "Youtube":
-			$json = file_get_contents("https://api.feliz7play.com/v4/youtubeinfo?video_id=". $video_id );
+			$json = file_get_contents("https://api.feliz7play.com/v4/youtubeinfo?video_id={$video_id}");
 			$obj = json_decode($json);
-			
-			$time = $obj->time;
-			$release_year = date('Y', strtotime($obj->release_date));
 
-			if ($obj) {
+			if ($obj && isset($obj->time) && isset($obj->release_date)) {
+				$time = $obj->time;
+				$release_year = date('Y', strtotime($obj->release_date));
+
 				update_field( 'post_video_length', $time, $post_id );
 				update_field( 'post_video_year', $release_year, $post_id );
-			} 
+			}
 
 			unset($json, $obj, $time, $size, $release_year);
 			break;
-			
+
 		case "Vimeo":
-			$json = file_get_contents("https://api.feliz7play.com/v4/vimeoinfo?video_id=". $video_id);
+			$json = file_get_contents("https://api.feliz7play.com/v4/vimeoinfo?video_id={$video_id}");
 			$obj = json_decode($json);
 
-			$time = $obj->time;
-			$release_year = date('Y', strtotime($obj->release_date));
+			if ($obj && isset($obj->time) && isset($obj->release_date)) {
+				$time = $obj->time;
+				$release_year = date('Y', strtotime($obj->release_date));
 
-			if ($time) {
 				update_field( 'post_video_length', $time, $post_id );
 				update_field( 'post_video_year', $release_year, $post_id );
-			} 
-			
+			}
+
 			unset($json, $obj, $time, $release_year);
 			break;
 	}
-
 	
 }
 
@@ -194,3 +195,25 @@ function cconsole($var) {
     echo "<script>console.log('" . $var . "');</script>";
     return;
 }
+
+// Função que torna taxonomia Category como radio buttons
+function custom_taxonomy_radio_buttons() {
+    ?>
+    <script>
+        jQuery(document).ready(function($) {
+            $('#categorychecklist input[type="checkbox"]').each(function() {
+				// Verifica se a categoria está selecionada e marca o radio button correspondente
+				$checked = '';
+				if ($(this).prop('checked')) {
+					$checked = 'checked="checked"';
+				}
+				// Substitui o checkbox por um radio button
+				$(this).replaceWith('<input type="radio" name="post_category[]" value="' + $(this).val() + '" ' + $checked + '/>');
+
+            });
+        });
+    </script>
+    <?php
+}
+add_action('admin_footer', 'custom_taxonomy_radio_buttons');
+

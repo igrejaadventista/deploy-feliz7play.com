@@ -3,6 +3,7 @@
 namespace Elementor\Modules\Announcements;
 
 use Elementor\Core\Base\App as BaseApp;
+use Elementor\Modules\Ai\Preferences;
 use Elementor\Modules\Announcements\Classes\Announcement;
 use Elementor\Settings as ElementorSettings;
 
@@ -11,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Module extends BaseApp {
+
+	const AI_ASSETS_BASE_URL = 'https://assets.elementor.com/ai/v1/';
 
 	/**
 	 * @return bool
@@ -42,10 +45,14 @@ class Module extends BaseApp {
 		wp_enqueue_script(
 			'announcements-app',
 			$this->get_js_assets_url( 'announcements-app' ),
-			[],
+			[
+				'wp-i18n',
+			],
 			ELEMENTOR_VERSION,
 			true
 		);
+
+		wp_set_script_translations( 'announcements-app', 'elementor' );
 
 		$this->print_config( 'announcements-app' );
 	}
@@ -61,7 +68,7 @@ class Module extends BaseApp {
 
 		foreach ( $active_announcements as $announcement ) {
 			$additional_settings[] = $announcement->get_prepared_data();
-			//@TODO - replace with ajax request from the front after actually triggered
+			// @TODO - replace with ajax request from the front after actually triggered
 			$announcement->after_triggered();
 		}
 
@@ -88,61 +95,39 @@ class Module extends BaseApp {
 	 * @return array[]
 	 */
 	private function get_raw_announcements(): array {
+		$raw_announcements = [];
+
+		if ( Preferences::is_ai_enabled( get_current_user_id() ) ) {
+			$raw_announcements[] = $this->get_ai_announcement_data();
+		}
+
+		// DO NOT USE THIS FILTER
+		return apply_filters( 'elementor/announcements/raw_announcements', $raw_announcements );
+	}
+
+	private function get_ai_announcement_data(): array {
 		return [
-			[
-				'title' => 'Create smarter with Elementor AI',
-				'description' => '<p>Instantly turn your ideas into original text and custom code with a free trial of Elementor AI installed on the newest versions of Elementor.</p>
-				<ul>
-					<li>Effortlessly write professional copy about any topic, in any tone. Then instantly translate it to twenty-five languages.</li>
-					<li>No code? No problem. Generate Custom Code, CSS, and HTML with a prompt</li>
-					<li>Coming soon:  A picture might be worth a thousand words, but all you need is a short description to generate the perfect image for your site.</li>
-				</ul>',
-				'media' => [
-					'type' => 'image',
-					'src' => ELEMENTOR_ASSETS_URL . 'images/announcement.png',
+			'title' => __( 'Discover your new superpowers ', 'elementor' ),
+			'description' => __( '<p>With AI for text, code, image generation and editing, you can bring your vision to life faster than ever. Start your free trial now - <b>no credit card required!</b></p>', 'elementor' ),
+			'media' => [
+				'type' => 'image',
+				'src' => self::AI_ASSETS_BASE_URL . 'images/ai-social-hd.gif',
+			],
+			'cta' => [
+				[
+					'label' => __( 'Let\'s do it', 'elementor' ),
+					'variant' => 'primary',
+					'target' => '_top',
+					'url' => '#welcome-ai',
 				],
-				'cta' => [
-					[
-						'label' => 'Continue',
-						'variant' => 'primary',
-						'target' => '_blank',
-					],
-					[
-						'label' => 'Learn More',
-						'target' => '_blank',
-						'url' => 'https://go.elementor.com/whats-new-popup-learn-elementor-ai/',
-					],
-				],
-				'triggers' => [
-					[
-						'action' => 'aiStared',
-					],
+				[
+					'label' => __( 'Skip', 'elementor' ),
+					'variant' => 'secondary',
 				],
 			],
-			[
-				'title' => 'Activate Containers for Brilliant Layouts',
-				'description' => 'Take advantage of the full power of Containers in Elementor to create slick, pixel-perfect, responsive layouts, plus improve the performance of your website. Follow these steps: <strong>Switch Flexbox Container to ‘Active’ and Save.</strong>',
-				'media' => [
-					'type' => 'image',
-					'src' => ELEMENTOR_ASSETS_URL . 'images/containers-announcement.png',
-				],
-				'cta' => [
-					[
-						'label' => 'Activate Container',
-						'variant' => 'primary',
-						'target' => '_blank',
-						'url' => ElementorSettings::get_url() . '#tab-experiments',
-					],
-					[
-						'label' => 'Try It First',
-						'target' => '_blank',
-						'url' => 'https://go.elementor.com/whats-new-popup/',
-					],
-				],
-				'triggers' => [
-					[
-						'action' => 'isFlexContainerInactive',
-					],
+			'triggers' => [
+				[
+					'action' => 'aiStarted',
 				],
 			],
 		];
@@ -179,10 +164,15 @@ class Module extends BaseApp {
 	}
 
 	public function __construct() {
+		parent::__construct();
+
+		add_action( 'elementor/init', [ $this, 'on_elementor_init' ] );
+	}
+
+	public function on_elementor_init() {
 		if ( empty( $this->get_active_announcements() ) ) {
 			return;
 		}
-		parent::__construct();
 
 		add_action( 'elementor/editor/footer', function () {
 			$this->render_app_wrapper();

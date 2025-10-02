@@ -1,6 +1,7 @@
 <?php
 namespace Elementor;
 
+use Elementor\Core\Utils\Hints;
 use Elementor\Modules\DynamicTags\Module as TagsModule;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -40,7 +41,7 @@ class Control_Gallery extends Base_Data_Control {
 	 * @since 1.0.0
 	 * @access public
 	 *
-	 * @param array $settings Control settings
+	 * @param array $settings Control settings.
 	 *
 	 * @return array Control settings.
 	 */
@@ -80,24 +81,70 @@ class Control_Gallery extends Base_Data_Control {
 				<div class="elementor-control-media__content elementor-control-tag-area">
 					<div class="elementor-control-gallery-status elementor-control-dynamic-switcher-wrapper">
 						<span class="elementor-control-gallery-status-title"></span>
-						<span class="elementor-control-gallery-clear elementor-control-unit-1">
+						<button class="elementor-control-gallery-clear elementor-control-unit-1 tooltip-target" data-tooltip="<?php echo esc_attr__( 'Clear gallery', 'elementor' ); ?>" aria-label="<?php echo esc_attr__( 'Clear gallery', 'elementor' ); ?>">
 							<i class="eicon-trash-o" aria-hidden="true"></i>
-							<span class="elementor-screen-only"><?php echo esc_html__( 'Remove gallery', 'elementor' ); ?></span>
-						</span>
+						</button>
 					</div>
 					<div class="elementor-control-gallery-content">
-						<div class="elementor-control-gallery-thumbnails"></div>
+						<div class="elementor-control-gallery-thumbnails" tabindex="0"></div>
 						<div class="elementor-control-gallery-edit">
 							<span><i class="eicon-pencil" aria-hidden="true"></i></span>
 							<span class="elementor-screen-only"><?php echo esc_html__( 'Edit gallery', 'elementor' ); ?></span>
 						</div>
-						<button class="elementor-button elementor-control-gallery-add">
+						<button class="elementor-button elementor-control-gallery-add tooltip-target" data-tooltip="<?php echo esc_attr__( 'Add Images', 'elementor' ); ?>" aria-label="<?php echo esc_attr__( 'Add Images', 'elementor' ); ?>">
 							<i class="eicon-plus-circle" aria-hidden="true"></i>
-							<span class="elementor-screen-only"><?php echo esc_html__( 'Add Images', 'elementor' ); ?></span>
 						</button>
 					</div>
 				</div>
+
+				<?php
+				/*
+				?>
+				<div class="elementor-control-media__warnings" role="alert" style="display: none;">
+					<?php
+					Hints::get_notice_template( [
+						'type' => 'warning',
+						'content' => esc_html__( 'This image doesn’t contain ALT text - which is necessary for accessibility and SEO.', 'elementor' ),
+						'icon' => true,
+					] );
+					?>
+				</div>
+				<?php
+				*/ ?>
+				<?php $this->maybe_display_io_hints(); ?>
 			</div>
+		</div>
+		<?php
+	}
+
+	private function maybe_display_io_hints() {
+		if ( Hints::should_display_hint( 'image-optimization' ) ) {
+			$content_text = esc_html__( 'Optimize your images to enhance site performance by using Image Optimizer.', 'elementor' );
+			$button_text = Hints::is_plugin_installed( 'image-optimization' ) ? esc_html__( 'Activate Plugin', 'elementor' ) : esc_html__( 'Install Plugin', 'elementor' );
+			$action_url = Hints::get_plugin_action_url( 'image-optimization' );
+		} elseif ( Hints::should_display_hint( 'image-optimization-connect' ) ) {
+			$content_text = esc_html__( "This image isn't optimized. You need to connect your Image Optimizer account first.", 'elementor' );
+			$button_text = esc_html__( 'Connect Now', 'elementor' );
+			$action_url = admin_url( 'admin.php?page=image-optimization-settings' );
+		} else {
+			return;
+		}
+
+		?>
+		<div class="elementor-control-media__promotions" role="alert" style="display: none;">
+			<?php
+			Hints::get_notice_template( [
+				'display' => ! Hints::is_dismissed( 'image-optimization' ),
+				'type' => 'info',
+				'content' => $content_text,
+				'icon' => true,
+				'dismissible' => 'image_optimizer_hint',
+				'button_text' => $button_text,
+				'button_event' => 'image_optimizer_hint',
+				'button_data' => [
+					'action_url' => $action_url,
+				],
+			] ); ?>
 		</div>
 		<?php
 	}
@@ -116,7 +163,6 @@ class Control_Gallery extends Base_Data_Control {
 	protected function get_default_settings() {
 		return [
 			'label_block' => true,
-			'separator' => 'none',
 			'dynamic' => [
 				'categories' => [ TagsModule::GALLERY_CATEGORY ],
 				'returnType' => 'object',

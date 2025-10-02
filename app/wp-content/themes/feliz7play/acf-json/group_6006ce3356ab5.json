@@ -26,7 +26,7 @@
             "label": "Seasons",
             "name": "seasons",
             "type": "true_false",
-            "instructions": "Esse campo deve ser ativado SOMENTE caso esta collection seja PAI de outras collection. NÃO deve ser marcado quando esta collection fot FILHA de outra collection.",
+            "instructions": "",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -98,6 +98,68 @@
             "min": 1900,
             "max": 2050,
             "step": ""
+        },
+        {
+            "key": "field_666300fed87bc",
+            "label": "Video Quality",
+            "name": "collection_video_quality",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "4k": "4k",
+                "1080p": "1080p",
+                "720p": "720p",
+                "480p": "480p"
+            },
+            "default_value": "1080p",
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "return_format": "value",
+            "ajax": 0,
+            "placeholder": ""
+        },
+        {
+            "key": "field_6660d71a3adab",
+            "label": "Video Age Rating",
+            "name": "collection_video_age_rating",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "AL": "AL",
+                "A10": "A10",
+                "A12": "A12",
+                "A14": "A14",
+                "A16": "A16",
+                "A18": "A18",
+                "L": "L",
+                "10": "10",
+                "12": "12",
+                "14": "14",
+                "16": "16",
+                "18": "18"
+            },
+            "default_value": false,
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "return_format": "value",
+            "ajax": 0,
+            "placeholder": ""
         },
         {
             "key": "field_6006cf04cafa3",
@@ -192,6 +254,44 @@
             "maxlength": ""
         },
         {
+            "key": "field_669a9c175515a",
+            "label": "HLS Link",
+            "name": "collection_hls_link",
+            "type": "url",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
+        },
+        {
+            "key": "field_665f0b86018c1",
+            "label": "Category",
+            "name": "collection_category",
+            "type": "taxonomy",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "taxonomy": "category",
+            "field_type": "checkbox",
+            "add_term": 0,
+            "save_terms": 0,
+            "load_terms": 0,
+            "return_format": "object",
+            "multiple": 0,
+            "allow_null": 0
+        },
+        {
             "key": "field_6006cf59cafa6",
             "label": "Genre",
             "name": "collection_genre",
@@ -215,7 +315,7 @@
         },
         {
             "key": "field_602a7a6c75d85",
-            "label": "Extras",
+            "label": "Social Media",
             "name": "",
             "type": "tab",
             "instructions": "",
@@ -348,6 +448,107 @@
                     "maxlength": ""
                 }
             ]
+        },
+        {
+            "key": "field_666c4a0fbae71",
+            "label": "Extras",
+            "name": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0
+        },
+        {
+            "key": "field_666c4c5dd4fa0",
+            "label": "Extra",
+            "name": "extra",
+            "type": "repeater",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "collapsed": "",
+            "min": 0,
+            "max": 0,
+            "layout": "table",
+            "button_label": "",
+            "sub_fields": [
+                {
+                    "key": "field_666c4f9c818e5",
+                    "label": "Title",
+                    "name": "extra_title",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "maxlength": ""
+                },
+                {
+                    "key": "field_666c4fd2818e6",
+                    "label": "List Videos",
+                    "name": "extra_list_videos",
+                    "type": "repeater",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "collapsed": "field_666c5025818e7",
+                    "min": 0,
+                    "max": 0,
+                    "layout": "table",
+                    "button_label": "",
+                    "sub_fields": [
+                        {
+                            "key": "field_666c5025818e7",
+                            "label": "Video",
+                            "name": "extra_video",
+                            "type": "post_object",
+                            "instructions": "",
+                            "required": 1,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "post_type": [
+                                "video"
+                            ],
+                            "taxonomy": [
+                                "category:extras"
+                            ],
+                            "allow_null": 0,
+                            "multiple": 0,
+                            "return_format": "object",
+                            "ui": 1
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "location": [
@@ -367,5 +568,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1643729429
+    "modified": 1732561139
 }

@@ -3,6 +3,7 @@ namespace Elementor\Core\Logger;
 
 use Elementor\Core\Base\Module as BaseModule;
 use Elementor\Core\Common\Modules\Ajax\Module;
+use Elementor\Core\Editor\Editor;
 use Elementor\Core\Logger\Loggers\Logger_Interface;
 use Elementor\Core\Logger\Items\PHP;
 use Elementor\Core\Logger\Items\JS;
@@ -11,7 +12,7 @@ use Elementor\Modules\System_Info\Module as System_Info;
 use Elementor\Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Manager extends BaseModule {
@@ -117,7 +118,6 @@ class Manager extends BaseModule {
 	 * Log Elementor errors and save them in the database.
 	 *
 	 * Fired by `wp_ajax_elementor_js_log` action.
-	 *
 	 */
 	public function js_log() {
 		/** @var Module $ajax */
@@ -126,6 +126,10 @@ class Manager extends BaseModule {
 		// PHPCS ignore is added throughout this method because nonce verification happens in the $ajax->verify_request_nonce() method.
 		if ( ! $ajax->verify_request_nonce() || empty( $_POST['data'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			wp_send_json_error();
+		}
+
+		if ( ! current_user_can( Editor::EDITING_CAPABILITY ) ) {
+			wp_send_json_error( 'Permission denied' );
 		}
 
 		// PHPCS - See comment above.
@@ -196,7 +200,7 @@ class Manager extends BaseModule {
 
 	/**
 	 * @param string $message
-	 * @param array $args
+	 * @param array  $args
 	 *
 	 * @return void
 	 */
@@ -206,7 +210,7 @@ class Manager extends BaseModule {
 
 	/**
 	 * @param string $message
-	 * @param array $args
+	 * @param array  $args
 	 *
 	 * @return void
 	 */
@@ -216,7 +220,7 @@ class Manager extends BaseModule {
 
 	/**
 	 * @param string $message
-	 * @param array $args
+	 * @param array  $args
 	 *
 	 * @return void
 	 */
@@ -226,7 +230,7 @@ class Manager extends BaseModule {
 
 	/**
 	 * @param string $message
-	 * @param array $args
+	 * @param array  $args
 	 *
 	 * @return void
 	 */

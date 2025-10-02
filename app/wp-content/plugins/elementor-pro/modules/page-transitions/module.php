@@ -53,7 +53,6 @@ class Module extends Module_Base {
 
 		parent::__construct();
 
-		$this->initialize_experiment();
 		$this->add_actions();
 	}
 
@@ -89,32 +88,8 @@ class Module extends Module_Base {
 			]
 		);
 
-		// Add an experiment message with a link to turn it on.
-		if ( ! $this->is_experiment_active() ) {
-			$this->add_experiment_message( $element );
-			return;
-		}
-
 		// Replace the teaser message with actual controls.
 		$this->register_page_transitions_controls( $element );
-	}
-
-	/**
-	 * Add a Page Transition experiment message when the experiment is off, with a link to turn it on.
-	 *
-	 * @param Controls_Stack $controls_stack
-	 *
-	 * @return void
-	 */
-	private function add_experiment_message( $controls_stack ) {
-		// Remove the hook to prevent infinite hook calls
-		// (since the `add_page_transitions_controls` registers the same section ID).
-		remove_action( 'elementor/element/after_section_end', [ $this, 'register_controls' ] );
-
-		$link = sprintf( '<a href="%s" target="_blank">%s</a>', admin_url( 'admin.php?page=elementor#tab-experiments' ), esc_html__( 'Experiments', 'elementor-pro' ) );
-		$message = sprintf( esc_html__( 'This feature is currently an experiment, you can turn it on in Elementor --> Settings --> %s.', 'elementor-pro' ), $link );
-
-		Plugin::elementor()->controls_manager->add_page_transitions_controls( $controls_stack, Settings_Page_Transitions::TAB_ID, [ $message ] );
 	}
 
 	/**
@@ -254,18 +229,19 @@ class Module extends Module_Base {
 		$controls_stack->add_control(
 			$this->get_control_id( 'animation_duration' ),
 			[
-				'label' => esc_html__( 'Animation Speed (ms)', 'elementor-pro' ),
+				'label' => esc_html__( 'Animation Duration', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'ms' ],
+				'size_units' => [ 's', 'ms', 'custom' ],
 				'default' => [
 					'unit' => 'ms',
 					'size' => 1500,
 				],
 				'range' => [
+					's' => [
+						'max' => 5,
+					],
 					'ms' => [
-						'min' => 0,
 						'max' => 5000,
-						'step' => 50,
 					],
 				],
 				'condition' => [
@@ -410,18 +386,19 @@ class Module extends Module_Base {
 		$controls_stack->add_control(
 			$this->get_control_id( 'preloader_animation_duration' ),
 			[
-				'label' => esc_html__( 'Animation Speed (ms)', 'elementor-pro' ),
+				'label' => esc_html__( 'Animation Duration', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'ms' ],
+				'size_units' => [ 's', 'ms', 'custom' ],
 				'default' => [
 					'unit' => 'ms',
 					'size' => 1500,
 				],
 				'range' => [
+					's' => [
+						'max' => 5,
+					],
 					'ms' => [
-						'min' => 0,
 						'max' => 5000,
-						'step' => 50,
 					],
 				],
 				// Show the control only for images, icons & specific custom pre-loaders.
@@ -462,18 +439,19 @@ class Module extends Module_Base {
 		$controls_stack->add_control(
 			$this->get_control_id( 'preloader_delay' ),
 			[
-				'label' => esc_html__( 'Preloader Delay (ms)', 'elementor-pro' ),
+				'label' => esc_html__( 'Preloader Delay', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'ms' ],
+				'size_units' => [ 's', 'ms', 'custom' ],
 				'default' => [
 					'unit' => 'ms',
 					'size' => 0,
 				],
 				'range' => [
+					's' => [
+						'max' => 5,
+					],
 					'ms' => [
-						'min' => 0,
 						'max' => 5000,
-						'step' => 50,
 					],
 				],
 				'condition' => [
@@ -516,16 +494,19 @@ class Module extends Module_Base {
 			[
 				'label' => esc_html__( 'Size', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'px' ],
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'default' => [
-					'unit' => 'px',
 					'size' => 20,
 				],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 300,
-						'step' => 1,
+					],
+					'em' => [
+						'max' => 30,
+					],
+					'rem' => [
+						'max' => 30,
 					],
 				],
 				'condition' => [
@@ -556,17 +537,10 @@ class Module extends Module_Base {
 			[
 				'label' => esc_html__( 'Rotate', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'deg' ],
+				'size_units' => [ 'deg', 'grad', 'rad', 'turn' ],
 				'default' => [
 					'unit' => 'deg',
 					'size' => 0,
-				],
-				'range' => [
-					'deg' => [
-						'min' => 0,
-						'max' => 360,
-						'step' => 10,
-					],
 				],
 				'condition' => [
 					$this->get_control_id( 'preloader_type' ) => 'icon',
@@ -583,6 +557,7 @@ class Module extends Module_Base {
 			[
 				'label' => esc_html__( 'Width', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'default' => [
 					'unit' => '%',
 				],
@@ -592,7 +567,6 @@ class Module extends Module_Base {
 				'mobile_default' => [
 					'unit' => '%',
 				],
-				'size_units' => [ '%', 'px', 'vw' ],
 				'range' => [
 					'%' => [
 						'min' => 1,
@@ -601,6 +575,12 @@ class Module extends Module_Base {
 					'px' => [
 						'min' => 1,
 						'max' => 1000,
+					],
+					'em' => [
+						'max' => 100,
+					],
+					'rem' => [
+						'max' => 100,
 					],
 					'vw' => [
 						'min' => 1,
@@ -621,6 +601,7 @@ class Module extends Module_Base {
 			[
 				'label' => esc_html__( 'Max Width', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'default' => [
 					'unit' => '%',
 				],
@@ -630,7 +611,6 @@ class Module extends Module_Base {
 				'mobile_default' => [
 					'unit' => '%',
 				],
-				'size_units' => [ '%', 'px', 'vw' ],
 				'range' => [
 					'%' => [
 						'min' => 1,
@@ -639,6 +619,12 @@ class Module extends Module_Base {
 					'px' => [
 						'min' => 1,
 						'max' => 1000,
+					],
+					'em' => [
+						'max' => 100,
+					],
+					'rem' => [
+						'max' => 100,
 					],
 					'vw' => [
 						'min' => 1,
@@ -659,12 +645,11 @@ class Module extends Module_Base {
 			[
 				'label' => esc_html__( 'Opacity', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'px' ],
 				'range' => [
 					'px' => [
 						'min' => 0,
 						'max' => 1,
-						'step' => .1,
+						'step' => 0.1,
 					],
 				],
 				'condition' => [
@@ -876,11 +861,6 @@ class Module extends Module_Base {
 	private function add_actions() {
 		add_action( 'elementor/element/after_section_end', [ $this, 'register_controls' ], 10, 2 );
 
-		// Don't execute unnecessary code if the experiment is off.
-		if ( ! $this->is_experiment_active() ) {
-			return;
-		}
-
 		add_action( 'wp_enqueue_scripts', function () {
 			if ( $this->should_enqueue_scripts() ) {
 				$this->enqueue_scripts();
@@ -893,49 +873,5 @@ class Module extends Module_Base {
 				$this->render();
 			}
 		}, 10, 2 );
-	}
-
-	/**
-	 * Register the module as an experimental feature data.
-	 *
-	 * @return bool - Whether the experiment is on or off.
-	 */
-	private function initialize_experiment() {
-		$description = esc_html__(
-			'Customize entrance and exit animations for every page on your site, add a preloader with predefined animations and icons or upload your own images.',
-			'elementor-pro'
-		);
-
-		$learn_more = sprintf(
-			'<a href="%s" target="_blank">%s</a>',
-			esc_attr( 'https://go.elementor.com/page-transition' ),
-			esc_html__( 'Learn More', 'elementor-pro' )
-		);
-
-		$experiments_manager = Plugin::elementor()->experiments;
-
-		$experiments_manager->add_feature( [
-			'name' => self::NAME,
-			'title' => esc_html__( 'Page Transitions', 'elementor-pro' ),
-			'default' => Experiments_Manager::STATE_INACTIVE,
-			'new_site' => [
-				'default_active' => true,
-			],
-			'release_status' => Experiments_Manager::RELEASE_STATUS_BETA,
-			'description' => $description . ' ' . $learn_more,
-		] );
-
-		return $experiments_manager->is_feature_active( self::NAME );
-	}
-
-	/**
-	 * Determine if the experiment is active.
-	 *
-	 * @return bool
-	 */
-	private function is_experiment_active() {
-		$experiments_manager = Plugin::elementor()->experiments;
-
-		return $experiments_manager->is_feature_active( self::NAME );
 	}
 }

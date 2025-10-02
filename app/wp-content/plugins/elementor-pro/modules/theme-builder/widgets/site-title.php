@@ -46,7 +46,6 @@ class Site_Title extends Widget_Heading {
 
 	protected function register_controls() {
 		parent::register_controls();
-
 		$this->update_control(
 			'title',
 			[
@@ -74,13 +73,14 @@ class Site_Title extends Widget_Heading {
 		$this->add_control(
 			'site_identity_notice',
 			[
-				'type' => Controls_Manager::RAW_HTML,
-				'raw' => sprintf(
+				'type' => Controls_Manager::ALERT,
+				'alert_type' => 'info',
+				'content' => sprintf(
+					/* translators: 1: Link opening tag, 2: Link closing tag. */
 					esc_html__( 'To edit the title of your site, go to %1$sSite Identity%2$s.', 'elementor-pro' ),
 					'<a href="#" onclick="elementorPro.modules.themeBuilder.openSiteIdentity( event )" >',
 					'</a>'
 				),
-				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
 			],
 			[
 				'position' => [
