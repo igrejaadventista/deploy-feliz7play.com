@@ -9,7 +9,7 @@
         "logDriver": "awslogs",
         "secretOptions": null,
         "options": {
-          "awslogs-group": "/ecs/ECSTASK",
+          "awslogs-group": "/ecs/v3-feliz7play",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
@@ -37,7 +37,7 @@
       "memoryReservation": null,
       "volumesFrom": [],
       "stopTimeout": null,
-      "image": "AWSACCID.dkr.ecr.us-east-1.amazonaws.com/ECSTASK",
+      "image": "AWSACCID.dkr.ecr.us-east-1.amazonaws.com/v3-feliz7play:latest",
       "startTimeout": null,
       "firelensConfiguration": null,
       "dependsOn": null,
@@ -54,13 +54,13 @@
       "dockerLabels": null,
       "systemControls": null,
       "privileged": null,
-      "name": "ECSTASK"
+      "name": "v3-feliz7play"
     }
   ],
   "placementConstraints": [],
   "memory": null,
   "taskRoleArn": "arn:aws:iam::AWSACCID:role/ecsTaskExecutionRole",
-  "family": "ECSTASK",
+  "family": "v3-feliz7play",
   "requiresAttributes": [
     {
       "targetId": null,
