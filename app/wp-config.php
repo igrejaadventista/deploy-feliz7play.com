@@ -125,7 +125,7 @@ define('AS3CF_SETTINGS', serialize(array(
 	'secret-access-key' => $_ENV['WP_S3_SECRET_KEY'],
 	'bucket' => $_ENV['WP_S3_BUCKET'],
     'enable-delivery-domain' => true,
-    'bucket' => $_ENV['WP_S3_BUCKET'],
+    'delivery-domain' => $_ENV['WP_S3_BUCKET'],
     'signed-urls-object-prefix' => 'feliz7play',
     'force-https' => true,
     'remove-local-file' => true,
@@ -140,3 +140,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /** Sets up WordPress vars and included files. */
 require_once ABSPATH . 'wp-settings.php';
+
