@@ -13,26 +13,28 @@ if ($ownUser->ID == $user->ID) {
 <div class="wfls-block wfls-always-active wfls-flex-item-full-width">
 	<div class="wfls-block-header wfls-block-header-border-bottom">
 		<div class="wfls-block-header-content">
-			<div class="wfls-block-title">
+			<div class="wfls-block-title wfls-two-factor-card-title">
+				<span class="wfls-two-factor-card-title-icon" aria-hidden="true"><i class="<?php echo esc_attr(\WordfenceLS\Utility_Style::font_awesome_classes('check-circle')); ?>"></i></span>
 				<strong><?php esc_html_e('Wordfence 2FA Active', 'wordfence'); ?></strong>
 			</div>
 		</div>
 	</div>
 	<div class="wfls-block-content wfls-padding-add-bottom">
-		<p><?php if ($ownAccount) { esc_html_e('Wordfence two-factor authentication is currently active on your account. You may deactivate it by clicking the button below.', 'wordfence'); } else { echo wp_kses(sprintf(__('Wordfence two-factor authentication is currently active on the account <strong>%s</strong>. You may deactivate it by clicking the button below.', 'wordfence'), esc_html($user->user_login)), array('strong'=>array())); } ?></p>
+		<p><?php if ($ownAccount) { esc_html_e('Wordfence two-factor authentication is currently active on your account. You may deactivate it by clicking the button below.', 'wordfence'); } else { echo wp_kses(sprintf(/* translators: Username */ __('Wordfence two-factor authentication is currently active for user <strong>%s</strong>. You may deactivate it by clicking the button below.', 'wordfence'), esc_html($user->user_login)), array('strong'=>array())); } ?></p>
 		<p class="wfls-center wfls-add-top"><a href="#" class="wfls-btn wfls-btn-default" id="wfls-deactivate" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Deactivate', 'wordfence'); ?></a></p>
 	</div>
 </div>
-<script type="text/x-jquery-template" id="wfls-tmpl-deactivate-prompt">
+<div style="display: none;">
 	<?php
 	echo \WordfenceLS\Model_View::create('common/modal-prompt', array(
+		'id' => 'wfls-template-deactivate-prompt',
 		'title' => __('Deactivate 2FA', 'wordfence'),
 		'message' => __('Are you sure you want to deactivate two-factor authentication?', 'wordfence'),
-		'primaryButton' => array('id' => 'wfls-deactivate-prompt-cancel', 'label' => __('Cancel', 'wordfence'), 'link' => '#'),
-		'secondaryButtons' => array(array('id' => 'wfls-deactivate-prompt-confirm', 'label' => __('Deactivate', 'wordfence'), 'link' => '#')),
+		'primaryButton' => array('class' => 'wfls-deactivate-prompt-cancel', 'label' => __('Cancel', 'wordfence'), 'link' => '#'),
+		'secondaryButtons' => array(array('class' => 'wfls-deactivate-prompt-confirm', 'label' => __('Deactivate', 'wordfence'), 'link' => '#')),
 	))->render();
 	?>
-</script>
+</div>
 <script type="application/javascript">
 	(function($) {
 		$(function() {
@@ -40,17 +42,10 @@ if ($ownUser->ID == $user->ID) {
 				e.preventDefault();
 				e.stopPropagation();
 
-				var prompt = $('#wfls-tmpl-deactivate-prompt').tmpl({});
-				var promptHTML = $("<div />").append(prompt).html();
-				WFLS.panelHTML((WFLS.screenSize(500) ? '300px' : '400px'), promptHTML, {overlayClose: false, closeButton: false, className: 'wfls-modal', onComplete: function() {
-					$('#wfls-deactivate-prompt-cancel').on('click', function(e) {
-						e.preventDefault();
-						e.stopPropagation();
-
-						WFLS.panelClose();
-					});
-
-					$('#wfls-deactivate-prompt-confirm').on('click', function(e) {
+				var content = $("#wfls-template-deactivate-prompt").clone().attr('id', null);
+				WFLS.standaloneModalHTML(content, { onOpen: function(modal) {
+					$(modal).find('.wfls-deactivate-prompt-cancel').on('click', WFLS.closeStandaloneModal);
+					$(modal).find('.wfls-deactivate-prompt-confirm').on('click', function(e) {
 						e.preventDefault();
 						e.stopPropagation();
 
@@ -63,17 +58,16 @@ if ($ownUser->ID == $user->ID) {
 							payload,
 							function(response) {
 								if (response.error) {
-									WFLS.panelModal((WFLS.screenSize(500) ? '300px' : '400px'), '<?php echo \WordfenceLS\Text\Model_JavaScript::esc_js(__('Error Deactivating 2FA', 'wordfence')); ?>', response.error);
+									WFLS.standaloneModal('<?php echo \WordfenceLS\Text\Model_JavaScript::esc_js(__('Error Deactivating 2FA', 'wordfence')); ?>', response.error);
 								}
 								else {
+									WFLS.closeStandaloneModal();
 									$('#wfls-deactivation-controls').crossfade($('#wfls-activation-controls'));
+									$('#wfls-grace-period-controls').toggle(!!response.grace_period_visible);
 								}
-
-								WFLS.panelClose(); //The prompt
 							},
 							function(error) {
-								WFLS.panelModal((WFLS.screenSize(500) ? '300px' : '400px'), '<?php echo \WordfenceLS\Text\Model_JavaScript::esc_js(__('Error Deactivating 2FA', 'wordfence')); ?>', '<?php echo \WordfenceLS\Text\Model_JavaScript::esc_js(__('An error was encountered while trying to deactivate two-factor authentication. Please try again.', 'wordfence')); ?>');
-								WFLS.panelClose(); //The prompt
+								WFLS.standaloneModal('<?php echo \WordfenceLS\Text\Model_JavaScript::esc_js(__('Error Deactivating 2FA', 'wordfence')); ?>', '<?php echo \WordfenceLS\Text\Model_JavaScript::esc_js(__('An error was encountered while trying to deactivate two-factor authentication. Please try again.', 'wordfence')); ?>');
 							}
 						);
 					});
@@ -81,4 +75,4 @@ if ($ownUser->ID == $user->ID) {
 			});
 		});
 	})(jQuery);
-</script> 
+</script>

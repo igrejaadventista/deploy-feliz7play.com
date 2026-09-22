@@ -7,6 +7,13 @@ if (defined('WFWAF_VERSION') && !defined('WFWAF_RUN_COMPLETE')) {
  */
 class wfXMLRPCBody
 {
+	/** Maximum decoded XML message size, in bytes. */
+	const MAX_MESSAGE_SIZE = 1048576;
+	/** Maximum number of simultaneously open array data or struct containers. */
+	const MAX_NESTING_DEPTH = 64;
+	/** Number of bytes passed to the XML parser at a time. */
+	const PARSE_CHUNK_SIZE = 262144;
+
 	var $header;
 	var $doctype;
 	var $message;
@@ -24,11 +31,21 @@ class wfXMLRPCBody
 	var $_value;
 	var $_currentTag;
 	var $_currentTagContents;
+	// Indicates that parsing stopped at a byte or nesting limit rather than because the XML was malformed.
+	var $_limitExceeded = false;
 	// The XML parser
 	var $_parser;
 	
 	static function canParse() {
 		return function_exists('xml_parser_create');
+	}
+
+	/**
+	 * Check whether the most recent parse failed because a resource limit was exceeded.
+	 * @return bool
+	 */
+	function hasExceededLimits() {
+		return $this->_limitExceeded;
 	}
 	
 	/**
@@ -102,7 +119,15 @@ class wfXMLRPCBody
 	
 	function parse()
 	{
+		$this->_limitExceeded = false;
 		if (!function_exists( 'xml_parser_create')) {
+			return false;
+		}
+		if (!is_string($this->message)) {
+			return false;
+		}
+		if (strlen($this->message) > self::MAX_MESSAGE_SIZE) {
+			$this->_limitExceeded = true;
 			return false;
 		}
 		
@@ -149,23 +174,27 @@ class wfXMLRPCBody
 		xml_set_element_handler($this->_parser, 'tag_open', 'tag_close');
 		xml_set_character_data_handler($this->_parser, 'cdata');
 		
-		// 256Kb, parse in chunks to avoid the RAM usage on very large messages
-		$chunk_size = 262144;
-		
-		$final = false;
-		do {
-			if (strlen($this->message) <= $chunk_size) {
-				$final = true;
+		// Parse with an offset so the unparsed remainder is not copied for every chunk.
+		$messageLength = strlen($this->message);
+		$offset = 0;
+		while ($offset < $messageLength) {
+			$part = substr($this->message, $offset, self::PARSE_CHUNK_SIZE);
+			$partLength = strlen($part);
+			$final = ($offset + $partLength >= $messageLength);
+			try {
+				if (!xml_parse($this->_parser, $part, $final)) {
+					return false;
+				}
 			}
-			$part = substr($this->message, 0, $chunk_size);
-			$this->message = substr($this->message, $chunk_size);
-			if (!xml_parse($this->_parser, $part, $final)) {
-				return false;
+			catch (Exception $e) {
+				if ($this->_limitExceeded) {
+					return false;
+				}
+				throw $e;
 			}
-			if ($final) {
-				break;
-			}
-		} while (true);
+			$offset += $partLength;
+		}
+		$this->message = '';
 		xml_parser_free($this->_parser);
 		
 		// Grab the error messages, if any
@@ -180,6 +209,10 @@ class wfXMLRPCBody
 	{
 		$this->_currentTagContents = '';
 		$this->_currentTag = $tag;
+		if (($tag === 'data' || $tag === 'struct') && count($this->_arraystructs) >= self::MAX_NESTING_DEPTH) {
+			$this->_limitExceeded = true;
+			throw new Exception('XML-RPC nesting depth limit exceeded.');
+		}
 		switch($tag) {
 			case 'methodCall':
 			case 'methodResponse':
@@ -213,7 +246,7 @@ class wfXMLRPCBody
 				$valueFlag = true;
 				break;
 			case 'double':
-				$value = (double)trim($this->_currentTagContents);
+				$value = (float) trim($this->_currentTagContents);
 				$valueFlag = true;
 				break;
 			case 'string':
@@ -232,7 +265,7 @@ class wfXMLRPCBody
 				}
 				break;
 			case 'boolean':
-				$value = (boolean)trim($this->_currentTagContents);
+				$value = (bool) trim($this->_currentTagContents);
 				$valueFlag = true;
 				break;
 			case 'base64':

@@ -4,6 +4,16 @@ class wfCrawl {
 	const GOOGLE_BOT_VERIFIED = 'verified';
 	const GOOGLE_BOT_FAKE = 'fakeBot';
 	const GOOGLE_BOT_UNDETERMINED = 'undetermined';
+
+	/**
+	 * Generates the SQL hex representation of a crawler verification cache signature.
+	 *
+	 * @param string $value
+	 * @return string
+	 */
+	private static function patternSignatureToSQLHex($value) {
+		return wfDB::binaryValueToSQLHex(md5($value, true));
+	}
 	
 	public static function isCrawler($UA){
 		$browscap = new wfBrowscap();
@@ -22,8 +32,9 @@ class wfCrawl {
 		$table = wfDB::networkTable('wfCrawlers');
 		$db = new wfDB();
 		$IPn = wfUtils::inet_pton($IP);
-		$ipHex = wfDB::binaryValueToSQLHex(wfUtils::inet_pton($IPn));
-		$status = $db->querySingle("select status from $table where IP={$ipHex} and patternSig=UNHEX(MD5('%s')) and lastUpdate > unix_timestamp() - %d", $hostPattern, WORDFENCE_CRAWLER_VERIFY_CACHE_TIME);
+		$ipHex = wfDB::binaryValueToSQLHex($IPn);
+		$patternSig = self::patternSignatureToSQLHex($hostPattern);
+		$status = $db->querySingle("select status from $table where IP={$ipHex} and patternSig={$patternSig} and lastUpdate > unix_timestamp() - %d", WORDFENCE_CRAWLER_VERIFY_CACHE_TIME);
 		if($status){
 			if($status == 'verified'){
 				return true;
@@ -33,7 +44,7 @@ class wfCrawl {
 		}
 		$host = wfUtils::reverseLookup($IP);
 		if(! $host){ 
-			$db->queryWrite("insert into $table (IP, patternSig, status, lastUpdate, PTR) values ({$ipHex}, UNHEX(MD5('%s')), '%s', unix_timestamp(), '%s') ON DUPLICATE KEY UPDATE status='%s', lastUpdate=unix_timestamp(), PTR='%s'", $hostPattern, 'noPTR', '', 'noPTR', '');
+			$db->queryWrite("insert into $table (IP, patternSig, status, lastUpdate, PTR) values ({$ipHex}, {$patternSig}, '%s', unix_timestamp(), '%s') ON DUPLICATE KEY UPDATE status='%s', lastUpdate=unix_timestamp(), PTR='%s'", 'noPTR', '', 'noPTR', '');
 			return false; 
 		}
 		if(preg_match($hostPattern, $host)){
@@ -46,14 +57,14 @@ class wfCrawl {
 				}
 			}
 			if($addrsMatch){
-				$db->queryWrite("insert into $table (IP, patternSig, status, lastUpdate, PTR) values ({$ipHex}, UNHEX(MD5('%s')), '%s', unix_timestamp(), '%s') ON DUPLICATE KEY UPDATE status='%s', lastUpdate=unix_timestamp(), PTR='%s'", $hostPattern, 'verified', $host, 'verified', $host);
+				$db->queryWrite("insert into $table (IP, patternSig, status, lastUpdate, PTR) values ({$ipHex}, {$patternSig}, '%s', unix_timestamp(), '%s') ON DUPLICATE KEY UPDATE status='%s', lastUpdate=unix_timestamp(), PTR='%s'", 'verified', $host, 'verified', $host);
 				return true;
 			} else {
-				$db->queryWrite("insert into $table (IP, patternSig, status, lastUpdate, PTR) values ({$ipHex}, UNHEX(MD5('%s')), '%s', unix_timestamp(), '%s') ON DUPLICATE KEY UPDATE status='%s', lastUpdate=unix_timestamp(), PTR='%s'", $hostPattern, 'fwdFail', $host, 'fwdFail', $host);
+				$db->queryWrite("insert into $table (IP, patternSig, status, lastUpdate, PTR) values ({$ipHex}, {$patternSig}, '%s', unix_timestamp(), '%s') ON DUPLICATE KEY UPDATE status='%s', lastUpdate=unix_timestamp(), PTR='%s'", 'fwdFail', $host, 'fwdFail', $host);
 				return false;
 			}
 		} else {
-			$db->queryWrite("insert into $table (IP, patternSig, status, lastUpdate, PTR) values ({$ipHex}, UNHEX(MD5('%s')), '%s', unix_timestamp(), '%s') ON DUPLICATE KEY UPDATE status='%s', lastUpdate=unix_timestamp(), PTR='%s'", $hostPattern, 'badPTR', $host, 'badPTR', $host);
+			$db->queryWrite("insert into $table (IP, patternSig, status, lastUpdate, PTR) values ({$ipHex}, {$patternSig}, '%s', unix_timestamp(), '%s') ON DUPLICATE KEY UPDATE status='%s', lastUpdate=unix_timestamp(), PTR='%s'", 'badPTR', $host, 'badPTR', $host);
 			return false;
 		}
 	}
@@ -125,10 +136,22 @@ class wfCrawl {
 			return $verified[$ip];
 		}
 		if (self::isGoogleCrawler($ua)) {
+			$services = wfUtils::whitelistPresets();
+			if (array_key_exists('google', $services)) {
+				$ranges = $services['google']['r'];
+				foreach ($ranges as $r) {
+					if (wfUtils::subnetContainsIP($r, $ip)) {
+						$verified[$ip] = true;
+						return $verified[$ip];
+					}
+				}
+			}
+			
 			if (self::verifyCrawlerPTR(wordfence::getLog()->getGooglePattern(), $ip)) {
 				$verified[$ip] = true;
 				return $verified[$ip];
 			}
+			
 			$noc1Status = self::verifyGooglebotViaNOC1($ip);
 			if ($noc1Status == self::GOOGLE_BOT_VERIFIED) {
 				$verified[$ip] = true;
@@ -139,7 +162,9 @@ class wfCrawl {
 				return $verified[$ip];
 			}
 			
-			return true; //We were unable to successfully validate Googlebot status so default to being permissive
+			if (!array_key_exists('google', $services)) {
+				return true; //We were unable to successfully validate Googlebot status so default to being permissive if the service IP list is missing
+			}
 		}
 		$verified[$ip] = false;
 		return $verified[$ip];
@@ -159,12 +184,11 @@ class wfCrawl {
 		$db = new wfDB();
 		$IPn = wfUtils::inet_pton($ip);
 		$ipHex = wfDB::binaryValueToSQLHex($IPn);
-		$patternSig = 'googlenoc1';
+		$patternSig = self::patternSignatureToSQLHex('googlenoc1');
 		$status = $db->querySingle("select status from $table
 				where IP={$ipHex}
-				and patternSig=UNHEX(MD5('%s'))
+				and patternSig={$patternSig}
 				and lastUpdate > unix_timestamp() - %d",
-				$patternSig,
 				WORDFENCE_CRAWLER_VERIFY_CACHE_TIME);
 		if ($status === 'verified') {
 			return self::GOOGLE_BOT_VERIFIED;
@@ -179,10 +203,10 @@ class wfCrawl {
 			));
 			if (is_array($data) && !empty($data['verified'])) {
 				// Cache results
-				$db->queryWrite("INSERT INTO {$table} (IP, patternSig, status, lastUpdate) VALUES ({$ipHex}, UNHEX(MD5('%s')), '%s', unix_timestamp()) ON DUPLICATE KEY UPDATE status = VALUES(status), lastUpdate = VALUES(lastUpdate)", $patternSig, 'verified');
+				$db->queryWrite("INSERT INTO {$table} (IP, patternSig, status, lastUpdate) VALUES ({$ipHex}, {$patternSig}, '%s', unix_timestamp()) ON DUPLICATE KEY UPDATE status = VALUES(status), lastUpdate = VALUES(lastUpdate)", 'verified');
 				return self::GOOGLE_BOT_VERIFIED;
 			} else {
-				$db->queryWrite("INSERT INTO {$table} (IP, patternSig, status, lastUpdate) VALUES ({$ipHex}, UNHEX(MD5('%s')), '%s', unix_timestamp()) ON DUPLICATE KEY UPDATE status = VALUES(status), lastUpdate = VALUES(lastUpdate)", $patternSig, 'fakeBot');
+				$db->queryWrite("INSERT INTO {$table} (IP, patternSig, status, lastUpdate) VALUES ({$ipHex}, {$patternSig}, '%s', unix_timestamp()) ON DUPLICATE KEY UPDATE status = VALUES(status), lastUpdate = VALUES(lastUpdate)", 'fakeBot');
 				self::GOOGLE_BOT_FAKE;
 			}
 		} catch (Exception $e) {

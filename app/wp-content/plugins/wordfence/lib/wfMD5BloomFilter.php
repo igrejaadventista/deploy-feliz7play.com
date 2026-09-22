@@ -76,7 +76,7 @@ class wfMD5BloomFilter {
 		$this->k2 = $k * 2;
 		$address_bits = (int)log($m,2);
 		$this->mask = (1 << $address_bits) - 8;
-		$this->bit_array = (binary)(str_repeat("\0",$this->getArraySize(true)));
+		$this->bit_array = (string) (str_repeat("\0",$this->getArraySize(true)));
 	}
 	public function __sleep() {
 		return array('n', 'm', 'k', 'k2', 'mask', 'bit_array');

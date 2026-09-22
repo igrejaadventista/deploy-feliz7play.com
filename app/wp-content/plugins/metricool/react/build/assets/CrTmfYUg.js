@@ -1,0 +1,1 @@
+import{o,P as r,O as s}from"./J3XbFqv-.js";import{A as t}from"./BQ9nIB57.js";import"./BVfD-bny.js";const n=o("/_authorized")({component:function(){return r.jsx(t,{children:r.jsx(s,{})})}});export{n as Route};

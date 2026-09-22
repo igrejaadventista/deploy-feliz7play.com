@@ -265,7 +265,7 @@ auEa+7b+FGTKs7dUo2BNGR7OVifK4GZ8w/ajS0TelhrSRi3BBQCGXLzUO/UURUAh
 
 		$ip = $this->getRequest()->getIP();
 		if ($this->isIPBlocked($ip)) {
-			$this->eventBus->prevBlocked($ip);
+			$this->notifyBlockEvent('prevBlocked', $ip);
 			$e = new wfWAFBlockException();
 			$e->setRequest($this->getRequest());
 			$e->setFailedRules(array('blocked'));
@@ -282,15 +282,15 @@ auEa+7b+FGTKs7dUo2BNGR7OVifK4GZ8w/ajS0TelhrSRi3BBQCGXLzUO/UURUAh
 			$this->eventBus->allow($ip, $e);
 
 		} catch (wfWAFBlockException $e) {
-			$this->eventBus->block($ip, $e);
+			$this->notifyBlockEvent('block', $ip, $e);
 			$this->blockAction($e);
 
 		} catch (wfWAFBlockXSSException $e) {
-			$this->eventBus->blockXSS($ip, $e);
+			$this->notifyBlockEvent('blockXSS', $ip, $e);
 			$this->blockXSSAction($e);
 
 		} catch (wfWAFBlockSQLiException $e) {
-			$this->eventBus->blockSQLi($ip, $e);
+			$this->notifyBlockEvent('blockSQLi', $ip, $e);
 			$this->blockAction($e);
 			
 		}
@@ -821,11 +821,13 @@ if (!defined('WFWAF_VERSION') || defined('WFWAF_RULES_LOADED')) {
 %s?>
 PHP
 				, $this->buildRuleSet($rules)), 'rules');
-			if (!empty($ruleString) && WFWAF_DEBUG && !file_exists($this->getStorageEngine()->getRulesDSLCacheFile())) {
-				wfWAFStorageFile::atomicFilePutContents($this->getStorageEngine()->getRulesDSLCacheFile(), $ruleString, 'rules');
-			}
+				
+				if (!empty($ruleString) && WFWAF_DEBUG && !file_exists($this->getStorageEngine()->getRulesDSLCacheFile())) {
+					wfWAFStorageFile::atomicFilePutContents($this->getStorageEngine()->getRulesDSLCacheFile(), $ruleString, 'rules');
+				}
 
 			} else {
+				$rules = $this->_preprocessRulesArray($rules);
 				$this->getStorageEngine()->setRules($rules);
 			}
 
@@ -854,6 +856,8 @@ PHP
 			throw new wfWAFBuildRulesException('Invalid rule format passed to buildRuleSet.');
 		}
 		$exportedCode = '';
+		
+		$rules = $this->_preprocessRulesArray($rules);
 
 		if (isset($rules['scores']) && is_array($rules['scores'])) {
 			foreach ($rules['scores'] as $category => $score) {
@@ -872,27 +876,29 @@ PHP
 
 		foreach (array('blacklistedParams', 'whitelistedParams') as $key) {
 			if (isset($rules[$key]) && is_array($rules[$key])) {
-				/** @var wfWAFRuleParserURLParam $urlParam */
-				foreach ($rules[$key] as $urlParam) {
-					if ($urlParam->getConditional()) {
-						
-						$exportedCode .= sprintf("\$this->{$key}[%s][] = array(\n%s => %s,\n%s => %s,\n%s => %s\n);\n", var_export($urlParam->getParam(), true), 
-							var_export('url', true), var_export($urlParam->getUrl(), true),
-							var_export('rules', true), var_export($urlParam->getRules(), true),
-							var_export('conditional', true), $urlParam->getConditional()->render());
-					}
-					else {
-						if ($urlParam->getRules()) {
-							$url = array(
-								'url'   => $urlParam->getUrl(),
-								'rules' => $urlParam->getRules(),
+				foreach ($rules[$key] as $paramKey => $payloads) {
+					foreach ($payloads as $payload) { /** @var array|string $payload */
+						if (is_string($payload)) {
+							$exportedCode .= sprintf("\$this->{$key}[%s][] = %s;\n", 
+								var_export($paramKey, true),
+								var_export($payload, true)
 							);
-						} else {
-							$url = $urlParam->getUrl();
 						}
-						
-						$exportedCode .= sprintf("\$this->{$key}[%s][] = %s;\n", var_export($urlParam->getParam(), true), 
-							var_export($url, true));
+						else if (array_key_exists('conditional', $payload)) {
+							$exportedCode .= sprintf("\$this->{$key}[%s][] = array(\n%s => %s,\n%s => %s,\n%s => %s\n);\n", 
+								var_export($paramKey, true),
+								var_export('url', true), var_export($payload['url'], true),
+								var_export('rules', true), var_export($payload['rules'], true),
+								var_export('conditional', true), $payload['conditional']->render()
+							);
+						}
+						else {
+							$exportedCode .= sprintf("\$this->{$key}[%s][] = array(\n%s => %s,\n%s => %s,\n);\n", 
+								var_export($paramKey, true),
+								var_export('url', true), var_export($payload['url'], true),
+								var_export('rules', true), var_export($payload['rules'], true)
+							);
+						}
 					}
 				}
 				$exportedCode .= "\n";
@@ -913,6 +919,47 @@ HTML
 		}
 
 		return $exportedCode;
+	}
+	
+	/**
+	 * Preprocesses the parsed rules array so it's suitable for use both by the file-based storage engine and the mysqli
+	 * engine.
+	 * 
+	 * @param array $rules
+	 * @return array
+	 */
+	protected function _preprocessRulesArray($rules) {
+		$cleaned = $rules;
+		foreach (array('blacklistedParams', 'whitelistedParams') as $key) {
+			if (isset($rules[$key]) && is_array($rules[$key])) {
+				/** @var wfWAFRuleParserURLParam $urlParam */
+				foreach ($rules[$key] as $index => $urlParam) {
+					unset($cleaned[$key][$index]);
+					$paramKey = $urlParam->getParam();
+					if (!array_key_exists($paramKey, $cleaned[$key])) {
+						$cleaned[$key][$paramKey] = array();
+					}
+					
+					if ($urlParam->getConditional()) {
+						$cleaned[$key][$paramKey][] = array(
+							'url' => $urlParam->getUrl(),
+							'rules' => $urlParam->getRules(),
+							'conditional' => $urlParam->getConditional(),
+						);
+					}
+					else if ($urlParam->getRules()) {
+						$cleaned[$key][$paramKey][] = array(
+							'url' => $urlParam->getUrl(),
+							'rules' => $urlParam->getRules(),
+						);
+					}
+					else {
+						$cleaned[$key][$paramKey][] = $urlParam->getUrl();
+					}
+				}
+			}
+		}
+		return $cleaned;
 	}
 
 	/**
@@ -1168,24 +1215,8 @@ HTML
 	 * @param int $httpCode
 	 */
 	public function blockAction($e, $httpCode = 403, $redirect = false, $template = null) {
-		$this->getStorageEngine()->logAttack($e->getFailedRules(), $e->getParamKey(), $e->getParamValue(), $e->getRequest(), $e->getRequest()->getMetadata());
-		
-		if ($redirect) {
-			wfWAFUtils::redirect($redirect); // exits and emits no cache headers
-		}
-		
-		if ($httpCode == 503) {
-			wfWAFUtils::statusHeader(503);
-			wfWAFUtils::doNotCache();
-			if ($secsToGo = $e->getRequest()->getMetadata('503Time')) {
-				header('Retry-After: ' . $secsToGo);
-			}
-			exit($this->getUnavailableMessage($e->getRequest()->getMetadata('503Reason'), $template));
-		}
-		
-		header('HTTP/1.0 403 Forbidden');
-		wfWAFUtils::doNotCache();
-		exit($this->getBlockedMessage($template));
+		$this->logBlockedRequest($e);
+		$this->sendBlockResponse($e, $httpCode, $redirect, $template);
 	}
 
 	/**
@@ -1194,24 +1225,236 @@ HTML
 	 * @param int $httpCode
 	 */
 	public function blockXSSAction($e, $httpCode = 403, $redirect = false) {
-		$this->getStorageEngine()->logAttack($e->getFailedRules(), $e->getParamKey(), $e->getParamValue(), $e->getRequest(), $e->getRequest()->getMetadata());
-		
+		$this->logBlockedRequest($e);
+		$this->sendBlockResponse($e, $httpCode, $redirect);
+	}
+
+	/**
+	 * Notify observers of a completed block decision without allowing observer failures to prevent enforcement.
+	 * @param string $method
+	 * @param string $ip
+	 * @param wfWAFRunException|null $exception
+	 * @return void
+	 */
+	protected function notifyBlockEvent($method, $ip, $exception = null) {
+		try {
+			switch ($method) {
+				case 'prevBlocked':
+					$this->eventBus->prevBlocked($ip);
+					break;
+
+				case 'block':
+					$this->eventBus->block($ip, $exception);
+					break;
+
+				case 'blockXSS':
+					$this->eventBus->blockXSS($ip, $exception);
+					break;
+
+				case 'blockSQLi':
+					$this->eventBus->blockSQLi($ip, $exception);
+					break;
+
+				default:
+					throw new InvalidArgumentException('Unsupported block event notification: ' . $method);
+			}
+		}
+		catch (Exception $eventException) {
+			$this->reportBlockAuxiliaryFailure('block event notification', $eventException);
+		}
+		catch (Throwable $eventException) {
+			$this->reportBlockAuxiliaryFailure('block event notification', $eventException);
+		}
+	}
+
+	/**
+	 * Log a blocked request without allowing storage or request-rendering failures to prevent enforcement.
+	 * @param wfWAFRunException $exception
+	 * @return void
+	 */
+	protected function logBlockedRequest($exception) {
+		try {
+			$request = $exception->getRequest();
+			$this->getStorageEngine()->logAttack($exception->getFailedRules(), $exception->getParamKey(), $exception->getParamValue(), $request, $request->getMetadata());
+		}
+		catch (Exception $loggingException) {
+			$this->reportBlockAuxiliaryFailure('attack logging', $loggingException);
+		}
+		catch (Throwable $loggingException) {
+			$this->reportBlockAuxiliaryFailure('attack logging', $loggingException);
+		}
+	}
+
+	/**
+	 * Send the configured block response, falling back to a dependency-free response if auxiliary work fails.
+	 * @param wfWAFRunException $exception
+	 * @param int $httpCode
+	 * @param string|false $redirect
+	 * @param string|null $template
+	 * @return void
+	 */
+	protected function sendBlockResponse($exception, $httpCode, $redirect, $template = null) {
 		if ($redirect) {
+			$this->sendBlockRedirect($redirect);
+		}
+
+		if ($httpCode == 503) {
+			$this->sendStatusHeader(503, 'HTTP/1.0 503 Service Unavailable');
+			$this->sendNoCacheHeaders();
+			try {
+				if ($secsToGo = $exception->getRequest()->getMetadata('503Time')) {
+					header('Retry-After: ' . $secsToGo);
+				}
+			}
+			catch (Exception $metadataException) {
+				$this->reportBlockAuxiliaryFailure('503 response metadata', $metadataException);
+			}
+			catch (Throwable $metadataException) {
+				$this->reportBlockAuxiliaryFailure('503 response metadata', $metadataException);
+			}
+
+			$response = $this->getSafeBlockResponse($exception, $httpCode, $template);
+			if ($response['fallback']) {
+				$this->sendRawBlockHeader('Content-Type: text/plain; charset=UTF-8');
+			}
+			exit($response['message']);
+		}
+
+		$this->sendStatusHeader(403, 'HTTP/1.0 403 Forbidden');
+		$this->sendNoCacheHeaders();
+		$response = $this->getSafeBlockResponse($exception, $httpCode, $template);
+		if ($response['fallback']) {
+			$this->sendRawBlockHeader('Content-Type: text/plain; charset=UTF-8');
+		}
+		exit($response['message']);
+	}
+
+	/**
+	 * Attempt a configured block redirect, returning only if it fails.
+	 * @param string $redirect
+	 * @return bool
+	 */
+	protected function sendBlockRedirect($redirect) {
+		try {
 			wfWAFUtils::redirect($redirect); // exits and emits no cache headers
 		}
-		
-		if ($httpCode == 503) {
-			wfWAFUtils::statusHeader(503);
-			wfWAFUtils::doNotCache();
-			if ($secsToGo = $e->getRequest()->getMetadata('503Time')) {
-				header('Retry-After: ' . $secsToGo);
-			}
-			exit($this->getUnavailableMessage($e->getRequest()->getMetadata('503Reason')));
+		catch (Exception $redirectException) {
+			$this->reportBlockAuxiliaryFailure('block redirect', $redirectException);
 		}
-		
-		header('HTTP/1.0 403 Forbidden');
-		wfWAFUtils::doNotCache();
-		exit($this->getBlockedMessage());
+		catch (Throwable $redirectException) {
+			$this->reportBlockAuxiliaryFailure('block redirect', $redirectException);
+		}
+		return false;
+	}
+
+	/**
+	 * Render a block response with a dependency-free fallback.
+	 * @param wfWAFRunException $exception
+	 * @param int $httpCode
+	 * @param string|null $template
+	 * @return array
+	 */
+	protected function getSafeBlockResponse($exception, $httpCode, $template = null) {
+		$isUnavailable = ($httpCode == 503);
+		$response = array(
+			'message' => $isUnavailable ? 'Service Unavailable' : 'Forbidden',
+			'fallback' => true,
+		);
+		try {
+			if ($isUnavailable) {
+				$response['message'] = $this->getUnavailableMessage($exception->getRequest()->getMetadata('503Reason'), $template);
+			}
+			else {
+				$response['message'] = $this->getBlockedMessage($template);
+			}
+			$response['fallback'] = false;
+		}
+		catch (Exception $renderException) {
+			$this->reportBlockAuxiliaryFailure(($isUnavailable ? '503' : '403') . ' response rendering', $renderException);
+		}
+		catch (Throwable $renderException) {
+			$this->reportBlockAuxiliaryFailure(($isUnavailable ? '503' : '403') . ' response rendering', $renderException);
+		}
+		return $response;
+	}
+
+	/**
+	 * Send a status header with a direct header fallback.
+	 * PHP normally emits a warning when a header cannot be sent, but a custom error handler may
+	 * convert that warning to an exception.
+	 * @param int $status
+	 * @param string $fallbackHeader
+	 * @return void
+	 */
+	protected function sendStatusHeader($status, $fallbackHeader) {
+		try {
+			wfWAFUtils::statusHeader($status);
+		}
+		catch (Exception $statusException) {
+			$this->reportBlockAuxiliaryFailure('block status header', $statusException);
+			$this->sendRawBlockHeader($fallbackHeader);
+		}
+		catch (Throwable $statusException) {
+			$this->reportBlockAuxiliaryFailure('block status header', $statusException);
+			$this->sendRawBlockHeader($fallbackHeader);
+		}
+	}
+
+	/**
+	 * Send a raw fallback header without allowing a header handler to prevent enforcement.
+	 * PHP normally emits a warning when a header cannot be sent, but a custom error handler may
+	 * convert that warning to an exception.
+	 * @param string $header
+	 * @return void
+	 */
+	protected function sendRawBlockHeader($header) {
+		try {
+			@header($header);
+		}
+		catch (Exception $headerException) {
+			$this->reportBlockAuxiliaryFailure('fallback block header', $headerException);
+		}
+		catch (Throwable $headerException) {
+			$this->reportBlockAuxiliaryFailure('fallback block header', $headerException);
+		}
+	}
+
+	/**
+	 * Send no-cache headers without allowing a header failure to prevent enforcement.
+	 * PHP normally emits a warning when a header cannot be sent, but a custom error handler may
+	 * convert that warning to an exception.
+	 * @return void
+	 */
+	protected function sendNoCacheHeaders() {
+		try {
+			wfWAFUtils::doNotCache();
+		}
+		catch (Exception $cacheException) {
+			$this->reportBlockAuxiliaryFailure('block cache headers', $cacheException);
+		}
+		catch (Throwable $cacheException) {
+			$this->reportBlockAuxiliaryFailure('block cache headers', $cacheException);
+		}
+	}
+
+	/**
+	 * Record an auxiliary block failure without exposing request data or risking enforcement.
+	 * PHP normally emits a warning when error logging fails, but a custom error handler may
+	 * convert that warning to an exception.
+	 * @param string $operation
+	 * @param Exception|Throwable $failure
+	 * @return void
+	 */
+	protected function reportBlockAuxiliaryFailure($operation, $failure) {
+		try {
+			error_log('A WAF block was enforced, but ' . $operation . ' failed (' . get_class($failure) . ').');
+		}
+		catch (Exception $reportingException) {
+			// Do not allow diagnostics to interfere with enforcement.
+		}
+		catch (Throwable $reportingException) {
+			// Do not allow diagnostics to interfere with enforcement.
+		}
 	}
 	
 	public function logAction($event) {
@@ -1324,10 +1567,14 @@ HTML
 			return;
 		}
 
-		$whitelist = (array) $this->getStorageEngine()->getConfig('whitelistedURLParams', null, 'livewaf');
-		if (!is_array($whitelist)) {
+		$whitelist = $this->getStorageEngine()->getConfig('whitelistedURLParams', null, 'livewaf');
+		if (is_object($whitelist)) {
+			$whitelist = (array) $whitelist;
+		}
+		else if (!is_array($whitelist)) {
 			$whitelist = array();
 		}
+		
 		if (is_array($ruleID)) {
 			foreach ($ruleID as $id) {
 				$whitelist[base64_encode($path) . "|" . base64_encode($paramKey)][$id] = $data;
@@ -1356,24 +1603,32 @@ HTML
 			&& is_array($this->whitelistedParams[$paramKey]))
 		) {
 			foreach ($this->whitelistedParams[$paramKey] as $urlRegex) {
-				if (is_array($urlRegex)) {
-					if (isset($urlRegex['rules']) && is_array($urlRegex['rules']) && !in_array($ruleID, $urlRegex['rules'])) {
+				if (is_array($urlRegex) || $urlRegex instanceof wfWAFRuleParserURLParam) {
+					$rules = is_array($urlRegex) ? $urlRegex['rules'] : $urlRegex->getRules();
+					if ($rules && !in_array($ruleID, $rules)) {
 						continue;
 					}
-					if (isset($urlRegex['conditional']) && !$urlRegex['conditional']->evaluate()) {
+					
+					$conditional = is_array($urlRegex) ? (isset($urlRegex['conditional']) ? $urlRegex['conditional'] : null) : $urlRegex->getConditional();
+					if ($conditional && !$conditional->evaluate()) {
 						continue;
 					}
-					$urlRegex = $urlRegex['url'];
+					
+					$urlRegex = is_array($urlRegex) ? $urlRegex['url'] : $urlRegex->getUrl();
 				}
-				if (preg_match($urlRegex, $urlPath)) {
+				
+				if (is_string($urlRegex) && preg_match($urlRegex, $urlPath)) {
 					return true;
 				}
 			}
 		}
 
 		$whitelistKey = base64_encode($urlPath) . "|" . base64_encode($paramKey);
-		$whitelist = (array) $this->getStorageEngine()->getConfig('whitelistedURLParams', array(), 'livewaf');
-		if (!is_array($whitelist)) {
+		$whitelist = $this->getStorageEngine()->getConfig('whitelistedURLParams', array(), 'livewaf');
+		if (is_object($whitelist)) {
+			$whitelist = (array) $whitelist;
+		}
+		else if (!is_array($whitelist)) {
 			$whitelist = array();
 		}
 
@@ -1501,16 +1756,21 @@ HTML
 			&& is_array($this->blacklistedParams[$paramKey])
 		) {
 			foreach ($this->blacklistedParams[$paramKey] as $urlRegex) {
-				if (is_array($urlRegex)) {
-					if (!in_array($ruleID, $urlRegex['rules'])) {
+				if (is_array($urlRegex) || $urlRegex instanceof wfWAFRuleParserURLParam) {
+					$rules = is_array($urlRegex) ? $urlRegex['rules'] : $urlRegex->getRules();
+					if ($rules && !in_array($ruleID, $rules)) {
 						continue;
 					}
-					if (isset($urlRegex['conditional']) && !$urlRegex['conditional']->evaluate()) {
+					
+					$conditional = is_array($urlRegex) ? (isset($urlRegex['conditional']) ? $urlRegex['conditional'] : null) : $urlRegex->getConditional();
+					if ($conditional && !$conditional->evaluate()) {
 						continue;
 					}
-					$urlRegex = $urlRegex['url'];
+					
+					$urlRegex = is_array($urlRegex) ? $urlRegex['url'] : $urlRegex->getUrl();
 				}
-				if (preg_match($urlRegex, $urlPath)) {
+				
+				if (is_string($urlRegex) && preg_match($urlRegex, $urlPath)) {
 					return true;
 				}
 			}

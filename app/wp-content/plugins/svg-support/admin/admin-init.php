@@ -45,28 +45,65 @@ function bodhi_svg_support_settings_page() {
 }
 
 /**
- * Sanitize class before saving
+ * Sanitize and save settings
  */
-function bodhi_sanitize_fields( $value ) {
-
-	if (isset($value['css_target'])) {
-		$value['css_target'] = esc_attr( sanitize_text_field( $value['css_target'] ) );
+function bodhi_svgs_settings_sanitize($input) {
+	// Process all settings
+	$output = $input;
+	
+	// Sanitize css_target
+	if (isset($output['css_target'])) {
+		$output['css_target'] = esc_attr( sanitize_text_field( $output['css_target'] ) );
 	}
 
-	if( !isset($value['sanitize_svg_front_end']) || $value['sanitize_svg_front_end'] !== 'on' ) {
-		$value['sanitize_svg_front_end'] = false;
+	// Handle sanitize_svg_front_end setting
+	if (!isset($output['sanitize_svg_front_end']) || $output['sanitize_svg_front_end'] !== 'on') {
+		$output['sanitize_svg_front_end'] = false;
 	}
 
-	if( !isset($value['sanitize_on_upload_roles']) ) {
-		$value['sanitize_on_upload_roles'] = array("none");
+	// Handle sanitize_on_upload_roles setting
+	if (!isset($output['sanitize_on_upload_roles'])) {
+		$output['sanitize_on_upload_roles'] = array("none");
+	} else {
+		$output['sanitize_on_upload_roles'] = (array)$output['sanitize_on_upload_roles'];
 	}
 
-	if( !isset($value['restrict']) ) {
-		$value['restrict'] = array("none");
+	// Handle restrict setting
+	if (!isset($output['restrict'])) {
+		$output['restrict'] = array("none");
+	} else {
+		$output['restrict'] = (array)$output['restrict'];
 	}
-
-	return $value;
+	
+	return $output;
 }
+
+/**
+ * Auto-save settings via AJAX (settings screen)
+ * Runs the same sanitize callback as the classic options.php flow.
+ */
+function bodhi_svgs_autosave_settings() {
+
+	check_ajax_referer( 'bodhi_svgs_autosave', 'nonce' );
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'You can\'t play with this.', 'svg-support' ) ), 403 );
+	}
+
+	$raw = isset( $_POST['bodhi_svgs_settings'] ) ? wp_unslash( $_POST['bodhi_svgs_settings'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized below via map_deep + settings sanitize callback.
+
+	if ( ! is_array( $raw ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Invalid settings payload.', 'svg-support' ) ), 400 );
+	}
+
+	$clean = bodhi_svgs_settings_sanitize( map_deep( $raw, 'sanitize_text_field' ) );
+
+	update_option( 'bodhi_svgs_settings', $clean );
+
+	wp_send_json_success();
+
+}
+add_action( 'wp_ajax_bodhi_svgs_autosave', 'bodhi_svgs_autosave_settings' );
 
 /**
  * Register settings in the database
@@ -74,7 +111,7 @@ function bodhi_sanitize_fields( $value ) {
 function bodhi_svgs_register_settings() {
 
 	$args = array(
-		'sanitize_callback' => 'bodhi_sanitize_fields'
+		'sanitize_callback' => 'bodhi_svgs_settings_sanitize'
 	);
 
 	register_setting( 'bodhi_svgs_settings_group', 'bodhi_svgs_settings', $args );

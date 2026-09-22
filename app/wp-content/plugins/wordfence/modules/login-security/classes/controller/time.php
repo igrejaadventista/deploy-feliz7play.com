@@ -191,4 +191,82 @@ class Controller_Time {
 		}
 		return $dt->format($format);
 	}
+
+	/**
+	 * Formats a timestamp as a relative "time ago" string, optionally switching to an absolute local date format
+	 * after a threshold has elapsed.
+	 *
+	 * @param int $timestamp Assumed to be in UTC.
+	 * @param int $dateSwitchThreshold Threshold in seconds after which to show an absolute date instead.
+	 * @param string|bool $dateFormat Absolute date format. Defaults to the WP date and time formats.
+	 * @param int $maxComponents Maximum number of time components to include in relative output.
+	 * @return string
+	 */
+	public static function format_time_ago($timestamp, $dateSwitchThreshold = 0, $dateFormat = false, $maxComponents = 2) {
+		if ($timestamp <= 0) {
+			return '';
+		}
+
+		$now = self::time();
+		if ($now <= $timestamp) {
+			return __('just now', 'wordfence');
+		}
+
+		$seconds = (int) floor($now - $timestamp);
+		if ($dateSwitchThreshold > 0 && $seconds > $dateSwitchThreshold) {
+			if ($dateFormat === false) {
+				$dateFormat = get_option('date_format') . ' ' . get_option('time_format');
+			}
+			return self::format_local_time($dateFormat, $timestamp);
+		}
+
+		return sprintf(
+			__('%s ago', 'wordfence'),
+			self::make_time_ago($seconds, $maxComponents)
+		);
+	}
+
+	/**
+	 * Converts a number of seconds into a display-friendly relative duration string.
+	 *
+	 * @param int $seconds
+	 * @param int $maxComponents
+	 * @return string
+	 */
+	public static function make_time_ago($seconds, $maxComponents = 2) {
+		$seconds = max(0, (int) floor($seconds));
+
+		$maxComponents = max(1, (int) $maxComponents);
+		$units = array(
+			array('seconds' => DAY_IN_SECONDS * 30, 'singular' => '%d month', 'plural' => '%d months'),
+			array('seconds' => DAY_IN_SECONDS, 'singular' => '%d day', 'plural' => '%d days'),
+			array('seconds' => HOUR_IN_SECONDS, 'singular' => '%d hour', 'plural' => '%d hours'),
+			array('seconds' => MINUTE_IN_SECONDS, 'singular' => '%d minute', 'plural' => '%d minutes'),
+		);
+		$components = array();
+		$remaining = $seconds;
+
+		foreach ($units as $unit) {
+			if (count($components) >= $maxComponents) {
+				break;
+			}
+
+			$value = (int) floor($remaining / $unit['seconds']);
+			if ($value <= 0) {
+				continue;
+			}
+
+			$components[] = sprintf(_n($unit['singular'], $unit['plural'], $value, 'wordfence'), $value);
+			$remaining -= $value * $unit['seconds'];
+		}
+
+		if (empty($components)) {
+			$components[] = sprintf(_n('%d second', '%d seconds', $seconds, 'wordfence'), $seconds);
+		}
+		else if (count($components) < $maxComponents && $remaining > 0) {
+			$components[] = sprintf(_n('%d second', '%d seconds', $remaining, 'wordfence'), $remaining);
+		}
+
+		return implode(' ', array_slice($components, 0, $maxComponents));
+	}
 }

@@ -37,7 +37,9 @@ class Controller_TOTP {
 		
 		global $wpdb;
 		$table = Controller_DB::shared()->secrets;
-		$wpdb->query($wpdb->prepare("INSERT INTO `{$table}` (`user_id`, `secret`, `recovery`, `ctime`, `vtime`, `mode`) VALUES (%d, %s, %s, UNIX_TIMESTAMP(), %d, 'authenticator')", $user->ID, Model_Compat::hex2bin($secret), implode('', array_map(function($r) { return Model_Compat::hex2bin($r); }, $recovery)), $vtime));
+		if ($wpdb->query($wpdb->prepare("INSERT INTO `{$table}` (`user_id`, `secret`, `recovery`, `ctime`, `vtime`, `mode`) VALUES (%d, %s, %s, UNIX_TIMESTAMP(), %d, 'authenticator')", $user->ID, Model_Compat::hex2bin($secret), implode('', array_map(function($r) { return Model_Compat::hex2bin($r); }, $recovery)), $vtime)) !== false) {
+			Controller_Users::shared()->clear_2fa_active_cache($user->ID);
+		}
 		
 		/**
 		 * Fires when 2FA is enabled for a user.
@@ -55,10 +57,15 @@ class Controller_TOTP {
 	 * 
 	 * @param \WP_User $user
 	 * @param string $code
+	 * @param bool $update Whether to update the matching code's state immediately.
+	 * @param array|null $deferredUpdate Receives an atomic deferred update when requested.
 	 * @return bool|null Returns null if the user does not have 2FA enabled, false if the code is invalid, and true if valid.
 	 */
-	public function validate_2fa($user, $code, $update = true) {
+	public function validate_2fa($user, $code, $update = true, &$deferredUpdate = null) {
 		global $wpdb;
+		if (func_num_args() >= 4) {
+			$deferredUpdate = null;
+		}
 		$table = Controller_DB::shared()->secrets;
 		$record = $wpdb->get_row($wpdb->prepare("SELECT * FROM `{$table}` WHERE `user_id` = %d FOR UPDATE", $user->ID), ARRAY_A);
 		if (!$record) {
@@ -76,6 +83,15 @@ class Controller_TOTP {
 					$updatedRecoveryCodes = implode('', $recoveryCodes);
 					$wpdb->query($wpdb->prepare("UPDATE `{$table}` SET `recovery` = X%s WHERE `id` = %d", $updatedRecoveryCodes, $record['id']));
 				}
+				else if (func_num_args() >= 4) {
+					unset($recoveryCodes[$index]);
+					$deferredUpdate = array(
+						'type' => 'recovery',
+						'id' => (int) $record['id'],
+						'previous' => strtolower(bin2hex($record['recovery'])),
+						'next' => implode('', $recoveryCodes),
+					);
+				}
 				$wpdb->query('COMMIT');
 				return true;
 			}
@@ -89,12 +105,53 @@ class Controller_TOTP {
 				if ($update) {
 					$wpdb->query($wpdb->prepare("UPDATE `{$table}` SET `vtime` = %d WHERE `id` = %d", $matches, $record['id']));
 				}
+				else if (func_num_args() >= 4) {
+					$deferredUpdate = array(
+						'type' => 'totp',
+						'id' => (int) $record['id'],
+						'previous' => (int) $record['vtime'],
+						'next' => (int) $matches,
+					);
+				}
 				$wpdb->query('COMMIT');
 				return true;
 			}
 		}
 		
 		$wpdb->query('ROLLBACK');
+		return false;
+	}
+
+	/**
+	 * Atomically applies a state update produced by validate_2fa().
+	 *
+	 * @param array|null $deferredUpdate Deferred validation state.
+	 * @return bool
+	 */
+	public function commit_deferred_2fa_validation($deferredUpdate) {
+		global $wpdb;
+		$table = Controller_DB::shared()->secrets;
+		if (!is_array($deferredUpdate) || !isset($deferredUpdate['type'], $deferredUpdate['id'], $deferredUpdate['previous'], $deferredUpdate['next'])) {
+			return false;
+		}
+		if ($deferredUpdate['type'] === 'recovery') {
+			$result = $wpdb->query($wpdb->prepare(
+				"UPDATE `{$table}` SET `recovery` = X%s WHERE `id` = %d AND `recovery` = X%s",
+				$deferredUpdate['next'],
+				$deferredUpdate['id'],
+				$deferredUpdate['previous']
+			));
+			return $result === 1;
+		}
+		if ($deferredUpdate['type'] === 'totp') {
+			$result = $wpdb->query($wpdb->prepare(
+				"UPDATE `{$table}` SET `vtime` = %d WHERE `id` = %d AND `vtime` = %d",
+				$deferredUpdate['next'],
+				$deferredUpdate['id'],
+				$deferredUpdate['previous']
+			));
+			return $result === 1;
+		}
 		return false;
 	}
 	

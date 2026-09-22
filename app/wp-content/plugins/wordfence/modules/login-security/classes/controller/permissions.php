@@ -3,9 +3,12 @@
 namespace WordfenceLS;
 
 class Controller_Permissions {
-	const CAP_ACTIVATE_2FA_SELF = 'wf2fa_activate_2fa_self'; //Activate 2FA on its own user account
-	const CAP_ACTIVATE_2FA_OTHERS = 'wf2fa_activate_2fa_others'; //Activate 2FA on user accounts other than its own
+	const CAP_ACTIVATE_2FA_SELF = 'wf2fa_activate_2fa_self'; //Activate/deactivate 2FA on its own user account
+	const CAP_ACTIVATE_2FA_OTHERS = 'wf2fa_activate_2fa_others'; //Activate/deactivate 2FA on user accounts other than its own
+	const CAP_MANAGE_PASSKEY_SELF = 'wfls_manage_passkey_self'; //Activate/deactivate passkey on its own user account
+	const CAP_MANAGE_PASSKEY_OTHERS = 'wfls_manage_passkey_others'; //Deactivate passkey on user accounts other than its own
 	const CAP_MANAGE_SETTINGS = 'wf2fa_manage_settings'; //Edit settings for the plugin
+	const CAP_SHOW_LOGIN_SECURITY = 'wfls_show_login_security'; //Internal cap to show/hide login security menu because `add_submenu_page` only supports a single cap binding (synced automatically)
 	
 	const SETTING_LAST_ROLE_CHANGE = 'wfls_last_role_change';
 	const SETTING_LAST_ROLE_SYNC = 'wfls_last_role_sync';
@@ -26,16 +29,42 @@ class Controller_Permissions {
 		return $_shared;
 	}
 	
-	public function install() {
+	/**
+	 * Installs required capabilities and initializes optional authentication roles when requested.
+	 *
+	 * @param bool $initialize2FARoles Whether every supported 2FA role should start as optional.
+	 * @param bool $initializePasskeyRoles Whether every supported passkey role should start as optional.
+	 * @return void
+	 */
+	public function install($initialize2FARoles = false, $initializePasskeyRoles = false) {
 		$this->_on_role_change();
 		if (is_multisite()) {
 			//Super Admin automatically gets all capabilities, so we don't need to explicitly add them
 			$this->_add_cap_multisite('administrator', self::CAP_ACTIVATE_2FA_SELF, $this->get_primary_sites());
+			$this->_add_cap_multisite('administrator', self::CAP_SHOW_LOGIN_SECURITY, $this->get_primary_sites());
+			if ($initialize2FARoles) {
+				foreach ($this->_wp_roles()->get_names() as $roleName => $roleLabel) {
+					$this->allow_2fa_self($roleName);
+				}
+			}
+			$this->sync_login_security_menu_visibility();
 		}
 		else {
 			$this->_add_cap('administrator', self::CAP_ACTIVATE_2FA_SELF);
 			$this->_add_cap('administrator', self::CAP_ACTIVATE_2FA_OTHERS);
+			$this->_add_cap('administrator', self::CAP_MANAGE_PASSKEY_OTHERS);
 			$this->_add_cap('administrator', self::CAP_MANAGE_SETTINGS);
+			if ($initialize2FARoles || $initializePasskeyRoles) {
+				foreach ($this->_wp_roles()->get_names() as $roleName => $roleLabel) {
+					if ($initialize2FARoles) {
+						$this->allow_2fa_self($roleName);
+					}
+					if ($initializePasskeyRoles) {
+						$this->allow_passkey_self($roleName);
+					}
+				}
+			}
+			$this->_sync_roles();
 		}
 	}
 	
@@ -80,7 +109,7 @@ class Controller_Permissions {
 	 * @param $network_id
 	 */
 	public function _wpmu_new_blog($site_id, $user_id, $domain, $path, $network_id) {
-		$this->sync_roles($network_id, $site_id);
+		$this->multisite_sync_roles($network_id, $site_id);
 	}
 	
 	/**
@@ -89,7 +118,7 @@ class Controller_Permissions {
 	 * @param $new_site
 	 */
 	public function _wp_initialize_site($new_site) {
-		$this->sync_roles($new_site->site_id, $new_site->blog_id);
+		$this->multisite_sync_roles($new_site->site_id, $new_site->blog_id);
 	}
 	
 	/**
@@ -127,7 +156,7 @@ class Controller_Permissions {
 		if ($last_role_change >= get_option(self::SETTING_LAST_ROLE_SYNC, 0)) {
 			$network_id = get_current_site()->id;
 			$blog_id = get_current_blog_id();
-			$this->sync_roles($network_id, $blog_id);
+			$this->multisite_sync_roles($network_id, $blog_id);
 			update_option(self::SETTING_LAST_ROLE_SYNC, time());
 		}
 	}
@@ -178,13 +207,78 @@ class Controller_Permissions {
 		}
 		return $wpdb->get_col($wpdb->prepare("SELECT `blog_id` FROM `{$wpdb->blogs}` WHERE `deleted` = 0 AND blog_id > %d ORDER BY blog_id LIMIT %d", $from, $count));
 	}
+	
+	private function _login_security_menu_capabilities() {
+		return array(
+			self::CAP_ACTIVATE_2FA_SELF,
+			self::CAP_ACTIVATE_2FA_OTHERS,
+			self::CAP_MANAGE_PASSKEY_SELF,
+			self::CAP_MANAGE_PASSKEY_OTHERS,
+			self::CAP_MANAGE_SETTINGS,
+		);
+	}
+
+	private function _role_should_show_login_security_menu($role, $alwaysShowMenu = null) {
+		if ($alwaysShowMenu === null) {
+			$alwaysShowMenu = Controller_Settings::shared()->should_always_show_login_security_menu();
+		}
+		if ($alwaysShowMenu) {
+			return true;
+		}
+
+		foreach ($this->_login_security_menu_capabilities() as $cap) {
+			if ($role->has_cap($cap)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private function _sync_roles_for_wp_roles($wp_roles, $role_name = null, $alwaysShowMenu = null) {
+		$role_names = $role_name === null ? array_keys($wp_roles->get_names()) : array($role_name);
+		foreach ($role_names as $role_name) {
+			$role = $wp_roles->get_role($role_name);
+			if ($role === null) {
+				continue;
+			}
+
+			if ($this->_role_should_show_login_security_menu($role, $alwaysShowMenu)) {
+				$this->_add_cap($role_name, self::CAP_SHOW_LOGIN_SECURITY, $wp_roles);
+			}
+			else {
+				$this->_remove_cap($role_name, self::CAP_SHOW_LOGIN_SECURITY, $wp_roles);
+			}
+		}
+	}
 
 	/**
-	 * Sync role capabilities from the default site to a newly added site
+	 * Syncs role capabilities to ensure internal role consistency (single site only)
+	 */
+	private function _sync_roles($role_name = null, $alwaysShowMenu = null) {
+		$this->_sync_roles_for_wp_roles($this->_wp_roles(), $role_name, $alwaysShowMenu);
+	}
+
+	public function sync_login_security_menu_visibility($role_name = null, $alwaysShowMenu = null) {
+		$this->_on_role_change();
+		if (is_multisite()) {
+			foreach ($this->get_sites() as $id) {
+				$wp_roles = $this->_wp_roles($id);
+				switch_to_blog($id);
+				$this->_sync_roles_for_wp_roles($wp_roles, $role_name, $alwaysShowMenu);
+				restore_current_blog();
+			}
+			return;
+		}
+
+		$this->_sync_roles($role_name, $alwaysShowMenu);
+	}
+
+	/**
+	 * Sync role capabilities from the default site to a newly added site (multisite only)
 	 * @param int $network_id the relevant network
 	 * @param int $site_id the newly added site(blog)
 	 */
-	private function sync_roles($network_id, $site_id){
+	private function multisite_sync_roles($network_id, $site_id){
 		if(array_key_exists($network_id, $this->network_roles)){
 			$current_roles=$this->network_roles[$network_id];
 		}
@@ -193,22 +287,29 @@ class Controller_Permissions {
 			$this->network_roles[$network_id]=$current_roles;
 		}
 		$new_site_roles=$this->_wp_roles($site_id);
-		$capabilities=array(
-			self::CAP_ACTIVATE_2FA_SELF,
-			self::CAP_ACTIVATE_2FA_OTHERS,
-			self::CAP_MANAGE_SETTINGS
-		);
-		foreach($current_roles->get_names() as $role_name=>$role_label){
-			if($new_site_roles->get_role($role_name)===null)
+		$capabilities = $this->_login_security_menu_capabilities();
+		$alwaysShowMenu = Controller_Settings::shared()->should_always_show_login_security_menu();
+		foreach ($current_roles->get_names() as $role_name=>$role_label) {
+			if ($new_site_roles->get_role($role_name)===null) {
 				$new_site_roles->add_role($role_name, $role_label);
-			$role=$current_roles->get_role($role_name);
-			foreach($capabilities as $cap){
-				if($role->has_cap($cap)){
+			}
+			$role = $current_roles->get_role($role_name);
+			$hasAny = false;
+			foreach ($capabilities as $cap) {
+				if ($role->has_cap($cap)) {
 					$this->_add_cap_multisite($role_name, $cap, array($site_id));
+					$hasAny = true;
 				}
-				else{
+				else {
 					$this->_remove_cap_multisite($role_name, $cap, array($site_id));
 				}
+			}
+			
+			if ($alwaysShowMenu || $hasAny) {
+				$this->_add_cap_multisite($role_name, self::CAP_SHOW_LOGIN_SECURITY, array($site_id));
+			}
+			else {
+				$this->_remove_cap_multisite($role_name, self::CAP_SHOW_LOGIN_SECURITY, array($site_id));
 			}
 		}
 	}
@@ -216,9 +317,11 @@ class Controller_Permissions {
 	public function allow_2fa_self($role_name) {
 		$this->_on_role_change();
 		if (is_multisite()) {
+			$this->_add_cap_multisite($role_name, self::CAP_SHOW_LOGIN_SECURITY, $this->get_primary_sites());
 			return $this->_add_cap_multisite($role_name, self::CAP_ACTIVATE_2FA_SELF, $this->get_primary_sites());
 		}
 		else {
+			$this->_add_cap($role_name, self::CAP_SHOW_LOGIN_SECURITY);
 			return $this->_add_cap($role_name, self::CAP_ACTIVATE_2FA_SELF);
 		}
 	}
@@ -226,13 +329,40 @@ class Controller_Permissions {
 	public function disallow_2fa_self($role_name) {
 		$this->_on_role_change();
 		if (is_multisite()) {
-			return $this->_remove_cap_multisite($role_name, self::CAP_ACTIVATE_2FA_SELF, $this->get_primary_sites());
+			$removed = $this->_remove_cap_multisite($role_name, self::CAP_ACTIVATE_2FA_SELF, $this->get_primary_sites());
+			$this->sync_login_security_menu_visibility($role_name);
+			return $removed;
 		}
 		else {
-			if ($role_name == 'administrator') {
-				return true;
-			}
-			return $this->_remove_cap($role_name, self::CAP_ACTIVATE_2FA_SELF);
+			$removed = $this->_remove_cap($role_name, self::CAP_ACTIVATE_2FA_SELF);
+			$this->_sync_roles($role_name);
+			return $removed;
+		}
+	}
+	
+	public function allow_passkey_self($role_name) {
+		$this->_on_role_change();
+		if (is_multisite()) {
+			$this->_add_cap_multisite($role_name, self::CAP_SHOW_LOGIN_SECURITY, $this->get_primary_sites());
+			return $this->_add_cap_multisite($role_name, self::CAP_MANAGE_PASSKEY_SELF, $this->get_primary_sites());
+		}
+		else {
+			$this->_add_cap($role_name, self::CAP_SHOW_LOGIN_SECURITY);
+			return $this->_add_cap($role_name, self::CAP_MANAGE_PASSKEY_SELF);
+		}
+	}
+	
+	public function disallow_passkey_self($role_name) {
+		$this->_on_role_change();
+		if (is_multisite()) {
+			$removed = $this->_remove_cap_multisite($role_name, self::CAP_MANAGE_PASSKEY_SELF, $this->get_primary_sites());
+			$this->sync_login_security_menu_visibility($role_name);
+			return $removed;
+		}
+		else {
+			$removed = $this->_remove_cap($role_name, self::CAP_MANAGE_PASSKEY_SELF);
+			$this->_sync_roles($role_name);
+			return $removed;
 		}
 	}
 	
@@ -426,6 +556,8 @@ class Controller_Permissions {
 	}
 
 	public function does_user_have_multisite_capability($user, $capability) {
+		if ($capability === self::CAP_MANAGE_PASSKEY_SELF || $capability === self::CAP_MANAGE_PASSKEY_OTHERS) { return false; } //Not yet supported for multisite non-super-admins despite configured capabilities
+		
 		$userRoles = $this->get_multisite_roles_for_user($user);
 		if (in_array('super-admin', $userRoles)) {
 			return true;

@@ -1,0 +1,1044 @@
+# Copyright (C) 2026 Really Simple Plugins
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Metricool - Social media and site statistics 2.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/trunk\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-08-25T08:11:12+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: metricool\n"
+
+#. Plugin Name of the plugin
+#: metricool.php
+msgid "Metricool - Social media and site statistics"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: metricool.php
+msgid "https://metricool.com/"
+msgstr ""
+
+#. Description of the plugin
+#: metricool.php
+msgid "Site metrics and social media analytics for Instagram, Facebook, YouTube, LinkedIn, X Twitter. The single best tool for Social Media Managers!"
+msgstr ""
+
+#. Author of the plugin
+#: metricool.php
+msgid "Really Simple Plugins"
+msgstr ""
+
+#. Author URI of the plugin
+#: metricool.php
+msgid "https://really-simple-plugins.com"
+msgstr ""
+
+#: app/Controllers/AdminController.php:56
+#: react/build/assets/BQ9nIB57.js:1
+#: react/build/assets/CxqXJQAD.js:1
+msgid "Settings"
+msgstr ""
+
+#: app/Controllers/AdminController.php:60
+msgid "Support"
+msgstr ""
+
+#: app/Controllers/DashboardController.php:89
+#: app/Controllers/DashboardController.php:90
+#: app/Controllers/SharePostController.php:130
+#: app/Controllers/SharePostController.php:182
+msgid "Metricool"
+msgstr ""
+
+#: app/Controllers/SharePostController.php:118
+msgid "Invalid nonce."
+msgstr ""
+
+#: app/Controllers/SharePostController.php:197
+msgid "Sharing is only possible for published posts."
+msgstr ""
+
+#: app/Controllers/SharePostController.php:220
+msgid "Share"
+msgstr ""
+
+#: app/Exceptions/ValidationException.php:20
+msgid "Validation failed."
+msgstr ""
+
+#: app/Features/AdminNotices/Notices/ReviewNotice.php:78
+msgid "Leave a review"
+msgstr ""
+
+#: app/Features/AdminNotices/Notices/ReviewNotice.php:131
+msgid "statistics"
+msgstr ""
+
+#: app/Features/AdminNotices/Notices/ReviewNotice.php:135
+msgid "sessions"
+msgstr ""
+
+#. translators: %s is replaced by either "x sessions" or "statistics", %2$ and %3$ are replaced with opening and closing a tag containing hyperlink
+#: app/Features/AdminNotices/Notices/ReviewNotice.php:140
+#, php-format
+msgid "Hi, Metricool has tracked %1$s on your site for the last 30 days. If you have a moment, please consider leaving a review on wordpress.org to spread the word. We greatly appreciate it! If you have any questions or feedback, leave us a %2$smessage%3$s."
+msgstr ""
+
+#: app/Features/AdminNotices/Notices/UpgradeNotice.php:57
+msgid "Sign in now!"
+msgstr ""
+
+#: app/Features/Notifications/Notices/ExampleConnectionsWarning.php:27
+#: app/Features/Notifications/Notices/ExampleConnectionsWarning.php:35
+msgid "This notice is a warning."
+msgstr ""
+
+#: app/Features/Notifications/Notices/ExampleConnectionsWarning.php:60
+#: app/Features/Notifications/Notices/FirstConnectionNotice.php:60
+#: app/Features/TaskManagement/Tasks/FirstConnectionTask.php:37
+#: app/Features/TaskManagement/Tasks/LinkedInTask.php:45
+#: app/Features/TaskManagement/Tasks/TwitterTask.php:45
+msgid "Connect"
+msgstr ""
+
+#: app/Features/Notifications/Notices/ExampleInactiveNotice.php:17
+#: app/Features/Notifications/Notices/ExampleInactiveNotice.php:25
+msgid "This is an inactive notice."
+msgstr ""
+
+#: app/Features/Notifications/Notices/ExampleNotice.php:17
+#: app/Features/Notifications/Notices/ExampleNotice.php:25
+msgid "This is a notice without a route."
+msgstr ""
+
+#: app/Features/Notifications/Notices/ExampleNotice.php:51
+#: app/Features/Notifications/Notices/ExamplePremiumNotice.php:52
+#: app/Features/Notifications/Notices/ExamplePremiumWarning.php:52
+msgid "Example text"
+msgstr ""
+
+#: app/Features/Notifications/Notices/ExamplePremiumNotice.php:18
+#: app/Features/Notifications/Notices/ExamplePremiumNotice.php:26
+msgid "This is an premium notice."
+msgstr ""
+
+#: app/Features/Notifications/Notices/ExamplePremiumWarning.php:18
+#: app/Features/Notifications/Notices/ExamplePremiumWarning.php:26
+msgid "This is an premium warning."
+msgstr ""
+
+#: app/Features/Notifications/Notices/ExampleWarning.php:17
+#: app/Features/Notifications/Notices/ExampleWarning.php:25
+msgid "This is a warning without a route."
+msgstr ""
+
+#: app/Features/Notifications/Notices/FirstConnectionNotice.php:27
+msgid "Get the most out of Metricool"
+msgstr ""
+
+#: app/Features/Notifications/Notices/FirstConnectionNotice.php:35
+msgid "Connect your first social account to Metricool to start scheduling and tracking your content."
+msgstr ""
+
+#: app/Features/Onboarding/OnboardingController.php:131
+msgid "You don’t have sufficient permissions to connect this brand. Please pick another brand or sign in with a different account."
+msgstr ""
+
+#. translators: %1$s is opening link and %2$s is closing link
+#: app/Features/Onboarding/OnboardingController.php:138
+#: app/Features/Onboarding/Services/CreateAccountService.php:48
+#, php-format
+msgid "Something went wrong. Please try again or %1$sleave a support message%2$s."
+msgstr ""
+
+#: app/Features/Onboarding/OnboardingController.php:153
+msgid "HTTPS is required to be able to authorize this website."
+msgstr ""
+
+#: app/Features/Onboarding/Services/CreateAccountService.php:55
+msgid "Password is not valid."
+msgstr ""
+
+#: app/Features/TaskManagement/TaskManagementEndpoints.php:75
+msgid "Task not found"
+msgstr ""
+
+#: app/Features/TaskManagement/TaskManagementEndpoints.php:82
+msgid "This task cannot be dismissed because it is required"
+msgstr ""
+
+#: app/Features/TaskManagement/TaskManagementEndpoints.php:85
+msgid "Task dismissed successfully"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/AbstractTask.php:152
+msgid "Premium"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/AbstractTask.php:156
+msgid "Special feature"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/AbstractTask.php:159
+msgid "Open"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/AbstractTask.php:167
+msgid "Urgent"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/AbstractTask.php:175
+msgid "Completed"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/AbstractTask.php:183
+msgid "Dismissed"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/FirstConnectionTask.php:28
+msgid "Get the most out of Metricool by linking your Social accounts"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/HistoricalDataTask.php:36
+msgid "Gain access to analytics with unlimited historical data."
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/HistoricalDataTask.php:45
+#: react/build/assets/BlatK_BK.js:1
+#: react/build/assets/BQ9nIB57.js:1
+msgid "Upgrade"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/LinkedInTask.php:36
+msgid "Connect your LinkedIn account"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/SchedulePostTask.php:16
+msgid "Schedule a post to promote your site!"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/SchedulePostTask.php:25
+msgid "Schedule a post"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/TwitterTask.php:36
+msgid "Connect your Twitter account"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/UnableToTrackTrafficTask.php:27
+msgid "Unable to track traffic on your site"
+msgstr ""
+
+#: app/Features/TaskManagement/Tasks/UnableToTrackTrafficTask.php:44
+msgid "Validate connection"
+msgstr ""
+
+#: app/Features/UserSettings/Rules/FirstDayOfWeekRule.php:18
+msgid "Please enter a valid day of the week (1 or 7)"
+msgstr ""
+
+#. translators: %s is the invalid language code submitted by the user.
+#: app/Features/UserSettings/Rules/SupportedLanguageRule.php:33
+#, php-format
+msgid "%s is not a supported language"
+msgstr ""
+
+#. translators: %s is the invalid timezone submitted by the user.
+#: app/Features/UserSettings/Rules/TimezoneRule.php:23
+#, php-format
+msgid "%s is not a valid timezone"
+msgstr ""
+
+#: app/Features/UserSettings/UserSettingsEndpoint.php:78
+msgid "Failed to retrieve settings"
+msgstr ""
+
+#: app/Features/UserSettings/UserSettingsEndpoint.php:93
+msgid "Validation failed"
+msgstr ""
+
+#: app/Features/UserSettings/UserSettingsEndpoint.php:97
+msgid "An unknown error occurred. Failed to update the settings!"
+msgstr ""
+
+#: app/Features/UserSettings/UserSettingsService.php:135
+msgid "Something went wrong while submitting the settings!"
+msgstr ""
+
+#: app/Http/Endpoints/AnalyticsEndpoint.php:73
+#: app/Http/Endpoints/DistributionEndpoint.php:85
+msgid "Failed to load Analytics data"
+msgstr ""
+
+#: app/Http/Endpoints/AnalyticsEndpoint.php:93
+#: app/Http/Endpoints/RealtimeEndpoint.php:101
+msgid "Page views"
+msgstr ""
+
+#: app/Http/Endpoints/AnalyticsEndpoint.php:97
+#: react/build/assets/BlatK_BK.js:1
+msgid "Visits"
+msgstr ""
+
+#: app/Http/Endpoints/AnalyticsEndpoint.php:101
+#: app/Http/Endpoints/RealtimeEndpoint.php:103
+#: app/Http/Endpoints/Responses/Statistics/CountriesResponse.php:22
+#: react/build/assets/BlatK_BK.js:1
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Visitors"
+msgstr ""
+
+#: app/Http/Endpoints/AnalyticsEndpoint.php:105
+#: react/build/assets/BlatK_BK.js:1
+msgid "Posts"
+msgstr ""
+
+#: app/Http/Endpoints/AnalyticsEndpoint.php:109
+#: react/build/assets/BlatK_BK.js:1
+msgid "Comments"
+msgstr ""
+
+#: app/Http/Endpoints/ConnectedBrandsEndpoint.php:64
+#: app/Http/Endpoints/ConnectedNetworksEndpoint.php:69
+msgid "Failed to load brands data"
+msgstr ""
+
+#: app/Http/Endpoints/CredentialsEndpoint.php:77
+msgid "Something went wrong."
+msgstr ""
+
+#: app/Http/Endpoints/OtherPluginsEndpoints.php:86
+msgid "Plugin not found"
+msgstr ""
+
+#: app/Http/Endpoints/OtherPluginsEndpoints.php:95
+msgid "An error occurred while performing the action."
+msgstr ""
+
+#: app/Http/Endpoints/RealtimeEndpoint.php:73
+msgid "Failed to load Realtime data"
+msgstr ""
+
+#: app/Http/Endpoints/Responses/Statistics/CountriesResponse.php:21
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Country"
+msgstr ""
+
+#: app/Http/Endpoints/Responses/Statistics/CountriesResponse.php:23
+msgid "Percentage"
+msgstr ""
+
+#: app/Http/Middleware/IsMetricoolAuthenticated.php:29
+msgid "Unauthorized. Please log-in into the Metricool plugin."
+msgstr ""
+
+#: app/Http/Middleware/IsWordPressAdminRequest.php:21
+msgid "Unauthorized. Please log in into the WordPress admin."
+msgstr ""
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/AcceptedRule.php:18
+#, php-format
+msgid "%s must be accepted."
+msgstr ""
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/ArrayRule.php:18
+#, php-format
+msgid "%s must be an array."
+msgstr ""
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/BooleanRule.php:18
+#, php-format
+msgid "%s must be true or false."
+msgstr ""
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/EmailRule.php:20
+#, php-format
+msgid "%s must be a valid email address."
+msgstr ""
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/InRule.php:19
+#, php-format
+msgid "%s is invalid."
+msgstr ""
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/IntegerRule.php:18
+#, php-format
+msgid "%s must be an integer."
+msgstr ""
+
+#. translators: %1$s and %2$s are field names
+#: app/Support/Validation/Rules/MatchesRule.php:22
+#, php-format
+msgid "%1$s must match %2$s."
+msgstr ""
+
+#. translators: %1$s is the field name, %2$s is the maximum size
+#: app/Support/Validation/Rules/MaxRule.php:22
+#, php-format
+msgid "%1$s must not be greater than %2$s."
+msgstr ""
+
+#. translators: %1$s is the field name, %2$s is the minimum size
+#: app/Support/Validation/Rules/MinRule.php:22
+#, php-format
+msgid "%1$s must be at least %2$s."
+msgstr ""
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/NumericRule.php:18
+#, php-format
+msgid "%s must be a number."
+msgstr ""
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/RequiredRule.php:20
+#, php-format
+msgid "%s is required."
+msgstr ""
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/StringRule.php:18
+#, php-format
+msgid "%s must be a string."
+msgstr ""
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/UrlRule.php:18
+#, php-format
+msgid "%s must be a valid URL."
+msgstr ""
+
+#: config/languages.php:9
+msgid "English"
+msgstr ""
+
+#: config/languages.php:13
+msgid "Spanish"
+msgstr ""
+
+#: config/languages.php:17
+msgid "French"
+msgstr ""
+
+#: config/languages.php:21
+msgid "Portuguese (Portugal)"
+msgstr ""
+
+#: config/languages.php:25
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: config/languages.php:29
+msgid "Deutsch"
+msgstr ""
+
+#: config/languages.php:33
+msgid "Italian"
+msgstr ""
+
+#: config/languages.php:37
+msgid "Danish"
+msgstr ""
+
+#: config/languages.php:41
+msgid "Dutch"
+msgstr ""
+
+#: config/plugins.php:17
+msgid "Lightweight plugin. Heavyweight security features."
+msgstr ""
+
+#: config/plugins.php:26
+msgid "Online Booking System"
+msgstr ""
+
+#: config/plugins.php:38
+msgid "Consent Management as it should be"
+msgstr ""
+
+#: config/plugins.php:49
+msgid "Terms & Conditions"
+msgstr ""
+
+#: views/admin/notices/layout.php:33
+msgid "Dismiss"
+msgstr ""
+
+#: views/admin/notices/layout.php:49
+msgid "Remind me later"
+msgstr ""
+
+#: views/admin/notices/upgrade-notice.php:15
+msgid "You have just upgraded to the new Metricool plugin"
+msgstr ""
+
+#. translators: 1: opening <strong> tag, 2: closing </strong> tag.
+#: views/admin/notices/upgrade-notice.php:21
+#, php-format
+msgid "Please %1$ssign in%2$s to discover all new functionality"
+msgstr ""
+
+#: react/build/assets/5NCLWOq6.js:1
+#: react/build/assets/CxqXJQAD.js:1
+msgid "Connections"
+msgstr ""
+
+#: react/build/assets/5NCLWOq6.js:1
+msgid "The accounts that are connected to Metricool"
+msgstr ""
+
+#: react/build/assets/5NCLWOq6.js:1
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Connected Accounts"
+msgstr ""
+
+#: react/build/assets/B6N17mhK.js:1
+msgid "Connect Wordpress"
+msgstr ""
+
+#: react/build/assets/B6N17mhK.js:1
+msgid "Connect a Blog"
+msgstr ""
+
+#. translators: variable is the name of a social media
+#: react/build/assets/B6N17mhK.js:3
+#: react/build/assets/B6N17mhK.js:7
+#: react/build/assets/B6N17mhK.js:9
+#: react/build/assets/B6N17mhK.js:11
+#: react/build/assets/B6N17mhK.js:13
+#: react/build/assets/B6N17mhK.js:15
+#: react/build/assets/B6N17mhK.js:17
+#: react/build/assets/B6N17mhK.js:19
+#: react/build/assets/B6N17mhK.js:21
+#: react/build/assets/B6N17mhK.js:23
+#: react/build/assets/B6N17mhK.js:25
+#: react/build/assets/B6N17mhK.js:27
+#: react/build/assets/B6N17mhK.js:29
+#, js-format
+msgid "Connect a %1$s Account"
+msgstr ""
+
+#. translators: variable is the name of a social media
+#: react/build/assets/B6N17mhK.js:5
+#, js-format
+msgid "Connect an %1$s Account"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Last week"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Current month"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Last 30 days"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Previous month"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Last 3 months"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Last 6 months"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Last 12 months"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Page Views"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Report"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "View Analytics"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Installed"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Install"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Activate"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Activating..."
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Downloading..."
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "There was an unexpected error executing the action for the selected plugin"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Email"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Enter your email"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Password"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Write your password here"
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:1
+msgid "Create your free account"
+msgstr ""
+
+#. translators: the two variables are opening and closing anchor tags
+#: react/build/assets/BlatK_BK.js:3
+#, js-format
+msgid "I have read and accept the %1$sLegal Terms%2$s by Metricool."
+msgstr ""
+
+#: react/build/assets/BlatK_BK.js:3
+msgid "I wish to receive communications about news and/or promotions from Metricool Software."
+msgstr ""
+
+#: react/build/assets/BQ9nIB57.js:1
+msgid "Dashboard"
+msgstr ""
+
+#: react/build/assets/BQ9nIB57.js:1
+msgid "Planner"
+msgstr ""
+
+#: react/build/assets/BQ9nIB57.js:1
+msgid "Help Center"
+msgstr ""
+
+#: react/build/assets/BQ9nIB57.js:1
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Metricool logo"
+msgstr ""
+
+#: react/build/assets/CxqXJQAD.js:1
+msgid "Notifications"
+msgstr ""
+
+#: react/build/assets/CxqXJQAD.js:1
+msgid "You currently have no notifications."
+msgstr ""
+
+#: react/build/assets/CxqXJQAD.js:1
+msgid "Account Settings"
+msgstr ""
+
+#: react/build/assets/CxqXJQAD.js:1
+msgid "Affiliation Program"
+msgstr ""
+
+#: react/build/assets/CxqXJQAD.js:1
+msgid "User Management"
+msgstr ""
+
+#: react/build/assets/CxqXJQAD.js:1
+msgid "My Tasks"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:1
+msgid "No results."
+msgstr ""
+
+#. translators: variables are page numbers
+#: react/build/assets/Dc4ANLcp.js:3
+#, js-format
+msgid "Page %1$s of %2$s"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Percent"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Last 30 Minutes"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "URL"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Real-time"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Analytics"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Traffic"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Countries"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Website Analytics"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Other Plugins"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Really Simple Plugins logo"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "There was an error dismissing your task"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "All Tasks"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Remaining Tasks"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "Progress"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:3
+msgid "You're all set! Great job!"
+msgstr ""
+
+#. translators: variable is number of tasks
+#: react/build/assets/Dc4ANLcp.js:5
+#, js-format
+msgid "You're on your way. You still have %1$s task open."
+msgid_plural "You're on your way. You still have %1$s tasks open."
+msgstr[0] ""
+msgstr[1] ""
+
+#: react/build/assets/Dc4ANLcp.js:5
+msgid "Link icon"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:5
+msgid "Connect your brand"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:5
+msgid "Choose the brand that you want to connect to this website"
+msgstr ""
+
+#. translators: the two variables are opening and closing anchor tags
+#: react/build/assets/Dc4ANLcp.js:7
+#, js-format
+msgid "Don’t see the brand you’re looking for? %1$sGo to Metricool.com%2$s and make sure you’re logged into the correct account."
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Choose your brand"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Select a brand"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Empty Brand"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Cancel"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Finish"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Metricool logo with cog icon"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Creating Awesomeness"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "We’re setting up your Metricool account."
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Sign In"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Sign in to discover the new Metricool plugin!"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Sign in to link WordPress to your Metricool account"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Sign in on Metricool"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Metricool logo icon"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "The digital Swiss Army Knife for social media marketers"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Already a Metricooler?"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Sign in here"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Join more than 2 million professionals, agencies and brands that use Metricool as their one-stop shop for social media and online ad management."
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Laptop and phone displaying the Metricool app"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Checkmark icon"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "You're all set!"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Welcome to the Metricool Wordpress plugin"
+msgstr ""
+
+#: react/build/assets/Dc4ANLcp.js:7
+msgid "Let's go to your dashboard!"
+msgstr ""
+
+#: react/build/assets/Dkha7hOO.js:1
+msgid "Try again"
+msgstr ""
+
+#: react/build/assets/Dkha7hOO.js:1
+msgid "Refresh page"
+msgstr ""
+
+#: react/build/assets/Dkha7hOO.js:1
+msgid "There was an error fetching this data."
+msgstr ""
+
+#: react/build/assets/Dkha7hOO.js:1
+msgid "Please try refreshing the page."
+msgstr ""
+
+#. translators: the two variables are opening and closing anchor tags
+#: react/build/assets/Dkha7hOO.js:3
+#, js-format
+msgid "If the error persists, please contact our %1$ssupport team%2$s."
+msgstr ""
+
+#: react/build/assets/Dkha7hOO.js:3
+msgid "Please enter a valid email address"
+msgstr ""
+
+#: react/build/assets/Dkha7hOO.js:3
+msgid "Password must be at least 8 characters"
+msgstr ""
+
+#: react/build/assets/Dkha7hOO.js:3
+msgid "Password cannot be longer than 20 characters"
+msgstr ""
+
+#: react/build/assets/Dkha7hOO.js:3
+msgid "Password must contain at least one upper case letter"
+msgstr ""
+
+#: react/build/assets/Dkha7hOO.js:3
+msgid "Password must contain at least one lower case letter"
+msgstr ""
+
+#: react/build/assets/Dkha7hOO.js:3
+msgid "Password must contain at least one number"
+msgstr ""
+
+#: react/build/assets/Dkha7hOO.js:3
+msgid "Password must contain at least one special character"
+msgstr ""
+
+#: react/build/assets/Dkha7hOO.js:3
+msgid "Please read and accept the Legal Terms"
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:1
+msgid "Saving..."
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:1
+msgid "Form contains errors"
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:1
+msgid "You have unsaved changes"
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:1
+msgid "Save changes"
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:1
+msgid "Currently logged in as"
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:1
+msgid "Log Out"
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:1
+msgid "Settings have been saved"
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:1
+msgid "There was an error updating your settings"
+msgstr ""
+
+#. translators: this text is taken directly from FireFox's native pop-up for unsaved changes. Please use that text for your language.
+#: react/build/assets/gmgNWZMz.js:3
+msgid "This page is asking you to confirm that you want to leave — information you’ve entered may not be saved."
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:3
+msgid "Account settings"
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:3
+msgid "Change Password"
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:3
+msgid "Monthly summary"
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:3
+msgid "Receive monthly summary"
+msgstr ""
+
+#: react/build/assets/gmgNWZMz.js:3
+msgid "Custom e-mail for the monthly summary"
+msgstr ""
+
+#. translators: variable is number the user's email address
+#: react/build/assets/gmgNWZMz.js:5
+#, js-format
+msgid "When this field is empty the monthly summary is sent to %1$s"
+msgstr ""
+
+#: react/build/assets/J3XbFqv-.js:2
+msgid "Route is not set"
+msgstr ""
+
+#: react/build/assets/J3XbFqv-.js:2
+msgid "Payload is not set"
+msgstr ""
+
+#: react/build/assets/J3XbFqv-.js:2
+msgid "Route not set. Please use setRoute before using setFilters."
+msgstr ""
+
+#: react/build/assets/J3XbFqv-.js:2
+msgid "An error occurred"
+msgstr ""
+
+#: react/build/assets/J3XbFqv-.js:2
+msgid "Uh-oh! We stumbled upon an error."
+msgstr ""
+
+#: react/build/assets/J3XbFqv-.js:2
+msgid "Error was copied"
+msgstr ""
+
+#: react/build/assets/J3XbFqv-.js:2
+#: react/build/assets/J3XbFqv-.js:4
+msgid "Copy Error"
+msgstr ""
+
+#: react/build/assets/J3XbFqv-.js:2
+msgid "We're sorry for the trouble. Please take a moment to report this issue on the WordPress forums so we can work on fixing it. Here’s how you can report the issue:"
+msgstr ""
+
+#. translators: variable is translated string of `Copy Error`
+#: react/build/assets/J3XbFqv-.js:4
+#, js-format
+msgid "Copy the error details by clicking the %1$s button above."
+msgstr ""
+
+#: react/build/assets/J3XbFqv-.js:4
+msgid "Navigate to the Support Forum."
+msgstr ""
+
+#: react/build/assets/J3XbFqv-.js:4
+msgid "If you haven’t already, log in to your WordPress.org account or create a new account."
+msgstr ""
+
+#. translators: variable is a string that should not be translated
+#: react/build/assets/J3XbFqv-.js:6
+#, js-format
+msgid "Once logged in, click on %1$s."
+msgstr ""
+
+#. translators: variable is a string that should not be translated
+#: react/build/assets/J3XbFqv-.js:8
+#, js-format
+msgid "Title: Mention %1$s along with a brief hint of the error."
+msgstr ""
+
+#: react/build/assets/J3XbFqv-.js:8
+msgid "Description: Paste the copied error details and explain what you were doing when the error occurred."
+msgstr ""
+
+#. translators: variable is a string that should not be translated
+#: react/build/assets/J3XbFqv-.js:10
+#, js-format
+msgid "Click %1$s to post your topic. Our team will look into the issue and provide assistance."
+msgstr ""

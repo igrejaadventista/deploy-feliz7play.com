@@ -64,13 +64,12 @@ function bodhi_svgs_save_featured_image_meta( $post_id, $post, $update ) {
 		return $post_id;
 	}
 
-	// Check if the new value is different from the existing value
-	$existing_value = get_post_meta( $post_id, 'inline_featured_image', true );
-	$new_value = isset( $_POST['inline_featured_image'] ) ? 1 : 0;
-
-	if ( $new_value != $existing_value ) {
-		// Update the meta value only if it has changed
-		update_post_meta( $post_id, 'inline_featured_image', $new_value );
+	// If checkbox is checked, add/update meta
+	if ( isset( $_POST['inline_featured_image'] ) ) {
+		update_post_meta( $post_id, 'inline_featured_image', 1 );
+	} else {
+		// If unchecked, delete the meta entirely
+		delete_post_meta( $post_id, 'inline_featured_image' );
 	}
 }
 add_action( 'save_post', 'bodhi_svgs_save_featured_image_meta', 10, 3 );
@@ -133,13 +132,9 @@ function bodhi_svgs_update_featured_image_meta($post_id, $value) {
  * Handle the AJAX request for updating featured image inline status
  */
 function bodhi_svgs_featured_image_inline_toggle() {
-    // Verify nonce and permissions
+    // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'svg-support-featured')) {
         wp_send_json_error('Invalid nonce');
-    }
-
-    if (!current_user_can('edit_posts')) {
-        wp_send_json_error('Insufficient permissions');
     }
 
     // Validate and sanitize input
@@ -150,12 +145,16 @@ function bodhi_svgs_featured_image_inline_toggle() {
     $post_id = intval($_POST['post_id']);
     $checked = ($_POST['checked'] === 'true');
 
+    // Verify the current user can edit this specific post
+    if (!current_user_can('edit_post', $post_id)) {
+        wp_send_json_error('Insufficient permissions');
+    }
+
     // Update the meta safely
     bodhi_svgs_update_featured_image_meta($post_id, $checked);
 
     wp_send_json_success();
 }
 
-// Hook the AJAX actions for both logged-in and non-logged-in users
+// Hook the AJAX action for logged-in users only
 add_action('wp_ajax_bodhi_svgs_featured_image_inline_toggle', 'bodhi_svgs_featured_image_inline_toggle');
-add_action('wp_ajax_nopriv_bodhi_svgs_featured_image_inline_toggle', 'bodhi_svgs_featured_image_inline_toggle');

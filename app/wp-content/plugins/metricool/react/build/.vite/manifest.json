@@ -1,0 +1,163 @@
+{
+  "_ATGErG6T.js": {
+    "file": "assets/ATGErG6T.js",
+    "name": "ListItem",
+    "imports": [
+      "src/main.tsx",
+      "_BVfD-bny.js"
+    ]
+  },
+  "_B6N17mhK.js": {
+    "file": "assets/B6N17mhK.js",
+    "name": "AccountTile",
+    "imports": [
+      "src/main.tsx",
+      "_Dkha7hOO.js",
+      "_BVfD-bny.js"
+    ]
+  },
+  "_BQ9nIB57.js": {
+    "file": "assets/BQ9nIB57.js",
+    "name": "AuthorizedLayout",
+    "imports": [
+      "src/main.tsx",
+      "_BVfD-bny.js"
+    ]
+  },
+  "_BVfD-bny.js": {
+    "file": "assets/BVfD-bny.js",
+    "name": "purify.es",
+    "imports": [
+      "src/main.tsx"
+    ]
+  },
+  "_BlatK_BK.js": {
+    "file": "assets/BlatK_BK.js",
+    "name": "OnboardingForm",
+    "imports": [
+      "src/main.tsx",
+      "_BVfD-bny.js",
+      "_Dkha7hOO.js"
+    ]
+  },
+  "_CI865kMO.js": {
+    "file": "assets/CI865kMO.js",
+    "name": "useAuthenticationData",
+    "imports": [
+      "src/main.tsx",
+      "_Dkha7hOO.js",
+      "_BVfD-bny.js"
+    ]
+  },
+  "_Dkha7hOO.js": {
+    "file": "assets/Dkha7hOO.js",
+    "name": "UserSettingsSchema",
+    "imports": [
+      "src/main.tsx",
+      "_BVfD-bny.js"
+    ]
+  },
+  "assets/fonts/Inter-Variable.woff2": {
+    "file": "assets/DiVDrmQJ.woff2",
+    "src": "assets/fonts/Inter-Variable.woff2"
+  },
+  "assets/fonts/Nunito-Variable.woff2": {
+    "file": "assets/BP9RvTzy.woff2",
+    "src": "assets/fonts/Nunito-Variable.woff2"
+  },
+  "node_modules/@tanstack/router-devtools-core/dist/BaseTanStackRouterDevtoolsPanel-SWyE65Is.js": {
+    "file": "assets/DVXVT7qf.js",
+    "name": "BaseTanStackRouterDevtoolsPanel-SWyE65Is",
+    "src": "node_modules/@tanstack/router-devtools-core/dist/BaseTanStackRouterDevtoolsPanel-SWyE65Is.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.tsx"
+    ]
+  },
+  "src/main.tsx": {
+    "file": "assets/J3XbFqv-.js",
+    "name": "main",
+    "src": "src/main.tsx",
+    "isEntry": true,
+    "dynamicImports": [
+      "node_modules/@tanstack/router-devtools-core/dist/BaseTanStackRouterDevtoolsPanel-SWyE65Is.js",
+      "src/routes/_authorized/route.lazy.tsx",
+      "src/routes/index.lazy.tsx",
+      "src/routes/_authorized/settings/route.lazy.tsx",
+      "src/routes/_authorized/settings/connections.lazy.tsx",
+      "src/routes/_authorized/settings/account.lazy.tsx"
+    ],
+    "css": [
+      "assets/Br94v6bi.css"
+    ],
+    "assets": [
+      "assets/DiVDrmQJ.woff2",
+      "assets/BP9RvTzy.woff2"
+    ]
+  },
+  "src/routes/_authorized/route.lazy.tsx": {
+    "file": "assets/CrTmfYUg.js",
+    "name": "route.lazy",
+    "src": "src/routes/_authorized/route.lazy.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.tsx",
+      "_BQ9nIB57.js",
+      "_BVfD-bny.js"
+    ]
+  },
+  "src/routes/_authorized/settings/account.lazy.tsx": {
+    "file": "assets/gmgNWZMz.js",
+    "name": "account.lazy",
+    "src": "src/routes/_authorized/settings/account.lazy.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.tsx",
+      "_Dkha7hOO.js",
+      "_BVfD-bny.js",
+      "_CI865kMO.js"
+    ]
+  },
+  "src/routes/_authorized/settings/connections.lazy.tsx": {
+    "file": "assets/5NCLWOq6.js",
+    "name": "connections.lazy",
+    "src": "src/routes/_authorized/settings/connections.lazy.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.tsx",
+      "_BlatK_BK.js",
+      "_BVfD-bny.js",
+      "_Dkha7hOO.js",
+      "_B6N17mhK.js"
+    ]
+  },
+  "src/routes/_authorized/settings/route.lazy.tsx": {
+    "file": "assets/CxqXJQAD.js",
+    "name": "route.lazy",
+    "src": "src/routes/_authorized/settings/route.lazy.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.tsx",
+      "_BVfD-bny.js",
+      "_BlatK_BK.js",
+      "_Dkha7hOO.js",
+      "_ATGErG6T.js"
+    ]
+  },
+  "src/routes/index.lazy.tsx": {
+    "file": "assets/Dc4ANLcp.js",
+    "name": "index.lazy",
+    "src": "src/routes/index.lazy.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.tsx",
+      "_BVfD-bny.js",
+      "_Dkha7hOO.js",
+      "_BlatK_BK.js",
+      "_BQ9nIB57.js",
+      "_CI865kMO.js",
+      "_B6N17mhK.js",
+      "_ATGErG6T.js"
+    ]
+  }
+}

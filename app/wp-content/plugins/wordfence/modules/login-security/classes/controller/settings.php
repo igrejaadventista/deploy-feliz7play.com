@@ -4,10 +4,17 @@ namespace WordfenceLS;
 
 use WordfenceLS\Settings\Model_DB;
 use WordfenceLS\Settings\Model_WPOptions;
+use WordfenceLS\Utility_Number;
 
 class Controller_Settings {
 	//Configurable
 	const OPTION_XMLRPC_ENABLED = 'xmlrpc-enabled';
+	const OPTION_ENABLE_2FA = 'enable-2fa';
+	const OPTION_ENABLE_PASSKEYS = 'enable-passkeys';
+	const DEFAULT_ENABLE_2FA = false;
+	const DEFAULT_ENABLE_PASSKEYS = false;
+	const LEGACY_DEFAULT_ENABLE_2FA = true;
+	const LEGACY_DEFAULT_ENABLE_PASSKEYS = true;
 	const OPTION_2FA_WHITELISTED = 'whitelisted';
 	const OPTION_IP_SOURCE = 'ip-source';
 	const OPTION_IP_TRUSTED_PROXIES = 'ip-trusted-proxies';
@@ -15,8 +22,12 @@ class Controller_Settings {
 	const OPTION_REQUIRE_2FA_GRACE_PERIOD_ENABLED = 'require-2fa-grace-period-enabled';
 	const OPTION_REQUIRE_2FA_GRACE_PERIOD = 'require-2fa-grace-period';
 	const OPTION_REQUIRE_2FA_USER_GRACE_PERIOD = '2fa-user-grace-period';
+	const OPTION_PASSKEY_ALLOWED_HOSTNAMES = 'passkey-allowed-hostnames';
+	const OPTION_PASSKEY_RELYING_PARTY_OVERRIDE = 'passkey-relying-party-override';
+	const OPTION_PASSKEY_SIGN_COUNT_MODE = 'passkey-sign-count-mode';
 	const OPTION_REMEMBER_DEVICE_ENABLED = 'remember-device';
 	const OPTION_REMEMBER_DEVICE_DURATION = 'remember-device-duration';
+	const OPTION_ALWAYS_SHOW_LOGIN_SECURITY_MENU = 'always-show-login-security-menu';
 	const OPTION_ALLOW_XML_RPC = 'allow-xml-rpc';
 	const OPTION_ENABLE_AUTH_CAPTCHA = 'enable-auth-captcha';
 	const OPTION_CAPTCHA_TEST_MODE = 'recaptcha-test-mode';
@@ -25,6 +36,7 @@ class Controller_Settings {
 	const OPTION_RECAPTCHA_THRESHOLD = 'recaptcha-threshold';
 	const OPTION_DELETE_ON_DEACTIVATION = 'delete-deactivation';
 	const OPTION_PREFIX_REQUIRED_2FA_ROLE = 'required-2fa-role';
+	const OPTION_PREFIX_REQUIRED_PASSKEY_ROLE = 'required-passkey-role';
 	const OPTION_ENABLE_WOOCOMMERCE_INTEGRATION = 'enable-woocommerce-integration';
 	const OPTION_ENABLE_WOOCOMMERCE_ACCOUNT_INTEGRATION = 'enable-woocommerce-account-integration';
 	const OPTION_ENABLE_SHORTCODE = 'enable-shortcode';
@@ -45,6 +57,10 @@ class Controller_Settings {
 	const OPTION_SCHEMA_VERSION = 'schema-version';
 	const OPTION_USER_COUNT_QUERY_STATE = 'user-count-query-state';
 	const OPTION_DISABLE_TEMPORARY_TABLES = 'disable-temporary-tables';
+	const OPTION_LAST_PASSKEY_RP = 'last-passkey-rp';
+	const OPTION_PUBLIC_SUFFIX_LIST = 'public-suffix-list';
+	const OPTION_PUBLIC_SUFFIX_LIST_ETAG = 'public-suffix-list-etag';
+	const OPTION_PASSKEY_HOSTNAME_WARNING_VERSION = 'passkey-hostname-warning-version';
 
 	const DEFAULT_REQUIRE_2FA_USER_GRACE_PERIOD = 10;
 	const MAX_REQUIRE_2FA_USER_GRACE_PERIOD = 99;
@@ -52,6 +68,14 @@ class Controller_Settings {
 	const STATE_2FA_DISABLED = 'disabled';
 	const STATE_2FA_OPTIONAL = 'optional';
 	const STATE_2FA_REQUIRED = 'required';
+	
+	const STATE_PASSKEY_DISABLED = 'passkey_disabled';
+	const STATE_PASSKEY_OPTIONAL = 'passkey_optional';
+	const STATE_PASSKEY_REQUIRED = 'passkey_required';
+
+	const PASSKEY_SIGN_COUNT_ALLOW = 'allow';
+	const PASSKEY_SIGN_COUNT_REJECT_LOWER = 'reject-lower';
+	const PASSKEY_SIGN_COUNT_REJECT_LOWER_AND_ZERO = 'reject-lower-and-zero';
 	
 	protected $_settingsStorage;
 	
@@ -73,44 +97,69 @@ class Controller_Settings {
 			$settingsStorage = new Model_DB();
 		}
 		$this->_settingsStorage = $settingsStorage;
-		$this->_migrate_admin_2fa_requirements_to_roles();
+	}
+	
+	/**
+	 * Returns a key/value array of all defaults. The value is the storage-ready value (e.g., a JSON string for array
+	 * settings).
+	 */
+	protected function _defaults() {
+		return array(
+			self::OPTION_ENABLE_2FA => self::DEFAULT_ENABLE_2FA,
+			self::OPTION_ENABLE_PASSKEYS => self::DEFAULT_ENABLE_PASSKEYS,
+			self::OPTION_XMLRPC_ENABLED => true,
+			self::OPTION_2FA_WHITELISTED => '',
+			self::OPTION_IP_SOURCE => Model_Request::IP_SOURCE_AUTOMATIC,
+			self::OPTION_IP_TRUSTED_PROXIES => '',
+			self::OPTION_REQUIRE_2FA_ADMIN => false,
+			self::OPTION_REQUIRE_2FA_GRACE_PERIOD_ENABLED => false,
+			self::OPTION_REQUIRE_2FA_USER_GRACE_PERIOD => self::DEFAULT_REQUIRE_2FA_USER_GRACE_PERIOD,
+			self::OPTION_PASSKEY_RELYING_PARTY_OVERRIDE => '',
+			self::OPTION_PASSKEY_SIGN_COUNT_MODE => self::PASSKEY_SIGN_COUNT_REJECT_LOWER,
+			self::OPTION_GLOBAL_NOTICES => '[]',
+			self::OPTION_REMEMBER_DEVICE_ENABLED => false,
+			self::OPTION_REMEMBER_DEVICE_DURATION => 30 * 86400,
+			self::OPTION_ALWAYS_SHOW_LOGIN_SECURITY_MENU => true,
+			self::OPTION_ALLOW_XML_RPC => true,
+			self::OPTION_ENABLE_AUTH_CAPTCHA => false,
+			self::OPTION_CAPTCHA_TEST_MODE => false,
+			self::OPTION_RECAPTCHA_SITE_KEY => '',
+			self::OPTION_RECAPTCHA_SECRET => '',
+			self::OPTION_CAPTCHA_STATS => '{"counts": [0,0,0,0,0,0,0,0,0,0,0], "avg": 0}',
+			self::OPTION_RECAPTCHA_THRESHOLD => 0.5,
+			self::OPTION_LAST_SECRET_REFRESH => 0,
+			self::OPTION_DELETE_ON_DEACTIVATION => false,
+			self::OPTION_ENABLE_WOOCOMMERCE_INTEGRATION => false,
+			self::OPTION_ENABLE_WOOCOMMERCE_ACCOUNT_INTEGRATION => false,
+			self::OPTION_ENABLE_SHORTCODE => false,
+			self::OPTION_ENABLE_LOGIN_HISTORY_COLUMNS => true,
+			self::OPTION_STACK_UI_COLUMNS => true,
+			self::OPTION_SCHEMA_VERSION => false,
+			self::OPTION_USER_COUNT_QUERY_STATE => false,
+			self::OPTION_DISABLE_TEMPORARY_TABLES => false,
+			self::OPTION_USE_NTP => true,
+			self::OPTION_ALLOW_DISABLING_NTP => false,
+			self::OPTION_NTP_FAILURE_COUNT => 0,
+			self::OPTION_NTP_OFFSET => 0,
+			self::OPTION_DISMISSED_FRESH_INSTALL_MODAL => false,
+			self::OPTION_PASSKEY_HOSTNAME_WARNING_VERSION => 0,
+		);
 	}
 	
 	public function set_defaults() {
-		$this->_settingsStorage->set_multiple(array(
-			self::OPTION_XMLRPC_ENABLED => array('value' => true, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_2FA_WHITELISTED => array('value' => '', 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false), 
-			self::OPTION_IP_SOURCE => array('value' => Model_Request::IP_SOURCE_AUTOMATIC, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_IP_TRUSTED_PROXIES => array('value' => '', 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_REQUIRE_2FA_ADMIN => array('value' => false, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_REQUIRE_2FA_GRACE_PERIOD_ENABLED => array('value' => false, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_REQUIRE_2FA_USER_GRACE_PERIOD => array('value' => self::DEFAULT_REQUIRE_2FA_USER_GRACE_PERIOD, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_GLOBAL_NOTICES => array('value' => '[]', 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_REMEMBER_DEVICE_ENABLED => array('value' => false, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_REMEMBER_DEVICE_DURATION => array('value' => (30 * 86400), 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_ALLOW_XML_RPC => array('value' => true, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_ENABLE_AUTH_CAPTCHA => array('value' => false, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_CAPTCHA_STATS => array('value' => '{"counts":[0,0,0,0,0,0,0,0,0,0,0],"avg":0}', 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_RECAPTCHA_THRESHOLD => array('value' => 0.5, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_LAST_SECRET_REFRESH => array('value' => 0, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_DELETE_ON_DEACTIVATION => array('value' => false, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_ENABLE_WOOCOMMERCE_INTEGRATION => array('value' => false, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_ENABLE_WOOCOMMERCE_ACCOUNT_INTEGRATION => array('value' => false, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_ENABLE_SHORTCODE => array('value' => false, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_ENABLE_LOGIN_HISTORY_COLUMNS => array('value' => true, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_STACK_UI_COLUMNS => array('value' => true, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_SCHEMA_VERSION => array('value' => 0, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_USER_COUNT_QUERY_STATE => array('value' => 0, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false),
-			self::OPTION_DISABLE_TEMPORARY_TABLES => array('value' => 0, 'autoload' => Model_Settings::AUTOLOAD_YES, 'allowOverwrite' => false)
-		));
+		$defaults = $this->_defaults();
+		$defaults = array_column(array_map(function($k, $v) {
+			return array('k' => $k, 'v' => array(
+				'value' => $v,
+				'autoload' => Model_Settings::AUTOLOAD_YES,
+				'allowOverwrite' => false,
+			));
+			}, array_keys($defaults), array_values($defaults)), 'v', 'k');
+		$this->_settingsStorage->set_multiple($defaults);
 	}
 	
 	public function set($key, $value, $already_validated = false) {
 		return $this->set_multiple(array($key => $value), $already_validated);
-	}
-	
-	public function set_array($key, $value, $already_validated = false) {
-		return $this->set_multiple(array($key => json_encode($value)), $already_validated);
 	}
 	
 	public function set_multiple($changes, $already_validated = false) {
@@ -119,6 +168,7 @@ class Controller_Settings {
 		}
 		$changes = $this->clean_multiple($changes);
 		$changes = $this->preprocess_multiple($changes);
+		$this->add_passkey_hostname_warning_version_update($changes);
 		$this->_settingsStorage->set_multiple($changes);
 		return true;
 	}
@@ -128,7 +178,7 @@ class Controller_Settings {
 	}
 	
 	public function get_bool($key, $default = false) {
-		return $this->_truthy_to_bool($this->get($key, $default));
+		return Utility_Number::truthyToBool($this->get($key, $default));
 	}
 	
 	public function get_int($key, $default = 0) {
@@ -154,6 +204,24 @@ class Controller_Settings {
 		$this->_settingsStorage->remove($key);
 	}
 	
+	public function all() {
+		$defaults = $this->_defaults();
+		// Fresh installs persist disabled values; missing values are from legacy installs and retain the enabled behavior.
+		$defaults[self::OPTION_ENABLE_2FA] = self::LEGACY_DEFAULT_ENABLE_2FA;
+		$defaults[self::OPTION_ENABLE_PASSKEYS] = self::LEGACY_DEFAULT_ENABLE_PASSKEYS;
+		$result = $this->_settingsStorage->get_multiple($defaults);
+		if ($this->passkey_allowed_hostnames_missing()) {
+			$result[self::OPTION_PASSKEY_ALLOWED_HOSTNAMES] = implode("\n", $this->default_passkey_allowed_hostnames(Utility_URL::get_default_public_suffix_list()));
+		}
+		else {
+			$result[self::OPTION_PASSKEY_ALLOWED_HOSTNAMES] = $this->get(self::OPTION_PASSKEY_ALLOWED_HOSTNAMES, '');
+		}
+		foreach ($result as $key => &$value) {
+			$value = $this->inflate($key, $value);
+		}
+		return $result;
+	}
+	
 	/**
 	 * Validates whether a user-entered setting value is acceptable. Returns true if valid or an error message if not.
 	 *
@@ -165,9 +233,12 @@ class Controller_Settings {
 		switch ($key) {
 			//Boolean
 			case self::OPTION_XMLRPC_ENABLED:
+			case self::OPTION_ENABLE_2FA:
+			case self::OPTION_ENABLE_PASSKEYS:
 			case self::OPTION_REQUIRE_2FA_ADMIN:
 			case self::OPTION_REQUIRE_2FA_GRACE_PERIOD_ENABLED:
 			case self::OPTION_REMEMBER_DEVICE_ENABLED:
+			case self::OPTION_ALWAYS_SHOW_LOGIN_SECURITY_MENU:
 			case self::OPTION_ALLOW_XML_RPC:
 			case self::OPTION_ENABLE_AUTH_CAPTCHA:
 			case self::OPTION_CAPTCHA_TEST_MODE:
@@ -186,12 +257,13 @@ class Controller_Settings {
 			case self::OPTION_LAST_SECRET_REFRESH:
 				return is_numeric($value); //Left using is_numeric to prevent issues with existing values
 			case self::OPTION_SCHEMA_VERSION:
+			case self::OPTION_PASSKEY_HOSTNAME_WARNING_VERSION:
 				return Utility_Number::isInteger($value, 0);
 				
 			//Array
 			case self::OPTION_GLOBAL_NOTICES:
 			case self::OPTION_CAPTCHA_STATS:
-				return preg_match('/^\[.*\]$/', $value) || preg_match('/^\{.*\}$/', $value); //Only a rough JSON validation
+				return is_array($value);
 				
 			//Special
 			case self::OPTION_IP_TRUSTED_PROXIES:
@@ -200,7 +272,7 @@ class Controller_Settings {
 				$parsed = array_filter(array_map(function($s) { return trim($s); }, preg_split('/[\r\n]/', $value)));
 				foreach ($parsed as $entry) {
 					if (!Controller_Whitelist::shared()->is_valid_range($entry)) {
-						return sprintf(__('The IP/range %s is invalid.', 'wordfence'), esc_html($entry));
+						return sprintf(/* translators: IP or range */ __('The IP/range %s is invalid.', 'wordfence'), esc_html($entry));
 					}
 				}
 				return true;
@@ -209,10 +281,38 @@ class Controller_Settings {
 					return __('An invalid IP source was provided.', 'wordfence');
 				}
 				return true;
+			case self::OPTION_PASSKEY_SIGN_COUNT_MODE:
+				if (!in_array($value, self::passkey_sign_count_modes(), true)) {
+					return __('An invalid passkey sign-in counter setting was provided.', 'wordfence');
+				}
+				return true;
 			case self::OPTION_REQUIRE_2FA_GRACE_PERIOD:
 				$gracePeriodEnd = strtotime($value);
 				if ($gracePeriodEnd <= \WordfenceLS\Controller_Time::time()) {
 					return __('The grace period end time must be in the future.', 'wordfence');
+				}
+				return true;
+			case self::OPTION_PASSKEY_RELYING_PARTY_OVERRIDE:
+				$value = is_string($value) ? trim($value) : '';
+				if ($value === '') {
+					return true;
+				}
+				if (preg_match('/[\s\/\?#]/', $value) || strpos($value, '://') !== false || strpos($value, ':') !== false) {
+					return __('The passkey credential domain must be a hostname only, without a protocol, port, or path.', 'wordfence');
+				}
+				if ($value !== 'localhost' && !preg_match('/^(?=.{1,253}$)(?!-)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i', $value)) {
+					return __('The passkey credential domain must be a valid hostname.', 'wordfence');
+				}
+				return true;
+			case self::OPTION_PASSKEY_ALLOWED_HOSTNAMES:
+				$hosts = $this->parse_passkey_allowed_hostnames($value);
+				if (empty($hosts)) {
+					return __('At least one passkey login hostname must be allowed.', 'wordfence');
+				}
+				foreach ($hosts as $host) {
+					if (!$this->is_valid_passkey_hostname($host)) {
+						return sprintf(/* translators: hostname */ __('The passkey login hostname %s is invalid. Enter a hostname with an optional port, without a protocol or path.', 'wordfence'), esc_html($host));
+					}
 				}
 				return true;
 			case self::OPTION_REMEMBER_DEVICE_DURATION:
@@ -238,9 +338,12 @@ class Controller_Settings {
 					}
 					return true;
 				}
-				return sprintf(__('An error was encountered while validating the reCAPTCHA site key: %s', 'wordfence'), $response->get_error_message());
+				return sprintf(/* translators: validation error */ __('An error was encountered while validating the reCAPTCHA site key: %s', 'wordfence'), $response->get_error_message());
 			case self::OPTION_REQUIRE_2FA_USER_GRACE_PERIOD:
-				return is_numeric($value) && $value >= 0 && $value <= self::MAX_REQUIRE_2FA_USER_GRACE_PERIOD;
+				if (!is_numeric($value) || $value < 0 || $value > self::MAX_REQUIRE_2FA_USER_GRACE_PERIOD) {
+					return sprintf(/* translators: 1. Minimum number of days. 2. Maximum number of days. */ __('The grace period day limit must be between %1$d and %2$d.', 'wordfence'), 0, self::MAX_REQUIRE_2FA_USER_GRACE_PERIOD);
+				}
+				return true;
 		}
 		return true;
 	}
@@ -272,9 +375,12 @@ class Controller_Settings {
 		switch ($key) {
 			//Boolean
 			case self::OPTION_XMLRPC_ENABLED:
+			case self::OPTION_ENABLE_2FA:
+			case self::OPTION_ENABLE_PASSKEYS:
 			case self::OPTION_REQUIRE_2FA_ADMIN:
 			case self::OPTION_REQUIRE_2FA_GRACE_PERIOD_ENABLED:
 			case self::OPTION_REMEMBER_DEVICE_ENABLED:
+			case self::OPTION_ALWAYS_SHOW_LOGIN_SECURITY_MENU:
 			case self::OPTION_ALLOW_XML_RPC:
 			case self::OPTION_ENABLE_AUTH_CAPTCHA:
 			case self::OPTION_CAPTCHA_TEST_MODE:
@@ -282,23 +388,29 @@ class Controller_Settings {
 			case self::OPTION_DELETE_ON_DEACTIVATION:
 			case self::OPTION_ENABLE_WOOCOMMERCE_INTEGRATION:
 			case self::OPTION_ENABLE_WOOCOMMERCE_ACCOUNT_INTEGRATION:
-			case self::OPTION_ENABLE_SHORTCODE;
+			case self::OPTION_ENABLE_SHORTCODE:
 			case self::OPTION_ENABLE_LOGIN_HISTORY_COLUMNS:
 			case self::OPTION_STACK_UI_COLUMNS:
 			case self::OPTION_USER_COUNT_QUERY_STATE:
 			case self::OPTION_DISABLE_TEMPORARY_TABLES:
-				return $this->_truthy_to_bool($value);
+				return Utility_Number::truthyToBool($value);
 				
 			//Int
 			case self::OPTION_REMEMBER_DEVICE_DURATION:
 			case self::OPTION_LAST_SECRET_REFRESH:
 			case self::OPTION_REQUIRE_2FA_USER_GRACE_PERIOD:
 			case self::OPTION_SCHEMA_VERSION:
+			case self::OPTION_PASSKEY_HOSTNAME_WARNING_VERSION:
 				return (int) $value;
 				
 			//Float
 			case self::OPTION_RECAPTCHA_THRESHOLD:
 				return (float) $value;
+			
+			//Array
+			case self::OPTION_GLOBAL_NOTICES:
+			case self::OPTION_CAPTCHA_STATS:
+				return json_encode($value);
 			
 			//Special
 			case self::OPTION_IP_TRUSTED_PROXIES:
@@ -313,9 +425,70 @@ class Controller_Settings {
 			case self::OPTION_REQUIRE_2FA_GRACE_PERIOD:
 				$dt = $this->_parse_local_time($value);
 				return $dt->format('U');
+			case self::OPTION_PASSKEY_ALLOWED_HOSTNAMES:
+				return implode("\n", $this->parse_passkey_allowed_hostnames($value));
+			case self::OPTION_PASSKEY_RELYING_PARTY_OVERRIDE:
 			case self::OPTION_RECAPTCHA_SITE_KEY:
 			case self::OPTION_RECAPTCHA_SECRET:
 				return trim($value);
+			case self::OPTION_PASSKEY_SIGN_COUNT_MODE:
+				return in_array($value, self::passkey_sign_count_modes(), true) ? $value : self::PASSKEY_SIGN_COUNT_REJECT_LOWER;
+		}
+		return $value;
+	}
+	
+	/**
+	 * Normalizes a setting value from its saved state into the desired type.
+	 *
+	 * @param string $key
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public function inflate($key, $value) {
+		switch ($key) {
+			//Boolean
+			case self::OPTION_XMLRPC_ENABLED:
+			case self::OPTION_ENABLE_2FA:
+			case self::OPTION_ENABLE_PASSKEYS:
+			case self::OPTION_REQUIRE_2FA_ADMIN:
+			case self::OPTION_REQUIRE_2FA_GRACE_PERIOD_ENABLED:
+			case self::OPTION_REMEMBER_DEVICE_ENABLED:
+			case self::OPTION_ALWAYS_SHOW_LOGIN_SECURITY_MENU:
+			case self::OPTION_ALLOW_XML_RPC:
+			case self::OPTION_ENABLE_AUTH_CAPTCHA:
+			case self::OPTION_CAPTCHA_TEST_MODE:
+			case self::OPTION_DISMISSED_FRESH_INSTALL_MODAL:
+			case self::OPTION_DELETE_ON_DEACTIVATION:
+			case self::OPTION_ENABLE_WOOCOMMERCE_INTEGRATION:
+			case self::OPTION_ENABLE_WOOCOMMERCE_ACCOUNT_INTEGRATION:
+			case self::OPTION_ENABLE_SHORTCODE:
+			case self::OPTION_ENABLE_LOGIN_HISTORY_COLUMNS:
+			case self::OPTION_STACK_UI_COLUMNS:
+			case self::OPTION_USER_COUNT_QUERY_STATE:
+			case self::OPTION_DISABLE_TEMPORARY_TABLES:
+				return Utility_Number::truthyToBool($value);
+			
+			//Int
+			case self::OPTION_REMEMBER_DEVICE_DURATION:
+			case self::OPTION_LAST_SECRET_REFRESH:
+			case self::OPTION_REQUIRE_2FA_USER_GRACE_PERIOD:
+			case self::OPTION_SCHEMA_VERSION:
+				return (int) $value;
+			
+			//Float
+			case self::OPTION_RECAPTCHA_THRESHOLD:
+				return (float) $value;
+			
+			//Array
+			case self::OPTION_GLOBAL_NOTICES:
+			case self::OPTION_CAPTCHA_STATS:
+				return json_decode($value, true);
+			
+			//Special
+			case self::OPTION_IP_TRUSTED_PROXIES:
+			case self::OPTION_2FA_WHITELISTED:
+				$value = !is_string($value) ? '' : $value;
+				return implode("\n", array_filter(array_map(function($s) { return trim($s); }, preg_split('/[\r\n]/', $value))));
 		}
 		return $value;
 	}
@@ -341,6 +514,422 @@ class Controller_Settings {
 
 	public function get_user_2fa_grace_period() {
 		return $this->get_int(self::OPTION_REQUIRE_2FA_USER_GRACE_PERIOD, self::DEFAULT_REQUIRE_2FA_USER_GRACE_PERIOD);
+	}
+
+	/**
+	 * Returns whether two-factor authentication is globally enabled.
+	 * Missing values are treated as enabled until the upgrade migration initializes them.
+	 *
+	 * @return bool
+	 */
+	public function is_2fa_enabled() {
+		return $this->get_bool(self::OPTION_ENABLE_2FA, self::LEGACY_DEFAULT_ENABLE_2FA);
+	}
+
+	/**
+	 * Returns whether passkeys are globally enabled.
+	 * Missing values are treated as enabled until the upgrade migration initializes them.
+	 *
+	 * @return bool
+	 */
+	public function are_passkeys_enabled() {
+		return $this->get_bool(self::OPTION_ENABLE_PASSKEYS, self::LEGACY_DEFAULT_ENABLE_PASSKEYS);
+	}
+	
+	private function get_required_passkey_role_key($role) {
+		return implode('.', array(self::OPTION_PREFIX_REQUIRED_PASSKEY_ROLE, $role));
+	}
+	
+	public function get_required_passkey_role_activation_time($role) {
+		if (is_multisite() && $role !== 'super-admin') {
+			return false;
+		}
+		$time = $this->get_int($this->get_required_passkey_role_key($role), -1);
+		if ($time < 0) { return false; }
+		return $time;
+	}
+	
+	public function get_user_passkey_grace_period() {
+		return $this->get_user_2fa_grace_period();
+	}
+
+	/**
+	 * Returns the valid passkey sign-in counter policy identifiers.
+	 *
+	 * @return string[]
+	 */
+	public static function passkey_sign_count_modes() {
+		return array(
+			self::PASSKEY_SIGN_COUNT_ALLOW,
+			self::PASSKEY_SIGN_COUNT_REJECT_LOWER,
+			self::PASSKEY_SIGN_COUNT_REJECT_LOWER_AND_ZERO,
+		);
+	}
+
+	/**
+	 * Returns the configured passkey sign-in counter policy.
+	 *
+	 * @return string
+	 */
+	public function passkey_sign_count_mode() {
+		$mode = $this->get(self::OPTION_PASSKEY_SIGN_COUNT_MODE, self::PASSKEY_SIGN_COUNT_REJECT_LOWER);
+		return in_array($mode, self::passkey_sign_count_modes(), true) ? $mode : self::PASSKEY_SIGN_COUNT_REJECT_LOWER;
+	}
+
+	/**
+	 * Returns the default hostnames allowed to complete passkey registration and login.
+	 *
+	 * @param string[]|null $publicSuffixList Optional public suffix list override.
+	 * @return string[]
+	 */
+	public function default_passkey_allowed_hostnames($publicSuffixList = null) {
+		$hosts = array();
+		foreach (array(site_url(), home_url()) as $url) {
+			$host = $this->passkey_allowed_hostname_from_url($url);
+			if ($host !== '') {
+				$hosts[] = $host;
+			}
+		}
+
+		$rpOverride = $this->normalize_passkey_hostname($this->get(self::OPTION_PASSKEY_RELYING_PARTY_OVERRIDE, ''));
+		if ($rpOverride !== '' && $this->is_valid_passkey_hostname($rpOverride)) {
+			$hosts[] = $rpOverride;
+		}
+
+		$rpHost = Utility_URL::reduce_to_public_suffix_plus_one(home_url(), $publicSuffixList);
+		if ($rpHost === '') {
+			$rpHost = Utility_URL::reduce_to_public_suffix_plus_one(site_url(), $publicSuffixList);
+		}
+		if ($rpHost !== '') {
+			if ($this->should_add_www_passkey_hostname($rpHost)) {
+				$hosts[] = 'www.' . preg_replace('/^www\./i', '', $rpHost);
+			}
+			$hosts[] = $rpHost;
+		}
+
+		return $this->normalize_unique_passkey_allowed_hostnames($hosts);
+	}
+
+	/**
+	 * Returns the configured hostnames allowed to complete passkey registration and login.
+	 *
+	 * @return string[]
+	 */
+	public function passkey_allowed_hostnames() {
+		if ($this->passkey_allowed_hostnames_missing()) {
+			return $this->default_passkey_allowed_hostnames();
+		}
+		$value = $this->get(self::OPTION_PASSKEY_ALLOWED_HOSTNAMES, '');
+		return $this->parse_passkey_allowed_hostnames($value);
+	}
+
+	/**
+	 * Returns whether the allowed passkey hostnames option has never been stored.
+	 *
+	 * @return bool
+	 */
+	public function passkey_allowed_hostnames_missing() {
+		$missing = new \stdClass();
+		return $this->get(self::OPTION_PASSKEY_ALLOWED_HOSTNAMES, $missing) === $missing;
+	}
+
+	/**
+	 * Returns the hostnames that would be stored after the first successful passkey registration.
+	 *
+	 * @param string $rpId RP ID used to create the passkey.
+	 * @param string $origin Browser-reported registration origin URL, or a hostname for previewing pending registration.
+	 * @return string[]
+	 */
+	public function initial_passkey_allowed_hostnames($rpId, $origin) {
+		$hosts = $this->default_passkey_allowed_hostnames();
+		$rpId = $this->normalize_passkey_hostname($rpId);
+		if ($this->is_valid_passkey_hostname($rpId)) {
+			$hosts[] = $rpId;
+		}
+
+		$originHost = $this->passkey_allowed_hostname_from_url($origin);
+		if ($originHost === '') {
+			$originHost = $this->normalize_passkey_allowed_hostname($origin);
+		}
+		if ($this->is_valid_passkey_hostname($originHost)) {
+			$hosts[] = $originHost;
+		}
+
+		return $this->normalize_unique_passkey_allowed_hostnames($hosts);
+	}
+
+	/**
+	 * Stores the initial allowed passkey hostnames after the first successful passkey registration.
+	 *
+	 * @param string $rpId RP ID used to create the passkey.
+	 * @param string $origin Browser-reported registration origin.
+	 * @return void
+	 */
+	public function set_initial_passkey_allowed_hostnames($rpId, $origin) {
+		if (!$this->passkey_allowed_hostnames_missing()) {
+			return;
+		}
+
+		$hosts = $this->initial_passkey_allowed_hostnames($rpId, $origin);
+		if (empty($hosts)) {
+			return;
+		}
+
+		$this->_settingsStorage->set(self::OPTION_PASSKEY_ALLOWED_HOSTNAMES, implode("\n", $hosts), Model_Settings::AUTOLOAD_YES, false);
+		$this->bump_passkey_hostname_warning_version();
+	}
+
+	/**
+	 * Adds the default allowed passkey hostnames to a pending settings save when the option has not been stored yet.
+	 *
+	 * @param array &$settings Pending settings changes.
+	 * @return void
+	 */
+	private function add_default_passkey_allowed_hostnames_to_settings_if_missing(&$settings) {
+		if (!$this->passkey_allowed_hostnames_missing() || array_key_exists(self::OPTION_PASSKEY_ALLOWED_HOSTNAMES, $settings)) {
+			return;
+		}
+
+		$hosts = $this->default_passkey_allowed_hostnames();
+		if (empty($hosts)) {
+			return;
+		}
+
+		$settings[self::OPTION_PASSKEY_ALLOWED_HOSTNAMES] = implode("\n", $hosts);
+	}
+
+	/**
+	 * Adds a hostname warning version bump when passkey hostname settings are changed.
+	 *
+	 * @param array &$settings Pending cleaned settings.
+	 * @return void
+	 */
+	private function add_passkey_hostname_warning_version_update(&$settings) {
+		$trackedSettings = array(
+			self::OPTION_PASSKEY_ALLOWED_HOSTNAMES,
+			self::OPTION_PASSKEY_RELYING_PARTY_OVERRIDE,
+		);
+
+		foreach ($trackedSettings as $key) {
+			if (!array_key_exists($key, $settings)) {
+				continue;
+			}
+
+			$missing = new \stdClass();
+			if ($this->get($key, $missing) !== $settings[$key]) {
+				$settings[self::OPTION_PASSKEY_HOSTNAME_WARNING_VERSION] = $this->get_int(self::OPTION_PASSKEY_HOSTNAME_WARNING_VERSION) + 1;
+				return;
+			}
+		}
+	}
+
+	/**
+	 * Increments the passkey hostname warning version.
+	 *
+	 * @return void
+	 */
+	private function bump_passkey_hostname_warning_version() {
+		$this->_settingsStorage->set(self::OPTION_PASSKEY_HOSTNAME_WARNING_VERSION, $this->get_int(self::OPTION_PASSKEY_HOSTNAME_WARNING_VERSION) + 1);
+	}
+
+	/**
+	 * Parses a newline-delimited hostname list into normalized hostnames.
+	 *
+	 * @param string|string[] $value Hostname list.
+	 * @return string[]
+	 */
+	private function parse_passkey_allowed_hostnames($value) {
+		if (is_array($value)) {
+			$items = $value;
+		}
+		else {
+			$value = is_string($value) ? $value : '';
+			$items = preg_split('/[\r\n]/', $value);
+		}
+		return $this->normalize_unique_passkey_allowed_hostnames($items);
+	}
+
+	/**
+	 * Normalizes hostnames and removes duplicates while preserving first-seen order.
+	 *
+	 * @param string[] $hosts Hostnames.
+	 * @return string[]
+	 */
+	private function normalize_unique_passkey_allowed_hostnames($hosts) {
+		$normalized = array();
+		foreach ($hosts as $host) {
+			$original = is_string($host) ? strtolower(trim($host)) : '';
+			$host = $this->normalize_passkey_allowed_hostname($host);
+			if ($host === '' && $original !== '') {
+				// Preserve invalid entries so validation fails instead of silently dropping part of the submitted list.
+				$host = $original;
+			}
+			if ($host !== '') {
+				$normalized[$host] = $host;
+			}
+		}
+		return array_values($normalized);
+	}
+
+	/**
+	 * Parses a configured passkey hostname with an optional port.
+	 *
+	 * IPv6 literals may be entered bare when no port is present, but are normalized to brackets for storage.
+	 *
+	 * @param string $value Configured hostname entry.
+	 * @return array|false Parsed host, optional port, and normalized entry, or false when invalid.
+	 */
+	public function parse_passkey_allowed_hostname($value) {
+		if (!is_string($value)) {
+			return false;
+		}
+
+		$value = strtolower(trim($value));
+		if ($value === '' || preg_match('/[\s\/\?#@]/', $value) || strpos($value, '://') !== false) {
+			return false;
+		}
+
+		$host = '';
+		$port = null;
+		if (substr($value, 0, 1) === '[') {
+			if (!preg_match('/^\[([^\]]+)\](?::([0-9]+))?$/', $value, $matches)) {
+				return false;
+			}
+			$host = $matches[1];
+			if (!filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+				return false;
+			}
+			if (isset($matches[2]) && $matches[2] !== '') {
+				$port = (int) $matches[2];
+			}
+		}
+		else if (filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+			$host = $value;
+		}
+		else {
+			if (substr_count($value, ':') > 1) {
+				return false;
+			}
+			if (strpos($value, ':') !== false) {
+				list($host, $portValue) = explode(':', $value, 2);
+				if ($portValue === '' || preg_match('/^[0-9]+$/D', $portValue) !== 1) {
+					return false;
+				}
+				$port = (int) $portValue;
+			}
+			else {
+				$host = $value;
+			}
+		}
+
+		$host = $this->normalize_passkey_hostname($host);
+		if (!$this->is_valid_passkey_hostname_only($host) || ($port !== null && ($port < 1 || $port > 65535))) {
+			return false;
+		}
+		if ($port === 443) {
+			$port = null;
+		}
+
+		$displayHost = filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? '[' . $host . ']' : $host;
+		return array(
+			'host' => $host,
+			'port' => $port,
+			'entry' => $displayHost . ($port === null ? '' : ':' . $port),
+		);
+	}
+
+	/**
+	 * Normalizes a configured passkey hostname and optional port for storage.
+	 *
+	 * @param string $value Configured hostname entry.
+	 * @return string Normalized entry, or an empty string when invalid.
+	 */
+	private function normalize_passkey_allowed_hostname($value) {
+		$parsed = $this->parse_passkey_allowed_hostname($value);
+		return is_array($parsed) ? $parsed['entry'] : '';
+	}
+
+	/**
+	 * Normalizes a hostname without a port for comparison and storage.
+	 *
+	 * @param string $host Hostname.
+	 * @return string
+	 */
+	private function normalize_passkey_hostname($host) {
+		if (!is_string($host)) {
+			return '';
+		}
+		$host = strtolower(rtrim(trim($host), '.'));
+		$unbracketed = trim($host, '[]');
+		if (filter_var($unbracketed, FILTER_VALIDATE_IP)) {
+			return $unbracketed;
+		}
+		return $host;
+	}
+
+	/**
+	 * Returns whether a base hostname should also include a www-prefixed default.
+	 *
+	 * @param string $host Hostname.
+	 * @return bool
+	 */
+	private function should_add_www_passkey_hostname($host) {
+		$host = $this->normalize_passkey_hostname($host);
+		return $host !== ''
+			&& $host !== 'localhost'
+			&& strpos($host, '.') !== false
+			&& !filter_var(trim($host, '[]'), FILTER_VALIDATE_IP);
+	}
+
+	/**
+	 * Extracts a normalized passkey hostname and optional effective port other than 443 from a URL.
+	 *
+	 * @param string $url URL.
+	 * @return string
+	 */
+	private function passkey_allowed_hostname_from_url($url) {
+		$parts = is_string($url) ? wp_parse_url($url) : false;
+		if (!is_array($parts) || empty($parts['host'])) {
+			return '';
+		}
+
+		$host = $this->normalize_passkey_hostname($parts['host']);
+		if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+			$host = '[' . $host . ']';
+		}
+		$scheme = isset($parts['scheme']) ? strtolower($parts['scheme']) : '';
+		$effectivePort = isset($parts['port']) ? (int) $parts['port'] : ($scheme === 'https' ? 443 : ($scheme === 'http' ? 80 : null));
+		if ($effectivePort !== null && $effectivePort !== 443) {
+			$host .= ':' . $effectivePort;
+		}
+
+		return $this->normalize_passkey_allowed_hostname($host);
+	}
+
+	/**
+	 * Returns whether a passkey hostname entry is valid.
+	 *
+	 * @param string $host Hostname.
+	 * @return bool
+	 */
+	private function is_valid_passkey_hostname($host) {
+		return $this->parse_passkey_allowed_hostname($host) !== false;
+	}
+
+	/**
+	 * Returns whether a normalized hostname without a port is valid for passkey origin policy.
+	 *
+	 * @param string $host Normalized hostname.
+	 * @return bool
+	 */
+	private function is_valid_passkey_hostname_only($host) {
+		if ($host === 'localhost') {
+			return true;
+		}
+		if (filter_var($host, FILTER_VALIDATE_IP)) {
+			return true;
+		}
+		return preg_match('/^(?=.{1,253}$)(?!-)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i', $host) === 1;
 	}
 
 	/**
@@ -374,7 +963,7 @@ class Controller_Settings {
 			}
 			
 			/**
-			 * Fires when 2FA availability/required on a role changes.
+			 * Fires when configured or effective 2FA availability/required on a role changes.
 			 *
 			 * @since 1.1.13
 			 *
@@ -385,9 +974,82 @@ class Controller_Settings {
 			
 			return true;
 		}
+		else if (preg_match('/^passkey-enabled-roles\.(.+)$/', $key, $matches)) { //Passkey-enabled roles are stored as capabilities rather than in the settings storage
+			$role = $matches[1];
+			if (is_multisite() && $role !== 'super-admin') {
+				Controller_Permissions::shared()->disallow_passkey_self($role);
+				$settings[$this->get_required_passkey_role_key($role)] = -1;
+				return true;
+			}
+			if ($role === 'super-admin') {
+				$roleValid = true;
+			}
+			else if (in_array($value, array(self::STATE_PASSKEY_OPTIONAL, self::STATE_PASSKEY_REQUIRED))) {
+				$roleValid = Controller_Permissions::shared()->allow_passkey_self($role);
+			}
+			else {
+				$roleValid = Controller_Permissions::shared()->disallow_passkey_self($role);
+			}
+			
+			if (!in_array($value, array(self::STATE_PASSKEY_OPTIONAL, self::STATE_PASSKEY_REQUIRED))) {
+				$value = self::STATE_PASSKEY_DISABLED;
+			}
+			
+			if ($roleValid) {
+				if (in_array($value, array(self::STATE_PASSKEY_OPTIONAL, self::STATE_PASSKEY_REQUIRED))) {
+					$this->add_default_passkey_allowed_hostnames_to_settings_if_missing($settings);
+				}
+				$settings[$this->get_required_passkey_role_key($role)] = ($value === self::STATE_PASSKEY_REQUIRED ? time() : -1);
+			}
+			
+			/**
+			 * Fires when configured or effective passkey availability/required on a role changes.
+			 *
+			 * @since 2.0.0
+			 *
+			 * @param string $role The name of the role.
+			 * @param string $state The state of passkeys on the role.
+			 */
+			do_action('wordfence_ls_changed_passkey_required', $role, $value);
+			
+			return true;
+		}
 		
 		//Settings that will dispatch actions
 		switch ($key) {
+			case self::OPTION_PASSKEY_RELYING_PARTY_OVERRIDE:
+				$before = $this->get($key);
+				$after = $value;
+				
+				if ($before != $after) {
+					$settings[self::OPTION_LAST_PASSKEY_RP] = '';
+					/**
+					 * Fires when the RP override changes.
+					 *
+					 * @since 2.0.0
+					 *
+					 * @param string $before The previous value.
+					 * @param string $after The new value.
+					 */
+					do_action('wordfence_ls_changed_rp_override', $before, $after);
+				}
+				break;
+			case self::OPTION_ALWAYS_SHOW_LOGIN_SECURITY_MENU:
+				$before = $this->get_bool($key, true);
+				$after = Utility_Number::truthyToBool($value);
+
+				if ($before != $after) {
+					/**
+					 * Fires when the always-show Login Security menu option is enabled/disabled.
+					 *
+					 * @since 2.0.0
+					 *
+					 * @param bool $before The previous value.
+					 * @param bool $after The new value.
+					 */
+					do_action('wordfence_ls_always_show_login_security_menu_toggled', $before, $after);
+				}
+				break;
 			case self::OPTION_XMLRPC_ENABLED:
 				$before = $this->get($key);
 				$after = $value;
@@ -555,9 +1217,106 @@ class Controller_Settings {
 	
 	public function preprocess_multiple($changes) {
 		$remaining = array();
+		$syncLoginSecurityMenuVisibility = false;
+		$alwaysShowLoginSecurityMenu = array_key_exists(self::OPTION_ALWAYS_SHOW_LOGIN_SECURITY_MENU, $changes) ? Utility_Number::truthyToBool($changes[self::OPTION_ALWAYS_SHOW_LOGIN_SECURITY_MENU]) : null;
+		$featureDefinitions = array(
+			self::OPTION_ENABLE_2FA => array(
+				'role_prefix' => 'enabled-roles.',
+				'required_prefix' => self::OPTION_PREFIX_REQUIRED_2FA_ROLE . '.',
+				'capability' => Controller_Permissions::CAP_ACTIVATE_2FA_SELF,
+				'disabled_state' => self::STATE_2FA_DISABLED,
+				'optional_state' => self::STATE_2FA_OPTIONAL,
+				'required_state' => self::STATE_2FA_REQUIRED,
+				'action' => 'wordfence_ls_changed_2fa_required',
+				'multisite_roles' => true,
+			),
+			self::OPTION_ENABLE_PASSKEYS => array(
+				'role_prefix' => 'passkey-enabled-roles.',
+				'required_prefix' => self::OPTION_PREFIX_REQUIRED_PASSKEY_ROLE . '.',
+				'capability' => Controller_Permissions::CAP_MANAGE_PASSKEY_SELF,
+				'disabled_state' => self::STATE_PASSKEY_DISABLED,
+				'optional_state' => self::STATE_PASSKEY_OPTIONAL,
+				'required_state' => self::STATE_PASSKEY_REQUIRED,
+				'action' => 'wordfence_ls_changed_passkey_required',
+				'multisite_roles' => false,
+			),
+		);
+		$changedFeatures = array();
+		foreach ($featureDefinitions as $option => $definition) {
+			if (array_key_exists($option, $changes)) {
+				$enabledBefore = $option === self::OPTION_ENABLE_2FA ? $this->is_2fa_enabled() : $this->are_passkeys_enabled();
+				$enabledAfter = Utility_Number::truthyToBool($changes[$option]);
+				if ($enabledBefore !== $enabledAfter) {
+					$definition['enabled_after'] = $enabledAfter;
+					$changedFeatures[] = $definition;
+				}
+			}
+		}
 		foreach ($changes as $key => $value) {
+			if ($key === self::OPTION_ALWAYS_SHOW_LOGIN_SECURITY_MENU || preg_match('/^(?:enabled-roles|passkey-enabled-roles)\./', $key)) {
+				$syncLoginSecurityMenuVisibility = true;
+			}
 			if (!$this->preprocess($key, $value, $remaining)) {
 				$remaining[$key] = $value;
+			}
+		}
+		if ($syncLoginSecurityMenuVisibility) {
+			Controller_Permissions::shared()->sync_login_security_menu_visibility(null, $alwaysShowLoginSecurityMenu);
+		}
+		if (!empty($changedFeatures)) {
+			$wpRoles = function_exists('wp_roles') ? wp_roles() : (class_exists('WP_Roles') ? new \WP_Roles() : null);
+			$roleObjects = is_object($wpRoles) && isset($wpRoles->role_objects) && is_array($wpRoles->role_objects) ? $wpRoles->role_objects : array();
+			foreach ($changedFeatures as $definition) {
+				$roles = array();
+				if (!is_multisite() || $definition['multisite_roles']) {
+					$roles = $roleObjects;
+				}
+				if (is_multisite()) {
+					$roles['super-admin'] = null;
+				}
+				foreach ($changes as $key => $value) {
+					if (strpos($key, $definition['role_prefix']) === 0) {
+						$role = substr($key, strlen($definition['role_prefix']));
+						if ($role !== '' && (!is_multisite() || $definition['multisite_roles'] || $role === 'super-admin')) {
+							$roles[$role] = isset($roleObjects[$role]) ? $roleObjects[$role] : null;
+						}
+					}
+				}
+
+				$requiredDefaults = array();
+				foreach (array_keys($roles) as $role) {
+					if (!array_key_exists($definition['role_prefix'] . $role, $changes)) {
+						$requiredDefaults[$definition['required_prefix'] . $role] = -1;
+					}
+				}
+				$requiredValues = $this->_settingsStorage->get_multiple($requiredDefaults);
+
+				foreach ($roles as $role => $roleObject) {
+					$pendingRoleKey = $definition['role_prefix'] . $role;
+					$roleWasChanged = array_key_exists($pendingRoleKey, $changes);
+					if ($roleWasChanged) {
+						$state = $changes[$pendingRoleKey];
+						if (!in_array($state, array($definition['optional_state'], $definition['required_state']), true)) {
+							$state = $definition['disabled_state'];
+						}
+					}
+					else {
+						$requiredKey = $definition['required_prefix'] . $role;
+						if (isset($requiredValues[$requiredKey]) && (int) $requiredValues[$requiredKey] >= 0) {
+							$state = $definition['required_state'];
+						}
+						else if ($role === 'super-admin' || (is_object($roleObject) && $roleObject->has_cap($definition['capability']))) {
+							$state = $definition['optional_state'];
+						}
+						else {
+							$state = $definition['disabled_state'];
+						}
+					}
+
+					if ($state !== $definition['disabled_state'] && (!$definition['enabled_after'] || !$roleWasChanged)) {
+						do_action($definition['action'], $role, $definition['enabled_after'] ? $state : $definition['disabled_state']);
+					}
+				}
 			}
 		}
 		return $remaining;
@@ -647,38 +1406,13 @@ class Controller_Settings {
 		return self::shared()->get_bool(Controller_Settings::OPTION_STACK_UI_COLUMNS, true);
 	}
 
+	public function should_always_show_login_security_menu() {
+		return $this->get_bool(self::OPTION_ALWAYS_SHOW_LOGIN_SECURITY_MENU, true);
+	}
+
 	/**
 	 * Utility
 	 */
-	
-	/**
-	 * Translates a value to a boolean, correctly interpreting various textual representations.
-	 *
-	 * @param $value
-	 * @return bool
-	 */
-	protected function _truthy_to_bool($value) {
-		if ($value === true || $value === false) {
-			return $value;
-		}
-		
-		if (is_null($value)) {
-			return false;
-		}
-		
-		if (is_numeric($value)) {
-			return !!$value;
-		}
-		
-		if (preg_match('/^(?:f(?:alse)?|no?|off)$/i', $value)) {
-			return false;
-		}
-		else if (preg_match('/^(?:t(?:rue)?|y(?:es)?|on)$/i', $value)) {
-			return true;
-		}
-		
-		return !empty($value);
-	}
 	
 	/**
 	 * Parses the given time string and returns its DateTime with the server's configured time zone.
@@ -735,7 +1469,12 @@ class Controller_Settings {
 		return $range;
 	}
 
-	private function _migrate_admin_2fa_requirements_to_roles() {
+	/**
+	 * Migrates the legacy administrator-only 2FA requirement setting to role-based requirement settings.
+	 *
+	 * @return void
+	 */
+	public function migrate_admin_2fa_requirements_to_roles() {
 		if (!$this->get_bool(self::OPTION_REQUIRE_2FA_ADMIN))
 			return;
 		$time = time();

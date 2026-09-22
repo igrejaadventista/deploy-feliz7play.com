@@ -1,0 +1,22 @@
+{
+    "name": "really-simple-plugins/metricool-scoped",
+    "description": "Runtime dependencies shipped with the Metricool plugin (scoped via wpify/scoper).",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": ">=7.4",
+        "ext-json": "*",
+        "ext-zlib": "*",
+        "adbario/php-dot-notation": "^3.3",
+        "guzzlehttp/guzzle": "^7.9",
+        "nesbot/carbon": "^2.0"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "platform": {
+            "php": "7.4"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

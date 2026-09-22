@@ -3,8 +3,8 @@ Contributors: mmaunder, wfryan, wfmatt, wfmattr
 Tags: security, malware, 2fa, firewall, scanner
 Requires at least: 4.7
 Requires PHP: 7.0
-Tested up to: 6.8
-Stable tag: 8.0.5
+Tested up to: 7.1
+Stable tag: 9.0.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -28,7 +28,7 @@ The sun never sets on our global security team and we run a sophisticated threat
 
 **Wordfence Security includes an endpoint firewall, malware scanner, robust login security features, live traffic views, and more.** Our [Threat Defense Feed](https://www.wordfence.com/threat-intel/) arms Wordfence with the newest firewall rules, malware signatures, and malicious IP addresses it needs to keep your website safe. 
 
-Rounded out by 2FA and a suite of additional features, Wordfence is the most comprehensive WordPress security solution available.
+Rounded out by passkeys, 2FA, and a suite of additional features, Wordfence is the most comprehensive WordPress security solution available.
 
 ### 🔥 WORDPRESS FIREWALL
 - **[Web Application Firewall](https://www.wordfence.com/help/firewall/)** identifies and blocks malicious traffic. Built and maintained by a large team focused 100% on WordPress security.
@@ -43,14 +43,16 @@ Rounded out by 2FA and a suite of additional features, Wordfence is the most com
 - **Real-time malware signature updates [Premium]** via the Threat Defense Feed (free version is delayed by 30 days).
 - **Compares with WordPress.org repository** your core files, themes and plugins, checking their integrity and reporting any changes to you.
 - **Repair WordPress core, theme, and plugin files** that have changed by overwriting them with a pristine, original version. Delete any files that don’t belong easily within the Wordfence interface.
+- **Malware Removal Tools** "Delete File" and "Delete All Deletable Files" options allow for efficient malware removal. Remember to investigate the scan results and backup files first!
 - **Checks your site for known security vulnerabilities** and alerts you to any issues. Also alerts you to potential security issues when a plugin has been closed or abandoned.
 - **Checks your content safety** by scanning file contents, posts and comments for dangerous URLs and suspicious content.
 - **Checks to see if your site or IP have been blocklisted [Premium]** for malicious activity, generating spam or other security issues.
 
 ### 🔒 LOGIN SECURITY
+- **[Passkeys](https://www.wordfence.com/help/login-security/#module-login-security-passkeys)** let users sign in with touch, facial recognition, a device password, or a PIN as a simple and secure alternative to a password and two-factor credentials.
 - **[Two-factor authentication (2FA)](https://www.wordfence.com/help/tools/two-factor-authentication/)**, one of the most secure forms of remote system authentication available via any TOTP-based authenticator app or service.
 - **[Login Page CAPTCHA](https://www.wordfence.com/help/login-security/)** stops bots from logging in.
-- **[2FA for WooCommerce and custom integrations](https://www.wordfence.com/help/login-security/#woocommerce-and-custom-integrations)** allow for 2FA to be setup on custom account pages
+- **[Passkey and 2FA management for WooCommerce and custom integrations](https://www.wordfence.com/help/login-security/#woocommerce-and-custom-integrations)** allows users to manage credentials on custom account pages.
 - **XML-RPC** options including disabling or adding 2FA.
 - **Password Security:** Block logins for administrators using known compromised passwords.
 
@@ -159,7 +161,7 @@ Wordfence provides true endpoint security for your WordPress website. Unlike clo
 * Wordfence scans check all your files, comments and posts for URLs in Google's Safe Browsing list. We are the only plugin to offer this very important security enhancement.
 * Wordfence scans do not consume large amounts of your bandwidth because all security scans happen on your web server which makes them very fast.
 * Wordfence fully supports WordPress Multi-Site which means you can security scan every blog in your Multi-Site installation with one click.
-* Wordfence includes Two-Factor authentication, the most secure way to stop brute force attackers in their tracks.
+* Wordfence includes passkeys and Two-Factor authentication to help secure WordPress accounts against phishing and brute-force attacks.
 * Wordfence fully supports IPv6 including giving you the ability to look up the location of IPv6 addresses, block IPv6 ranges, detect IPv6 country and do a whois lookup on IPv6 addresses and more.
 
 = Will Wordfence slow down my website? =
@@ -205,6 +207,94 @@ Secure your website with Wordfence.
 9. Logging in is easy with Wordfence 2FA.
 
 == Changelog ==
+
+= 9.0.1 - September 8, 2026 =
+* Improvement: UX enhancements for passkey authentication and general login security
+* Improvement: GeoIP database updated
+* Fix: Improved error handling in WAF request handlers and XML-RPC parser
+* Fix: Fixed an issue with translations not showing on the Login Security Settings tab
+* Fix: Addressed several potential PHP 8.5+ deprecation notices
+* Fix: Reworked MD5 hash use in MySQL to avoid deprecation in 9.7+
+
+= 9.0.0 - August 10, 2026 =
+* Improvement: Added support for passkey authentication
+    * Available for both free and premium installations
+    * Can be enabled for any user role (multisite support is currently limited)
+    * WooCommerce integration
+    * Support for custom authentication integrations
+* Improvement: GeoIP database updated
+* Improvement: Several mobile styling and layout improvements on the login security page
+* Improvement: Added diagnostics info for authentication hooks to assist with login-related troubleshooting
+* Change: Hardened 2FA flow when installed next to plugins with non-standard authentication (credit: Austin Ginder of Anchor Hosting)
+* Change: Hardened 2FA remember cookie handling
+* Change: The scanner will now display an issue when the standalone Wordfence Login Security plugin is installed because all functionality is already provided by Wordfence itself
+* Change: Updated internal libraries used by the Vue UI
+* Change: Login error masking setting now also applies to the Login Security functionality
+
+= 8.2.2 - May 13, 2026 =
+* Improvement: Better presentation of Live Traffic data on wide screens
+* Improvement: Increased legibility of token fields
+* Improvement: Reworked the pagination of the Blocking page for a better UX
+* Improvement: Country blocking token field can now expand to show all entries
+* Improvement: Performance improvements for the activity log and better pause behavior on window blur/focus
+* Improvement: GeoIP database updated
+* Change: Removed deprecated Central endpoint
+* Fix: Addressed issue where the last activity log entry could repeatedly appear
+* Fix: Using the embedded shortcode for the 2FA form now correctly enqueues core JavaScript dependencies
+* Fix: Modals with content that overflows on smaller viewports can now be scrolled
+* Fix: The changelog link in plugin upgrade scan issues now links correctly
+
+= 8.2.1 - May 6, 2026 =
+* Fix: Fixed issue with some i18n plugins/themes when a user has no 2FA recovery codes
+* Fix: Toggled options with additional help links now correctly open the link rather than toggling the option
+* Fix: Country Blocking editing fixed when there are multiple pages of block rules
+* Fix: Added better error handling to the initial Vue data load
+* Fix: Handled error when logging in using legacy 2FA with separate prompts enabled
+
+= 8.2.0 - April 29, 2026 =
+* Improvement: Migrated all deprecated JavaScript libraries in use to a Vue-based infrastructure
+* Improvement: GeoIP database update
+* Improvement: Better coverage of `aria-` accessibility attributes
+* Improvement: Added `translators` comments to translatable strings where previously missing
+* Fix: WordPress 7.0 compatibility fixes
+* Note: Legacy two factor authentication using SMS-based codes will be discontinued around July 1, 2026. Sites using this functionality should migrate users to the TOTP-based two factor authentication on the Login Security page of the plugin
+
+= 8.1.4 - December 20, 2025 =
+* Fix: Fixed an issue with `inet_pton` introduced by a recent patch to PHP 8.1+ that could cause a fatal error if a malformed IP address was passed to the call
+
+= 8.1.3 - December 3, 2025 =
+* Improvement: Updated the bundled geoip database
+* Note: Verified compatibility with WordPress 6.9
+
+= 8.1.2 - November 12, 2025 =
+* Improvement: Updated the bundled geoip database
+
+= 8.1.1 - November 5, 2025 =
+* Improvement: Improved localization support for the various block screens and messages
+* Improvement: Updated the bundled geoip database
+* Improvement: Prioritized Wordfence tables in the diagnostics tool when large numbers of tables exist
+* Improvement: Allow non-US Google crawler IP addresses to pass country blocking
+* Improvement: Enforcement of password strength requirements is now applied on the corresponding REST API endpoints
+* Fix: Fixed detection for first-time logins and overall sending for login alerts when the corresponding settings are enabled
+* Fix: When the WAF is using the mysql storage engine, fixed an issue with exclusion rules for the WAF not running correctly
+* Fix: Reduced per-hit database query load around checking license status for free installations
+* Fix: Optimized data sync with the WAF to better detect when the known server IP address list has changed
+
+= 8.1.0 - August 25, 2025 =
+* Improvement: Added password scanning support for WordPress 6.8 and later
+* Improvement: Limited email alerts to 5 per hour by default and added notification when limit has been reached
+* Improvement: Improved URL scanning performance
+* Improvement: Updated GeoIP database
+* Change: Reduced scan result severity for vulnerabilities with high attack complexity or required privileges
+* Change: Added messaging around WAF support when NGINX Unit is detected
+* Change: Added notice and scan result about Wordfence Assistant
+* Change: Adjusted IPv6 connection issue message and appearance
+* Fix: Prevented deprecation notice about calling base64_encode with null parameter
+* Fix: Prevented deprecation message about calling preg_match with null parameter
+* Fix: Corrected license type shown on dashboard when expiring
+* Fix: Prevented disabled getmyuid function from causing fatal error
+* Fix: Prevented disabled get_current_user function from causing fatal error
+* Fix: Prevented notice about _load_textdomain_just_in_time being called incorrectly
 
 = 8.0.5 - April 8, 2025 =
 * Fix: Compatibility fixes for WordPress 6.8
@@ -500,95 +590,5 @@ Secure your website with Wordfence.
 = 7.5.6 - October 18, 2021 =
 * Fix: Prevented login errors with WooCommerce integration when manual username entry is enabled on the WooCommerce registration form
 * Fix: Corrected theme incompatibilities with WooCommerce integration
-
-= 7.5.5 - August 16, 2021 =
-* Improvement: Enhanced accessibility
-* Improvement: Replaced regex in scan log with signature ID
-* Improvement: Updated Knockout JS dependency to version 3.5.1
-* Improvement: Removed PHP 8 compatibility notice
-* Improvement: Added NTP status for Login Security to Diagnostics
-* Improvement: Updated plugin headers for compatibility with WordPress 5.8
-* Improvement: Updated Nginx documentation links to HTTPS
-* Improvement: Updated IP address geolocation database
-* Improvement: Expanded WAF SQL syntax support
-* Improvement: Added optional constants to configure WAF database connection
-* Improvement: Added support for matching punycode domain names
-* Improvement: Updated Wordfence install count
-* Improvement: Deprecated support for WordPress versions older than 4.4.0
-* Improvement: Added warning messages when blocking U.S.
-* Improvement: Added MYSQLI_CLIENT_SSL support to WAF database connection
-* Improvement: Added 2FA and reCAPTCHA support for WooCommerce login and registration forms
-* Improvement: Added option to require 2FA for any role
-* Improvement: Added logic to automatically disable NTP after repeated failures and option to manually disable NTP
-* Improvement: Updated reCAPTCHA setup note
-* Fix: Prevented issue where country blocking changes are not saved
-* Fix: Corrected string placeholder
-* Fix: Added missing text domain to translation calls
-* Fix: Corrected warning about sprintf arguments on Central setup page
-* Fix: Prevented lost password functionality from revealing valid logins
-
-= 7.5.4 - June 7, 2021 =
-
-* Fix: Resolve conflict with woocommerce-gateway-amazon-payments-advanced plugin
-
-= 7.5.3 - May 10, 2021 =
-
-* Improvement: Expanded WAF capabilities including better JSON and user permission handling
-* Improvement: Switched to relative paths in WAF auto_prepend file to increase portability
-* Improvement: Eliminated unnecessary calls to Wordfence servers
-* Fix: Prevented errors on PHP 8.0 when disk_free_space and/or disk_total_space are included in disabled_functions
-* Fix: Fixed PHP notices caused by unexpected plugin version data
-* Fix: Gracefully handle unexpected responses from Wordfence servers
-* Fix: Time field now displays correctly on "See Recent Traffic" overlay
-* Fix: Corrected typo on Diagnostics page
-* Fix: Corrected IP counts on activity report
-* Fix: Added missing line break in scan result emails
-* Fix: Sending test activity report now provides success/failure response
-* Fix: Reduced SQLi false positives caused by comma-separated strings
-* Fix: Fixed JS error when resolving last scan result
-
-= 7.5.2 - March 24, 2021 =
-
-* Fix: Fixed fatal error on single-sites running WordPress <4.9.
-
-= 7.5.1 - March 24, 2021 =
-
-* Fix: Fixed fatal error when viewing the Login Security settings page from an allowlisted IP.
-
-= 7.5.0 - March 24, 2021 =
-
-* Improvement: Translation-readiness: All user-facing strings are now run through WordPress's i18n functions.
-* Improvement: Remove legacy admin functions no longer used within the UI.
-* Improvement: Local GeoIP database update.
-* Improvement: Remove Lynwood IP range from allowlist, and add new AWS IP range.
-* Fix: Fixed bug with unlocking a locked out IP without correctly resetting its failure counters.
-* Fix: Sites using deleted premium licenses correctly revert to free license behavior.
-* Fix: When enabled, cookies are now set for the correct roles on previously used devices.
-* Fix: WAF cron jobs are now skipped when running on the CLI.
-* Fix: PHP 8.0 compatibility - prevent syntax error when linting files.
-* Fix: Fixed issue where PHP 8 notice sometimes cannot be dismissed.
-
-= 7.4.14 - December 3, 2020 =
-
-* Improvement: Added option to disable application passwords.
-* Improvement: Updated site cleaning callout with 1-year guarantee.
-* Improvement: Upgraded sodium_compat library to 1.13.0.
-* Improvement: Replaced the terms whitelist and blacklist with allowlist and blocklist.
-* Improvement: Made a number of WordPress 5.6 and jQuery 3.x compatibility improvements.
-* Improvement: Made a number of PHP8 compatilibility improvements.
-* Improvement: Added dismissable notice informing users of possible PHP8 compatibility issues.
-
-= 7.4.12 - October 21, 2020 =
-
-* Improvement: Initial integration of i18n in Wordfence.
-* Improvement: Prevent Wordfence from loading under <PHP 5.3.
-* Improvement: Updated GeoIP database.
-* Improvement: Prevented wildcard from running/saving for scan's excluded files pattern.
-* Improvement: Included Wordfence Login Security tables in diagnostics missing table list.
-* Fix: Removed new scan issues when WordPress update occurs mid-scan.
-* Fix: Specified category when saving `whitelistedServiceIPs` to WAF storage engine.
-* Fix: Removed localhost IP for auto-update email alerts.
-* Fix: Fixed broken message in Live Traffic with MySQLi storage engine for blocklisted hits.
-* Fix: Removed optional parameter values for PHP 8 compatibility.
 
 You can find a [complete changelog](https://www.wordfence.com/help/advanced/changelog/) on our documentation site.

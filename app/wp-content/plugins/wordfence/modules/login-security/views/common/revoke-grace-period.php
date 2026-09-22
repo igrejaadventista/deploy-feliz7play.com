@@ -1,24 +1,27 @@
 <?php
 if (!defined('WORDFENCE_LS_VERSION')) { exit; }
 
-$errorMessage = __('Unable to Revoke Grace Period', 'wordfence');
+$idPrefix = isset($idPrefix) && is_string($idPrefix) ? $idPrefix : 'wfls-';
+$buttonID = $idPrefix . 'revoke-grace-period';
+$failureMessageID = $idPrefix . 'revoke-grace-period-failed';
+$errorMessage = __('Unable to Revoke Authentication Grace Period', 'wordfence');
 ?>
-<div class="wfls-add-top wfls-add-bottom wfls-grace-period-container">
+<div class="wfls-add-top wfls-add-bottom wfls-grace-period-container wfls-flex-horizontal wfls-flex-align-left">
 	<div class="wfls-grace-period-button-container">
-		<button class="wfls-btn wfls-btn-default" id="wfls-revoke-grace-period">
+		<button class="wfls-btn wfls-btn-default" id="<?php echo esc_attr($buttonID); ?>">
 			<?php esc_html_e('Revoke Grace Period', 'wordfence') ?>
 		</button>
 
 	</div>
 </div>
 <div>
-	<p id="wfls-revoke-grace-period-failed" style="display: none"><strong><?php echo esc_html($errorMessage) ?></strong></p>
+	<p id="<?php echo esc_attr($failureMessageID); ?>" style="display: none"><strong><?php echo esc_html($errorMessage) ?></strong></p>
 </div>
 <script type="application/javascript">
 	(function($) {
 		$(function() {
-			var failureMessage = $('#wfls-revoke-grace-period-failed');
-			var button = $('#wfls-revoke-grace-period');
+			var failureMessage = $('#<?php echo \WordfenceLS\Text\Model_JavaScript::esc_js($failureMessageID); ?>');
+			var button = $('#<?php echo \WordfenceLS\Text\Model_JavaScript::esc_js($buttonID); ?>');
 			function revoke2faGracePeriod(userId, success, failure) {
 				var ajaxContext = (typeof WFLS === 'undefined' ? GWFLS : WFLS);
 				ajaxContext.ajax(
@@ -32,10 +35,9 @@ $errorMessage = __('Unable to Revoke Grace Period', 'wordfence');
 			}
 			function handleError() {
 				if (typeof WFLS === 'object') {
-					WFLS.panelModal(
-						(WFLS.screenSize(500) ? '300px' : '400px'),
+					WFLS.standaloneModal(
 						<?php echo json_encode($errorMessage) ?>,
-						<?php echo json_encode(__('An unexpected error occurred while attempting to revoke the grace period.', 'wordfence')) ?>
+						<?php echo json_encode(__('An unexpected error occurred while attempting to revoke the authentication grace period.', 'wordfence')) ?>
 					);
 				}
 				else {

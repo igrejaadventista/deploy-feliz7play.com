@@ -129,14 +129,20 @@ class wfPatternCookieRedactor extends wfCookieRedactor {
 	}
 
 	public function redact(&$name, &$value) {
+		if ((!is_scalar($name) && $name !== null && !(is_object($name) && method_exists($name, '__toString'))) ||
+			(!is_scalar($value) && $value !== null && !(is_object($value) && method_exists($value, '__toString')))) {
+			return;
+		}
+		$nameSubject = (string) $name;
+		$valueSubject = (string) $value;
 		$pregOffsetCaptureSupported = version_compare(PHP_VERSION, '7.4.0', '>=');
 		$nameCallback = array($this, $pregOffsetCaptureSupported ? 'replaceName' : 'replaceNameFallback');
 		foreach ($this->patterns as $namePattern => $valuePatterns) {
 			if ($pregOffsetCaptureSupported) {
-				$nameRedacted = preg_replace_callback($namePattern, $nameCallback, $name, 1, $matchCount, PREG_OFFSET_CAPTURE);
+				$nameRedacted = preg_replace_callback($namePattern, $nameCallback, $nameSubject, 1, $matchCount, PREG_OFFSET_CAPTURE);
 			}
 			else {
-				$nameRedacted = preg_replace_callback($namePattern, $nameCallback, $name, 1, $matchCount);
+				$nameRedacted = preg_replace_callback($namePattern, $nameCallback, $nameSubject, 1, $matchCount);
 			}
 			if ($matchCount === 1 && $nameRedacted !== null) {
 				$name = $nameRedacted;
@@ -147,7 +153,7 @@ class wfPatternCookieRedactor extends wfCookieRedactor {
 				if (is_array($valuePatterns)) {
 					$valueMatched = false;
 					foreach ($valuePatterns as $valuePattern) {
-						if (preg_match($valuePattern, $value) === 1) {
+						if (preg_match($valuePattern, $valueSubject) === 1) {
 							$valueMatched = true;
 							break;
 						}
@@ -262,7 +268,7 @@ class wfWAFRequest implements wfWAFRequestInterface {
 		$request->setHeaders($kvHeaders);
 
 		if (wfWAFUtils::strlen($bodyString) > 0) {
-			if (preg_match('/^multipart\/form\-data; boundary=(.*?)$/i', $request->getHeaders('Content-Type'), $boundaryMatches)) {
+			if (preg_match('/^multipart\/form\-data; boundary=(.*?)$/i', (string) $request->getHeaders('Content-Type'), $boundaryMatches)) {
 				$body = '';
 				$files = array();
 				$fileNames = array();
@@ -638,7 +644,7 @@ class wfWAFRequest implements wfWAFRequestInterface {
 				if (!$preventRedaction)
 					$redactor->redact($resolvedName, $cookieValue);
 				
-				$cookieString .= $resolvedName . '=' . urlencode($cookieValue) . '; ';
+				$cookieString .= $resolvedName . '=' . urlencode((string) $cookieValue) . '; ';
 			}
 		}
 		return $cookieString;
@@ -889,46 +895,73 @@ class wfWAFRequest implements wfWAFRequestInterface {
 		$rawBody = $this->getRawBody();
 		$contentType = $this->getHeaders('Content-Type');
 		if (wfXMLRPCBody::canParse() && $isXMLRPC && is_string($rawBody) && !$preventRedaction) {
-			$xml =& $rawBody;
+			$xml = $rawBody;
 			if ($contentType == 'application/x-www-form-urlencoded') {
 				$xml = @urldecode($rawBody);
 			}
 			
 			$xmlrpc = new wfXMLRPCBody($xml);
-			if ($xmlrpc->parse() && $xmlrpc->messageType == 'methodCall') {
+			$parsed = $xmlrpc->parse();
+			if (!$parsed && $xmlrpc->hasExceededLimits()) {
+				$body = '[redacted]';
+				if ($contentType == 'application/x-www-form-urlencoded') {
+					$body = urlencode($body);
+				}
+			}
+			else if ($parsed && $xmlrpc->messageType == 'methodCall') {
 				if ($xmlrpc->methodName == 'system.multicall') {
-					$subCalls =& $xmlrpc->params[0]['value'];
-					if (is_array($subCalls)) {
-						foreach ($subCalls as &$call) {
-							$method = $call['value']['methodName']['value'];
-							$params =& $call['value']['params']['value'];
-							
+					if (isset($xmlrpc->params[0]) && is_array($xmlrpc->params[0]) &&
+						isset($xmlrpc->params[0]['value']) && is_array($xmlrpc->params[0]['value'])) {
+						$subCalls = $xmlrpc->params[0]['value'];
+						foreach ($subCalls as $callIndex => $call) {
+							if (!is_array($call) || !isset($call['value']) || !is_array($call['value'])) {
+								continue;
+							}
+
+							$callValue = $call['value'];
+							if (!isset($callValue['methodName']) || !is_array($callValue['methodName']) ||
+								!array_key_exists('value', $callValue['methodName']) || !is_string($callValue['methodName']['value']) ||
+								!isset($callValue['params']) || !is_array($callValue['params']) ||
+								!isset($callValue['params']['value']) || !is_array($callValue['params']['value'])) {
+								continue;
+							}
+
+							$method = $callValue['methodName']['value'];
 							if (isset($xmlrpcFieldMap[$method])) {
+								$params = $callValue['params']['value'];
 								$fieldIndexes = $xmlrpcFieldMap[$method];
 								foreach ($fieldIndexes as $i) {
-									if (isset($params[$i])) {
+									if (isset($params[$i]) && is_array($params[$i]) && array_key_exists('value', $params[$i])) {
 										$params[$i]['value'] = '[redacted]';
 									}
 								}
+								$callValue['params']['value'] = $params;
+								$call['value'] = $callValue;
+								$subCalls[$callIndex] = $call;
 							}
 						}
+						$xmlrpc->params[0]['value'] = $subCalls;
 					}
 				}
 				else {
-					if (isset($xmlrpcFieldMap[$xmlrpc->methodName])) {
-						$params =& $xmlrpc->params;
+					if (isset($xmlrpcFieldMap[$xmlrpc->methodName]) && is_array($xmlrpc->params)) {
+						$params = $xmlrpc->params;
 						$fieldIndexes = $xmlrpcFieldMap[$xmlrpc->methodName];
 						foreach ($fieldIndexes as $i) {
-							if (isset($params[$i])) {
+							if (isset($params[$i]) && is_array($params[$i]) && array_key_exists('value', $params[$i])) {
 								$params[$i]['value'] = '[redacted]';
 							}
 						}
+						$xmlrpc->params = $params;
 					}
 				}
 				
 				$xml = (string) $xmlrpc;
 				if ($contentType == 'application/x-www-form-urlencoded') {
 					$body = urlencode($xml);
+				}
+				else {
+					$body = $xml;
 				}
 			}
 		}

@@ -209,7 +209,7 @@ add_filter( 'wp_generate_attachment_metadata', 'bodhi_svgs_generate_svg_attachme
  */
 function bodhi_svgs_sanitize( $file ){
 
-	global $sanitizer;
+	$sanitizer = bodhi_svgs_sanitizer();
 
 	$sanitizer->setAllowedTags( new bodhi_svg_tags() );
 	$sanitizer->setAllowedAttrs( new bodhi_svg_attributes() );
@@ -270,10 +270,9 @@ function bodhi_svgs_sanitize( $file ){
 function bodhi_svgs_minify() {
 
 	global $bodhi_svgs_options;
-	global $sanitizer;
 
 	if ( !empty($bodhi_svgs_options['minify_svg']) && $bodhi_svgs_options['minify_svg'] === 'on' ) {
-		$sanitizer->minify(true);
+		bodhi_svgs_sanitizer()->minify(true);
 	}
 
 }
@@ -312,38 +311,69 @@ function bodhi_svgs_sanitize_svg($file) {
 	$file_path = $file['tmp_name'];
 	$file_name = $file['name'];
 
-	// First quick check - if it's clearly not an SVG, return early
-	if (!empty($file_name) && strtolower(pathinfo($file_name, PATHINFO_EXTENSION)) !== 'svg') {
+	// First quick check - if it's clearly not an SVG (.svg or .svgz), return early.
+	// .svgz must NOT bypass sanitization: it is registered as image/svg+xml and
+	// served inline, so a .svgz holding plaintext SVG could otherwise store XSS.
+	$file_ext = strtolower( pathinfo( $file_name, PATHINFO_EXTENSION ) );
+	if ( ! empty( $file_name ) && $file_ext !== 'svg' && $file_ext !== 'svgz' ) {
 		return $file;
 	}
 
 	// Multiple validation checks for SVG
-	if ($file_path && file_exists($file_path)) {
+	if ( $file_path && file_exists( $file_path ) ) {
 		// 1. Check MIME type using fileinfo
-		$finfo = finfo_open(FILEINFO_MIME_TYPE);
-		$real_mime = finfo_file($finfo, $file_path);
-		finfo_close($finfo);
+		$finfo = finfo_open( FILEINFO_MIME_TYPE );
+		$real_mime = finfo_file( $finfo, $file_path );
+		finfo_close( $finfo );
 
-		// 2. Read first bytes of the file to check for SVG header
-		$file_content = file_get_contents($file_path);
-		$is_svg_content = false;
-		if ($file_content) {
-			// Check for XML declaration and SVG tag
-			$is_svg_content = (
-				preg_match('/^\s*(?:<\?xml[^>]*>\s*)?(?:<!DOCTYPE[^>]*>\s*)?<svg[^>]*>/i', $file_content) &&
-				strpos($file_content, '</svg>') !== false
-			);
+		// 2. Read file content to check for SVG header
+		$file_content = file_get_contents( $file_path );
+
+		// A .svgz upload arrives gzip-compressed; decompress before validating so
+		// we inspect the real SVG markup, not the gzip container bytes. A plaintext
+		// .svgz (the XSS PoC) is not gzipped and falls through unchanged.
+		$is_gzipped_upload = bodhi_svgs_is_gzipped( $file_content );
+		if ( $is_gzipped_upload ) {
+			$decoded = gzdecode( $file_content );
+			if ( $decoded === false ) {
+				$file['error'] = __( 'File is not a valid SVG.', 'svg-support' );
+				return $file;
+			}
+			$file_content = $decoded;
 		}
 
-		// If neither MIME type nor content validation passes
-		if (($real_mime !== 'image/svg+xml' && $real_mime !== 'image/svg') || !$is_svg_content) {
-			$file['error'] = __('File is not a valid SVG.', 'svg-support');
+		// Check for XML declaration and SVG tag
+		$pattern1 = '/^[\s\n]*(?:<\?xml[^>]*>[\s\n]*)?(?:<!--.*?-->[\s\n]*)*(?:<!DOCTYPE[^>]*>[\s\n]*)?(?:<!--.*?-->[\s\n]*)*<svg[^>]*>/is';
+		$pattern2 = '/^[\s\n]*(?:<!--.*?-->[\s\n]*)*<svg[^>]*>/is';
+
+		$match1 = preg_match( $pattern1, $file_content );
+		$match2 = preg_match( $pattern2, $file_content );
+		$has_closing = strpos( $file_content, '</svg>' ) !== false;
+
+		$is_svg_content = ( $match1 || $match2 ) && $has_closing;
+
+		// If content validation fails OR (mime type isn't SVG AND isn't a plain text
+		// file containing SVG AND isn't a gzipped .svgz whose decoded payload is SVG).
+		// A genuinely gzipped .svgz reports application/gzip from finfo, so once the
+		// decompressed payload is confirmed valid SVG we accept it as image/svg+xml.
+		if ( !$is_svg_content ||
+			( $real_mime !== 'image/svg+xml' &&
+			  $real_mime !== 'image/svg' &&
+			  !( $real_mime === 'text/plain' && $is_svg_content ) &&
+			  !( $is_gzipped_upload && $is_svg_content ) ) ) {
+			$file['error'] = __( 'File is not a valid SVG.', 'svg-support' );
 			return $file;
 		}
 	}
 
-	// Now we know it's an SVG, continue with security checks
-	if (!defined('REST_REQUEST') && !wp_verify_nonce(
+	// Detect programmatic sideloads (e.g. media_handle_sideload()), which run
+	// through wp_handle_sideload_prefilter rather than a browser upload form.
+	$is_sideload = ( current_filter() === 'wp_handle_sideload_prefilter' );
+
+	// Now we know it's an SVG, continue with security checks.
+	// Sideloads are server-initiated and have no media form nonce, so the
+	// anti-CSRF nonce check only applies to standard browser uploads.
+	if (!$is_sideload && !defined('REST_REQUEST') && !wp_verify_nonce(
 		sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'] ?? '')), 
 		'media-form'
 	)) {
@@ -362,29 +392,14 @@ function bodhi_svgs_sanitize_svg($file) {
 	// Check if the user has the capability to upload SVGs
 	$can_upload_files = current_user_can('upload_files');
 
-	// Force sanitize unless user is in roles that bypass sanitization
-	if ($can_upload_files && empty($no_sanitize_needed)) {
-		global $sanitizer;
-		
-		// Read file contents
-		$file_content = file_get_contents($file_path);
-		if ($file_content === false) {
-			$file['error'] = __("Unable to read SVG file for sanitization.", 'svg-support');
-			return $file;
-		}
-
-		// Sanitize the content
-		$clean_svg = $sanitizer->sanitize($file_content);
-		
-		if ($clean_svg === false) {
+	// Always sanitize sideloaded files (they may run with no interactive user);
+	// otherwise force sanitize unless the user is in a role that bypasses it.
+	if ($is_sideload || ($can_upload_files && empty($no_sanitize_needed))) {
+		// Delegate to the shared, gzip-aware sanitizer so browser uploads, REST
+		// uploads and imports all apply the same whitelist filters, remote-reference
+		// removal and gzip (.svgz) handling.
+		if ( ! bodhi_svgs_sanitize( $file_path ) ) {
 			$file['error'] = __("Sorry, this file couldn't be sanitized for security reasons and wasn't uploaded.", 'svg-support');
-			return $file;
-		}
-
-		// Write sanitized content back
-		$write_result = file_put_contents($file_path, $clean_svg);
-		if ($write_result === false) {
-			$file['error'] = __("Unable to save sanitized SVG file.", 'svg-support');
 			return $file;
 		}
 	}
@@ -393,6 +408,8 @@ function bodhi_svgs_sanitize_svg($file) {
 }
 // Add filter to handle upload pre-filtering for sanitization
 add_filter('wp_handle_upload_prefilter', 'bodhi_svgs_sanitize_svg');
+// Also sanitize SVGs added programmatically via media_handle_sideload()
+add_filter('wp_handle_sideload_prefilter', 'bodhi_svgs_sanitize_svg');
 
 /**
  * Fix for image widget PHP warnings related to metadata.
@@ -510,53 +527,6 @@ function bodhi_svgs_rest_pre_upload($file, $request) {
 }
 add_filter('rest_pre_upload_file', 'bodhi_svgs_rest_pre_upload', 10, 2);
 
-/**
- * Clean up duplicate inline_featured_image meta entries
- * 
- * This is a one-time migration function that runs only when upgrading to version 2.5.9
- * to fix duplicate meta entries caused by older plugin versions. The slow meta query
- * is intentional and necessary for this cleanup operation.
- *
- * @since 2.5.9
- * @see svg-support.php Version upgrade handling
- * @return void
- */
-function bodhi_svgs_cleanup_duplicate_meta() {
-    // Use WP_Query with optimized parameters and batching
-    $batch_size = 100;
-    $offset = 0;
-    
-    do {
-        $query = new WP_Query(array(
-            'post_type'      => 'any',
-            'posts_per_page' => $batch_size,
-            'offset'         => $offset,
-            'meta_query'     => array(
-                array(
-                    'key'     => 'inline_featured_image',
-                    'compare' => 'EXISTS'
-                )
-            ),
-            'no_found_rows'  => true,
-            'fields'         => 'ids'
-        ));
-
-        if ($query->have_posts()) {
-            foreach ($query->posts as $post_id) {
-                $meta_values = get_post_meta($post_id, 'inline_featured_image');
-                
-                if (count($meta_values) > 1) {
-                    $keep_value = end($meta_values);
-                    delete_post_meta($post_id, 'inline_featured_image');
-                    add_post_meta($post_id, 'inline_featured_image', $keep_value);
-                }
-            }
-        }
-
-        $offset += $batch_size;
-    } while (count($query->posts) === $batch_size);
-}
-
 function bodhi_svgs_handle_upload_check($fileinfo) {
     if ($fileinfo['type'] === 'image/svg+xml') {
         global $bodhi_last_upload_info;
@@ -588,15 +558,9 @@ function bodhi_svgs_rest_insert_attachment($prepared_attachment, $request) {
         }
         
         if ($file_path && file_exists($file_path)) {
-            global $sanitizer;
-            $file_content = file_get_contents($file_path);
-            
-            if ($file_content !== false) {
-                $clean_svg = $sanitizer->sanitize($file_content);
-                if ($clean_svg !== false) {
-                    file_put_contents($file_path, $clean_svg);
-                }
-            }
+            // Use the shared, gzip-aware sanitizer for consistency with the upload
+            // and REST pre-upload paths (best-effort; non-fatal here).
+            bodhi_svgs_sanitize($file_path);
         }
     }
     

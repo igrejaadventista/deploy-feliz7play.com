@@ -610,12 +610,12 @@ class wfServices_JSON
 
 					// This would work on its own, but I'm trying to be
 					// good about returning integers where appropriate:
-					// return (float)$str;
+					// return (float) $str;
 
 					// Return float or int, as appropriate
-					return ((float)$str == (integer)$str)
-						? (integer)$str
-						: (float)$str;
+					return ((float) $str == (int) $str)
+						? (int) $str
+						: (float) $str;
 
 				} elseif (preg_match('/^("|\').*(\1)$/s', $str, $m) && $m[1] == $m[2]) {
 					// STRINGS RETURNED IN UTF-8 FORMAT

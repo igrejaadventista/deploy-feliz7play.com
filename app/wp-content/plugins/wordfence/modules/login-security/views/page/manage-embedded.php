@@ -3,10 +3,15 @@ if (!defined('WORDFENCE_LS_VERSION')) { exit; }
 
 $assets = isset($assets) ? $assets : array();
 $scriptData = isset($scriptData) ? $scriptData : array();
+$twoFactorEnabledForUser = isset($twoFactorEnabledForUser) ? $twoFactorEnabledForUser : true;
+$settingsURL = isset($settingsURL) ? $settingsURL : (is_multisite() ? network_admin_url('admin.php?page=WFLS#top#settings') : admin_url('admin.php?page=WFLS#top#settings'));
+$showSettingsButton = isset($showSettingsButton) ? $showSettingsButton : true;
 
 $enabled = \WordfenceLS\Controller_Users::shared()->has_2fa_active($user);
 $requires2fa = \WordfenceLS\Controller_Users::shared()->requires_2fa($user, $inGracePeriod, $requiredAt);
 $lockedOut = $requires2fa && !$enabled;
+$ownUser = wp_get_current_user();
+$ownAccount = $ownUser->ID == $user->ID;
 
 $containerClasses = 'wfls-flex-row ' . ($stacked ? 'wfls-flex-row-wrapped' : 'wfls-flex-row-wrappable wfls-flex-row-equal-heights');
 $columnClasses = 'wfls-flex-row wfls-flex-item-xs-100 ' . ($stacked ? '' : 'wfls-flex-row-equal-heights');
@@ -23,7 +28,20 @@ $columnClasses = 'wfls-flex-row wfls-flex-item-xs-100 ' . ($stacked ? '' : 'wfls
 	<?php $asset->renderInlineIfNotEnqueued(); ?>
 <?php endforeach ?>
 <div id="wfls-management-embedded"<?php if ($stacked): ?> class="stacked" <?php endif ?>>
-	<p><?php echo wp_kses(sprintf(__('Two-Factor Authentication, or 2FA, significantly improves login security for your account. Wordfence 2FA works with a number of TOTP-based apps like Google Authenticator, FreeOTP, and Authy. For a full list of tested TOTP-based apps, <a href="%s" target="_blank" rel="noopener noreferrer">click here</a>.', 'wordfence'), \WordfenceLS\Controller_Support::esc_supportURL(\WordfenceLS\Controller_Support::ITEM_MODULE_LOGIN_SECURITY_2FA)), array('a'=>array('href'=>array(), 'target'=>array(), 'rel'=>array()))); ?></p>
+	<p><?php echo wp_kses(sprintf(/* translators: Support URL */ __('Two-Factor Authentication, or 2FA, significantly improves login security for your account. Wordfence 2FA works with a number of TOTP-based apps like Google Authenticator, FreeOTP, and Authy. For a full list of tested TOTP-based apps, <a href="%s" target="_blank" rel="noopener noreferrer">click here</a>.', 'wordfence'), \WordfenceLS\Controller_Support::esc_supportURL(\WordfenceLS\Controller_Support::ITEM_MODULE_LOGIN_SECURITY_2FA)), array('a'=>array('href'=>array(), 'target'=>array(), 'rel'=>array()))); ?></p>
+	<?php if (!$twoFactorEnabledForUser): ?>
+		<?php
+			$globallyEnabled = \WordfenceLS\Controller_Settings::shared()->is_2fa_enabled();
+			echo \WordfenceLS\Model_View::create('page/feature-disabled', array(
+				'title' => !$globallyEnabled ? __('Two-Factor Authentication is disabled.', 'wordfence') : ($ownAccount ? __('Two-Factor Authentication is disabled.', 'wordfence') : __('2FA is disabled for this user.', 'wordfence')),
+				'message' => !$globallyEnabled ? __('Signing in using 2FA is currently disabled for this site. Existing credentials and role settings are preserved.', 'wordfence') : ($ownAccount ? __('Your role does not have permission to activate two-factor authentication.', 'wordfence') : ($showSettingsButton ? __('Enable two-factor authentication on the settings page for this user\'s role to manage 2FA for the user.', 'wordfence') : __('Two-factor authentication is not enabled for this user\'s role.', 'wordfence'))),
+				'settingsURL' => $settingsURL,
+				'showSettingsButton' => $showSettingsButton,
+			))->render();
+		?>
+	</div>
+		<?php return; ?>
+	<?php endif; ?>
 	<div id="wfls-deactivation-controls" class="<?php echo $containerClasses ?>"<?php if (!$enabled) { echo ' style="display: none;"'; } ?>>
 		<!-- begin status content -->
 		<div class="<?php echo $columnClasses ?>">

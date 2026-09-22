@@ -1,0 +1,72 @@
+{
+    "name": "really-simple-plugins/metricool",
+    "version": "2.1.0",
+    "description": "Site metrics and social media analytics for Instagram, Facebook, YouTube, LinkedIn, X Twitter. The single best tool for Social Media Managers!",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://metricool.com/",
+    "authors": [
+        {
+            "name": "Really Simple Plugins",
+            "email": "beheer@really-simple-plugins.com",
+            "homepage": "https://really-simple-plugins.com/",
+            "role": "Organisation"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "php-stubs/wordpress-stubs": "6.8.2",
+        "phpcompatibility/phpcompatibility-wp": "^3.0@alpha",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "slevomat/coding-standard": "^8.14",
+        "squizlabs/php_codesniffer": "^3.9",
+        "szepeviktor/phpstan-wordpress": "^2.0",
+        "wpify/scoper": "^3.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Metricool\\": "app",
+            "Metricool\\Bootstrap\\": "bootstrap"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "platform": {
+            "php": "8.2"
+        },
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true,
+            "wpify/scoper": true
+        }
+    },
+    "extra": {
+        "wpify-scoper": {
+            "prefix": "Metricool\\Vendor",
+            "folder": "vendor/_scoped",
+            "globals": [
+                "wp-cli",
+                "wordpress",
+                "woocommerce"
+            ],
+            "composerjson": "composer-scoped.json",
+            "composerlock": "composer-scoped.lock",
+            "autorun": true
+        }
+    },
+    "scripts": {
+        "lint": "vendor/bin/phpcs --report=full",
+        "lint:report": "vendor/bin/phpcs --report=full --report-file=phpcs-report.txt",
+        "lint:summary": "vendor/bin/phpcs --report=summary",
+        "lint:summary:report": "vendor/bin/phpcs --report=summary --report-file=phpcs-report.txt",
+        "quality": "vendor/bin/phpstan analyse --memory-limit=2048M",
+        "quality:report": "vendor/bin/phpstan analyse --memory-limit=2048M > phpstan-report.txt",
+        "quality:diagnose": "vendor/bin/phpstan diagnose --memory-limit=2048M"
+    },
+    "minimum-stability": "alpha",
+    "prefer-stable": true
+}

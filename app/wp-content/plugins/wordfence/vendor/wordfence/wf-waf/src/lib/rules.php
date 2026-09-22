@@ -611,6 +611,12 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 			'subjects',
 		);
 	}
+	
+	public function __wakeup() {
+		if (empty($this->getWAF())) {
+			$this->setWAF(wfWAF::getInstance());
+		}
+	}
 
 	/**
 	 * @param string|array $subject
@@ -910,7 +916,7 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 					
 					$commonStringsChecked = array();
 					foreach ($patterns as $index => $rule) {
-						if (@preg_match('/' . $rule . '/iS', null) === false) {
+						if (@preg_match('/' . $rule . '/iS', '') === false) {
 							continue; //This PCRE version can't compile the rule
 						}
 						
@@ -1883,11 +1889,23 @@ class wfWAFRuleComparisonSubject {
 	}
 
 	public function filterReplace($value, $find, $replace) {
-		return str_replace($find, $replace, $value);
+		if (is_array($value)) {
+			return str_replace($find, $replace, $value);
+		}
+		if (is_scalar($value) || (is_object($value) && method_exists($value, '__toString'))) {
+			return str_replace($find, $replace, (string) $value);
+		}
+		return $value;
 	}
 
 	public function filterPregReplace($value, $pattern, $replacement, $limit=-1) {
-		return preg_replace($pattern, $replacement, $value, $limit);
+		if (is_array($value)) {
+			return preg_replace($pattern, $replacement, $value, $limit);
+		}
+		if (is_scalar($value) || (is_object($value) && method_exists($value, '__toString'))) {
+			return preg_replace($pattern, $replacement, (string) $value, $limit);
+		}
+		return $value;
 	}
 
 	private function getMatchingKeys($array, $patterns) {

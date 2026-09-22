@@ -61,12 +61,16 @@ abstract class wfAuditLogObserversWordfence extends wfAuditLog {
 	
 	const WORDFENCE_LS_2FA_DEACTIVATED = 'wordfence.ls.2fa.deactivated';
 	const WORDFENCE_LS_2FA_ACTIVATED = 'wordfence.ls.2fa.activated';
+	const WORDFENCE_LS_PASSKEY_REGISTERED = 'wordfence.ls.passkey.registered';
+	const WORDFENCE_LS_PASSKEY_REMOVED = 'wordfence.ls.passkey.removed';
+	const WORDFENCE_LS_PASSKEY_PASSWORD_AUTH_TOGGLED = 'wordfence.ls.passkey-password-auth.toggled';
 	const WORDFENCE_LS_XML_RPC_REQUIRES_2FA_TOGGLED = 'wordfence.ls.xml-rpc-2fa.toggled';
 	const WORDFENCE_LS_ALLOWED_IPS_UPDATED = 'wordfence.ls.allowed-ips.updated';
 	const WORDFENCE_LS_IP_SOURCE_CHANGED = 'wordfence.ls.ip-source.changed';
 	const WORDFENCE_LS_TRUSTED_PROXIES_UPDATED = 'wordfence.ls.trusted-proxies.updated';
 	const WORDFENCE_LS_2FA_REQUIRED_CHANGED = 'wordfence.ls.2fa-required.changed';
-	const WORDFENCE_LS_2FA_GRACE_PERIOD_CHANGED = 'wordfence.ls.2fa-grace-period.changed';
+	const WORDFENCE_LS_PASSKEY_REQUIRED_CHANGED = 'wordfence.ls.passkey-required.changed';
+	const WORDFENCE_LS_PASSKEY_2FA_GRACE_PERIOD_CHANGED = 'wordfence.ls.passkey-2fa-grace-period.changed';
 	const WORDFENCE_LS_XML_RPC_TOGGLED = 'wordfence.ls.xml-rpc-enabled.toggled';
 	const WORDFENCE_LS_CAPTCHA_TOGGLED = 'wordfence.ls.captcha-enabled.toggled';
 	const WORDFENCE_LS_CAPTCHA_THRESHOLD_CHANGED = 'wordfence.ls.captcha-threshold.changed';
@@ -111,6 +115,9 @@ abstract class wfAuditLogObserversWordfence extends wfAuditLog {
 			wfAuditLog::AUDIT_LOG_CATEGORY_AUTHENTICATION => array(
 				self::WORDFENCE_LS_2FA_DEACTIVATED,
 				self::WORDFENCE_LS_2FA_ACTIVATED,
+				self::WORDFENCE_LS_PASSKEY_REGISTERED,
+				self::WORDFENCE_LS_PASSKEY_REMOVED,
+				self::WORDFENCE_LS_PASSKEY_PASSWORD_AUTH_TOGGLED,
 				
 				self::WORDFENCE_ENFORCE_STRONG_PASSWORDS_TOGGLED,
 				self::WORDFENCE_MASK_LOGIN_ERRORS_TOGGLED,
@@ -120,7 +127,8 @@ abstract class wfAuditLogObserversWordfence extends wfAuditLog {
 				self::WORDFENCE_LS_XML_RPC_REQUIRES_2FA_TOGGLED,
 				self::WORDFENCE_LS_ALLOWED_IPS_UPDATED,
 				self::WORDFENCE_LS_2FA_REQUIRED_CHANGED,
-				self::WORDFENCE_LS_2FA_GRACE_PERIOD_CHANGED,
+				self::WORDFENCE_LS_PASSKEY_REQUIRED_CHANGED,
+				self::WORDFENCE_LS_PASSKEY_2FA_GRACE_PERIOD_CHANGED,
 			),
 			wfAuditLog::AUDIT_LOG_CATEGORY_FIREWALL => array(
 				self::WORDFENCE_WAF_MODE_CHANGED,
@@ -232,12 +240,16 @@ abstract class wfAuditLogObserversWordfence extends wfAuditLog {
 			
 			self::WORDFENCE_LS_2FA_DEACTIVATED => __('2FA Deactivated on User', 'wordfence'),
 			self::WORDFENCE_LS_2FA_ACTIVATED => __('2FA Activated on User', 'wordfence'),
+			self::WORDFENCE_LS_PASSKEY_REGISTERED => __('Passkey Registered on User', 'wordfence'),
+			self::WORDFENCE_LS_PASSKEY_REMOVED => __('Passkey Removed from User', 'wordfence'),
+			self::WORDFENCE_LS_PASSKEY_PASSWORD_AUTH_TOGGLED => __('Passkey Username/Password Authentication Toggled', 'wordfence'),
 			self::WORDFENCE_LS_XML_RPC_REQUIRES_2FA_TOGGLED => __('XML-RPC Requires 2FA Toggled', 'wordfence'),
 			self::WORDFENCE_LS_ALLOWED_IPS_UPDATED => __('IPs Bypassing 2FA Updated', 'wordfence'),
 			self::WORDFENCE_LS_IP_SOURCE_CHANGED => __('IP Source Changed', 'wordfence'),
 			self::WORDFENCE_LS_TRUSTED_PROXIES_UPDATED => __('Trusted Proxies Updated', 'wordfence'),
 			self::WORDFENCE_LS_2FA_REQUIRED_CHANGED => __('2FA Role Requirements Changed', 'wordfence'),
-			self::WORDFENCE_LS_2FA_GRACE_PERIOD_CHANGED => __('2FA Grace Period Changed', 'wordfence'),
+			self::WORDFENCE_LS_PASSKEY_REQUIRED_CHANGED => __('Passkey Role Requirements Changed', 'wordfence'),
+			self::WORDFENCE_LS_PASSKEY_2FA_GRACE_PERIOD_CHANGED => __('Passkey/2FA Grace Period Changed', 'wordfence'),
 			self::WORDFENCE_LS_XML_RPC_TOGGLED => __('XML-RPC Interface Toggled', 'wordfence'),
 			self::WORDFENCE_LS_CAPTCHA_TOGGLED => __('Login Captcha Toggled', 'wordfence'),
 			self::WORDFENCE_LS_CAPTCHA_THRESHOLD_CHANGED => __('reCAPTCHA Threshold Changed', 'wordfence'),
@@ -504,6 +516,22 @@ abstract class wfAuditLogObserversWordfence extends wfAuditLog {
 		$auditLog->_addObserver('wordfence_ls_2fa_activated', function($user) use ($auditLog) { //2FA activated on a user
 			$auditLog->_recordAction(self::WORDFENCE_LS_2FA_ACTIVATED, $auditLog->_sanitizeUserdata($user));
 		});
+
+		$auditLog->_addObserver('wordfence_ls_passkey_registered', function($user, $passkey) use ($auditLog) { //Passkey registered on a user
+			$auditLog->_recordAction(self::WORDFENCE_LS_PASSKEY_REGISTERED, self::_sanitizePasskeyData($user, $passkey));
+		});
+
+		$auditLog->_addObserver('wordfence_ls_passkey_removed', function($user, $passkey) use ($auditLog) { //Passkey removed from a user
+			$auditLog->_recordAction(self::WORDFENCE_LS_PASSKEY_REMOVED, self::_sanitizePasskeyData($user, $passkey));
+		});
+
+		$auditLog->_addObserver('wordfence_ls_passkey_password_auth_toggled', function($user, $before, $after) use ($auditLog) { //Username/password auth allowed while passkeys exist
+			$auditLog->_recordAction(self::WORDFENCE_LS_PASSKEY_PASSWORD_AUTH_TOGGLED, array(
+				'user' => $auditLog->_sanitizeUserdata($user),
+				'before' => (bool) $before,
+				'after' => (bool) $after,
+			));
+		});
 		
 		$auditLog->_addObserver('wordfence_ls_xml_rpc_2fa_toggled', function($before, $after) use ($auditLog) { //2FA required for XML-RPC calls
 			$auditLog->_recordAction(self::WORDFENCE_LS_XML_RPC_REQUIRES_2FA_TOGGLED, array('state' => $after));
@@ -523,8 +551,8 @@ abstract class wfAuditLogObserversWordfence extends wfAuditLog {
 			$auditLog->_recordAction(self::WORDFENCE_LS_TRUSTED_PROXIES_UPDATED, array('changes' => $changes));
 		});
 		
-		$auditLog->_addObserver('wordfence_ls_changed_grace_period', function($before, $after) use ($auditLog) { //2FA grace period changed
-			$auditLog->_recordAction(self::WORDFENCE_LS_2FA_GRACE_PERIOD_CHANGED, array('before' => $before, 'after' => $after));
+		$auditLog->_addObserver('wordfence_ls_changed_grace_period', function($before, $after) use ($auditLog) { //Passkey/2FA grace period changed
+			$auditLog->_recordAction(self::WORDFENCE_LS_PASSKEY_2FA_GRACE_PERIOD_CHANGED, array('before' => $before, 'after' => $after));
 		});
 		
 		$auditLog->_addObserver('wordfence_ls_xml_rpc_enabled_toggled', function($before, $after) use ($auditLog) { //XML-RPC enabled/disabled
@@ -565,6 +593,18 @@ abstract class wfAuditLogObserversWordfence extends wfAuditLog {
 			
 			$auditLog->_needsDestruct();
 		});
+
+		$auditLog->_addObserver('wordfence_ls_changed_passkey_required', function($role, $value) use ($auditLog) { //Passkey requirement changed on a role
+			if (!$auditLog->_hasState('wordfence_ls_changed_passkey_required.changes', 0)) {
+				$auditLog->_trackState('wordfence_ls_changed_passkey_required.changes', array(), 0);
+			}
+
+			$state = $auditLog->_getState('wordfence_ls_changed_passkey_required.changes', 0);
+			$state[$role] = $value;
+			$auditLog->_trackState('wordfence_ls_changed_passkey_required.changes', $state, 0);
+
+			$auditLog->_needsDestruct();
+		});
 	}
 	
 	/**
@@ -573,7 +613,7 @@ abstract class wfAuditLogObserversWordfence extends wfAuditLog {
 	 * @param wfAuditLog $auditLog
 	 */
 	protected static function _registerCoalescers($auditLog) {
-		$auditLog->_addCoalescer(function() use ($auditLog) { //Network active plugins changed
+		$auditLog->_addCoalescer(function() use ($auditLog) { //2FA requirements changed on one or more roles
 			$changes = $auditLog->_getState('wordfence_ls_changed_2fa_required.changes', 0);
 			if (!is_array($changes) || !count($changes)) {
 				return;
@@ -581,5 +621,42 @@ abstract class wfAuditLogObserversWordfence extends wfAuditLog {
 			
 			$auditLog->_recordAction(self::WORDFENCE_LS_2FA_REQUIRED_CHANGED, array('changes' => $changes));
 		});
+
+		$auditLog->_addCoalescer(function() use ($auditLog) { //Passkey requirements changed on one or more roles
+			$changes = $auditLog->_getState('wordfence_ls_changed_passkey_required.changes', 0);
+			if (!is_array($changes) || !count($changes)) {
+				return;
+			}
+
+			$auditLog->_recordAction(self::WORDFENCE_LS_PASSKEY_REQUIRED_CHANGED, array('changes' => $changes));
+		});
+	}
+
+	protected static function _sanitizePasskeyData($user, $passkey) {
+		$credentialID = '';
+		$label = '';
+
+		if (is_array($passkey)) {
+			if (isset($passkey['credential_id']) && is_string($passkey['credential_id'])) {
+				$credentialID = bin2hex($passkey['credential_id']);
+			}
+			if (isset($passkey['label']) && is_string($passkey['label'])) {
+				$label = $passkey['label'];
+			}
+		}
+		else if (is_object($passkey)) {
+			if (isset($passkey->credential_id) && is_string($passkey->credential_id)) {
+				$credentialID = bin2hex($passkey->credential_id);
+			}
+			if (isset($passkey->label) && is_string($passkey->label)) {
+				$label = $passkey->label;
+			}
+		}
+
+		return array(
+			'user_id' => ($user instanceof WP_User) ? (int) $user->ID : (is_object($user) && isset($user->ID) ? (int) $user->ID : 0),
+			'credential_id' => $credentialID,
+			'label' => $label,
+		);
 	}
 }

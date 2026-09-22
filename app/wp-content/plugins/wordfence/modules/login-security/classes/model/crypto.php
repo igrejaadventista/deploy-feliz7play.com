@@ -7,8 +7,10 @@ abstract class Model_Crypto {
 	 * Refreshes the secrets used by the plugin.
 	 */
 	public static function refresh_secrets() {
-		Controller_Settings::shared()->set(Controller_Settings::OPTION_SHARED_HASH_SECRET_KEY, bin2hex(self::random_bytes(32)));
-		Controller_Settings::shared()->set(Controller_Settings::OPTION_SHARED_SYMMETRIC_SECRET_KEY, bin2hex(self::random_bytes(32)));
+		$hashSecret = bin2hex(self::random_bytes(32, false));
+		$symmetricSecret = bin2hex(self::random_bytes(32, false));
+		Controller_Settings::shared()->set(Controller_Settings::OPTION_SHARED_HASH_SECRET_KEY, $hashSecret);
+		Controller_Settings::shared()->set(Controller_Settings::OPTION_SHARED_SYMMETRIC_SECRET_KEY, $symmetricSecret);
 		Controller_Settings::shared()->set(Controller_Settings::OPTION_LAST_SECRET_REFRESH, Controller_Time::time(), true);
 	}
 	
@@ -47,8 +49,17 @@ abstract class Model_Crypto {
 	 * Utility
 	 */
 	
-	public static function random_bytes($bytes) {
+	/**
+	 * Returns random bytes, optionally requiring PHP's operating-system-backed CSPRNG.
+	 *
+	 * @param int $bytes Number of bytes to return.
+	 * @param bool $allowFallback Whether legacy random-generator fallbacks may be used.
+	 * @return string Random bytes.
+	 * @throws \RuntimeException When fallback is disallowed and secure randomness is unavailable.
+	 */
+	public static function random_bytes($bytes, $allowFallback = true) {
 		$bytes = (int) $bytes;
+		$failure = null;
 		if (function_exists('random_bytes')) {
 			try {
 				$rand = random_bytes($bytes);
@@ -56,12 +67,15 @@ abstract class Model_Crypto {
 					return $rand;
 				}
 			} catch (\Exception $e) {
-				// Fall through
+				$failure = $e;
 			} catch (\TypeError $e) {
-				// Fall through
+				$failure = $e;
 			} catch (\Error $e) {
-				// Fall through
+				$failure = $e;
 			}
+		}
+		if (!$allowFallback) {
+			throw new \RuntimeException('Unable to generate secure random bytes.', 0, $failure);
 		}
 		if (function_exists('mcrypt_create_iv')) {
 			// phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.mcrypt_create_ivDeprecatedRemoved,PHPCompatibility.Extensions.RemovedExtensions.mcryptDeprecatedRemoved,PHPCompatibility.Constants.RemovedConstants.mcrypt_dev_urandomDeprecatedRemoved
