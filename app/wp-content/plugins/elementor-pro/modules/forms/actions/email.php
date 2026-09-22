@@ -2,6 +2,7 @@
 namespace ElementorPro\Modules\Forms\Actions;
 
 use Elementor\Controls_Manager;
+use Elementor\Core\Admin\Admin_Notices;
 use ElementorPro\Core\Utils\Hints;
 use ElementorPro\Core\Utils;
 use ElementorPro\Core\Utils\Collection;
@@ -36,6 +37,8 @@ class Email extends Action_Base {
 			]
 		);
 
+		$this->maybe_add_site_mailer_notice( $widget );
+
 		$widget->add_control(
 			$this->get_control_id( 'email_to' ),
 			[
@@ -56,7 +59,7 @@ class Email extends Action_Base {
 		);
 
 		/* translators: %s: Site title. */
-		$default_message = sprintf( esc_html__( 'New message from "%s"', 'elementor-pro' ), get_option( 'blogname' ) );
+		$default_message = sprintf( __( 'New message from "%s"', 'elementor-pro' ), get_option( 'blogname' ) );
 
 		$widget->add_control(
 			$this->get_control_id( 'email_subject' ),
@@ -220,35 +223,95 @@ class Email extends Action_Base {
 			]
 		);
 
+		$widget->end_controls_section();
+	}
+
+	public function maybe_add_site_mailer_notice( $widget ) {
 		$notice_id = 'site_mailer_forms_email_notice';
-		if ( Hints::should_show_hint( $notice_id ) ) {
-			$notice_content = esc_html__( 'Experiencing email deliverability issues? Get your emails delivered with Site Mailer.', 'elementor-pro' );
 
-			if ( 2 === Utils\Abtest::get_variation( 'plg_site_mailer_submission' ) ) {
-				$notice_content = esc_html__( 'Make sure your emails reach the inbox every time with Site Mailer', 'elementor-pro' );
-			}
-
-			$widget->add_control(
-				$this->get_control_id( 'site_mailer_promo' ),
-				[
-					'type' => Controls_Manager::RAW_HTML,
-					'raw' => Hints::get_notice_template( [
-						'display' => ! Hints::is_dismissed( $notice_id ),
-						'type' => 'info',
-						'content' => $notice_content,
-						'icon' => true,
-						'dismissible' => $notice_id,
-						'button_text' => Hints::is_plugin_installed( 'site-mailer' ) ? __( 'Activate Plugin', 'elementor-pro' ) : __( 'Install Plugin', 'elementor-pro' ),
-						'button_event' => $notice_id,
-						'button_data' => [
-							'action_url' => Hints::get_plugin_action_url( 'site-mailer' ),
-						],
-					], true ),
-				]
-			);
+		if ( ! Hints::should_show_hint( $notice_id ) ) {
+			return;
 		}
 
-		$widget->end_controls_section();
+		$plugin_slug = 'site-mailer';
+
+		$one_subscription = method_exists( Hints::class, 'is_plugin_connected_to_one_subscription' ) && Hints::is_plugin_connected_to_one_subscription();
+		$is_installed = Hints::is_plugin_installed( $plugin_slug );
+		$is_active = Hints::is_plugin_active( $plugin_slug );
+
+		if ( $is_active ) {
+			return;
+		}
+
+		if ( $one_subscription ) {
+			if ( ! $is_installed ) {
+				$notice_content = esc_html__( 'Make sure your site’s emails reach the inbox every time. Email Deliverability is included in your ONE subscription.', 'elementor-pro' );
+				$button_text = esc_html__( 'Install now', 'elementor-pro' );
+				$button_url = Hints::get_plugin_install_url( $plugin_slug );
+				$campaign_data = [
+					'name' => 'site_mailer_forms_email_notice',
+					'campaign' => 'sm-plg-form-v1-one-install',
+					'source' => 'sm-editor-form-one-install',
+					'medium' => 'wp-dash-one',
+				];
+			} elseif ( ! $is_active ) {
+				$notice_content = esc_html__( 'Ensure your site’s emails reach the inbox every time. Email Deliverability is included in your ONE subscription. Activate it to continue.', 'elementor-pro' );
+				$button_text = esc_html__( 'Activate now', 'elementor-pro' );
+				$button_url = Hints::get_plugin_activate_url( $plugin_slug );
+				$campaign_data = [
+					'name' => 'site_mailer_forms_email_notice',
+					'campaign' => 'sm-plg-form-v1-one-activate',
+					'source' => 'sm-editor-form-one-activate',
+					'medium' => 'wp-dash-one',
+				];
+			}
+		} else {
+			$notice_content = esc_html__( 'Experiencing email deliverability issues? Get your emails delivered with Email Deliverability.', 'elementor-pro' );
+
+			if ( 2 === Utils\Abtest::get_variation( 'plg_site_mailer_submission' ) ) {
+				$notice_content = esc_html__( 'Make sure your emails reach the inbox every time with Email Deliverability.', 'elementor-pro' );
+			}
+
+			if ( ! $is_installed ) {
+				$button_text = esc_html__( 'Install now', 'elementor-pro' );
+				$button_url = Hints::get_plugin_install_url( $plugin_slug );
+				$campaign_data = [
+					'name' => 'site_mailer_forms_email_notice',
+					'campaign' => 'sm-form-install',
+					'source' => 'sm-plg-form-v1-install',
+					'medium' => 'wp-dash',
+				];
+			} elseif ( ! $is_active ) {
+				$button_text = esc_html__( 'Activate now', 'elementor-pro' );
+				$button_url = Hints::get_plugin_activate_url( $plugin_slug );
+				$campaign_data = [
+					'name' => 'site_mailer_forms_email_notice',
+					'campaign' => 'sm-form-activate',
+					'source' => 'sm-plg-form-v1-activate',
+					'medium' => 'wp-dash',
+				];
+			}
+		}
+
+		$widget->add_control(
+			$this->get_control_id( 'site_mailer_promo' ),
+			[
+				'type' => Controls_Manager::RAW_HTML,
+				'raw' => Hints::get_notice_template( [
+					'display' => ! Hints::is_dismissed( $notice_id ),
+					'type' => 'info',
+					'content' => $notice_content,
+					'icon' => true,
+					'dismissible' => $notice_id,
+					'button_text' => $button_text,
+					'button_event' => $notice_id,
+					'button_data' => [
+						'action_url' => $button_url,
+						'source' => $campaign_data['source'],
+					],
+				], true ),
+			]
+		);
 	}
 
 	public function on_export( $element ) {
@@ -316,6 +379,30 @@ class Email extends Action_Base {
 		if ( ! empty( $email_meta ) ) {
 			$fields['email_content'] .= $line_break . '---' . $line_break . $line_break . $email_meta;
 		}
+
+		/**
+		 * Email fields.
+		 *
+		 * Filters all email fields (to, cc, bcc, subject, content, from, etc.)
+		 * before they are used to build headers and send the email. This hook
+		 * allows developers to modify any email parameter in one place.
+		 *
+		 * @since 4.0.3
+		 *
+		 * @param array       $fields {
+		 *     Email field values.
+		 *
+		 *     @type string $email_to        Recipient address(es).
+		 *     @type string $email_subject   Email subject line.
+		 *     @type string $email_content   Email body content.
+		 *     @type string $email_from_name Sender name.
+		 *     @type string $email_from      Sender email address.
+		 *     @type string $email_to_cc     CC address(es).
+		 *     @type string $email_to_bcc    BCC address(es).
+		 * }
+		 * @param Form_Record $record An instance of the form record.
+		 */
+		$fields = apply_filters( 'elementor_pro/forms/wp_mail_fields', $fields, $record );
 
 		$headers = sprintf( 'From: %s <%s>' . "\r\n", $fields['email_from_name'], $fields['email_from'] );
 		$headers .= sprintf( 'Reply-To: %s' . "\r\n", $email_reply_to );

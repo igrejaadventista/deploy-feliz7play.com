@@ -15,55 +15,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Submissions_Menu_Item implements Admin_Menu_Item_With_Page {
-	public function get_capability() {
+	public function get_capability(): string {
 		return 'manage_options';
 	}
 
-	public function get_label() {
+	public function get_label(): string {
 		return esc_html__( 'Submissions', 'elementor-pro' );
 	}
 
-	public function get_page_title() {
+	public function get_page_title(): string {
 		return esc_html__( 'Submissions', 'elementor-pro' );
 	}
 
-	public function get_parent_slug() {
+	public function get_parent_slug(): string {
 		return Settings::PAGE_ID;
 	}
 
-	public function is_visible() {
+	public function is_visible(): bool {
 		return true;
 	}
 
-	public function get_position() {
-		return null;
+	public function get_position(): ?int {
+		return 50;
 	}
 
-	public function render() {
-		if ( $this->should_show_hint() ) {
-			/**
-			 * @var Admin_Notices $admin_notices
-			 */
-			$admin_notices = Plugin::elementor()->admin->get_component( 'admin-notices' );
-
-			$notice_options = [
-				'description' => esc_html__( 'Experiencing email deliverability issues? Get your emails delivered with Site Mailer.', 'elementor-pro' ),
-				'id' => 'site_mailer_forms_submissions_notice',
-				'type' => 'cta',
-				'button_secondary' => [
-					'text' => Hints::is_plugin_installed( 'site-mailer' ) ? esc_html__( 'Activate Plugin', 'elementor-pro' ) : esc_html__( 'Install Plugin', 'elementor-pro' ),
-					'url' => Hints::get_plugin_action_url( 'site-mailer' ),
-					'type' => 'cta',
-				],
-			];
-
-			if ( 2 === Abtest::get_variation( 'plg_site_mailer_submission' ) ) {
-				$notice_options['title'] = esc_html__( 'Get Your Emails Delivered With Site Mailer', 'elementor-pro' );
-				$notice_options['description'] = esc_html__( 'Make sure emails reach the inbox every time with improved deliverability, detailed email logs, and an easy setup with no need for an SMTP plugin.', 'elementor-pro' );
-			}
-
-			$admin_notices->print_admin_notice( $notice_options );
-		}
+	public function render(): void {
+		$this->maybe_render_hints();
 		?>
 		<div class="wrap">
 			<h1 class="wp-heading-inline"><?php echo esc_html__( 'Submissions', 'elementor-pro' ); ?></h1>
@@ -71,6 +48,105 @@ class Submissions_Menu_Item implements Admin_Menu_Item_With_Page {
 			<div id="e-form-submissions"></div>
 		</div>
 		<?php
+	}
+
+	private function maybe_render_hints() {
+		if ( ! $this->has_submissions() ) {
+			return;
+		}
+
+		if ( $this->should_show_site_mailer_hint() ) {
+			$this->render_site_mailer_notice();
+		}
+	}
+
+	private function render_site_mailer_notice() {
+		$notice_id = 'site_mailer_forms_submissions_notice';
+
+		if ( ! current_user_can( 'install_plugins' ) ) {
+			return;
+		}
+
+		$plugin_slug = 'site-mailer';
+
+		$one_subscription = method_exists( Hints::class, 'is_plugin_connected_to_one_subscription' ) && Hints::is_plugin_connected_to_one_subscription();
+		$is_installed = Hints::is_plugin_installed( $plugin_slug );
+		$is_active = Hints::is_plugin_active( $plugin_slug );
+
+		if ( $is_active ) {
+			return;
+		}
+
+		if ( $one_subscription ) {
+			$title = esc_html__( 'Get your emails delivered with Email Deliverability', 'elementor-pro' );
+
+			if ( ! $is_installed ) {
+				$description = esc_html__( 'Ensure form submission emails reach the inbox and track delivery with built-in logs. Email Deliverability is included in your ONE subscription.', 'elementor-pro' );
+				$button_text = esc_html__( 'Install now', 'elementor-pro' );
+				$button_url = Hints::get_plugin_install_url( $plugin_slug );
+				$campaign_data = [
+					'name' => 'site_mailer_forms_submissions_notice',
+					'campaign' => 'sm-plg-submission-v1',
+					'source' => 'sm-submission-one-install',
+					'medium' => 'wp-dash-one',
+				];
+			} elseif ( ! $is_active ) {
+				$description = esc_html__( 'Ensure form submission emails reach the inbox and track delivery with built-in logs. Email Deliverability is included in your ONE subscription. Activate it to continue.', 'elementor-pro' );
+				$button_text = esc_html__( 'Activate now', 'elementor-pro' );
+				$button_url = Hints::get_plugin_action_url( $plugin_slug );
+				$campaign_data = [
+					'name' => 'site_mailer_forms_submissions_notice',
+					'campaign' => 'sm-plg-submission-v1',
+					'source' => 'sm-submission-one-activate',
+					'medium' => 'wp-dash-one',
+				];
+			}
+		} else {
+			$title = esc_html__( 'Get Your Emails Delivered With Email Deliverability', 'elementor-pro' );
+			$description = esc_html__( 'Make sure emails reach the inbox every time with improved deliverability, detailed email logs, and an easy setup with no need for an SMTP plugin.', 'elementor-pro' );
+
+			if ( ! $is_installed ) {
+				$button_text = esc_html__( 'Install now', 'elementor-pro' );
+				$button_url = Hints::get_plugin_install_url( $plugin_slug );
+				$campaign_data = [
+					'name' => 'site_mailer_forms_submissions_notice',
+					'campaign' => 'sm-plg-submission-v1',
+					'source' => 'sm-submission-install',
+					'medium' => 'wp-dash',
+				];
+			} elseif ( ! $is_active ) {
+				$button_text = esc_html__( 'Activate now', 'elementor-pro' );
+				$button_url = Hints::get_plugin_action_url( $plugin_slug );
+				$campaign_data = [
+					'name' => 'site_mailer_forms_submissions_notice',
+					'campaign' => 'sm-plg-submission-v1',
+					'source' => 'sm-submission-activate',
+					'medium' => 'wp-dash',
+				];
+			}
+		}
+
+		$notice_options = [
+			'id' => $notice_id,
+			'title' => $title,
+			'description' => $description,
+			'type' => 'cta',
+			'button_secondary' => [
+				'text' => $button_text,
+				'url' => $button_url,
+				'type' => 'cta',
+				'data' => [
+					'source' => $campaign_data['source'],
+				],
+			],
+		];
+
+		/**
+		 * @var Admin_Notices $admin_notices
+		 */
+		$admin_notices = Plugin::elementor()->admin->get_component( 'admin-notices' );
+
+		$admin_notices->print_admin_notice( $notice_options );
 	}
 
 	public function has_submissions( $min_count = 1 ): bool {
@@ -83,10 +159,9 @@ class Submissions_Menu_Item implements Admin_Menu_Item_With_Page {
 		return $min_count <= $submissions_count;
 	}
 
-	public function should_show_hint(): bool {
+	public function should_show_site_mailer_hint(): bool {
 		return ( Hints::should_show_hint( 'site_mailer_forms_submissions_notice' )
-				 && $this->has_submissions( 10 )
-				 && ! User::is_user_notice_viewed( 'site_mailer_forms_submissions_notice' )
+				&& ! User::is_user_notice_viewed( 'site_mailer_forms_submissions_notice' )
 		);
 	}
 }

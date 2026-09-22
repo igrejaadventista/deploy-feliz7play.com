@@ -5,6 +5,7 @@ use Elementor\Controls_Manager;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Typography;
+use ElementorPro\Modules\CollectionLoop\Utils\Loop_Iteration_Context;
 use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -27,6 +28,10 @@ class Product_Add_To_Cart extends Base_Widget {
 
 	public function get_keywords() {
 		return [ 'woocommerce', 'shop', 'store', 'cart', 'product', 'button', 'add to cart' ];
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
 	/**
@@ -121,7 +126,10 @@ class Product_Add_To_Cart extends Base_Widget {
 	}
 
 	private function is_loop_item() {
-		return 'loop-item' === Plugin::elementor()->documents->get_current()->get_type();
+		$document = Plugin::elementor()->documents->get_current();
+
+		return ( $document && 'loop-item' === $document->get_type() )
+			|| Loop_Iteration_Context::is_v4_collection_loop_active();
 	}
 
 	private function is_loop_item_template_edit() {
@@ -216,8 +224,7 @@ class Product_Add_To_Cart extends Base_Widget {
 		$this->add_control(
 			'wc_style_warning',
 			[
-				// TODO: Remove define() with the release of Elementor 3.22
-				'type' => defined( 'Controls_Manager::ALERT' ) ? Controls_Manager::ALERT : 'alert',
+				'type' => Controls_Manager::ALERT,
 				'alert_type' => 'info',
 				'content' => esc_html__( 'The style of this widget is often affected by your theme and plugins. If you experience any such issue, try to switch to a basic theme and deactivate related plugins.', 'elementor-pro' ),
 			]

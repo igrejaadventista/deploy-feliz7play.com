@@ -3,7 +3,7 @@
 namespace Elementor\Modules\Checklist;
 
 use Elementor\Core\Base\Module as BaseModule;
-use Elementor\Core\Experiments\Manager;
+use Elementor\Core\Experiments\Manager as Experiments_Manager;
 use Elementor\Modules\ElementorCounter\Module as Elementor_Counter;
 use Elementor\Core\Isolation\Wordpress_Adapter;
 use Elementor\Core\Isolation\Wordpress_Adapter_Interface;
@@ -13,13 +13,13 @@ use Elementor\Core\Isolation\Elementor_Counter_Adapter_Interface;
 use Elementor\Plugin;
 use Elementor\Utils;
 use Elementor\Modules\Checklist\Data\Controller;
-use Elementor\Core\Utils\Isolation_Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
 class Module extends BaseModule implements Checklist_Module_Interface {
+	const EXPERIMENT_NAME = 'launchpad-checklist';
 	const DB_OPTION_KEY = 'elementor_checklist';
 	const VISIBILITY_SWITCH_ID = 'show_launchpad_checklist';
 	const FIRST_CLOSED_CHECKLIST_IN_EDITOR = 'first_closed_checklist_in_editor';
@@ -43,10 +43,15 @@ class Module extends BaseModule implements Checklist_Module_Interface {
 		?Wordpress_Adapter_Interface $wordpress_adapter = null,
 		?Elementor_Adapter_Interface $elementor_adapter = null
 	) {
-		$this->wordpress_adapter = $wordpress_adapter ?? Isolation_Manager::get_adapter( Wordpress_Adapter::class );
-		$this->elementor_adapter = $elementor_adapter ?? Isolation_Manager::get_adapter( Elementor_Adapter::class );
+		$this->wordpress_adapter = $wordpress_adapter ?? new Wordpress_Adapter();
+		$this->elementor_adapter = $elementor_adapter ?? new Elementor_Adapter();
 
 		parent::__construct();
+
+		if ( ! Plugin::$instance->experiments->is_feature_active( self::EXPERIMENT_NAME ) ) {
+			return;
+		}
+
 		$this->init_user_progress();
 
 		Plugin::$instance->data_manager_v2->register_controller( new Controller() );
@@ -68,6 +73,17 @@ class Module extends BaseModule implements Checklist_Module_Interface {
 	 */
 	public function get_name(): string {
 		return 'e-checklist';
+	}
+
+	public static function get_experimental_data(): array {
+		return [
+			'name' => self::EXPERIMENT_NAME,
+			'title' => esc_html__( 'Launchpad Checklist', 'elementor' ),
+			'description' => esc_html__( 'Launchpad Checklist feature to boost productivity and deliver your site faster', 'elementor' ),
+			'hidden' => true,
+			'default' => Experiments_Manager::STATE_INACTIVE,
+			'release_status' => Experiments_Manager::RELEASE_STATUS_STABLE,
+		];
 	}
 
 	/**
@@ -241,6 +257,7 @@ class Module extends BaseModule implements Checklist_Module_Interface {
 	}
 
 	public static function should_display_checklist_toggle_control(): bool {
-		return current_user_can( 'manage_options' );
+		return Plugin::$instance->experiments->is_feature_active( self::EXPERIMENT_NAME )
+			&& current_user_can( 'manage_options' );
 	}
 }

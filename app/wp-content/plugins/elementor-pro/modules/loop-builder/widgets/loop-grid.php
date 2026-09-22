@@ -18,7 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Loop_Grid extends Base {
-
 	public function get_name() {
 		return 'loop-grid';
 	}
@@ -46,7 +45,11 @@ class Loop_Grid extends Base {
 	 * @return array Widget style dependencies.
 	 */
 	public function get_style_depends(): array {
-		return [ 'widget-loop-builder' ];
+		return [ 'widget-loop-grid' ];
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return true;
 	}
 
 	protected function register_layout_section() {
@@ -231,18 +234,18 @@ class Loop_Grid extends Base {
 				'type' => Controls_Manager::SELECT,
 				'default' => '1',
 				'options' => [
-					'1' => '1',
-					'2' => '2',
-					'3' => '3',
-					'4' => '4',
-					'5' => '5',
-					'6' => '6',
-					'7' => '7',
-					'8' => '8',
-					'9' => '9',
-					'10' => '10',
-					'11' => '11',
-					'12' => '12',
+					'1' => esc_html__( '1', 'elementor-pro' ),
+					'2' => esc_html__( '2', 'elementor-pro' ),
+					'3' => esc_html__( '3', 'elementor-pro' ),
+					'4' => esc_html__( '4', 'elementor-pro' ),
+					'5' => esc_html__( '5', 'elementor-pro' ),
+					'6' => esc_html__( '6', 'elementor-pro' ),
+					'7' => esc_html__( '7', 'elementor-pro' ),
+					'8' => esc_html__( '8', 'elementor-pro' ),
+					'9' => esc_html__( '9', 'elementor-pro' ),
+					'10' => esc_html__( '10', 'elementor-pro' ),
+					'11' => esc_html__( '11', 'elementor-pro' ),
+					'12' => esc_html__( '12', 'elementor-pro' ),
 				],
 				'condition' => [
 					'template_id!' => '',
@@ -592,7 +595,7 @@ class Loop_Grid extends Base {
 
 	public static function on_import_update_dynamic_content( array $element_config, array $data, $controls = null ) : array {
 		if ( isset( $element_config['settings']['template_id'] ) && isset( $data['post_ids'] ) ) {
-			$element_config['settings']['template_id'] = $data['post_ids'][ $element_config['settings']['template_id'] ];
+			$element_config['settings']['template_id'] = $data['post_ids'][ $element_config['settings']['template_id'] ] ?? 0;
 		}
 
 		return $element_config;

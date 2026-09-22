@@ -36,6 +36,10 @@ class Code_Highlight extends Base_Widget {
 		return false;
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
 	public function get_script_depends() {
 		$depends = [
 			'prismjs_core' => true,
@@ -64,16 +68,6 @@ class Code_Highlight extends Base_Widget {
 		}
 
 		return array_keys( $depends );
-	}
-
-	public function get_css_config() {
-		// This widget is loading its own CSS using get_style_depends.
-		return [
-			'key' => $this->get_group_name(),
-			'version' => ELEMENTOR_PRO_VERSION,
-			'file_path' => '',
-			'data' => [],
-		];
 	}
 
 	protected function register_controls() {
@@ -301,6 +295,43 @@ class Code_Highlight extends Base_Widget {
 			</pre>
 		</div>
 		<?php
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$code = (string) ( $settings['code'] ?? '' );
+
+		if ( '' === $code ) {
+			return '';
+		}
+
+		$language = $this->sanitize_markdown_language( (string) ( $settings['language'] ?? '' ) );
+		$fence = $this->get_markdown_code_fence( $code );
+
+		return $fence . $language . "\n" . $code . "\n" . $fence;
+	}
+
+	private function sanitize_markdown_language( string $language ): string {
+		if ( ! preg_match( '/^[A-Za-z0-9_+\-]+$/', $language ) ) {
+			return '';
+		}
+
+		return $language;
+	}
+
+	private function get_markdown_code_fence( string $code ): string {
+		preg_match_all( '/`+/', $code, $matches );
+
+		$longest = 0;
+
+		foreach ( $matches[0] as $run ) {
+			$length = strlen( $run );
+			if ( $length > $longest ) {
+				$longest = $length;
+			}
+		}
+
+		return str_repeat( '`', max( 3, $longest + 1 ) );
 	}
 
 	protected function content_template() {

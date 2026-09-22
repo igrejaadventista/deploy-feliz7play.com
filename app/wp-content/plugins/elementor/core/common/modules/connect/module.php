@@ -5,6 +5,7 @@ use Elementor\Core\Base\Module as BaseModule;
 use Elementor\Core\Common\Modules\Connect\Apps\Base_App;
 use Elementor\Core\Common\Modules\Connect\Apps\Common_App;
 use Elementor\Core\Common\Modules\Connect\Apps\Connect;
+use Elementor\Core\Common\Modules\Connect\Apps\Feedback;
 use Elementor\Core\Common\Modules\Connect\Apps\Library;
 use Elementor\Plugin;
 use Elementor\Utils;
@@ -75,6 +76,7 @@ class Module extends BaseModule {
 		$this->registered_apps = [
 			'connect' => Connect::get_class_name(),
 			'library' => Library::get_class_name(),
+			'feedback' => Feedback::get_class_name(),
 		];
 
 		// When using REST API the parent module is construct after the action 'elementor/init'
@@ -130,13 +132,13 @@ class Module extends BaseModule {
 	 * @since 2.3.0
 	 * @access public
 	 *
-	 * @param string $slug App slug.
-	 * @param string $class App full class name.
+	 * @param string $slug       App slug.
+	 * @param string $class_name App full class name.
 	 *
 	 * @return self The updated apps manager instance.
 	 */
-	public function register_app( $slug, $class ) {
-		$this->registered_apps[ $slug ] = $class;
+	public function register_app( $slug, $class_name ) {
+		$this->registered_apps[ $slug ] = $class_name;
 
 		return $this;
 	}

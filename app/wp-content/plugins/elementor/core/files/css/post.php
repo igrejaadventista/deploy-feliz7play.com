@@ -4,6 +4,7 @@ namespace Elementor\Core\Files\CSS;
 use Elementor\Controls_Stack;
 use Elementor\Core\DynamicTags\Dynamic_CSS;
 use Elementor\Core\Kits\Manager;
+use Elementor\Core\Frontend\Widget_Content_Render_Mode;
 use Elementor\Element_Base;
 use Elementor\Plugin;
 
@@ -218,7 +219,7 @@ class Post extends Base {
 	 * @param array          $replacements   Replacements.
 	 * @param array          $all_controls   All controls.
 	 */
-	public function add_controls_stack_style_rules( Controls_Stack $controls_stack, array $controls, array $values, array $placeholders, array $replacements, array $all_controls = null ) {
+	public function add_controls_stack_style_rules( Controls_Stack $controls_stack, array $controls, array $values, array $placeholders, array $replacements, ?array $all_controls = null ) {
 		parent::add_controls_stack_style_rules( $controls_stack, $controls, $values, $placeholders, $replacements, $all_controls );
 
 		if ( $controls_stack instanceof Element_Base ) {
@@ -281,6 +282,10 @@ class Post extends Base {
 	 * @param Element_Base $element The element.
 	 */
 	protected function render_styles( Element_Base $element ) {
+		if ( Widget_Content_Render_Mode::is( Widget_Content_Render_Mode::MARKDOWN ) ) {
+			return;
+		}
+
 		/**
 		 * Before element parse CSS.
 		 *

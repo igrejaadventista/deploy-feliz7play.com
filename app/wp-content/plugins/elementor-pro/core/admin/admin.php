@@ -39,11 +39,9 @@ class Admin extends App {
 	public function enqueue_styles() {
 		$suffix = Utils::is_script_debug() ? '' : '.min';
 
-		$direction_suffix = is_rtl() ? '-rtl' : '';
-
 		wp_register_style(
 			'elementor-pro-admin',
-			ELEMENTOR_PRO_ASSETS_URL . 'css/admin' . $direction_suffix . $suffix . '.css',
+			ELEMENTOR_PRO_URL . 'assets/css/admin' . $suffix . '.css',
 			[],
 			ELEMENTOR_PRO_VERSION
 		);
@@ -176,11 +174,11 @@ class Admin extends App {
 				'field_args' => [
 					'type' => 'raw_html',
 					'html' => sprintf(
-						$rollback_html . '<a data-placeholder-text="' . esc_html__( 'Reinstall', 'elementor-pro' ) . ' v{VERSION}" href="#" data-placeholder-url="%s" class="button elementor-button-spinner elementor-rollback-button">%s</a>',
+						$rollback_html . '<button data-placeholder-text="' . esc_html__( 'Reinstall', 'elementor-pro' ) . ' v{VERSION}" data-placeholder-url="%s" class="button elementor-button-spinner elementor-rollback-button">%s</button>',
 						wp_nonce_url( admin_url( 'admin-post.php?action=elementor_pro_rollback&version=VERSION' ), 'elementor_pro_rollback' ),
 						__( 'Reinstall', 'elementor-pro' )
 					),
-					'desc' => '<span style="color: red;">' . esc_html__( 'Warning: Please backup your database before making the rollback.', 'elementor-pro' ) . '</span>',
+					'desc' => '<span style="color: red;">' . esc_html__( 'Warning: Please back up your database before making the rollback.', 'elementor-pro' ) . '</span>',
 				],
 			],
 		] );
@@ -225,12 +223,6 @@ class Admin extends App {
 		$rollback->run();
 
 		wp_die( '', esc_html__( 'Rollback to Previous Version', 'elementor-pro' ), [ 'response' => 200 ] );
-	}
-
-	public function plugin_action_links( $links ) {
-		unset( $links['go_pro'] );
-
-		return $links;
 	}
 
 	public function plugin_row_meta( $plugin_meta, $plugin_file ) {
@@ -282,15 +274,19 @@ class Admin extends App {
 	 * Admin constructor.
 	 */
 	public function __construct() {
-		$this->add_component( 'canary-deployment', new Canary_Deployment() );
-
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_styles' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'admin_menu', [ $this, 'remove_go_pro_menu' ], 0 );
 
 		add_action( 'elementor/admin/after_create_settings/' . Tools::PAGE_ID, [ $this, 'register_admin_tools_fields' ], 50 );
 
-		add_filter( 'plugin_action_links_' . ELEMENTOR_PLUGIN_BASE, [ $this, 'plugin_action_links' ], 50 );
+		add_filter( 'plugin_action_links_' . ELEMENTOR_PLUGIN_BASE, function ( $links ) {
+			return Action_Links::get_links( $links );
+		}, 50 );
+		add_filter( 'plugin_action_links_' . ELEMENTOR_PRO_PLUGIN_BASE, function ( $links ) {
+			return Action_Links::get_pro_links( $links );
+		}, 50 );
+
 		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
 
 		add_filter( 'elementor/finder/categories', [ $this, 'add_finder_items' ] );

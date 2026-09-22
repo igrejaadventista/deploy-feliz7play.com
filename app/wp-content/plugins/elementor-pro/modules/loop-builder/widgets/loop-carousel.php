@@ -40,7 +40,11 @@ class Loop_Carousel extends Base {
 	 * @return array Widget style dependencies.
 	 */
 	public function get_style_depends(): array {
-		return [ 'e-swiper', 'widget-loop-builder' ];
+		return [ 'widget-loop-carousel' ];
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
 	protected function get_initial_config() {
@@ -174,8 +178,7 @@ class Loop_Carousel extends Base {
 
 
 	public function get_loop_header_widget_classes(): array {
-		$swiper_class = Plugin::elementor()->experiments->is_feature_active( 'e_swiper_latest' ) ? 'swiper' : 'swiper-container';
-		return [ $swiper_class ];
+		return [ 'swiper' ];
 	}
 
 	public function before_skin_render() {
@@ -252,7 +255,7 @@ class Loop_Carousel extends Base {
 			[
 				'label' => esc_html__( 'Edit Handle Selector', 'elementor-pro' ),
 				'type' => Controls_Manager::HIDDEN,
-				'default' => '.elementor-widget-container',
+				'default' => '.elementor-loop-container',
 				'render_type' => 'none',
 				'frontend_available' => true,
 			]

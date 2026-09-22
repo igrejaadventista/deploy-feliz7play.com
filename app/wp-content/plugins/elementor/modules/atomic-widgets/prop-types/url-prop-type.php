@@ -2,13 +2,13 @@
 
 namespace Elementor\Modules\AtomicWidgets\PropTypes;
 
-use Elementor\Modules\AtomicWidgets\PropTypes\Base\Plain_Prop_Type;
+use Elementor\Modules\AtomicWidgets\PropTypes\Primitives\String_Prop_Type;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-class Url_Prop_Type extends Plain_Prop_Type {
+class Url_Prop_Type extends String_Prop_Type {
 	public static function get_key(): string {
 		return 'url';
 	}
@@ -24,7 +24,7 @@ class Url_Prop_Type extends Plain_Prop_Type {
 			return true;
 		}
 
-		return (bool) wp_http_validate_url( $value );
+		return false !== filter_var( $value, FILTER_VALIDATE_URL );
 	}
 
 	protected function sanitize_value( $value ) {

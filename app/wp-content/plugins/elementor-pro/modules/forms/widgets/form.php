@@ -14,13 +14,13 @@ use ElementorPro\Modules\Forms\Classes\Form_Base;
 use ElementorPro\Modules\Forms\Controls\Fields_Repeater;
 use ElementorPro\Modules\Forms\Module;
 use ElementorPro\Plugin;
+use ElementorPro\Core\Utils\Hints;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
 class Form extends Form_Base {
-
 	public function get_name() {
 		return 'form';
 	}
@@ -41,6 +41,10 @@ class Form extends Form_Base {
 		return false;
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
 	/**
 	 * Get style dependencies.
 	 *
@@ -53,6 +57,52 @@ class Form extends Form_Base {
 	 */
 	public function get_style_depends(): array {
 		return [ 'widget-form' ];
+	}
+
+	private function should_show_atomic_form_promotion(): bool {
+		if ( version_compare( ELEMENTOR_VERSION, '4.0', '<' ) ) {
+			return false;
+		}
+		if ( ! Plugin::elementor()->experiments->is_feature_active( 'e_atomic_elements' ) ) {
+			return false;
+		}
+		if ( ! Plugin::elementor()->experiments->is_feature_active( 'e_pro_atomic_form' ) ) {
+			return false;
+		}
+
+		return ! Hints::is_dismissed( 'atomic_form_v3_promotion' );
+	}
+
+	private function render_atomic_form_promotion() {
+		if ( ! $this->should_show_atomic_form_promotion() ) {
+			return;
+		}
+
+		$this->add_control(
+			'atomic_form_v3_promotion',
+			[
+				'type' => Controls_Manager::NOTICE,
+				'notice_type' => 'info',
+				'icon' => true,
+				'dismissible' => false,
+				'heading' => esc_html__( 'Atomic form', 'elementor-pro' ),
+				'content' => '<style>'
+					. '.elementor-control-atomic_form_v3_promotion .elementor-control-notice { gap: 6px; padding: 11px 13px; margin-block-start: -10px; }'
+					. '.elementor-control-atomic_form_v3_promotion .elementor-control-notice-main { padding-inline-end: 12px; }'
+					. '.elementor-control-atomic_form_v3_promotion .elementor-control-notice-main-heading { font-weight: normal; font-size: 13px; }'
+					. '.elementor-control-atomic_form_v3_promotion .e-btn { background: transparent; padding: 0; font-weight: 800; }'
+					. '.elementor-control-atomic_form_v3_promotion .e-btn:hover { background: transparent; }'
+					. '.elementor-control-atomic_form_v3_promotion .e-btn-1 { color: #69727D; }'
+					. '.elementor-control-atomic_form_v3_promotion .e-btn-2 { color: #3F6AD8; }'
+					. '</style>'
+					. esc_html__( 'Switch to the Atomic form for full styling control and unlimited design flexibility.', 'elementor-pro' ),
+				'button_text' => esc_html__( 'Dismiss', 'elementor-pro' ),
+				'button_event' => 'atomic_form_v3_promotion',
+				'button_text2' => esc_html__( 'Use Atomic Form', 'elementor-pro' ),
+				'button_event2' => 'atomic_form_v3_promotion',
+				'separator' => 'after',
+			]
+		);
 	}
 
 	protected function register_controls() {
@@ -497,13 +547,17 @@ class Form extends Form_Base {
 			]
 		);
 
+		$this->render_atomic_form_promotion();
+
 		$this->add_control(
 			'form_name',
 			[
 				'label' => esc_html__( 'Form Name', 'elementor-pro' ),
 				'type' => Controls_Manager::TEXT,
 				'default' => esc_html__( 'New Form', 'elementor-pro' ),
-				'placeholder' => esc_html__( 'Form Name', 'elementor-pro' ),
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
@@ -876,13 +930,13 @@ class Form extends Form_Base {
 				'frontend_available' => true,
 				'render_type' => 'none',
 				'options' => [
-					'none' => 'None',
-					'text' => 'Text',
-					'icon' => 'Icon',
-					'number' => 'Number',
-					'progress_bar' => 'Progress Bar',
-					'number_text' => 'Number & Text',
-					'icon_text' => 'Icon & Text',
+					'none' => esc_html__( 'None', 'elementor-pro' ),
+					'text' => esc_html__( 'Text', 'elementor-pro' ),
+					'icon' => esc_html__( 'Icon', 'elementor-pro' ),
+					'number' => esc_html__( 'Number', 'elementor-pro' ),
+					'progress_bar' => esc_html__( 'Progress Bar', 'elementor-pro' ),
+					'number_text' => esc_html__( 'Number & Text', 'elementor-pro' ),
+					'icon_text' => esc_html__( 'Icon & Text', 'elementor-pro' ),
 				],
 				'default' => 'number_text',
 			]
@@ -896,9 +950,9 @@ class Form extends Form_Base {
 				'frontend_available' => true,
 				'render_type' => 'none',
 				'options' => [
-					'circle' => 'Circle',
-					'square' => 'Square',
-					'rounded' => 'Rounded',
+					'circle' => esc_html__( 'Circle', 'elementor-pro' ),
+					'square' => esc_html__( 'Square', 'elementor-pro' ),
+					'rounded' => esc_html__( 'Rounded', 'elementor-pro' ),
 					'none' => 'None',
 				],
 				'default' => 'circle',
@@ -1328,7 +1382,7 @@ class Form extends Form_Base {
 				'type' => Controls_Manager::COLOR,
 				'default' => '#ffffff',
 				'selectors' => [
-					'{{WRAPPER}} .elementor-field-group:not(.elementor-field-type-upload) .elementor-field:not(.elementor-select-wrapper)' => 'background-color: {{VALUE}};',
+					'{{WRAPPER}} .elementor-field-group .elementor-field:not(.elementor-select-wrapper)' => 'background-color: {{VALUE}};',
 					'{{WRAPPER}} .elementor-field-group .elementor-select-wrapper select' => 'background-color: {{VALUE}};',
 				],
 				'separator' => 'before',
@@ -1341,7 +1395,7 @@ class Form extends Form_Base {
 				'label' => esc_html__( 'Border Color', 'elementor-pro' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .elementor-field-group:not(.elementor-field-type-upload) .elementor-field:not(.elementor-select-wrapper)' => 'border-color: {{VALUE}};',
+					'{{WRAPPER}} .elementor-field-group .elementor-field:not(.elementor-select-wrapper)' => 'border-color: {{VALUE}};',
 					'{{WRAPPER}} .elementor-field-group .elementor-select-wrapper select' => 'border-color: {{VALUE}};',
 					'{{WRAPPER}} .elementor-field-group .elementor-select-wrapper::before' => 'color: {{VALUE}};',
 				],
@@ -1357,7 +1411,7 @@ class Form extends Form_Base {
 				'placeholder' => '1',
 				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'selectors' => [
-					'{{WRAPPER}} .elementor-field-group:not(.elementor-field-type-upload) .elementor-field:not(.elementor-select-wrapper)' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .elementor-field-group .elementor-field:not(.elementor-select-wrapper)' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					'{{WRAPPER}} .elementor-field-group .elementor-select-wrapper select' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
@@ -1370,7 +1424,7 @@ class Form extends Form_Base {
 				'type' => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
 				'selectors' => [
-					'{{WRAPPER}} .elementor-field-group:not(.elementor-field-type-upload) .elementor-field:not(.elementor-select-wrapper)' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .elementor-field-group .elementor-field:not(.elementor-select-wrapper)' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					'{{WRAPPER}} .elementor-field-group .elementor-select-wrapper select' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
@@ -2261,8 +2315,8 @@ class Form extends Form_Base {
 			/**
 			 * Elementor form pre render.
 			 *
-			 * Fires before the from is rendered in the frontend. This hook allows
-			 * developers to add functionality before the from is rendered.
+			 * Fires before the form is rendered in the frontend. This hook allows
+			 * developers to add functionality before the form is rendered.
 			 *
 			 * @since 2.4.0
 			 *
@@ -2335,6 +2389,7 @@ class Form extends Form_Base {
 
 		if ( ! empty( $instance['form_name'] ) ) {
 			$this->add_render_attribute( 'form', 'name', $instance['form_name'] );
+			$this->add_render_attribute( 'form', 'aria-label', $instance['form_name'] );
 		}
 
 		if ( 'custom' === $instance['form_validation'] ) {
@@ -2477,7 +2532,7 @@ class Form extends Form_Base {
 								</span>
 							<?php endif; ?>
 							<?php if ( ! empty( $instance['button_text'] ) ) : ?>
-								<span <?php $this->print_render_attribute_string( 'button-text' ); ?>><?php $this->print_unescaped_setting( 'button_text' ); ?></span>
+								<span <?php $this->print_render_attribute_string( 'button-text' ); ?>><?php echo wp_kses_post( $instance['button_text'] ); ?></span>
 							<?php endif; ?>
 						</span>
 					</button>
@@ -2738,7 +2793,7 @@ class Form extends Form_Base {
 								<# } #>
 
 								<# if ( settings.button_text ) { #>
-									<span {{{ view.getRenderAttributeString( 'button-text' ) }}}>{{{ settings.button_text }}}</span>
+									<span {{{ view.getRenderAttributeString( 'button-text' ) }}}>{{ settings.button_text }}</span>
 								<# } #>
 							</span>
 						</button>

@@ -1,14 +1,13 @@
 <?php
 namespace ElementorPro\Modules\DynamicTags\ACF\Tags;
 
-use ElementorPro\Modules\DynamicTags\Tags\Base\Tag;
 use ElementorPro\Modules\DynamicTags\ACF\Module;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class ACF_Text extends Tag {
+class ACF_Text extends Base_ACF_Rendered_Tag {
 
 	public function get_name() {
 		return 'acf-text';
@@ -76,13 +75,21 @@ class ACF_Text extends Tag {
 					$meta = $this->get_queried_object_meta( $meta_key );
 					$value = isset( $meta['address'] ) ? $meta['address'] : '';
 					break;
+				case 'true_false':
+					$value = (string) $value;
+					break;
 			} // End switch().
 		} else {
 			// Field settings has been deleted or not available.
 			$value = get_field( $meta_key );
 		} // End if().
 
-		echo wp_kses_post( $value );
+		if ( ! is_string( $value ) ) {
+			$type = gettype( $value );
+			wp_trigger_error( 'acf-text', "ACF Text Field value must be string, but is type of: $type", E_USER_WARNING );
+		} else {
+			echo wp_kses_post( $value );
+		}
 	}
 
 	public function get_panel_template_setting_key() {

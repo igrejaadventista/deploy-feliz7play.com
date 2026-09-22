@@ -3,6 +3,7 @@
 
 namespace ElementorPro\Modules\Tiers\AdminMenuItems;
 
+use Elementor\Core\Utils\Promotions\Filtered_Promotions_Manager;
 use Elementor\Modules\Promotions\AdminMenuItems\Interfaces\Promotion_Menu_Item;
 use Elementor\Settings;
 
@@ -12,35 +13,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 abstract class Base_Promotion_Item implements Promotion_Menu_Item {
 
-	public function get_name() {
+	public function get_name(): string {
 		return 'base_promotion';
 	}
 
-	public function is_visible() {
+	public function is_visible(): bool {
 		return true;
 	}
 
-	public function get_parent_slug() {
+	public function get_parent_slug(): string {
 		return Settings::PAGE_ID;
 	}
 
-	public function get_capability() {
+	public function get_capability(): string {
 		return 'manage_options';
 	}
 
-	public function get_cta_text() {
+	public function get_cta_text(): string {
 		return esc_html__( 'Upgrade Now', 'elementor-pro' );
 	}
 
-	public function get_image_url() {
+	public function get_image_url(): string {
 		return ELEMENTOR_ASSETS_URL . 'images/go-pro-wp-dashboard.svg';
 	}
 
-	public function get_promotion_description() {
+	public function get_promotion_description(): string {
 		return '';
 	}
 
-	public function render() {
+	public function render(): void {
 		$config = [
 			'title' => $this->get_promotion_title(),
 			'description' => $this->get_promotion_description(),
@@ -48,6 +49,9 @@ abstract class Base_Promotion_Item implements Promotion_Menu_Item {
 			'upgrade_text' => $this->get_cta_text(),
 			'upgrade_url' => $this->get_cta_url(),
 		];
+
+		$config = Filtered_Promotions_Manager::get_filtered_promotion_data( $config, 'elementor-pro/advanced-' . $this->get_name() . '-pro-widget/promotion', 'upgrade_url' );
+
 		?>
 		<div class="wrap">
 			<div class="elementor-blank_state">

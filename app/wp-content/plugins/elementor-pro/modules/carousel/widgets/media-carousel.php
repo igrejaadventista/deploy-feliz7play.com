@@ -40,6 +40,10 @@ class Media_Carousel extends Base {
 		return [ 'media', 'carousel', 'image', 'video', 'lightbox' ];
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
 	/**
 	 * Get style dependencies.
 	 *
@@ -54,8 +58,22 @@ class Media_Carousel extends Base {
 		return [ 'e-swiper', 'widget-media-carousel', 'widget-carousel-module-base' ];
 	}
 
+	/**
+	 * Get script dependencies.
+	 *
+	 * Retrieve the list of script dependencies the widget requires.
+	 *
+	 * @since 3.27.0
+	 * @access public
+	 *
+	 * @return array Widget script dependencies.
+	 */
+	public function get_script_depends(): array {
+		return [ 'swiper' ];
+	}
+
 	protected function render() {
-		$settings = $this->get_active_settings();
+		$settings = $this->get_settings_for_display();
 
 		if ( $settings['overlay'] ) {
 			$this->add_render_attribute( 'image-overlay', 'class', [
@@ -284,7 +302,7 @@ class Media_Carousel extends Base {
 		return $slide['image']['url'];
 	}
 
-	protected function print_slider( array $settings = null ) {
+	protected function print_slider( ?array $settings = null ) {
 		$this->lightbox_slide_index = 0;
 
 		parent::print_slider( $settings );
@@ -426,7 +444,7 @@ class Media_Carousel extends Base {
 					'auto' => esc_html__( 'Auto', 'elementor-pro' ),
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementor-main-swiper .elementor-carousel-image' => 'background-size: {{VALUE}}',
+					'{{WRAPPER}} .elementor-main-swiper:not(.elementor-thumbnails-swiper) .elementor-carousel-image' => 'background-size: {{VALUE}}',
 				],
 			]
 		);
@@ -490,7 +508,7 @@ class Media_Carousel extends Base {
 				'selector' => '{{WRAPPER}} .elementor-custom-embed-play i',
 				'fields_options' => [
 					'text_shadow_type' => [
-						'label' => _x( 'Shadow', 'Text Shadow Control', 'elementor-pro' ),
+						'label' => esc_html__( 'Shadow', 'elementor-pro' ),
 					],
 				],
 			]
@@ -679,7 +697,7 @@ class Media_Carousel extends Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementor-main-swiper' => 'height: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementor-main-swiper:not(.elementor-thumbnails-swiper)' => 'height: {{SIZE}}{{UNIT}};',
 				],
 				'condition' => [
 					'skin' => 'slideshow',
@@ -774,6 +792,7 @@ class Media_Carousel extends Base {
 			'slides_to_scroll',
 			'pagination',
 			'heading_pagination',
+			'pagination_gap',
 			'pagination_size',
 			'pagination_position',
 			'pagination_color',
@@ -813,7 +832,7 @@ class Media_Carousel extends Base {
 			'space_between',
 			[
 				'selectors' => [
-					'{{WRAPPER}}.elementor-skin-slideshow .elementor-main-swiper' => 'margin-bottom: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}}.elementor-skin-slideshow .elementor-main-swiper:not(.elementor-thumbnails-swiper)' => 'margin-bottom: {{SIZE}}{{UNIT}}',
 				],
 				'render_type' => 'ui',
 			]

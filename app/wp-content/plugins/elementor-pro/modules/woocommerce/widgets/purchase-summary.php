@@ -39,6 +39,10 @@ class Purchase_Summary extends Base_Widget {
 		return [ 'woocommerce-elements' ];
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
 	/**
 	 * Get style dependencies.
 	 *
@@ -463,8 +467,8 @@ class Purchase_Summary extends Base_Widget {
 				'label' => esc_html__( 'Preview order with', 'elementor-pro' ),
 				'type' => Controls_Manager::SELECT,
 				'options' => [
-					'' => 'Latest Order',
-					'custom-order' => 'Order ID',
+					'' => esc_html__( 'Latest Order', 'elementor-pro' ),
+					'custom-order' => esc_html__( 'Order ID', 'elementor-pro' ),
 				],
 			]
 		);
@@ -1201,7 +1205,7 @@ class Purchase_Summary extends Base_Widget {
 			'order_details_titles_totals',
 			[
 				'type' => Controls_Manager::HEADING,
-				'label' => esc_html__( 'Titles &amp; Totals', 'elementor-pro' ),
+				'label' => esc_html__( 'Titles & Totals', 'elementor-pro' ),
 			]
 		);
 

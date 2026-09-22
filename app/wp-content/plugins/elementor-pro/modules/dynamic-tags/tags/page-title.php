@@ -2,7 +2,7 @@
 namespace ElementorPro\Modules\DynamicTags\Tags;
 
 use Elementor\Controls_Manager;
-use ElementorPro\Modules\DynamicTags\Tags\Base\Tag;
+use ElementorPro\Modules\DynamicTags\Tags\Base\Pro_Tag;
 use ElementorPro\Core\Utils;
 use ElementorPro\Modules\DynamicTags\Module;
 use ElementorPro\Plugin;
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Page_Title extends Tag {
+class Page_Title extends Pro_Tag {
 	public function get_name() {
 		return 'page-title';
 	}
@@ -47,9 +47,10 @@ class Page_Title extends Tag {
 			}
 		}
 
-		$include_context = 'yes' === $this->get_settings( 'include_context' );
+		$include_context = $this->get_settings( 'include_context' );
+		$is_included = 'yes' === $include_context || true === $include_context;
 
-		$title = Utils::get_page_title( $include_context );
+		$title = Utils::get_page_title( $is_included );
 
 		echo wp_kses_post( $title );
 	}

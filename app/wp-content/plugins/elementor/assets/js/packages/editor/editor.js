@@ -1,2 +1,126 @@
-/*! For license information please see editor.js.LICENSE.txt */
-!function(){"use strict";var e={"./node_modules/react-dom/client.js":function(e,t,n){var r=n("react-dom"),o=r.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;t.createRoot=function(e,t){o.usingClientEntryPoint=!0;try{return r.createRoot(e,t)}finally{o.usingClientEntryPoint=!1}},t.hydrateRoot=function(e,t,n){o.usingClientEntryPoint=!0;try{return r.hydrateRoot(e,t,n)}finally{o.usingClientEntryPoint=!1}}},react:function(e){e.exports=window.React},"react-dom":function(e){e.exports=window.ReactDOM},"@elementor/editor-current-user":function(e){e.exports=window.elementorV2.editorCurrentUser},"@elementor/editor-v1-adapters":function(e){e.exports=window.elementorV2.editorV1Adapters},"@elementor/locations":function(e){e.exports=window.elementorV2.locations},"@elementor/query":function(e){e.exports=window.elementorV2.query},"@elementor/store":function(e){e.exports=window.elementorV2.store},"@elementor/ui":function(e){e.exports=window.elementorV2.ui}},t={};function n(r){var o=t[r];if(void 0!==o)return o.exports;var i=t[r]={exports:{}};return e[r](i,i.exports,n),i.exports}n.d=function(e,t){for(var r in t)n.o(t,r)&&!n.o(e,r)&&Object.defineProperty(e,r,{enumerable:!0,get:t[r]})},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})};var r={};!function(){n.r(r),n.d(r,{injectIntoLogic:function(){return y},injectIntoTop:function(){return m},start:function(){return w}});var e=n("@elementor/locations"),t=n("react"),o=n("react-dom"),i=n("./node_modules/react-dom/client.js"),c=n("@elementor/editor-current-user"),l=n("@elementor/editor-v1-adapters"),u=n("@elementor/query"),a=n("@elementor/store"),d=n("@elementor/ui"),{Slot:s,inject:m}=(0,e.createLocation)(),{Slot:f,inject:y}=(0,e.createLocation)();function p(){return t.createElement(t.Fragment,null,t.createElement(s,null),t.createElement("div",{style:{display:"none"}},t.createElement(f,null)))}function w(e){const n=(0,a.__createStore)(),r=(0,u.createQueryClient)();(0,l.__privateDispatchReadyEvent)(),(0,c.ensureCurrentUser)({queryClient:r}),function(e,t){let n;try{const r=(0,i.createRoot)(t);n=()=>{r.render(e)}}catch{n=()=>{o.render(e,t)}}n()}(t.createElement(a.__StoreProvider,{store:n},t.createElement(u.QueryClientProvider,{client:r},t.createElement(d.DirectionProvider,{rtl:"rtl"===window.document.dir},t.createElement(d.ThemeProvider,null,t.createElement(p,null))))),e)}}(),(window.elementorV2=window.elementorV2||{}).editor=r}(),window.elementorV2.editor?.init?.();
+(function(_elementor_locations, react, react_dom, _elementor_editor_ui, _elementor_editor_v1_adapters, _elementor_query, _elementor_store, _elementor_ui, _elementor_editor_current_user) {
+
+//#region \0rolldown/runtime.js
+	var __create = Object.create;
+	var __defProp = Object.defineProperty;
+	var __name = (target, value) => __defProp(target, "name", {
+		value,
+		configurable: true
+	});
+	var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+	var __getOwnPropNames = Object.getOwnPropertyNames;
+	var __getProtoOf = Object.getPrototypeOf;
+	var __hasOwnProp = Object.prototype.hasOwnProperty;
+	var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
+	var __exportAll = (all, no_symbols) => {
+		let target = {};
+		for (var name in all) {
+			__defProp(target, name, {
+				get: all[name],
+				enumerable: true
+			});
+		}
+		if (!no_symbols) {
+			__defProp(target, Symbol.toStringTag, { value: "Module" });
+		}
+		return target;
+	};
+	var __copyProps = (to, from, except, desc) => {
+		if (from && typeof from === "object" || typeof from === "function") {
+			for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+				key = keys[i];
+				if (!__hasOwnProp.call(to, key) && key !== except) {
+					__defProp(to, key, {
+						get: ((k) => from[k]).bind(null, key),
+						enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+					});
+				}
+			}
+		}
+		return to;
+	};
+	var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+		value: mod,
+		enumerable: true
+	}) : target, mod));
+
+//#endregion
+react = __toESM(react);
+react_dom = __toESM(react_dom);
+
+//#region packages/packages/core/editor/src/locations.ts
+	var { Slot: TopSlot, inject: injectIntoTop } = (0, _elementor_locations.createLocation)();
+	var { Slot: LogicSlot, inject: injectIntoLogic } = (0, _elementor_locations.createLocation)();
+
+//#endregion
+//#region node_modules/react-dom/client.js
+	var require_client = /* @__PURE__ */ __commonJSMin(((exports) => {
+		var m = (globalThis.ReactDOM);
+		var i = m.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+		exports.createRoot = function(c, o) {
+			i.usingClientEntryPoint = true;
+			try {
+				return m.createRoot(c, o);
+			} finally {
+				i.usingClientEntryPoint = false;
+			}
+		};
+	}));
+
+//#endregion
+//#region packages/packages/core/editor/src/components/shell.tsx
+var import_client = require_client();
+	function Shell() {
+		return /* @__PURE__ */ react.createElement(react.Fragment, null, /* @__PURE__ */ react.createElement(TopSlot, null), /* @__PURE__ */ react.createElement("div", { style: { display: "none" } }, /* @__PURE__ */ react.createElement(LogicSlot, null)));
+	}
+
+//#endregion
+//#region packages/packages/core/editor/src/ensure-current-user.ts
+	async function ensureCurrentUser() {
+		return (0, _elementor_editor_v1_adapters.registerDataHook)("after", "editor/documents/attach-preview", async () => {
+			try {
+				await (0, _elementor_editor_current_user.ensureUser)();
+			} catch {}
+		});
+	}
+
+//#endregion
+//#region packages/packages/core/editor/src/start.tsx
+	function start(domElement) {
+		const store = (0, _elementor_store.__createStore)();
+		const queryClient = (0, _elementor_query.createQueryClient)();
+		ensureCurrentUser();
+		(0, _elementor_editor_v1_adapters.__privateDispatchReadyEvent)();
+		render(/* @__PURE__ */ react.createElement(_elementor_store.__StoreProvider, { store }, /* @__PURE__ */ react.createElement(_elementor_query.QueryClientProvider, { client: queryClient }, /* @__PURE__ */ react.createElement(_elementor_ui.DirectionProvider, { rtl: window.document.dir === "rtl" }, /* @__PURE__ */ react.createElement(_elementor_ui.ThemeProvider, null, /* @__PURE__ */ react.createElement(_elementor_editor_ui.GlobalDialog, null), /* @__PURE__ */ react.createElement(Shell, null))))), domElement);
+	}
+	function render(app, domElement) {
+		let renderFn;
+		try {
+			const root = (0, import_client.createRoot)(domElement);
+			renderFn = () => {
+				root.render(app);
+			};
+		} catch {
+			renderFn = () => {
+				react_dom.render(app, domElement);
+			};
+		}
+		renderFn();
+	}
+
+//#endregion
+//#region packages/packages/core/editor/src/index.ts
+	var src_exports = /* @__PURE__ */ __exportAll({
+		injectIntoLogic: () => injectIntoLogic,
+		injectIntoTop: () => injectIntoTop,
+		start: () => start
+	});
+
+//#endregion
+//#region \0elementor-package-library-entry
+	(window.elementorV2 = window.elementorV2 || {}).editor = src_exports;
+
+//#endregion
+})(elementorV2.locations, React, ReactDOM, elementorV2.editorUi, elementorV2.editorV1Adapters, elementorV2.query, elementorV2.store, elementorV2.ui, elementorV2.editorCurrentUser);
+window.elementorV2.editor?.init?.();
+//# sourceMappingURL=editor.js.map

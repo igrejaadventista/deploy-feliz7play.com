@@ -5,9 +5,11 @@ use Elementor\Controls_Manager;
 use Elementor\Core\Kits\Documents\Tabs\Global_Colors;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Group_Control_Typography;
+use ElementorPro\Modules\Posts\Traits\Render_Posts_Markdown_Trait;
 use ElementorPro\Modules\Posts\Widgets\Posts_Base;
 use ElementorPro\Modules\ThemeBuilder\Skins;
 use ElementorPro\Modules\QueryControl\Module as Query_Control;
+use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -17,6 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Posts
  */
 class Archive_Posts extends Posts_Base {
+
+	use Render_Posts_Markdown_Trait;
 
 	public function get_name() {
 		return 'archive-posts';
@@ -38,8 +42,8 @@ class Archive_Posts extends Posts_Base {
 		return [ 'posts', 'cpt', 'archive', 'loop', 'query', 'cards', 'custom post type' ];
 	}
 
-	public function get_inline_css_depends() {
-		return [ 'posts' ];
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
 	/**
@@ -90,7 +94,7 @@ class Archive_Posts extends Posts_Base {
 			[
 				'label' => esc_html__( 'Nothing Found Message', 'elementor-pro' ),
 				'type' => Controls_Manager::TEXTAREA,
-				'default' => esc_html__( 'It seems we can\'t find what you\'re looking for.', 'elementor-pro' ),
+				'default' => esc_html__( 'It seems we can’t find what you’re looking for.', 'elementor-pro' ),
 				'dynamic' => [
 					'active' => true,
 				],
@@ -161,5 +165,9 @@ class Archive_Posts extends Posts_Base {
 		}
 
 		Query_Control::add_to_avoid_list( wp_list_pluck( $this->query->posts, 'ID' ) );
+	}
+
+	public function render_markdown(): string {
+		return $this->render_posts_query_as_markdown();
 	}
 }

@@ -5,6 +5,7 @@ use Elementor\Controls_Manager;
 use Elementor\Core\Kits\Documents\Tabs\Global_Colors;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Group_Control_Typography;
+use Elementor\Group_Control_Text_Shadow;
 use ElementorPro\Base\Base_Widget;
 use ElementorPro\Plugin;
 
@@ -35,7 +36,14 @@ class Post_Excerpt extends Base_Widget {
 		return [ 'post', 'excerpt', 'description' ];
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
 	protected function register_controls() {
+		$optimized_markup = Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' ) && ! $this->has_widget_inner_wrapper();
+		$widget_container_selector = $optimized_markup ? '' : ' .elementor-widget-container';
+
 		$this->start_controls_section(
 			'section_content',
 			[
@@ -71,16 +79,16 @@ class Post_Excerpt extends Base_Widget {
 				'label' => esc_html__( 'Alignment', 'elementor-pro' ),
 				'type' => Controls_Manager::CHOOSE,
 				'options' => [
-					'left' => [
-						'title' => esc_html__( 'Left', 'elementor-pro' ),
+					'start' => [
+						'title' => esc_html__( 'Start', 'elementor-pro' ),
 						'icon' => 'eicon-text-align-left',
 					],
 					'center' => [
 						'title' => esc_html__( 'Center', 'elementor-pro' ),
 						'icon' => 'eicon-text-align-center',
 					],
-					'right' => [
-						'title' => esc_html__( 'Right', 'elementor-pro' ),
+					'end' => [
+						'title' => esc_html__( 'End', 'elementor-pro' ),
 						'icon' => 'eicon-text-align-right',
 					],
 					'justify' => [
@@ -88,9 +96,71 @@ class Post_Excerpt extends Base_Widget {
 						'icon' => 'eicon-text-align-justify',
 					],
 				],
-				'selectors' => [
-					'{{WRAPPER}} .elementor-widget-container' => 'text-align: {{VALUE}};',
+				'classes' => 'elementor-control-start-end',
+				'selectors_dictionary' => [
+					'left' => is_rtl() ? 'end' : 'start',
+					'right' => is_rtl() ? 'start' : 'end',
 				],
+				'selectors' => [
+					"{{WRAPPER}}{$widget_container_selector}" => 'text-align: {{VALUE}};',
+				],
+				'separator' => 'after',
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			[
+				'name' => 'typography',
+				'global' => [
+					'default' => Global_Typography::TYPOGRAPHY_TEXT,
+				],
+				'selector' => "{{WRAPPER}}{$widget_container_selector}",
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Text_Shadow::get_type(),
+			[
+				'name' => 'text_shadow',
+				'selector' => '{{WRAPPER}}',
+			]
+		);
+
+		$this->add_responsive_control(
+			'paragraph_spacing',
+			[
+				'label' => esc_html__( 'Paragraph Spacing', 'elementor-pro' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'vh', 'custom' ],
+				'range' => [
+					'px' => [
+						'max' => 100,
+					],
+					'em' => [
+						'min' => 0.1,
+						'max' => 20,
+					],
+				],
+				'selectors' => [
+					"{{WRAPPER}}{$widget_container_selector}" => 'margin-bottom: {{SIZE}}{{UNIT}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'separator',
+			[
+				'type' => Controls_Manager::DIVIDER,
+			]
+		);
+
+		$this->start_controls_tabs( 'link_colors' );
+
+		$this->start_controls_tab(
+			'colors_normal',
+			[
+				'label' => esc_html__( 'Normal', 'elementor-pro' ),
 			]
 		);
 
@@ -103,26 +173,83 @@ class Post_Excerpt extends Base_Widget {
 					'default' => Global_Colors::COLOR_TEXT,
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementor-widget-container' => 'color: {{VALUE}};',
+					"{{WRAPPER}}{$widget_container_selector}" => 'color: {{VALUE}};',
 				],
 			]
 		);
 
-		$this->add_group_control(
-			Group_Control_Typography::get_type(),
+		$this->add_control(
+			'link_color',
 			[
-				'name' => 'typography',
-				'global' => [
-					'default' => Global_Typography::TYPOGRAPHY_TEXT,
+				'label' => esc_html__( 'Link Color', 'elementor-pro' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} a' => 'color: {{VALUE}};',
 				],
-				'selector' => '{{WRAPPER}} .elementor-widget-container',
 			]
 		);
+
+		$this->end_controls_tab();
+
+		$this->start_controls_tab(
+			'colors_hover',
+			[
+				'label' => esc_html__( 'Hover', 'elementor-pro' ),
+			]
+		);
+
+		$this->add_control(
+			'link_hover_color',
+			[
+				'label' => esc_html__( 'Link Color', 'elementor-pro' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} a:hover, {{WRAPPER}} a:focus' => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'link_hover_color_transition_duration',
+			[
+				'label' => esc_html__( 'Transition Duration', 'elementor-pro' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 's', 'ms', 'custom' ],
+				'default' => [
+					'unit' => 's',
+				],
+				'selectors' => [
+					'{{WRAPPER}} a' => 'transition-duration: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->end_controls_tab();
+
+		$this->end_controls_tabs();
 
 		$this->end_controls_section();
 	}
 
 	protected function render() {
 		$this->print_unescaped_setting( 'excerpt' );
+	}
+
+	public function render_markdown(): string {
+		$post_id = get_the_ID();
+
+		if ( ! $post_id ) {
+			return '';
+		}
+
+		$document = Plugin::elementor()->documents->get( $post_id );
+
+		if ( $document && $document->is_built_with_elementor() ) {
+			return '';
+		}
+
+		$excerpt = trim( wp_strip_all_tags( (string) get_the_excerpt() ) );
+
+		return $excerpt;
 	}
 }

@@ -3,8 +3,7 @@ namespace ElementorPro\Modules\LoopBuilder\Documents;
 
 use Elementor\Controls_Manager;
 use Elementor\Core\Base\Document;
-use ElementorPro\Modules\LoopBuilder\Files\Css\Loop as Loop_CSS;
-use ElementorPro\Modules\LoopBuilder\Files\Css\Loop_Preview;
+use ElementorPro\Modules\LoopBuilder\Files\Css\Loop_Css_Printer;
 use ElementorPro\Modules\QueryControl\Module as QueryModule;
 use ElementorPro\Modules\ThemeBuilder\Documents\Theme_Document;
 use ElementorPro\Core\Utils;
@@ -202,10 +201,6 @@ class Loop extends Theme_Document {
 			'recommended' => [
 				'title' => esc_html__( 'Recommended', 'elementor-pro' ),
 			],
-			'layout' => [
-				'title' => esc_html__( 'Layout', 'elementor-pro' ),
-				'hideIfEmpty' => true,
-			],
 		];
 		return static::insert_categories_after_favorites( $new_categories );
 	}
@@ -262,13 +257,7 @@ class Loop extends Theme_Document {
 	}
 
 	private function enqueue_loop_css() {
-		if ( $this->is_autosave() ) {
-			$css_file = Loop_Preview::create( $this->post->ID );
-		} else {
-			$css_file = Loop_CSS::create( $this->post->ID );
-		}
-
-		$css_file->print_all_css( $this->post->ID );
+		Loop_Css_Printer::print_for_post( $this->post->ID, $this->is_autosave() );
 	}
 
 	/**
@@ -281,6 +270,14 @@ class Loop extends Theme_Document {
 	public function get_content( $with_css = false ) {
 		$edit_mode = Plugin::elementor()->editor->is_edit_mode();
 
+		$document = Plugin::elementor()->documents->get_current();
+
+		$should_switch_document = $document && $document::get_type() !== self::DOCUMENT_TYPE;
+
+		if ( $should_switch_document ) {
+			Plugin::elementor()->documents->switch_to_document( $this );
+		}
+
 		add_filter( 'elementor/frontend/builder_content/before_print_css', [ $this, 'prevent_inline_css_printing' ] );
 
 		$this->enqueue_loop_css();
@@ -292,6 +289,10 @@ class Loop extends Theme_Document {
 		remove_filter( 'elementor/frontend/builder_content/before_print_css', [ $this, 'prevent_inline_css_printing' ] );
 
 		Plugin::elementor()->editor->set_edit_mode( $edit_mode );
+
+		if ( $should_switch_document ) {
+			Plugin::elementor()->documents->restore_document();
+		}
 
 		return $content;
 	}
@@ -447,7 +448,11 @@ class Loop extends Theme_Document {
 		$existing_categories = parent::get_editor_panel_categories();
 		$category_keys = array_keys( $existing_categories );
 		$index = array_search( 'favorites', $category_keys, true );
-		return array_splice( $existing_categories, 0, $index + 1 ) + $new_categories + array_splice( $existing_categories, $index + 1 );
+
+		$before_and_including_favorites = array_slice( $existing_categories, 0, $index + 1, true );
+		$after_favorites = array_slice( $existing_categories, $index + 1, null, true );
+
+		return $before_and_including_favorites + $new_categories + $after_favorites;
 	}
 
 	private function update_post_settings_controls( $source_type ) {

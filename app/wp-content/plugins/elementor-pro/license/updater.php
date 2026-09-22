@@ -94,7 +94,7 @@ class Updater {
 			$_transient_data->checked[ $this->plugin_name ] = $this->plugin_version;
 		}
 
-		$_transient_data->last_checked = current_time( 'timestamp' );
+		$_transient_data->last_checked = time();
 
 		if ( ! isset( $_transient_data->translations ) ) {
 			$_transient_data->translations = [];

@@ -30,7 +30,7 @@ class Singular extends Condition_Base {
 	}
 
 	public function get_all_label() {
-		return esc_html__( 'All Singular', 'elementor-pro' );
+		return esc_html__( 'All singular', 'elementor-pro' );
 	}
 
 	public function register_sub_conditions() {
@@ -57,6 +57,6 @@ class Singular extends Condition_Base {
 	}
 
 	public function check( $args ) {
-		return ( is_singular() && ! is_embed() ) || is_404();
+		return ( is_singular() && ! is_embed() ) || is_404() || Module::is_missing_term_or_author_archive();
 	}
 }

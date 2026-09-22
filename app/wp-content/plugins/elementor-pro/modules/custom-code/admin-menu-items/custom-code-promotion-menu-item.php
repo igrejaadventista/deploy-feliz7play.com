@@ -35,7 +35,7 @@ class Custom_Code_Promotion_Menu_Item extends Base_Promotion_Template {
 			: $connect_url;
 	}
 
-	public function get_cta_text() {
+	public function get_cta_text(): string {
 		if ( ! API::active_licence_has_feature( Custom_Code_Module::MODULE_NAME ) ) {
 			return esc_html__( 'Upgrade Now', 'elementor-pro' );
 		}
@@ -45,23 +45,27 @@ class Custom_Code_Promotion_Menu_Item extends Base_Promotion_Template {
 			: esc_html__( 'Connect & Activate', 'elementor-pro' );
 	}
 
-	public function get_label() {
+	public function get_label(): string {
 		return $this->get_page_title();
 	}
 
-	public function get_page_title() {
+	public function get_page_title(): string {
 		return esc_html__( 'Custom Code', 'elementor-pro' );
 	}
 
 	public function get_promotion_title(): string {
-		return sprintf( esc_html__( 'Enjoy Creative Freedom %s with Custom Code', 'elementor-pro' ), '<br />' );
+		return sprintf(
+			/* translators: %s: Line break HTML. */
+			esc_html__( 'Enjoy Creative Freedom %s with Custom Code', 'elementor-pro' ),
+			'<br />'
+		);
 	}
 
 	public function get_video_url(): string {
 		return 'https://www.youtube-nocookie.com/embed/IOovQd1hJUg?si=JLHk3UAexnvTfU1a';
 	}
 
-	public function get_promotion_description() {
+	public function get_promotion_description(): string {
 		return esc_html__(
 			'Add Custom Code snippets to your website.',
 			'elementor-pro'

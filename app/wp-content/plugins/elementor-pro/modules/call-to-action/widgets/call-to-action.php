@@ -15,6 +15,8 @@ use Elementor\Group_Control_Text_Stroke;
 use Elementor\Icons_Manager;
 use Elementor\Utils;
 use ElementorPro\Base\Base_Widget;
+use ElementorPro\Base\Markdown_Utils;
+use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -40,6 +42,10 @@ class Call_To_Action extends Base_Widget {
 
 	protected function is_dynamic_content(): bool {
 		return false;
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
 	/**
@@ -344,6 +350,22 @@ class Call_To_Action extends Base_Widget {
 				'dynamic' => [
 					'active' => true,
 				],
+				'assets' => [
+					'styles' => [
+						[
+							'name' => 'e-ribbon',
+							'conditions' => [
+								'terms' => [
+									[
+										'name' => 'ribbon_title',
+										'operator' => '!==',
+										'value' => '',
+									],
+								],
+							],
+						],
+					],
+				],
 			]
 		);
 
@@ -414,20 +436,25 @@ class Call_To_Action extends Base_Widget {
 				'label' => esc_html__( 'Alignment', 'elementor-pro' ),
 				'type' => Controls_Manager::CHOOSE,
 				'options' => [
-					'left' => [
-						'title' => esc_html__( 'Left', 'elementor-pro' ),
+					'start' => [
+						'title' => esc_html__( 'Start', 'elementor-pro' ),
 						'icon' => 'eicon-text-align-left',
 					],
 					'center' => [
 						'title' => esc_html__( 'Center', 'elementor-pro' ),
 						'icon' => 'eicon-text-align-center',
 					],
-					'right' => [
-						'title' => esc_html__( 'Right', 'elementor-pro' ),
+					'end' => [
+						'title' => esc_html__( 'End', 'elementor-pro' ),
 						'icon' => 'eicon-text-align-right',
 					],
 				],
 				'default' => 'center',
+				'classes' => 'elementor-control-start-end',
+				'selectors_dictionary' => [
+					'left' => is_rtl() ? 'end' : 'start',
+					'right' => is_rtl() ? 'start' : 'end',
+				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-cta__content' => 'text-align: {{VALUE}}',
 				],
@@ -890,6 +917,14 @@ class Call_To_Action extends Base_Widget {
 			Group_Control_Text_Stroke::get_type(),
 			[
 				'name' => 'text_stroke',
+				'selector' => '{{WRAPPER}} .elementor-cta__title',
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Text_Shadow::get_type(),
+			[
+				'name' => 'title_text_shadow',
 				'selector' => '{{WRAPPER}} .elementor-cta__title',
 			]
 		);
@@ -1811,20 +1846,20 @@ class Call_To_Action extends Base_Widget {
 
 				<?php if ( ! empty( $settings['title'] ) ) : ?>
 					<<?php Utils::print_validated_html_tag( $title_tag ); ?> <?php $this->print_render_attribute_string( 'title' ); ?>>
-						<?php $this->print_unescaped_setting( 'title' ); ?>
+						<?php echo wp_kses_post( $settings['title'] ); ?>
 					</<?php Utils::print_validated_html_tag( $title_tag ); ?>>
 				<?php endif; ?>
 
 				<?php if ( ! empty( $settings['description'] ) ) : ?>
 					<<?php Utils::print_validated_html_tag( $description_tag ); ?> <?php $this->print_render_attribute_string( 'description' ); ?>>
-						<?php $this->print_unescaped_setting( 'description' ); ?>
+						<?php echo wp_kses_post( $settings['description'] ); ?>
 					</<?php Utils::print_validated_html_tag( $description_tag ); ?>>
 				<?php endif; ?>
 
 				<?php if ( ! empty( $settings['button'] ) ) : ?>
 					<div class="elementor-cta__button-wrapper elementor-cta__content-item elementor-content-item <?php echo esc_attr( $animation_class ); ?>">
 					<<?php Utils::print_validated_html_tag( $button_tag ); ?> <?php $this->print_render_attribute_string( 'button' ); ?>>
-						<?php $this->print_unescaped_setting( 'button' ); ?>
+						<?php echo wp_kses_post( $settings['button'] ); ?>
 					</<?php Utils::print_unescaped_internal_string( $button_tag ); ?>>
 					</div>
 				<?php endif; ?>
@@ -1834,16 +1869,66 @@ class Call_To_Action extends Base_Widget {
 		if ( ! empty( $settings['ribbon_title'] ) ) :
 			$this->add_render_attribute( 'ribbon-wrapper', 'class', 'elementor-ribbon' );
 
-			if ( ! empty( $settings['ribbon_horizontal_position'] ) ) {
+			if ( ! empty( $settings['ribbon_horizontal_position'] ) ) :
 				$this->add_render_attribute( 'ribbon-wrapper', 'class', 'elementor-ribbon-' . $settings['ribbon_horizontal_position'] );
-			}
+			endif;
+
+			$this->add_render_attribute( 'ribbon_title', 'class', 'elementor-ribbon-inner' );
+			$this->add_inline_editing_attributes( 'ribbon_title' );
 			?>
 			<div <?php $this->print_render_attribute_string( 'ribbon-wrapper' ); ?>>
-				<div class="elementor-ribbon-inner"><?php $this->print_unescaped_setting( 'ribbon_title' ); ?></div>
+				<div <?php $this->print_render_attribute_string( 'ribbon_title' ); ?>>
+					<?php echo wp_kses_post( $settings['ribbon_title'] ); ?>
+				</div>
 			</div>
 		<?php endif; ?>
 		</<?php Utils::print_validated_html_tag( $wrapper_tag ); ?>>
 		<?php
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$blocks = [];
+
+		$bg_image_md = Markdown_Utils::image_from_media_array( $settings['bg_image'] ?? [] );
+
+		if ( '' !== $bg_image_md ) {
+			$blocks[] = $bg_image_md;
+		}
+
+		if ( 'image' === ( $settings['graphic_element'] ?? '' ) ) {
+			$graphic_image_md = Markdown_Utils::image_from_media_array( $settings['graphic_image'] ?? [] );
+
+			if ( '' !== $graphic_image_md ) {
+				$blocks[] = $graphic_image_md;
+			}
+		}
+
+		$title = Utils::html_to_plain_text( $settings['title'] ?? '' );
+		$description = Utils::html_to_plain_text( $settings['description'] ?? '' );
+		$button = Utils::html_to_plain_text( $settings['button'] ?? '' );
+		$url = $settings['link']['url'] ?? '';
+
+		if ( '' !== $title || '' !== $description || '' !== $button ) {
+			$content_blocks = [];
+
+			if ( '' !== $title ) {
+				$tag = $settings['title_tag'] ?? 'h2';
+				$content_blocks[] = Markdown_Utils::heading( $title, $tag );
+			}
+
+			if ( '' !== $description ) {
+				$content_blocks[] = $description;
+			}
+
+			if ( '' !== $button ) {
+				$content_blocks[] = Markdown_Utils::button( $button, $url );
+			}
+
+			$blocks[] = Markdown_Utils::join_blocks( $content_blocks );
+		}
+
+		return Markdown_Utils::join_blocks( $blocks );
 	}
 
 	/**
@@ -1973,28 +2058,32 @@ class Call_To_Action extends Base_Widget {
 					</div>
 				<# } #>
 				<# if ( settings.title ) { #>
-					<{{ titleTag }} {{{ view.getRenderAttributeString( 'title' ) }}}>{{{ settings.title }}}</{{ titleTag }}>
+					<{{ titleTag }} {{{ view.getRenderAttributeString( 'title' ) }}}>{{ settings.title }}</{{ titleTag }}>
 				<# } #>
 
 				<# if ( settings.description ) { #>
-					<{{ descriptionTag }} {{{ view.getRenderAttributeString( 'description' ) }}}>{{{ settings.description }}}</{{ descriptionTag }}>
+					<{{ descriptionTag }} {{{ view.getRenderAttributeString( 'description' ) }}}>{{ settings.description }}</{{ descriptionTag }}>
 				<# } #>
 
 				<# if ( settings.button ) { #>
 					<div class="elementor-cta__button-wrapper elementor-cta__content-item elementor-content-item {{ animationClass }}">
-						<{{ buttonTag }} href="#" {{{ view.getRenderAttributeString( 'button' ) }}}>{{{ settings.button }}}</{{ buttonTag }}>
+						<{{ buttonTag }} href="#" {{{ view.getRenderAttributeString( 'button' ) }}}>{{ settings.button }}</{{ buttonTag }}>
 					</div>
 				<# } #>
 			</div>
 		<# } #>
 		<# if ( settings.ribbon_title ) {
-			var ribbonClasses = 'elementor-ribbon';
+			view.addRenderAttribute( 'ribbon', 'class', 'elementor-ribbon' );
 
 			if ( settings.ribbon_horizontal_position ) {
-				ribbonClasses += ' elementor-ribbon-' + settings.ribbon_horizontal_position;
-			} #>
-			<div class="{{ ribbonClasses }}">
-				<div class="elementor-ribbon-inner">{{{ settings.ribbon_title }}}</div>
+				view.addRenderAttribute( 'ribbon', 'class', 'elementor-ribbon-' + settings.ribbon_horizontal_position );
+			}
+
+			view.addRenderAttribute( 'ribbon_title', 'class', 'elementor-ribbon-inner' );
+			view.addInlineEditingAttributes( 'ribbon_title' );
+			#>
+			<div {{{ view.getRenderAttributeString( 'ribbon' ) }}}>
+				<div {{{ view.getRenderAttributeString( 'ribbon_title' ) }}}>{{ settings.ribbon_title }}</div>
 			</div>
 		<# } #>
 		</{{ wrapperTag }}>

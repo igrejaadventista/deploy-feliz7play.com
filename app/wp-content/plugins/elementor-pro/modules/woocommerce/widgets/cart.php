@@ -2358,10 +2358,10 @@ class Cart extends Base_Widget {
 		<div class="coupon e-cart-section shop_table">
 			<div class="form-row coupon-col">
 				<div class="coupon-col-start">
-					<input type="text" name="coupon_code" class="input-text" id="coupon_code" value="" placeholder="<?php esc_attr_e( 'Coupon code', 'elementor-pro' ); ?>" />
+					<input type="text" name="coupon_code" class="input-text" id="coupon_code" value="" placeholder="<?php echo esc_attr__( 'Coupon code', 'elementor-pro' ); ?>" />
 				</div>
 				<div class="coupon-col-end">
-					<button <?php $this->print_render_attribute_string( 'button_coupon' ); ?> value="<?php esc_attr_e( 'Apply coupon', 'elementor-pro' ); ?>"><?php esc_attr_e( 'Apply coupon', 'elementor-pro' ); ?></button>
+					<button <?php $this->print_render_attribute_string( 'button_coupon' ); ?> value="<?php echo esc_attr__( 'Apply coupon', 'elementor-pro' ); ?>"><?php echo esc_html__( 'Apply coupon', 'elementor-pro' ); ?></button>
 				</div>
 				<?php do_action( 'woocommerce_cart_coupon' ); ?>
 			</div>
@@ -2404,14 +2404,17 @@ class Cart extends Base_Widget {
 	 * @return boolean
 	 */
 	private function should_render_coupon() {
-		$settings = $this->get_settings_for_display();
-		$coupon_display_control = true;
-
-		if ( '' === $settings['section_coupon_display'] ) {
-			$coupon_display_control = false;
+		if ( ! wc_coupons_enabled() ) {
+			return false;
 		}
 
-		return wc_coupons_enabled() && $coupon_display_control;
+		$settings = $this->get_settings_for_display();
+
+		if ( isset( $settings['section_coupon_display'] ) && '' === $settings['section_coupon_display'] ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

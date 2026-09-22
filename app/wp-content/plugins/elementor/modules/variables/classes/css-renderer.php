@@ -2,19 +2,21 @@
 
 namespace Elementor\Modules\Variables\Classes;
 
+use Elementor\Modules\Variables\Services\Variables_Service;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
 class CSS_Renderer {
-	private Variables $variables;
+	private Variables_Service $service;
 
-	public function __construct( Variables $variables ) {
-		$this->variables = $variables;
+	public function __construct( Variables_Service $service ) {
+		$this->service = $service;
 	}
 
 	private function global_variables(): array {
-		return $this->variables->get_all();
+		return $this->service->get_variables_list();
 	}
 
 	public function raw_css(): string {
@@ -51,13 +53,22 @@ class CSS_Renderer {
 
 	private function build_css_variable_entry( string $id, array $variable ): ?string {
 		$variable_name = sanitize_text_field( $id );
+
+		if ( ! array_key_exists( 'deleted_at', $variable ) ) {
+			$variable_name = sanitize_text_field( $variable['label'] ?? '' );
+		}
+
 		$value = sanitize_text_field( $variable['value'] ?? '' );
 
 		if ( empty( $value ) || empty( $variable_name ) ) {
 			return null;
 		}
 
-		return "--{$variable_name}:{$value};";
+		$entry = "--{$variable_name}:{$value};";
+
+		$additional = apply_filters( 'elementor/variables/css_entry_additional', '', $variable, $id );
+
+		return $entry . $additional;
 	}
 
 	private function wrap_with_root( array $css_entries ): string {

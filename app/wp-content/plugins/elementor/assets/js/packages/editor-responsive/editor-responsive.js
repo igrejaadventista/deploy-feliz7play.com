@@ -1,2 +1,148 @@
-/*! For license information please see editor-responsive.js.LICENSE.txt */
-!function(){"use strict";var e={react:function(e){e.exports=window.React},"@elementor/editor-v1-adapters":function(e){e.exports=window.elementorV2.editorV1Adapters},"@wordpress/i18n":function(e){e.exports=window.wp.i18n}},t={};function n(r){var i=t[r];if(void 0!==i)return i.exports;var o=t[r]={exports:{}};return e[r](o,o.exports,n),o.exports}n.d=function(e,t){for(var r in t)n.o(t,r)&&!n.o(e,r)&&Object.defineProperty(e,r,{enumerable:!0,get:t[r]})},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})};var r={};!function(){n.r(r),n.d(r,{getBreakpoints:function(){return d},getBreakpointsTree:function(){return l},useActivateBreakpoint:function(){return a},useActiveBreakpoint:function(){return s},useBreakpoints:function(){return u},useBreakpointsMap:function(){return p}});var e=n("@elementor/editor-v1-adapters"),t=n("@wordpress/i18n"),i=n("react");function o(){const{breakpoints:e}=window.elementor?.config?.responsive||{};if(!e||0===Object.entries(e).length)return{minWidth:[],defaults:[],maxWidth:[]};const n=[],r=[],i=[{id:"desktop",label:(0,t.__)("Desktop","elementor")}];Object.entries(e).forEach((([e,t])=>{if(!t.is_enabled)return;const o={id:e,label:t.label,width:t.value,type:"min"===t.direction?"min-width":"max-width"};o.width?"min-width"===o.type?n.push(o):"max-width"===o.type&&r.push(o):i.push(o)}));const o=(e,t)=>e.width&&t.width?t.width-e.width:0;return{minWidth:n.sort(o),defaults:i,maxWidth:r.sort(o)}}function d(){const{minWidth:e,defaults:t,maxWidth:n}=o();return[...e,...t,...n]}function u(){return(0,e.__privateUseListenTo)((0,e.v1ReadyEvent)(),d)}function s(){return(0,e.__privateUseListenTo)((0,e.windowEvent)("elementor/device-mode/change"),c)}function c(){const e=window;return e.elementor?.channels?.deviceMode?.request?.("currentMode")||null}function a(){return(0,i.useCallback)((t=>(0,e.__privateRunCommand)("panel/change-device-mode",{device:t})),[])}function p(){const e=u().map((e=>[e.id,e]));return Object.fromEntries(e)}function l(){const{minWidth:e,defaults:t,maxWidth:n}=o(),[r]=t,i={...r,children:[]},d=e=>{let t=i;e.forEach((e=>{const n={...e,children:[]};t.children.push(n),t=n}))};return d(e),d(n),i}}(),(window.elementorV2=window.elementorV2||{}).editorResponsive=r}(),window.elementorV2.editorResponsive?.init?.();
+(function(react, _elementor_editor_v1_adapters, _wordpress_i18n) {
+
+//#region \0rolldown/runtime.js
+	var __defProp = Object.defineProperty;
+	var __name = (target, value) => __defProp(target, "name", {
+		value,
+		configurable: true
+	});
+	var __exportAll = (all, no_symbols) => {
+		let target = {};
+		for (var name in all) {
+			__defProp(target, name, {
+				get: all[name],
+				enumerable: true
+			});
+		}
+		if (!no_symbols) {
+			__defProp(target, Symbol.toStringTag, { value: "Module" });
+		}
+		return target;
+	};
+
+//#endregion
+
+//#region packages/packages/libs/editor-responsive/src/hooks/use-activate-breakpoint.ts
+	function useActivateBreakpoint() {
+		return (0, react.useCallback)((breakpoint) => {
+			return (0, _elementor_editor_v1_adapters.__privateRunCommand)("panel/change-device-mode", { device: breakpoint });
+		}, []);
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-responsive/src/hooks/use-active-breakpoint.ts
+	function useActiveBreakpoint() {
+		return (0, _elementor_editor_v1_adapters.__privateUseListenTo)((0, _elementor_editor_v1_adapters.windowEvent)("elementor/device-mode/change"), getActiveBreakpoint);
+	}
+	function getActiveBreakpoint() {
+		return window.elementor?.channels?.deviceMode?.request?.("currentMode") || null;
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-responsive/src/sync/utils/get-breakpoints-by-widths.ts
+	function getBreakpointsByWidths() {
+		const { breakpoints } = window.elementor?.config?.responsive || {};
+		if (!breakpoints || Object.entries(breakpoints).length === 0) return {
+			minWidth: [],
+			defaults: [],
+			maxWidth: []
+		};
+		const minWidth = [];
+		const maxWidth = [];
+		const defaults = [{
+			id: "desktop",
+			label: (0, _wordpress_i18n.__)("Desktop", "elementor")
+		}];
+		Object.entries(breakpoints).forEach(([id, v1Breakpoint]) => {
+			if (!v1Breakpoint.is_enabled) return;
+			const breakpoint = {
+				id,
+				label: v1Breakpoint.label,
+				width: v1Breakpoint.value,
+				type: v1Breakpoint.direction === "min" ? "min-width" : "max-width"
+			};
+			if (!breakpoint.width) defaults.push(breakpoint);
+			else if (breakpoint.type === "min-width") minWidth.push(breakpoint);
+			else if (breakpoint.type === "max-width") maxWidth.push(breakpoint);
+		});
+		const byWidth = (a, b) => {
+			return a.width && b.width ? b.width - a.width : 0;
+		};
+		return {
+			minWidth: minWidth.sort(byWidth),
+			defaults,
+			maxWidth: maxWidth.sort(byWidth)
+		};
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-responsive/src/sync/get-breakpoints.ts
+	function getBreakpoints() {
+		const { minWidth, defaults, maxWidth } = getBreakpointsByWidths();
+		return [
+			...minWidth,
+			...defaults,
+			...maxWidth
+		];
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-responsive/src/hooks/use-breakpoints.ts
+	function useBreakpoints() {
+		return (0, _elementor_editor_v1_adapters.__privateUseListenTo)((0, _elementor_editor_v1_adapters.v1ReadyEvent)(), getBreakpoints);
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-responsive/src/hooks/use-breakpoints-map.ts
+	function useBreakpointsMap() {
+		const breakpoints = useBreakpoints();
+		return (0, react.useMemo)(() => {
+			const entries = breakpoints.map((breakpoint) => [breakpoint.id, breakpoint]);
+			return Object.fromEntries(entries);
+		}, [breakpoints]);
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-responsive/src/sync/get-breakpoints-tree.ts
+	function getBreakpointsTree() {
+		const { minWidth, defaults, maxWidth } = getBreakpointsByWidths();
+		const [rootBreakpoint] = defaults;
+		const rootNode = {
+			...rootBreakpoint,
+			children: []
+		};
+		const buildBranch = (breakpoints) => {
+			let last = rootNode;
+			breakpoints.forEach((breakpoint) => {
+				const newNode = {
+					...breakpoint,
+					children: []
+				};
+				last.children.push(newNode);
+				last = newNode;
+			});
+		};
+		buildBranch(minWidth);
+		buildBranch(maxWidth);
+		return rootNode;
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-responsive/src/index.ts
+	var src_exports = /* @__PURE__ */ __exportAll({
+		getBreakpoints: () => getBreakpoints,
+		getBreakpointsTree: () => getBreakpointsTree,
+		useActivateBreakpoint: () => useActivateBreakpoint,
+		useActiveBreakpoint: () => useActiveBreakpoint,
+		useBreakpoints: () => useBreakpoints,
+		useBreakpointsMap: () => useBreakpointsMap
+	});
+
+//#endregion
+//#region \0elementor-package-library-entry
+	(window.elementorV2 = window.elementorV2 || {}).editorResponsive = src_exports;
+
+//#endregion
+})(React, elementorV2.editorV1Adapters, wp.i18n);
+window.elementorV2.editorResponsive?.init?.();
+//# sourceMappingURL=editor-responsive.js.map

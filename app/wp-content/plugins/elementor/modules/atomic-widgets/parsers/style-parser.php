@@ -6,20 +6,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use Elementor\Modules\AtomicWidgets\Module;
+use Elementor\Modules\AtomicWidgets\OptIn\Opt_In;
 use Elementor\Plugin;
+use Elementor\Utils;
+use Elementor\Core\Utils\Api\Parse_Result;
+use Elementor\Modules\AtomicWidgets\Styles\Style_States;
 
 class Style_Parser {
 	const VALID_TYPES = [
 		'class',
 	];
 
-	const VALID_STATES = [
-		'hover',
-		'active',
-		'focus',
-		null,
-	];
 
 	private array $schema;
 
@@ -49,7 +46,7 @@ class Style_Parser {
 
 		if ( ! isset( $style['label'] ) || ! is_string( $style['label'] ) ) {
 			$result->errors()->add( 'label', 'missing_or_invalid' );
-		} elseif ( Plugin::$instance->experiments->is_feature_active( Module::EXPERIMENT_VERSION_3_30 ) ) {
+		} elseif ( Plugin::$instance->experiments->is_feature_active( Opt_In::EXPERIMENT_NAME ) ) {
 			$label_validation = $this->validate_style_label( $style['label'] );
 
 			if ( ! $label_validation['is_valid'] ) {
@@ -75,8 +72,10 @@ class Style_Parser {
 			}
 
 			$meta_result = $this->validate_meta( $variant['meta'] );
+			$custom_css_result = $this->validate_custom_css( $variant );
 
 			$result->errors()->merge( $meta_result->errors(), 'meta' );
+			$result->errors()->merge( $custom_css_result->errors(), 'custom_css' );
 
 			if ( $meta_result->is_valid() ) {
 				$variant_result = $props_parser->validate( $variant['props'] );
@@ -164,7 +163,7 @@ class Style_Parser {
 			return $result;
 		}
 
-		if ( ! array_key_exists( 'state', $meta ) || ! in_array( $meta['state'], self::VALID_STATES, true ) ) {
+		if ( ! array_key_exists( 'state', $meta ) || ! Style_States::is_valid_state( $meta['state'] ) ) {
 			$result->errors()->add( 'state', 'missing_or_invalid_value' );
 
 			return $result;
@@ -175,6 +174,20 @@ class Style_Parser {
 			$result->errors()->add( 'breakpoint', 'missing_or_invalid_value' );
 
 			return $result;
+		}
+
+		return $result;
+	}
+
+	private function validate_custom_css( array $variant ): Parse_Result {
+		$result = Parse_Result::make();
+
+		if ( ! empty( $variant['custom_css']['raw'] ) && (
+				! is_string( $variant['custom_css']['raw'] ) ||
+				null === Utils::decode_string( $variant['custom_css']['raw'], null )
+			)
+		) {
+			$result->errors()->add( 'custom_css', 'invalid_type' );
 		}
 
 		return $result;
@@ -192,6 +205,18 @@ class Style_Parser {
 		return $meta;
 	}
 
+	private function sanitize_custom_css( array $variant ) {
+		if ( empty( $variant['custom_css']['raw'] ) ) {
+			return null;
+		}
+
+		$custom_css = Utils::decode_string( $variant['custom_css']['raw'] );
+		$custom_css = sanitize_textarea_field( $custom_css );
+		$custom_css = [ 'raw' => Utils::encode_string( $custom_css ) ];
+
+		return empty( $custom_css['raw'] ) ? null : $custom_css;
+	}
+
 	/**
 	 * @param array $style
 	 * the style object to sanitize
@@ -207,10 +232,15 @@ class Style_Parser {
 			$style['id'] = sanitize_key( $style['id'] );
 		}
 
+		if ( isset( $style['sync_to_v3'] ) ) {
+			$style['sync_to_v3'] = (bool) $style['sync_to_v3'];
+		}
+
 		if ( ! empty( $style['variants'] ) ) {
 			foreach ( $style['variants'] as $variant_index => $variant ) {
 				$style['variants'][ $variant_index ]['props'] = $props_parser->sanitize( $variant['props'] )->unwrap();
 				$style['variants'][ $variant_index ]['meta'] = $this->sanitize_meta( $variant['meta'] );
+				$style['variants'][ $variant_index ]['custom_css'] = $this->sanitize_custom_css( $variant );
 			}
 		}
 

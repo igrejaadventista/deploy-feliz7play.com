@@ -1,2 +1,367 @@
-/*! For license information please see editor-panels.js.LICENSE.txt */
-!function(){"use strict";var e={react:function(e){e.exports=window.React},"@elementor/editor":function(e){e.exports=window.elementorV2.editor},"@elementor/editor-v1-adapters":function(e){e.exports=window.elementorV2.editorV1Adapters},"@elementor/locations":function(e){e.exports=window.elementorV2.locations},"@elementor/store":function(e){e.exports=window.elementorV2.store},"@elementor/ui":function(e){e.exports=window.elementorV2.ui}},n={};function t(o){var r=n[o];if(void 0!==r)return r.exports;var i=n[o]={exports:{}};return e[o](i,i.exports,t),i.exports}t.d=function(e,n){for(var o in n)t.o(n,o)&&!t.o(e,o)&&Object.defineProperty(e,o,{enumerable:!0,get:n[o]})},t.o=function(e,n){return Object.prototype.hasOwnProperty.call(e,n)},t.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})};var o={};!function(){t.r(o),t.d(o,{Panel:function(){return b},PanelBody:function(){return O},PanelFooter:function(){return T},PanelHeader:function(){return E},PanelHeaderTitle:function(){return S},__createPanel:function(){return y},__registerPanel:function(){return g},init:function(){return h}});var e=t("@elementor/editor"),n=t("@elementor/store"),r=t("react"),i=t("@elementor/locations"),l=t("@elementor/ui"),c=t("@elementor/editor-v1-adapters"),{inject:a,useInjections:u}=(0,i.createLocation)(),s=e=>e.panels.openId,p=(0,n.__createSlice)({name:"panels",initialState:{openId:null},reducers:{open(e,n){e.openId=n.payload},close(e,n){n.payload&&e.openId!==n.payload||(e.openId=null)}}}),d="panel/v2";function m(){return document.querySelector("#elementor-panel-inner")}function f(){const e=["#elementor-panel-header-wrapper","#elementor-panel-content-wrapper","#elementor-panel-state-loading","#elementor-panel-footer"].join(", ");return document.querySelectorAll(e)}function _({on:e,when:t,callback:o}){let r;(0,n.__subscribe)((()=>{const i=e((0,n.__getState)());t({prev:r,current:i})&&o({prev:r,current:i}),r=i}))}function v(e){const n=(0,r.useRef)(m);return n.current?r.createElement(l.Portal,{container:n.current,...e}):null}function w(){const e=function(){const e=u(),t=(0,n.__useSelector)(s);return(0,r.useMemo)((()=>e.find((e=>t===e.id))),[e,t])}(),t=e?.component??null;return t?r.createElement(v,null,r.createElement(t,null)):null}function h(){(0,c.__privateListenTo)((0,c.windowEvent)("elementor/panel/init"),(()=>(0,c.__privateRegisterRoute)(d))),(0,c.__privateListenTo)((0,c.routeOpenEvent)(d),(()=>{f().forEach((e=>{e.setAttribute("hidden","hidden"),e.setAttribute("inert","true")}))})),(0,c.__privateListenTo)((0,c.routeCloseEvent)(d),(()=>s((0,n.__getState)())&&(0,n.__dispatch)(p.actions.close()))),(0,c.__privateListenTo)((0,c.routeCloseEvent)(d),(()=>{f().forEach((e=>{e.removeAttribute("hidden"),e.removeAttribute("inert")}))})),(0,c.__privateListenTo)((0,c.windowEvent)("elementor/panel/init"),(()=>_({on:e=>s(e),when:({prev:e,current:n})=>!(e||!n),callback:()=>(0,c.__privateOpenRoute)(d)}))),(0,c.__privateListenTo)((0,c.windowEvent)("elementor/panel/init"),(()=>_({on:e=>s(e),when:({prev:e,current:n})=>!(n||!e),callback:()=>(0,c.__privateIsRouteActive)(d)&&(0,c.__privateOpenRoute)(function(){const e=window?.elementor?.documents?.getCurrent?.()?.config?.panel?.default_route;return e||"panel/elements/categories"}())}))),(0,n.__registerSlice)(p),(0,e.injectIntoTop)({id:"panels",component:w})}function y({id:e,component:t,onOpen:o,onClose:r,allowedEditModes:i,blockOnKitRoutes:l}){const a=function(e,t={}){return()=>{const o=(0,n.__useSelector)(s),r=(0,c.__privateUseRouteStatus)(d,t);return{isOpen:o===e&&r.isActive,isBlocked:r.isBlocked}}}(e,{allowedEditModes:i,blockOnKitRoutes:l}),u=function(e,t,o={}){let r=null;return()=>{const i=(0,n.__useDispatch)(),{isBlocked:l}=t();return{open:async()=>{l||(i(p.actions.open(e)),r=o.onOpen?.()??null)},close:async()=>{l||(i(p.actions.close(e)),o.onClose?.(r))}}}}(e,a,{onOpen:o,onClose:r});return{panel:{id:e,component:t},usePanelStatus:a,usePanelActions:u}}function g({id:e,component:n}){a({id:e,component:n})}function b({children:e,sx:n,...t}){return r.createElement(l.Drawer,{open:!0,variant:"persistent",anchor:"left",PaperProps:{sx:{position:"relative",width:"100%",bgcolor:"background.default",border:"none"}},sx:{height:"100%",...n},...t},e)}var x=(0,l.styled)(l.Box)((({theme:e})=>({height:e?.spacing(6)||"48px",display:"flex",alignItems:"center",justifyContent:"center",gap:e?.spacing(.5)||"4px"})));function E({children:e,...n}){return r.createElement(r.Fragment,null,r.createElement(x,{component:"header",...n},e))}var P=(0,l.styled)(l.Typography)((({theme:e,variant:n="body1"})=>"inherit"===n?{}:{"&.MuiTypography-root":{...e.typography[n]}}));function S({children:e,...n}){return r.createElement(P,{component:"h2",variant:"subtitle1",...n},e)}function O({children:e,sx:n,...t}){return r.createElement(l.Box,{component:"main",sx:{overflowY:"auto",height:"100%",...n},...t},e)}function T({children:e,sx:n,...t}){return r.createElement(r.Fragment,null,r.createElement(l.Divider,null),r.createElement(l.Box,{component:"footer",sx:{display:"flex",position:"sticky",bottom:0,px:2,py:1.5},...t},e))}}(),(window.elementorV2=window.elementorV2||{}).editorPanels=o}(),window.elementorV2.editorPanels?.init?.();
+(function(_elementor_editor, _elementor_store, react, _elementor_locations, _elementor_ui, _elementor_editor_v1_adapters) {
+
+//#region \0rolldown/runtime.js
+	var __create = Object.create;
+	var __defProp = Object.defineProperty;
+	var __name = (target, value) => __defProp(target, "name", {
+		value,
+		configurable: true
+	});
+	var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+	var __getOwnPropNames = Object.getOwnPropertyNames;
+	var __getProtoOf = Object.getPrototypeOf;
+	var __hasOwnProp = Object.prototype.hasOwnProperty;
+	var __exportAll = (all, no_symbols) => {
+		let target = {};
+		for (var name in all) {
+			__defProp(target, name, {
+				get: all[name],
+				enumerable: true
+			});
+		}
+		if (!no_symbols) {
+			__defProp(target, Symbol.toStringTag, { value: "Module" });
+		}
+		return target;
+	};
+	var __copyProps = (to, from, except, desc) => {
+		if (from && typeof from === "object" || typeof from === "function") {
+			for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+				key = keys[i];
+				if (!__hasOwnProp.call(to, key) && key !== except) {
+					__defProp(to, key, {
+						get: ((k) => from[k]).bind(null, key),
+						enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+					});
+				}
+			}
+		}
+		return to;
+	};
+	var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+		value: mod,
+		enumerable: true
+	}) : target, mod));
+
+//#endregion
+react = __toESM(react);
+
+//#region packages/packages/core/editor-panels/src/location.ts
+	var panelsMeta = /* @__PURE__ */ new Map();
+	var { inject: baseInject, useInjections: baseUseInjections, getInjections } = (0, _elementor_locations.createLocation)();
+	(0, _elementor_locations.__registerFlushInjections)(() => {
+		panelsMeta.clear();
+	});
+	function injectIntoPanels({ id, component, keepMounted }) {
+		const existedBefore = getInjections().some((injection) => injection.id === id);
+		baseInject({
+			id,
+			component
+		});
+		if (!existedBefore) panelsMeta.set(id, { keepMounted });
+	}
+	function usePanelsInjections() {
+		return baseUseInjections().map((injection) => ({
+			...injection,
+			keepMounted: panelsMeta.get(injection.id)?.keepMounted ?? false
+		}));
+	}
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/store/selectors.ts
+	var selectOpenId = (state) => state.panels.openId;
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/store/slice.ts
+	var initialState = { openId: null };
+	var slice_default = (0, _elementor_store.__createSlice)({
+		name: "panels",
+		initialState,
+		reducers: {
+			open(state, action) {
+				state.openId = action.payload;
+			},
+			close(state, action) {
+				if (!action.payload || state.openId === action.payload) state.openId = null;
+			}
+		}
+	});
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/sync.ts
+	var V2_PANEL = "panel/v2";
+	function getPortalContainer() {
+		return document.querySelector("#elementor-panel-inner");
+	}
+	function sync() {
+		(0, _elementor_editor_v1_adapters.__privateListenTo)((0, _elementor_editor_v1_adapters.windowEvent)("elementor/panel/init"), () => (0, _elementor_editor_v1_adapters.__privateRegisterRoute)(V2_PANEL));
+		(0, _elementor_editor_v1_adapters.__privateListenTo)((0, _elementor_editor_v1_adapters.routeOpenEvent)(V2_PANEL), () => {
+			getV1PanelElements().forEach((el) => {
+				el.setAttribute("hidden", "hidden");
+				el.setAttribute("inert", "true");
+			});
+		});
+		(0, _elementor_editor_v1_adapters.__privateListenTo)((0, _elementor_editor_v1_adapters.routeCloseEvent)(V2_PANEL), () => selectOpenId((0, _elementor_store.__getState)()) && (0, _elementor_store.__dispatch)(slice_default.actions.close()));
+		(0, _elementor_editor_v1_adapters.__privateListenTo)((0, _elementor_editor_v1_adapters.routeCloseEvent)(V2_PANEL), () => {
+			getV1PanelElements().forEach((el) => {
+				el.removeAttribute("hidden");
+				el.removeAttribute("inert");
+			});
+		});
+		(0, _elementor_editor_v1_adapters.__privateListenTo)((0, _elementor_editor_v1_adapters.windowEvent)("elementor/panel/init"), () => subscribe({
+			on: (state) => selectOpenId(state),
+			when: ({ prev, current }) => !!(!prev && current),
+			callback: () => (0, _elementor_editor_v1_adapters.__privateOpenRoute)(V2_PANEL)
+		}));
+		(0, _elementor_editor_v1_adapters.__privateListenTo)((0, _elementor_editor_v1_adapters.windowEvent)("elementor/panel/init"), () => subscribe({
+			on: (state) => selectOpenId(state),
+			when: ({ prev, current }) => !!(!current && prev),
+			callback: () => (0, _elementor_editor_v1_adapters.__privateIsRouteActive)("panel/v2") && (0, _elementor_editor_v1_adapters.__privateOpenRoute)(getDefaultRoute())
+		}));
+	}
+	function getV1PanelElements() {
+		const v1ElementsSelector = [
+			"#elementor-panel-header-wrapper",
+			"#elementor-panel-content-wrapper",
+			"#elementor-panel-state-loading"
+		].join(", ");
+		return document.querySelectorAll(v1ElementsSelector);
+	}
+	function getDefaultRoute() {
+		return window?.elementor?.documents?.getCurrent?.()?.config?.panel?.default_route || "panel/elements/categories";
+	}
+	function subscribe({ on, when, callback }) {
+		let prev;
+		(0, _elementor_store.__subscribe)(() => {
+			const current = on((0, _elementor_store.__getState)());
+			if (when({
+				prev,
+				current
+			})) callback({
+				prev,
+				current
+			});
+			prev = current;
+		});
+	}
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/components/internal/portal.tsx
+	function Portal(props) {
+		const [container, setContainer] = (0, react.useState)(() => getPortalContainer());
+		(0, react.useEffect)(() => {
+			if (container) return;
+			const resolveContainer = () => {
+				const portalContainer = getPortalContainer();
+				if (portalContainer) setContainer(portalContainer);
+			};
+			window.addEventListener("elementor/panel/init", resolveContainer);
+			resolveContainer();
+			return () => {
+				window.removeEventListener("elementor/panel/init", resolveContainer);
+			};
+		}, [container]);
+		if (!container) return null;
+		return /* @__PURE__ */ react.createElement(_elementor_ui.Portal, {
+			container,
+			...props
+		});
+	}
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/components/internal/panels.tsx
+	function Panels() {
+		const injections = usePanelsInjections();
+		const openId = (0, _elementor_store.__useSelector)(selectOpenId);
+		const persistentInjections = injections.filter((injection) => injection.keepMounted);
+		const openInjection = injections.find((injection) => openId === injection.id);
+		if (!persistentInjections.length && !openInjection) return null;
+		return /* @__PURE__ */ react.createElement(Portal, null, persistentInjections.map(({ id, component: Component }) => /* @__PURE__ */ react.createElement("div", {
+			key: id,
+			style: { display: openId === id ? "contents" : "none" }
+		}, /* @__PURE__ */ react.createElement(Component, null))), openInjection && !openInjection.keepMounted && /* @__PURE__ */ react.createElement(openInjection.component, null));
+	}
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/init.ts
+	function init() {
+		sync();
+		(0, _elementor_store.__registerSlice)(slice_default);
+		(0, _elementor_editor.injectIntoTop)({
+			id: "panels",
+			component: Panels
+		});
+	}
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/api.ts
+	function createPanel({ id, component, onOpen, onClose, allowedEditModes, blockOnKitRoutes, isOpenPreviousElement = false, keepMounted = false }) {
+		const usePanelStatus = createUseStatus(id, {
+			allowedEditModes,
+			blockOnKitRoutes
+		});
+		const usePanelActions = createUseActions(id, usePanelStatus, {
+			onOpen,
+			onClose
+		}, isOpenPreviousElement);
+		return {
+			panel: {
+				id,
+				component,
+				keepMounted
+			},
+			usePanelStatus,
+			usePanelActions
+		};
+	}
+	function registerPanel({ id, component, keepMounted }) {
+		injectIntoPanels({
+			id,
+			component,
+			keepMounted
+		});
+	}
+	function createUseStatus(id, options = {}) {
+		return () => {
+			const openPanelId = (0, _elementor_store.__useSelector)(selectOpenId);
+			const v1PanelStatus = (0, _elementor_editor_v1_adapters.__privateUseRouteStatus)(V2_PANEL, options);
+			return {
+				isOpen: openPanelId === id && v1PanelStatus.isActive,
+				isBlocked: v1PanelStatus.isBlocked
+			};
+		};
+	}
+	function createUseActions(id, useStatus, options = {}, isOpenPreviousElement) {
+		let stateSnapshot = null;
+		let previousSelectedElement = null;
+		return () => {
+			const dispatch = (0, _elementor_store.__useDispatch)();
+			const { isBlocked } = useStatus();
+			return {
+				open: async () => {
+					if (isBlocked) return;
+					if (isOpenPreviousElement) previousSelectedElement = window.elementor?.selection?.getElements?.()[0]?.model.get("id") ?? null;
+					dispatch(slice_default.actions.open(id));
+					stateSnapshot = options.onOpen?.() ?? null;
+				},
+				close: async () => {
+					if (isBlocked) return;
+					dispatch(slice_default.actions.close(id));
+					await options.onClose?.(stateSnapshot);
+					if (previousSelectedElement) {
+						try {
+							const container = window.elementor?.getContainer?.(previousSelectedElement);
+							(0, _elementor_editor_v1_adapters.__privateRunCommand)("document/elements/select", { container });
+						} catch {}
+						previousSelectedElement = null;
+					}
+				}
+			};
+		};
+	}
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/components/external/panel.tsx
+	function Panel({ children, sx, ...props }) {
+		return /* @__PURE__ */ react.createElement(_elementor_ui.Drawer, {
+			open: true,
+			variant: "persistent",
+			anchor: "left",
+			PaperProps: { sx: {
+				position: "relative",
+				width: "100%",
+				bgcolor: "background.default",
+				border: "none"
+			} },
+			sx: {
+				height: "100%",
+				...sx
+			},
+			...props
+		}, children);
+	}
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/components/external/panel-header.tsx
+	var Header = (0, _elementor_ui.styled)(_elementor_ui.Box)(({ theme }) => ({
+		height: theme?.spacing(6) || "48px",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		gap: theme?.spacing(.5) || "4px"
+	}));
+	function PanelHeader({ children, ...props }) {
+		return /* @__PURE__ */ react.createElement(react.Fragment, null, /* @__PURE__ */ react.createElement(Header, {
+			component: "header",
+			...props
+		}, children));
+	}
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/components/external/panel-header-title.tsx
+	var Typography = (0, _elementor_ui.styled)(_elementor_ui.Typography)(({ theme, variant = "body1" }) => {
+		if (variant === "inherit") return {};
+		return { "&.MuiTypography-root": { ...theme.typography[variant] } };
+	});
+	var PanelHeaderTitle = (0, react.forwardRef)(({ children, ...props }, ref) => {
+		return /* @__PURE__ */ react.createElement(Typography, {
+			ref,
+			component: "h2",
+			variant: "subtitle1",
+			...props
+		}, children);
+	});
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/components/external/panel-body.tsx
+	function PanelBody({ children, sx, ...props }) {
+		return /* @__PURE__ */ react.createElement(_elementor_ui.Box, {
+			component: "main",
+			sx: {
+				overflowY: "auto",
+				height: "100%",
+				...sx
+			},
+			...props
+		}, children);
+	}
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/components/external/panel-footer.tsx
+	function PanelFooter({ children, sx, ...props }) {
+		return /* @__PURE__ */ react.createElement(react.Fragment, null, /* @__PURE__ */ react.createElement(_elementor_ui.Divider, null), /* @__PURE__ */ react.createElement(_elementor_ui.Box, {
+			component: "footer",
+			sx: {
+				display: "flex",
+				position: "sticky",
+				bottom: 0,
+				px: 2,
+				py: 1.5
+			},
+			...props
+		}, children));
+	}
+
+//#endregion
+//#region packages/packages/core/editor-panels/src/index.ts
+	var src_exports = /* @__PURE__ */ __exportAll({
+		Panel: () => Panel,
+		PanelBody: () => PanelBody,
+		PanelFooter: () => PanelFooter,
+		PanelHeader: () => PanelHeader,
+		PanelHeaderTitle: () => PanelHeaderTitle,
+		__createPanel: () => createPanel,
+		__registerPanel: () => registerPanel,
+		createPanel: () => createPanel,
+		init: () => init,
+		registerPanel: () => registerPanel
+	});
+
+//#endregion
+//#region \0elementor-package-library-entry
+	(window.elementorV2 = window.elementorV2 || {}).editorPanels = src_exports;
+
+//#endregion
+})(elementorV2.editor, elementorV2.store, React, elementorV2.locations, elementorV2.ui, elementorV2.editorV1Adapters);
+window.elementorV2.editorPanels?.init?.();
+//# sourceMappingURL=editor-panels.js.map

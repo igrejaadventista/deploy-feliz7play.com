@@ -36,7 +36,7 @@ class Module extends Module_Base {
 	}
 
 	public static function is_active() {
-		return Plugin::elementor()->experiments->is_feature_active( \Elementor\Modules\NestedElements\Module::EXPERIMENT_NAME );
+		return Plugin::elementor()->experiments->is_feature_active( 'container' );
 	}
 
 	/**
@@ -49,6 +49,7 @@ class Module extends Module_Base {
 			'name' => static::EXPERIMENT_NAME,
 			'title' => esc_html__( 'Menu', 'elementor-pro' ),
 			'description' => sprintf(
+				/* translators: 1: Link opening tag, 2: Link closing tag. */
 				esc_html__( 'Create beautiful menus and mega menus with new nested capabilities. Mega menus are ideal for websites with complex navigation structures and unique designs. %1$sLearn More%2$s', 'elementor-pro' ),
 				'<a href="https://go.elementor.com/wp-dash-mega-menu/" target="_blank">',
 				'</a>'
@@ -56,9 +57,12 @@ class Module extends Module_Base {
 			'hidden' => false,
 			'release_status' => Manager::RELEASE_STATUS_BETA,
 			'default' => Manager::STATE_INACTIVE,
+			'new_site' => [
+				'default_active' => true,
+				'minimum_installation_version' => '3.30.0',
+			],
 			'dependencies' => [
 				'container',
-				'nested-elements',
 			],
 		];
 

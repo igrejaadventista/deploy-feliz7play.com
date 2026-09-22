@@ -6,6 +6,7 @@ use Elementor\Group_Control_Image_Size;
 use Elementor\Icons_Manager;
 use Elementor\Repeater;
 use ElementorPro\Base\Base_Widget;
+use ElementorPro\Base\Markdown_Utils;
 use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,6 +37,15 @@ abstract class Base extends Base_Widget {
 			[
 				'label' => esc_html__( 'Slides', 'elementor-pro' ),
 				'tab' => Controls_Manager::TAB_CONTENT,
+			]
+		);
+
+		$this->add_control(
+			'slides_name',
+			[
+				'label' => esc_html__( 'Slides Name', 'elementor-pro' ),
+				'type' => Controls_Manager::TEXT,
+				'default' => esc_html__( 'Slides', 'elementor-pro' ),
 			]
 		);
 
@@ -282,7 +292,7 @@ abstract class Base extends Base_Widget {
 		$this->add_control(
 			'lazyload',
 			[
-				'label' => esc_html__( 'Lazyload', 'elementor-pro' ),
+				'label' => esc_html__( 'Lazy Load', 'elementor-pro' ),
 				'type' => Controls_Manager::SWITCHER,
 				'separator' => 'before',
 				'frontend_available' => true,
@@ -482,7 +492,25 @@ abstract class Base extends Base_Widget {
 			]
 		);
 
-		$swiper_class = Plugin::elementor()->experiments->is_feature_active( 'e_swiper_latest' ) ? 'swiper' : 'swiper-container';
+		$this->add_responsive_control(
+			'pagination_gap',
+			[
+				'label' => esc_html__( 'Space Between Dots', 'elementor-pro' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+				'range' => [
+					'px' => [
+						'max' => 50,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .swiper-pagination-bullet' => '--swiper-pagination-bullet-horizontal-gap: {{SIZE}}{{UNIT}}; --swiper-pagination-bullet-vertical-gap: {{SIZE}}{{UNIT}};',
+				],
+				'condition' => [
+					'pagination' => 'bullets',
+				],
+			]
+		);
 
 		$this->add_responsive_control(
 			'pagination_size',
@@ -503,8 +531,7 @@ abstract class Base extends Base_Widget {
 				],
 				'selectors' => [
 					'{{WRAPPER}} .swiper-pagination-bullet' => 'height: {{SIZE}}{{UNIT}}; width: {{SIZE}}{{UNIT}}',
-					'{{WRAPPER}} .' . $swiper_class . '-horizontal .swiper-pagination-progressbar' => 'height: {{SIZE}}{{UNIT}}',
-					'{{WRAPPER}} .swiper-pagination-fraction' => 'font-size: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .swiper-horizontal .swiper-pagination-progressbar' => 'height: {{SIZE}}{{UNIT}}',
 				],
 				'condition' => [
 					'pagination!' => '',
@@ -539,13 +566,14 @@ abstract class Base extends Base_Widget {
 				'condition' => [
 					'pagination!' => '',
 				],
+				'control_type' => 'content',
 			]
 		);
 
 		$this->end_controls_section();
 	}
 
-	protected function print_slider( array $settings = null ) {
+	protected function print_slider( ?array $settings = null ) {
 		if ( null === $settings ) {
 			$settings = $this->get_settings_for_display();
 		}
@@ -558,37 +586,48 @@ abstract class Base extends Base_Widget {
 		$settings = array_merge( $default_settings, $settings );
 
 		$slides_count = count( $settings['slides'] );
-		$swiper_class = Plugin::elementor()->experiments->is_feature_active( 'e_swiper_latest' ) ? 'swiper' : 'swiper-container';
+		$optimized_markup = Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+
+		$this->add_render_attribute( [
+			'wrapper' => [
+				'class' => [ $settings['container_class'], 'swiper' ],
+				'role' => 'region',
+				'aria-roledescription' => 'carousel',
+				'aria-label' => $settings['slides_name'],
+			],
+		] );
 		?>
+		<?php if ( ! $optimized_markup ) : ?>
 		<div class="elementor-swiper">
-			<div class="<?php echo esc_attr( $settings['container_class'] ); ?> <?php echo esc_attr( $swiper_class ); ?>">
+		<?php endif; ?>
+			<div <?php $this->print_render_attribute_string( 'wrapper' ); ?>>
 				<div class="swiper-wrapper">
 					<?php
 					foreach ( $settings['slides'] as $index => $slide ) :
 						$this->slide_prints_count++;
 						?>
-						<div class="swiper-slide">
+						<div class="swiper-slide" role="group" aria-roledescription="slide">
 							<?php $this->print_slide( $slide, $settings, 'slide-' . $index . '-' . $this->slide_prints_count ); ?>
 						</div>
 					<?php endforeach; ?>
 				</div>
 				<?php if ( 1 < $slides_count ) : ?>
+					<?php if ( $settings['show_arrows'] ) : ?>
+						<div class="elementor-swiper-button elementor-swiper-button-prev" role="button" tabindex="0" aria-label="<?php echo esc_attr__( 'Previous', 'elementor-pro' ); ?>">
+							<?php $this->render_swiper_button( 'previous' ); ?>
+						</div>
+						<div class="elementor-swiper-button elementor-swiper-button-next" role="button" tabindex="0" aria-label="<?php echo esc_attr__( 'Next', 'elementor-pro' ); ?>">
+							<?php $this->render_swiper_button( 'next' ); ?>
+						</div>
+					<?php endif; ?>
 					<?php if ( $settings['pagination'] ) : ?>
 						<div class="swiper-pagination"></div>
 					<?php endif; ?>
-					<?php if ( $settings['show_arrows'] ) : ?>
-						<div class="elementor-swiper-button elementor-swiper-button-prev" role="button" tabindex="0">
-							<?php $this->render_swiper_button( 'previous' ); ?>
-							<span class="elementor-screen-only"><?php echo esc_html__( 'Previous', 'elementor-pro' ); ?></span>
-						</div>
-						<div class="elementor-swiper-button elementor-swiper-button-next" role="button" tabindex="0">
-							<?php $this->render_swiper_button( 'next' ); ?>
-							<span class="elementor-screen-only"><?php echo esc_html__( 'Next', 'elementor-pro' ); ?></span>
-						</div>
-					<?php endif; ?>
 				<?php endif; ?>
 			</div>
+		<?php if ( ! $optimized_markup ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -627,5 +666,69 @@ abstract class Base extends Base_Widget {
 			'library' => 'eicons',
 			'value' => $icon_value,
 		], [ 'aria-hidden' => 'true' ] );
+	}
+
+	protected function build_carousel_slide_markdown( array $slide, array $settings ): string {
+		$blocks = [];
+
+		foreach ( [ 'heading', 'title', 'name' ] as $key ) {
+			$text = Markdown_Utils::plain_text( $slide[ $key ] ?? '' );
+
+			if ( '' !== $text ) {
+				$blocks[] = $text;
+				break;
+			}
+		}
+
+		$content = Markdown_Utils::plain_text( $slide['content'] ?? '' );
+
+		if ( '' !== $content ) {
+			$blocks[] = $content;
+		}
+
+		$image_md = Markdown_Utils::image_from_media_array( $slide['image'] ?? [] );
+
+		if ( '' !== $image_md ) {
+			$blocks[] = $image_md;
+		}
+
+		$video_url = $slide['video']['url'] ?? '';
+
+		if ( '' !== $video_url ) {
+			$blocks[] = Markdown_Utils::link( esc_html__( 'Video', 'elementor-pro' ), $video_url );
+		}
+
+		$link_url = $slide['image_link_to']['url'] ?? $slide['link']['url'] ?? '';
+
+		if ( '' !== $link_url ) {
+			$blocks[] = Markdown_Utils::link( esc_html__( 'Link', 'elementor-pro' ), $link_url );
+		}
+
+		if ( isset( $slide['rating'] ) && '' !== $slide['rating'] ) {
+			$blocks[] = '- **' . esc_html__( 'Rating', 'elementor-pro' ) . ':** ' . $slide['rating'];
+		}
+
+		return Markdown_Utils::join_blocks( $blocks );
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$slides = $settings['slides'] ?? [];
+
+		if ( empty( $slides ) ) {
+			return '';
+		}
+
+		$blocks = [];
+
+		foreach ( $slides as $slide ) {
+			$slide_md = $this->build_carousel_slide_markdown( $slide, $settings );
+
+			if ( '' !== $slide_md ) {
+				$blocks[] = $slide_md;
+			}
+		}
+
+		return Markdown_Utils::widget_section( $this->get_title(), Markdown_Utils::join_blocks( $blocks ) );
 	}
 }

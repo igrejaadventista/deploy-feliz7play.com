@@ -1,10 +1,11 @@
-/*! elementor - v3.30.0 - 22-07-2025 */
 :root {
   --e-a-color-white:	#ffffff;
   --e-a-color-black:	#000000;
   --e-a-color-logo:	#ffffff;
+  --e-a-color-circle-logo:	#000000;
   --e-a-color-primary:	#F3BAFD;
   --e-a-color-primary-bold:	#D004D4;
+  --e-a-color-primary-bold-dark: #C00BB9;
   --e-a-color-secondary:	#515962;
   --e-a-color-success:	#0A875A;
   --e-a-color-danger:	#DC2626;
@@ -13,6 +14,7 @@
   --e-a-color-accent:	#93003f;
   --e-a-color-global:	#1DDDBF;
   --e-a-color-accent-promotion:	#93003f;
+  --e-a-color-accent-promotion-disabled: rgba(147, 0, 63, 0.38);
   --e-a-bg-default:	#ffffff;
   --e-a-bg-invert:	#0C0D0E;
   --e-a-bg-hover:	#F1F2F3;

@@ -4,7 +4,7 @@
 namespace ElementorPro\Modules\Tiers\AdminMenuItems;
 
 use Elementor\Core\Admin\Menu\Interfaces\Admin_Menu_Item_With_Page;
-use ElementorPro\Core\Utils\Promotions\Validate_Promotion;
+use Elementor\Core\Utils\Promotions\Filtered_Promotions_Manager;
 use Elementor\Settings;
 use Elementor\Utils;
 
@@ -22,19 +22,19 @@ abstract class Base_Promotion_Template implements Admin_Menu_Item_With_Page {
 
 	abstract protected function get_video_url():string;
 
-	public function is_visible() {
+	public function is_visible(): bool {
 		return true;
 	}
 
-	public function get_parent_slug() {
+	public function get_parent_slug(): string {
 		return Settings::PAGE_ID;
 	}
 
-	public function get_capability() {
+	public function get_capability(): string {
 		return 'manage_options';
 	}
 
-	protected function get_cta_text() {
+	protected function get_cta_text(): string {
 		return esc_html__( 'Upgrade Now', 'elementor-pro' );
 	}
 
@@ -61,7 +61,7 @@ abstract class Base_Promotion_Template implements Admin_Menu_Item_With_Page {
 		return ob_get_clean();
 	}
 
-	public function render() {
+	public function render(): void {
 		$promotion_data = $this->get_promotion_data();
 		?>
 			<div class="e-feature-promotion">
@@ -91,7 +91,7 @@ abstract class Base_Promotion_Template implements Admin_Menu_Item_With_Page {
 	 * @return array
 	 */
 	private function get_promotion_data(): array {
-		return [
+		$config = [
 			'promotion_title' => $this->get_promotion_title(),
 			'cta_url' => $this->get_cta_url(),
 			'cta_text' => $this->get_cta_text(),
@@ -99,5 +99,7 @@ abstract class Base_Promotion_Template implements Admin_Menu_Item_With_Page {
 			'lines' => $this->get_lines(),
 			'side_note' => $this->get_side_note(),
 		];
+
+		return Filtered_Promotions_Manager::get_filtered_promotion_data( $config, 'elementor-pro/advanced-' . $this->get_name() . '-pro-widget/promotion', 'cta_url' );
 	}
 }

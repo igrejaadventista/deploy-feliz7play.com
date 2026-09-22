@@ -26,6 +26,9 @@ class Locations_Manager {
 	protected $locations_printed = [];
 	protected $locations_skipped = [];
 
+	/** @var array<int,array<string,int[]>> Per-request cache: queried post id => ( location slug => document ids ). */
+	private $location_doc_ids_cache = [];
+
 	public function __construct() {
 		$this->set_core_locations();
 
@@ -40,6 +43,16 @@ class Locations_Manager {
 		}
 
 		add_filter( 'pre_handle_404', [ $this, 'should_allow_pagination_on_single_templates' ], 10, 2 );
+		add_filter( 'pre_handle_404', [ $this, 'should_allow_pagination_on_archive_templates' ], 11, 2 );
+
+		if ( version_compare( ELEMENTOR_VERSION, '4.2', '>=' ) ) {
+			add_filter(
+				'elementor/document/related_posts',
+				[ $this, 'get_location_doc_ids_for_post' ],
+				10,
+				2
+			);
+		}
 	}
 
 	/**
@@ -80,6 +93,54 @@ class Locations_Manager {
 			$document = Plugin::elementor()->documents->get( $post_id );
 
 			if ( $this->is_valid_pagination( $document->get_elements_data(), $wp_query->query_vars['page'] ) ) {
+				$handled = true;
+			}
+		}
+
+		return $handled;
+	}
+
+	/**
+	 * Fix WP 5.5 pagination issue.
+	 *
+	 * Return true to mark that it's handled and avoid WP to set it as 404.
+	 *
+	 * @see https://github.com/elementor/elementor/issues/12126
+	 * @see https://core.trac.wordpress.org/ticket/50976
+	 *
+	 * Based on the logic at \WP::handle_404.
+	 *
+	 * @param $handled - Default false.
+	 * @param $wp_query
+	 *
+	 * @return bool
+	 */
+	public function should_allow_pagination_on_archive_templates( $handled, $wp_query ) {
+		$is_archive = is_archive() || is_home() || is_search();
+
+		if ( $handled || ! $is_archive ) {
+			return $handled;
+		}
+
+		$current_post_id = $wp_query->query['page_id'] ?? ( $wp_query->queried_object->ID ?? null );
+		$documents = Module::instance()->get_conditions_manager()->get_documents_for_location( 'archive' );
+
+		if ( empty( $documents ) ) {
+			return $handled;
+		}
+
+		foreach ( $documents as $document ) {
+			$post_id = $document->get_post()->ID;
+
+			// Will be handled by the pre_handle_404 filter in the posts module.
+			if ( $current_post_id === $post_id ) {
+				continue;
+			}
+
+			$document = Plugin::elementor()->documents->get( $post_id );
+			$current_page = max( 1, get_query_var( 'paged' ), get_query_var( 'page' ) );
+
+			if ( $this->is_valid_pagination( $document->get_elements_data(), $current_page ) ) {
 				$handled = true;
 			}
 		}
@@ -128,13 +189,12 @@ class Locations_Manager {
 
 				// Don't enqueue current post here (let the  preview/frontend components to handle it)
 				if ( $current_post_id !== $post_id ) {
+					do_action( 'elementor/post/render', $post_id );
+
 					$css_file = new Post_CSS( $post_id );
 					$css_files[] = $css_file;
 
-					$page_assets = get_post_meta( $post_id, Assets::ASSETS_META_KEY, true );
-					if ( ! empty( $page_assets ) ) {
-						Plugin::elementor()->assets_loader->enable_assets( $page_assets );
-					}
+					$this->handle_page_assets( $post_id, $document );
 				}
 			}
 		}
@@ -148,6 +208,26 @@ class Locations_Manager {
 				$css_file->enqueue();
 			}
 		}
+	}
+
+	/**
+	 * @param int $post_id
+	 * @param Theme_Document $document
+	 *
+	 * @return void
+	 */
+	private function handle_page_assets( $post_id, $document ): void {
+		$page_assets = get_post_meta( $post_id, Assets::ASSETS_META_KEY, true );
+		if ( ! empty( $page_assets ) ) {
+			Plugin::elementor()->assets_loader->enable_assets( $page_assets );
+			return;
+		}
+
+		if ( ! method_exists( $document, 'update_runtime_elements' ) ) {
+			return;
+		}
+
+		$document->update_runtime_elements();
 	}
 
 	public function template_include( $template ) {
@@ -175,9 +255,11 @@ class Locations_Manager {
 			$location = $document->get_location();
 		} elseif ( function_exists( 'is_shop' ) && is_shop() ) {
 			$location = 'archive';
+		} elseif ( is_404() || Module::is_missing_term_or_author_archive() ) {
+			$location = 'single';
 		} elseif ( is_archive() || is_tax() || is_home() || is_search() ) {
 			$location = 'archive';
-		} elseif ( is_singular() || is_404() ) {
+		} elseif ( is_singular() ) {
 			$location = 'single';
 		}
 
@@ -413,7 +495,7 @@ class Locations_Manager {
 				$location_settings = $this->get_location( $document_location );
 				// If is a `content` document or the theme is not support the document location (header/footer and etc.).
 				if ( $location_settings && ! $location_settings['edit_in_content'] ) {
-					$content = '<div class="elementor-theme-builder-content-area">' . esc_html__( 'Content Area', 'elementor-pro' ) . '</div>';
+					$content = '<div class="elementor-theme-builder-content-area">' . esc_html__( 'Content area', 'elementor-pro' ) . '</div>';
 				}
 			}
 		}
@@ -512,6 +594,47 @@ class Locations_Manager {
 		}
 
 		return $meta;
+	}
+
+	public function get_location_doc_ids_for_post( array $related, $post_id ): array {
+		$queried_post_id = (int) get_the_ID();
+
+		if ( ! $queried_post_id || (int) $post_id !== $queried_post_id ) {
+			return $related;
+		}
+
+		if ( ! isset( $this->location_doc_ids_cache[ $queried_post_id ] ) ) {
+			$this->location_doc_ids_cache[ $queried_post_id ] = [];
+
+			$locations = $this->get_locations();
+
+			if ( ! empty( $this->current_page_template ) ) {
+				$locations = $this->filter_page_template_locations( $locations );
+			}
+
+			foreach ( array_keys( $locations ) as $location ) {
+				$documents = Module::instance()->get_conditions_manager()->get_documents_for_location( $location );
+
+				foreach ( $documents as $document ) {
+					$doc_post_id = (int) $document->get_post()->ID;
+
+					// Skip the currently queried post — it is already the parent.
+					if ( $doc_post_id === $queried_post_id ) {
+						continue;
+					}
+
+					$this->location_doc_ids_cache[ $queried_post_id ][ $location ][] = $doc_post_id;
+				}
+			}
+		}
+
+		if ( empty( $this->location_doc_ids_cache[ $queried_post_id ] ) ) {
+			return $related;
+		}
+
+		$doc_ids = array_merge( ...array_values( $this->location_doc_ids_cache[ $queried_post_id ] ) );
+
+		return array_values( array_unique( array_merge( $related, $doc_ids ) ) );
 	}
 
 	private function set_core_locations() {

@@ -10,6 +10,8 @@ use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Icons_Manager;
 use Elementor\Utils;
 use ElementorPro\Base\Base_Widget;
+use ElementorPro\Base\Markdown_Heading_Collector;
+use ElementorPro\Base\Markdown_Utils;
 use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -40,6 +42,10 @@ class Table_Of_Contents extends Base_Widget {
 
 	protected function is_dynamic_content(): bool {
 		return false;
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
 	/**
@@ -344,7 +350,7 @@ class Table_Of_Contents extends Base_Widget {
 			}
 
 			$minimized_on_options[ $breakpoint_key ] = sprintf(
-				/* translators: 1: Breakpoint label, 2: `<` character, 3: Breakpoint value. */
+				/* translators: 1: Breakpoint label, 2: Comparison operator, 3: Breakpoint value in pixels. */
 				esc_html__( '%1$s (%2$s %3$dpx)', 'elementor-pro' ),
 				$breakpoint->get_label(),
 				'<',
@@ -541,9 +547,6 @@ class Table_Of_Contents extends Base_Widget {
 			]
 		);
 
-		$logical_start = is_rtl() ? 'right' : 'left';
-		$logical_end = is_rtl() ? 'left' : 'right';
-
 		$this->add_responsive_control(
 			'header_text_align',
 			[
@@ -552,7 +555,7 @@ class Table_Of_Contents extends Base_Widget {
 				'options' => [
 					'start' => [
 						'title' => esc_html__( 'Start', 'elementor-pro' ),
-						'icon' => "eicon-text-align-$logical_start",
+						'icon' => 'eicon-text-align-left',
 					],
 					'center' => [
 						'title' => esc_html__( 'Center', 'elementor-pro' ),
@@ -560,10 +563,11 @@ class Table_Of_Contents extends Base_Widget {
 					],
 					'end' => [
 						'title' => esc_html__( 'End', 'elementor-pro' ),
-						'icon' => "eicon-text-align-$logical_end",
+						'icon' => 'eicon-text-align-right',
 					],
 				],
 				'default' => 'start',
+				'classes' => 'elementor-control-start-end',
 				'selectors' => [
 					'{{WRAPPER}} .elementor-toc__header-title' => 'text-align: {{VALUE}}',
 				],
@@ -629,15 +633,16 @@ class Table_Of_Contents extends Base_Widget {
 				'options' => [
 					'row-reverse' => [
 						'title' => esc_html__( 'Start', 'elementor-pro' ),
-						'icon' => "eicon-h-align-$logical_start",
+						'icon' => 'eicon-h-align-left',
 					],
 					'row' => [
 						'title' => esc_html__( 'End', 'elementor-pro' ),
-						'icon' => "eicon-h-align-$logical_end",
+						'icon' => 'eicon-h-align-right',
 					],
 				],
 				'default' => 'row',
 				'toggle' => false,
+				'classes' => 'elementor-control-start-end',
 				'selectors' => [
 					'{{WRAPPER}} .elementor-toc__header' => 'flex-direction: {{VALUE}};',
 				],
@@ -907,7 +912,7 @@ class Table_Of_Contents extends Base_Widget {
 					'tabindex' => '0',
 					'aria-controls' => $toc_id,
 					'aria-expanded' => 'true',
-					'aria-label' => esc_html__( 'Open table of contents', 'elementor-pro' ),
+					'aria-label' => esc_attr__( 'Open table of contents', 'elementor-pro' ),
 				]
 			);
 			$this->add_render_attribute(
@@ -918,22 +923,26 @@ class Table_Of_Contents extends Base_Widget {
 					'tabindex' => '0',
 					'aria-controls' => $toc_id,
 					'aria-expanded' => 'true',
-					'aria-label' => esc_html__( 'Close table of contents', 'elementor-pro' ),
+					'aria-label' => esc_attr__( 'Close table of contents', 'elementor-pro' ),
 				]
 			);
 		}
 
 		$html_tag = Utils::validate_html_tag( $settings['html_tag'] );
 		?>
+		<?php if ( ! Utils::is_empty( $settings['title'] ) || ( 'yes' === $settings['minimize_box'] ) ) : ?>
 		<div <?php $this->print_render_attribute_string( 'header' ); ?>>
+			<?php if ( ! Utils::is_empty( $settings['title'] ) ) : ?>
 			<<?php Utils::print_validated_html_tag( $html_tag ); ?> class="elementor-toc__header-title">
-				<?php $this->print_unescaped_setting( 'title' ); ?>
+				<?php echo wp_kses_post( $settings['title'] ); ?>
 			</<?php Utils::print_validated_html_tag( $html_tag ); ?>>
+			<?php endif; ?>
 			<?php if ( 'yes' === $settings['minimize_box'] ) : ?>
 				<div <?php $this->print_render_attribute_string( 'expand-button' ); ?>><?php Icons_Manager::render_icon( $settings['expand_icon'], [ 'aria-hidden' => 'true' ] ); ?></div>
 				<div <?php $this->print_render_attribute_string( 'collapse-button' ); ?>><?php Icons_Manager::render_icon( $settings['collapse_icon'], [ 'aria-hidden' => 'true' ] ); ?></div>
 			<?php endif; ?>
 		</div>
+		<?php endif; ?>
 		<div <?php $this->print_render_attribute_string( 'body' ); ?>>
 			<div class="elementor-toc__spinner-container">
 				<?php
@@ -953,5 +962,34 @@ class Table_Of_Contents extends Base_Widget {
 			</div>
 		</div>
 		<?php
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$blocks = [];
+		$title = Utils::html_to_plain_text( $settings['title'] ?? '' );
+
+		if ( '' !== trim( $title ) ) {
+			$blocks[] = Markdown_Utils::heading( $title, $settings['html_tag'] ?? 'h2' );
+		}
+
+		$tags = $settings['headings_by_tags'] ?? [];
+
+		if ( ! empty( $tags ) ) {
+			$post_id = get_the_ID();
+			$headings = $post_id
+				? Markdown_Heading_Collector::collect_from_document( $post_id, $tags, $this->get_id() )
+				: [];
+
+			if ( ! empty( $headings ) ) {
+				$ordered = 'numbers' === ( $settings['marker_view'] ?? '' );
+				$blocks[] = Markdown_Utils::nested_heading_list( $headings, $ordered );
+			} else {
+				$tag_list = implode( ', ', array_map( 'strtoupper', $tags ) );
+				$blocks[] = 'Indexes page headings: ' . $tag_list;
+			}
+		}
+
+		return Markdown_Utils::join_blocks( $blocks );
 	}
 }

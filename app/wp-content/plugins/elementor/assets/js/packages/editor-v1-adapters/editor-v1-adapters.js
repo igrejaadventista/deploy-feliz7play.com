@@ -1,2 +1,443 @@
-/*! For license information please see editor-v1-adapters.js.LICENSE.txt */
-!function(){"use strict";var e={react:function(e){e.exports=window.React},"@elementor/utils":function(e){e.exports=window.elementorV2.utils}},t={};function n(r){var o=t[r];if(void 0!==o)return o.exports;var i=t[r]={exports:{}};return e[r](i,i.exports,n),i.exports}n.d=function(e,t){for(var r in t)n.o(t,r)&&!n.o(e,r)&&Object.defineProperty(e,r,{enumerable:!0,get:t[r]})},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})};var r={};!function(){n.r(r),n.d(r,{__privateDispatchReadyEvent:function(){return w},__privateFlushListeners:function(){return E},__privateIsRouteActive:function(){return b},__privateListenTo:function(){return h},__privateOpenRoute:function(){return u},__privateRegisterRoute:function(){return a},__privateRunCommand:function(){return o},__privateRunCommandSync:function(){return i},__privateSetReady:function(){return v},__privateUseIsRouteActive:function(){return j},__privateUseListenTo:function(){return P},__privateUseRouteStatus:function(){return A},blockCommand:function(){return D},changeEditMode:function(){return R},commandEndEvent:function(){return s},commandStartEvent:function(){return c},isExperimentActive:function(){return $},registerDataHook:function(){return k},routeCloseEvent:function(){return l},routeOpenEvent:function(){return d},undoable:function(){return x},useEditMode:function(){return O},v1ReadyEvent:function(){return m},windowEvent:function(){return f}});var e=n("react"),t=n("@elementor/utils");async function o(e,t,{internal:n=!1}={}){const r=i(e,t,{internal:n});return r instanceof Promise?r:(u=r)&&"object"==typeof u&&Object.hasOwn(u,"promise")&&Object.hasOwn(u,"then")&&Object.hasOwn(u,"fail")?(o=r,new Promise(((e,t)=>{o.then(e,t)}))):Promise.resolve(r);var o,u}function i(e,t,{internal:n=!1}={}){const r=window,o=n?r.$e?.internal:r.$e?.run;if(!o)throw new Error(`\`${n?"$e.internal":"$e.run"}()\` is not available`);return o(e,t)}function u(e){const t=window;if(!t.$e?.route)return Promise.reject("`$e.route()` is not available");try{return Promise.resolve(t.$e.route(e))}catch(e){return Promise.reject(e)}}function a(e){const t=window;if(!t.$e?.routes?.register)return Promise.reject("`$e.routes.register()` is not available");const n=e.split("/");if(n.length<2)return Promise.reject(`\`${e}\` is an invalid route`);const r=n.pop(),o=n.join("/");try{return Promise.resolve(t.$e.routes.register(o,r,(()=>null)))}catch(e){return Promise.reject(e)}}var c=e=>({type:"command",name:e,state:"before"}),s=e=>({type:"command",name:e,state:"after"}),d=e=>({type:"route",name:e,state:"open"}),l=e=>({type:"route",name:e,state:"close"}),f=e=>({type:"window-event",name:e}),m=()=>f("elementor/initialized"),p=!1;function v(e){p=e}function w(){return function(){const e=window.__elementorEditorV1LoadingPromise;return e||Promise.reject("Elementor Editor V1 is not loaded")}().then((()=>{v(!0),window.dispatchEvent(new CustomEvent("elementor/initialized"))}))}var y=new Map,g=new AbortController;function h(e,t){Array.isArray(e)||(e=[e]);const n=e.map((e=>{const{type:n,name:r}=e;switch(n){case"command":return function(e,t,n){return _(`elementor/commands/run/${t}`,(t=>{"command"===t.type&&t.command===e&&n(t)}))}(r,e.state,t);case"route":return function(e,t,n){return _(`elementor/routes/${t}`,(t=>{"route"===t.type&&t.route.startsWith(e)&&n(t)}))}(r,e.state,t);case"window-event":return _(r,t)}}));return()=>{n.forEach((e=>e()))}}function E(){g.abort(),y.clear(),v(!1),g=new AbortController}function _(e,t){return!y.has(e)&&(y.set(e,[]),function(e){window.addEventListener(e,function(e){return t=>{if(!p)return;const n=function(e){return e instanceof CustomEvent&&e.detail?.command?{type:"command",command:e.detail.command,args:e.detail.args,originalEvent:e}:e instanceof CustomEvent&&e.detail?.route?{type:"route",route:e.detail.route,originalEvent:e}:{type:"window-event",event:e.type,originalEvent:e}}(t);y.get(e)?.forEach((e=>{e(n)}))}}(e),{signal:g.signal})}(e)),y.get(e)?.push(t),()=>{const n=y.get(e);if(!n?.length)return;const r=n.filter((e=>e!==t));y.set(e,r)}}function b(e){const t=window;return!!t.$e?.routes?.isPartOf(e)}var $=e=>{const t=window;return!!t.elementorCommon?.config?.experimentalFeatures?.[e]};function P(t,n,r=[]){const[o,i]=(0,e.useState)((()=>n()));return(0,e.useEffect)((()=>{const e=()=>i(n());return e(),h(t,e)}),r),o}function j(e){return P([d(e),l(e)],(()=>b(e)),[e])}function O(){return P(f("elementor/edit-mode/change"),C)}function C(){return window.elementor.channels.dataEditMode.request("activeMode")}function R(e){return window.elementor.changeEditMode(e)}function A(e,{blockOnKitRoutes:t=!0,allowedEditModes:n=["edit"]}={}){const r=j(e),o=j("panel/global"),i=O(),u=!n.includes(i);return{isActive:r&&!u,isBlocked:u||t&&o}}var S=(0,t.createError)({code:"history_manager_not_available",message:"Cannot access History manager."});function x(e,t){return e.redo??=e.do,n=>{const r=n,o=e,i=function(){const e=window,t=e.elementor?.documents?.getCurrent?.()?.history;if(!t)throw new S;return t}();let u=o.do(r);return i.addItem({title:M(t.title)(r,u),subTitle:M(t.subtitle)(r,u),type:"",restore:(e,t)=>{t?u=o.redo(r,u):o.undo(r,u)}}),u}}function M(e){return"function"==typeof e?e:()=>e??""}var V=0;function k(e,t,n){const r=window,o=r.$e?.modules?.hookData,i={after:o?.After,dependency:o?.Dependency}[e];if(!i)throw new Error(`Data hook '${e}' is not available`);const u=++V,a=new class extends i{getCommand(){return t}getId(){return`${t}--data--${u}`}apply(e){return n(e)}};return a.register(),a}function D({command:e,condition:t}){return k("dependency",e,(e=>!t(e)))}}(),(window.elementorV2=window.elementorV2||{}).editorV1Adapters=r}(),window.elementorV2.editorV1Adapters?.init?.();
+(function(react, _elementor_utils) {
+
+//#region \0rolldown/runtime.js
+	var __defProp = Object.defineProperty;
+	var __name = (target, value) => __defProp(target, "name", {
+		value,
+		configurable: true
+	});
+	var __exportAll = (all, no_symbols) => {
+		let target = {};
+		for (var name in all) {
+			__defProp(target, name, {
+				get: all[name],
+				enumerable: true
+			});
+		}
+		if (!no_symbols) {
+			__defProp(target, Symbol.toStringTag, { value: "Module" });
+		}
+		return target;
+	};
+
+//#endregion
+
+//#region packages/packages/libs/editor-v1-adapters/src/dispatchers/utils.ts
+	function isJQueryDeferred(value) {
+		return !!value && "object" === typeof value && Object.hasOwn(value, "promise") && Object.hasOwn(value, "then") && Object.hasOwn(value, "fail");
+	}
+	function promisifyJQueryDeferred(deferred) {
+		return new Promise((resolve, reject) => {
+			deferred.then(resolve, reject);
+		});
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/dispatchers/dispatchers.ts
+	async function runCommand(command, args, { internal = false } = {}) {
+		const result = runCommandSync(command, args, { internal });
+		if (result instanceof Promise) return result;
+		if (isJQueryDeferred(result)) return promisifyJQueryDeferred(result);
+		return Promise.resolve(result);
+	}
+	function runCommandSync(command, args, { internal = false } = {}) {
+		const extendedWindow = window;
+		const run = internal ? extendedWindow.$e?.internal : extendedWindow.$e?.run;
+		if (!run) throw new Error(`\`${internal ? "$e.internal" : "$e.run"}()\` is not available`);
+		return run(command, args);
+	}
+	function openRoute(route) {
+		const extendedWindow = window;
+		if (!extendedWindow.$e?.route) return Promise.reject("`$e.route()` is not available");
+		try {
+			return Promise.resolve(extendedWindow.$e.route(route));
+		} catch (e) {
+			return Promise.reject(e);
+		}
+	}
+	function registerRoute(route) {
+		const extendedWindow = window;
+		if (!extendedWindow.$e?.routes?.register) return Promise.reject("`$e.routes.register()` is not available");
+		const routeParts = route.split("/");
+		if (routeParts.length < 2) return Promise.reject(`\`${route}\` is an invalid route`);
+		const componentRoute = routeParts.pop();
+		const component = routeParts.join("/");
+		try {
+			return Promise.resolve(extendedWindow.$e.routes.register(component, componentRoute, () => null));
+		} catch (e) {
+			return Promise.reject(e);
+		}
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/listeners/event-creators.ts
+	var commandStartEvent = (command) => {
+		return {
+			type: "command",
+			name: command,
+			state: "before"
+		};
+	};
+	var commandEndEvent = (command) => {
+		return {
+			type: "command",
+			name: command,
+			state: "after"
+		};
+	};
+	var routeOpenEvent = (route) => {
+		return {
+			type: "route",
+			name: route,
+			state: "open"
+		};
+	};
+	var routeCloseEvent = (route) => {
+		return {
+			type: "route",
+			name: route,
+			state: "close"
+		};
+	};
+	var windowEvent = (event) => {
+		return {
+			type: "window-event",
+			name: event
+		};
+	};
+	var v1ReadyEvent = () => {
+		return windowEvent("elementor/initialized");
+	};
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/listeners/is-ready.ts
+	var ready = false;
+	function isReady() {
+		return ready;
+	}
+	function setReady(value) {
+		ready = value;
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/listeners/utils.ts
+	function dispatchReadyEvent() {
+		return getV1LoadingPromise().then(() => {
+			setReady(true);
+			window.dispatchEvent(new CustomEvent("elementor/initialized"));
+		});
+	}
+	function getV1LoadingPromise() {
+		const v1LoadingPromise = window.__elementorEditorV1LoadingPromise;
+		if (!v1LoadingPromise) return Promise.reject("Elementor Editor V1 is not loaded");
+		return v1LoadingPromise;
+	}
+	function normalizeEvent(e) {
+		if (e instanceof CustomEvent && e.detail?.command) return {
+			type: "command",
+			command: e.detail.command,
+			args: e.detail.args,
+			originalEvent: e
+		};
+		if (e instanceof CustomEvent && e.detail?.route) return {
+			type: "route",
+			route: e.detail.route,
+			originalEvent: e
+		};
+		return {
+			type: "window-event",
+			event: e.type,
+			originalEvent: e
+		};
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/listeners/listeners.ts
+	var callbacksByEvent = /* @__PURE__ */ new Map();
+	var abortController = new AbortController();
+	function listenTo(eventDescriptors, callback) {
+		if (!Array.isArray(eventDescriptors)) eventDescriptors = [eventDescriptors];
+		const cleanups = eventDescriptors.map((event) => {
+			const { type, name } = event;
+			switch (type) {
+				case "command": return registerCommandListener(name, event.state, callback);
+				case "route": return registerRouteListener(name, event.state, callback);
+				case "window-event": return registerWindowEventListener(name, callback);
+			}
+		});
+		return () => {
+			cleanups.forEach((cleanup) => cleanup());
+		};
+	}
+	function flushListeners() {
+		abortController.abort();
+		callbacksByEvent.clear();
+		setReady(false);
+		abortController = new AbortController();
+	}
+	function registerCommandListener(command, state, callback) {
+		return registerWindowEventListener(`elementor/commands/run/${state}`, (e) => {
+			if (e.type === "command" && e.command === command) callback(e);
+		});
+	}
+	function registerRouteListener(route, state, callback) {
+		return registerWindowEventListener(`elementor/routes/${state}`, (e) => {
+			if (e.type === "route" && e.route.startsWith(route)) callback(e);
+		});
+	}
+	var V1_READY_EVENT_NAME = "elementor/initialized";
+	function registerWindowEventListener(event, callback) {
+		if (!callbacksByEvent.has(event)) {
+			callbacksByEvent.set(event, []);
+			addListener(event);
+		}
+		callbacksByEvent.get(event)?.push(callback);
+		if (event === V1_READY_EVENT_NAME && isReady()) Promise.resolve().then(() => {
+			if (callbacksByEvent.get(event)?.includes(callback)) callback({
+				type: "window-event",
+				event,
+				originalEvent: new CustomEvent(event)
+			});
+		});
+		return () => {
+			const callbacks = callbacksByEvent.get(event);
+			if (!callbacks?.length) return;
+			const filtered = callbacks.filter((cb) => cb !== callback);
+			callbacksByEvent.set(event, filtered);
+		};
+	}
+	function addListener(event) {
+		window.addEventListener(event, makeEventHandler(event), { signal: abortController.signal });
+	}
+	function makeEventHandler(event) {
+		return (e) => {
+			if (!isReady()) return;
+			const normalizedEvent = normalizeEvent(e);
+			callbacksByEvent.get(event)?.forEach((callback) => {
+				callback(normalizedEvent);
+			});
+		};
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/readers/index.ts
+	var EXPERIMENTAL_FEATURES = {};
+	function isRouteActive(route) {
+		return !!window.$e?.routes?.isPartOf(route);
+	}
+	var isExperimentActive = (experiment) => {
+		return !!window.elementorCommon?.config?.experimentalFeatures?.[experiment];
+	};
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/hooks/use-listen-to.ts
+	function useListenTo(event, getSnapshot, deps = []) {
+		const [snapshot, setSnapshot] = (0, react.useState)(() => getSnapshot());
+		(0, react.useEffect)(() => {
+			const updateState = () => setSnapshot(getSnapshot());
+			updateState();
+			return listenTo(event, updateState);
+		}, deps);
+		return snapshot;
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/hooks/use-is-route-active.ts
+	function useIsRouteActive(route) {
+		return useListenTo([routeOpenEvent(route), routeCloseEvent(route)], () => isRouteActive(route), [route]);
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/edit-mode.ts
+	function useEditMode() {
+		return useListenTo(windowEvent("elementor/edit-mode/change"), getCurrentEditMode);
+	}
+	function getCurrentEditMode() {
+		return window.elementor.channels.dataEditMode.request("activeMode");
+	}
+	function changeEditMode(newMode) {
+		return window.elementor.changeEditMode(newMode);
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/hooks/use-route-status.ts
+	function useRouteStatus(route, { blockOnKitRoutes = true, allowedEditModes = ["edit"] } = {}) {
+		const isRouteActive = useIsRouteActive(route);
+		const isKitRouteActive = useIsRouteActive("panel/global");
+		const currentEditMode = useEditMode();
+		const isBlockedByEditMode = !allowedEditModes.includes(currentEditMode);
+		return {
+			isActive: isRouteActive && !isBlockedByEditMode,
+			isBlocked: isBlockedByEditMode || blockOnKitRoutes && isKitRouteActive
+		};
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/ajax/index.ts
+	var ajax = {
+		async load(data) {
+			const extendedWindow = window;
+			return new Promise((success, error) => {
+				extendedWindow.elementorCommon?.ajax?.load({
+					...data,
+					success,
+					error
+				});
+			});
+		},
+		invalidateCache(data) {
+			window.elementorCommon?.ajax?.invalidateCache(data);
+		}
+	};
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/undoable/get-history-manager.ts
+	var HistoryManagerNotAvailable = (0, _elementor_utils.createError)({
+		code: "history_manager_not_available",
+		message: "Cannot access History manager."
+	});
+	function getHistoryManager() {
+		const historyManger = window.elementor?.documents?.getCurrent?.()?.history;
+		if (!historyManger) throw new HistoryManagerNotAvailable();
+		return historyManger;
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/undoable/undoable.ts
+	function undoable(actions, options) {
+		actions.redo ?? (actions.redo = actions.do);
+		const _addHistoryItem = options.debounce ? (0, _elementor_utils.debounce)(addHistoryItem, options.debounce.wait) : addHistoryItem;
+		return (payload) => {
+			const _payload = payload;
+			const _actions = actions;
+			let doReturn = _actions.do(_payload);
+			let undoReturn;
+			_addHistoryItem({
+				title: normalizeToGenerator(options.title)(_payload, doReturn),
+				subTitle: normalizeToGenerator(options.subtitle)(_payload, doReturn),
+				type: "",
+				restore: (_, isRedo) => {
+					if (isRedo) {
+						doReturn = _actions.redo(_payload, doReturn, undoReturn);
+						return;
+					}
+					undoReturn = _actions.undo(_payload, doReturn);
+				}
+			});
+			return doReturn;
+		};
+	}
+	function normalizeToGenerator(value) {
+		return typeof value === "function" ? value : () => value ?? "";
+	}
+	function addHistoryItem(item) {
+		getHistoryManager().addItem(item);
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/data-hooks/register-data-hook.ts
+	var hookId = 0;
+	function registerDataHook(type, command, callback) {
+		const hooksClasses = window.$e?.modules?.hookData;
+		const HookClass = {
+			after: hooksClasses?.After,
+			dependency: hooksClasses?.Dependency
+		}[type];
+		if (!HookClass) throw new Error(`Data hook '${type}' is not available`);
+		const currentHookId = ++hookId;
+		const hook = new class extends HookClass {
+			getCommand() {
+				return command;
+			}
+			getId() {
+				return `${command}--data--${currentHookId}`;
+			}
+			apply(args, result) {
+				const hookOptions = {};
+				const currentWindow = window;
+				const commandsCurrentTrace = currentWindow.$e?.commands?.currentTrace;
+				if (commandsCurrentTrace) hookOptions.commandsCurrentTrace = commandsCurrentTrace;
+				const currentHistoryItemId = currentWindow.elementor?.documents?.getCurrent()?.history?.getCurrentId();
+				if (currentHistoryItemId) hookOptions.currentHistoryItemId = currentHistoryItemId;
+				if (type === "dependency") return callback(args, hookOptions);
+				return callback(args, result, hookOptions);
+			}
+		}();
+		hook.register();
+		return hook;
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/data-hooks/block-command.ts
+	function blockCommand({ command, condition }) {
+		return registerDataHook("dependency", command, (args) => {
+			return !condition(args);
+		});
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/canvas/get-canvas-iframe-document.ts
+	function getCanvasIframeDocument() {
+		return window.elementor?.$preview?.[0]?.contentDocument;
+	}
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/config/get-elementor-globals.ts
+	var getElementorConfig = () => {
+		return window.elementor?.config ?? {};
+	};
+	var getElementorFrontendConfig = () => {
+		return window.elementorFrontend?.config ?? {};
+	};
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/config/enqueue-font.ts
+	var enqueueFont = (fontFamily, context = "preview") => {
+		return window.elementor?.helpers?.enqueueFont?.(fontFamily, context) ?? null;
+	};
+
+//#endregion
+//#region packages/packages/libs/editor-v1-adapters/src/index.ts
+	var src_exports = /* @__PURE__ */ __exportAll({
+		EXPERIMENTAL_FEATURES: () => EXPERIMENTAL_FEATURES,
+		__privateDispatchReadyEvent: () => dispatchReadyEvent,
+		__privateFlushListeners: () => flushListeners,
+		__privateIsReady: () => isReady,
+		__privateIsRouteActive: () => isRouteActive,
+		__privateListenTo: () => listenTo,
+		__privateOpenRoute: () => openRoute,
+		__privateRegisterRoute: () => registerRoute,
+		__privateRunCommand: () => runCommand,
+		__privateRunCommandSync: () => runCommandSync,
+		__privateSetReady: () => setReady,
+		__privateUseIsRouteActive: () => useIsRouteActive,
+		__privateUseListenTo: () => useListenTo,
+		__privateUseRouteStatus: () => useRouteStatus,
+		ajax: () => ajax,
+		blockCommand: () => blockCommand,
+		changeEditMode: () => changeEditMode,
+		commandEndEvent: () => commandEndEvent,
+		commandStartEvent: () => commandStartEvent,
+		enqueueFont: () => enqueueFont,
+		getCanvasIframeDocument: () => getCanvasIframeDocument,
+		getCurrentEditMode: () => getCurrentEditMode,
+		getElementorConfig: () => getElementorConfig,
+		getElementorFrontendConfig: () => getElementorFrontendConfig,
+		isExperimentActive: () => isExperimentActive,
+		registerDataHook: () => registerDataHook,
+		routeCloseEvent: () => routeCloseEvent,
+		routeOpenEvent: () => routeOpenEvent,
+		undoable: () => undoable,
+		useEditMode: () => useEditMode,
+		v1ReadyEvent: () => v1ReadyEvent,
+		windowEvent: () => windowEvent
+	});
+
+//#endregion
+//#region \0elementor-package-library-entry
+	(window.elementorV2 = window.elementorV2 || {}).editorV1Adapters = src_exports;
+
+//#endregion
+})(React, elementorV2.utils);
+window.elementorV2.editorV1Adapters?.init?.();
+//# sourceMappingURL=editor-v1-adapters.js.map

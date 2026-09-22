@@ -1,5 +1,430 @@
 # Elementor Pro - by Elementor.com
 
+#### 4.3.0 - 2026-09-22
+
+* New: Expanded Elementor MCP with Pro capabilities, including Theme Builder templates, Popups, and Components
+* Tweak: Added taxonomy filtering to Loop, allowing content to be filtered by categories, tags, and custom taxonomies
+* Tweak: Added alternating templates with configurable frequency and static positioning to Loop
+* Tweak: Added customizable empty states to Loop, allowing any element to be nested and displayed when no results are found
+* Tweak: Added disabled state styling for Previous and Next pagination buttons in Loop
+* Tweak: Added default value support for dependent settings in Atomic Forms
+* Tweak: Improved access to Loop Item editing across all panel views
+* Fix: Blog page title may not display correctly in Archive Title widget
+* Fix: Keyboard navigation cannot exit the Custom CSS control
+* Fix: Page-specific CSS may be missing on the first visit after automatic CSS cleanup
+* Fix: Empty Atomic Form success and error messages prevent adding new elements after their default content is removed
+
+#### 4.2.3 - 2026-08-31
+
+* Tweak: Updated WordPress compatibility to version 7.1
+
+#### 4.2.2 - 2026-08-19
+
+* Fix: Improved code security enforcement in Dynamic Tags
+* Fix: Improved code security enforcement in Form widget
+* Fix: Dynamic tags are not supported in email recipient fields in Form - Atomic Editor
+
+#### 4.2.1 - 2026-07-28
+
+* Fix: Child product categories display the parent category image when Loop Taxonomy is used in a Product Archive template - Atomic Editor
+* Fix: ACF Dynamic Tags display default values instead of item data in Loops - Atomic Editor
+* Fix: ACF fields display in a flat list instead of being grouped by field group in Dynamic Tag - Atomic Editor
+
+#### 4.2.0 - 2026-07-20
+
+* New: Introducing Loop for building dynamic content layouts - Atomic Editor
+* Tweak: Added Email 2 as an additional action after submit in Atomic Form - Atomic Editor
+* Tweak: Improved the settings UI in Atomic Form - Atomic Editor
+* Tweak: Added autocomplete support for better accessibility in Atomic Form - Atomic Editor
+* Tweak: Added accessibility support for Atomic Form success and error messages after submission - Atomic Editor
+* Fix: Local styles are not loaded inside Shortcode or Template widgets - Atomic Editor ([#32921](https://github.com/elementor/elementor/issues/32921))
+* Fix: Empty overrides in nested Components show the default value instead of remaining empty - Atomic Editor
+* Fix: Classes created from Components override the expected class priority - Atomic Editor
+* Fix: Redoing detach Component inside another Component leaves stale exposed properties behind - Atomic Editor
+* Fix: Atomic Form elements cannot be copied and pasted - Atomic Editor
+* Fix: Metadata is missing from email submissions in Atomic Form - Atomic Editor
+* Fix: Sub-menu indicators flicker while the page is loading in WordPress Menu widget
+* Fix: Load on Click duplicates the initial posts instead of loading the next posts when using multiple Posts widgets
+* Fix: Buttons are not keyboard accessible in Flip Box widget
+* Fix: Non-existent pages can trigger a fatal error in Archive and 404 templates
+* Fix: Custom Search Results URLs can trigger a fatal error in Search widget
+* Fix: Headings are highlighted inconsistently when scrolling down and back up in Table of Contents widget
+* Fix: PHP warnings appear when WooCommerce coupons are disabled in Cart and Checkout widgets
+
+#### 4.1.3 - 2026-07-14
+
+* Fix: Content section isn't expanded by default when adding atomic element inside Atomic Form - Atomic Editor
+* Fix: Atomic Form cannot be saved as template - Atomic Editor
+
+#### 4.1.2 - 2026-06-23
+
+* Fix: Email action is not configured correctly when submitting Atomic Forms - Atomic Editor
+
+#### 4.1.1 - 2026-06-08
+
+* Fix: Live Results item count does not apply correctly on Tablet and Mobile in Search widget
+* Fix: Default animation appears for logged-out users when using an ACF URL dynamic tag in Lottie widget
+* Fix: "Something went wrong" error appears when using Taxonomy Filter with a Loop Grid based on Current Query
+
+#### 4.1.0 - 2026-05-26
+
+* Tweak: Added Radio Button element to Atomic Form - Atomic Editor
+* Tweak: Added Select element to Atomic Form - Atomic Editor
+* Tweak: Added Date Picker element to Atomic Form - Atomic Editor
+* Tweak: Added Time Picker element to Atomic Form - Atomic Editor
+* Tweak: Added File Upload element to Atomic Form - Atomic Editor
+* Tweak: Added Webhook URL support to Atomic Form - Atomic Editor
+* Tweak: Improved the default To and From field settings in Atomic Form - Atomic Editor
+* Tweak: Updated the Connected Input ID control to a Select control in Atomic Form - Atomic Editor
+* Tweak: Added the Atomic Elements section when editing Loop Grid templates - Atomic Editor
+* Tweak: Added support for dynamic field mentions in email content in Atomic Form - Atomic Editor
+* Tweak: Added Start and End grid lines for the While Scrolling effect in Interactions - Atomic Editor
+* Tweak: Updated the minimum required WordPress version to 6.8
+* Fix: Custom styles are lost for Atomic elements used in loops - Atomic Editor
+* Fix: Action Log and Page Title are not recorded in Atomic Form submissions - Atomic Editor
+* Fix: Inline editing does not work for Buttons inside Atomic Form - Atomic Editor
+* Fix: Atomic Form cannot be dragged into containers or child containers - Atomic Editor
+* Fix: Pasting content from another site may cause a fatal error with Loop Item Templates
+
+#### 4.0.4 - 2026-04-28
+
+* Fix: Flexbox and Div Block do not work with display conditions - Atomic Editor
+* Fix: Custom CSS editor not editable in RTL websites - Atomic Editor
+
+#### 4.0.3 - 2026-04-20
+
+* Tweak: Updated base style font styling in Atomic Form - Atomic Editor
+* Fix: Submit button not working inside popups in Atomic Form - Atomic Editor
+* Fix: Forms fail to send when using ACF Email dynamic tag - Atomic Editor
+* Fix: Custom CSS editor not editable in RTL websites - Atomic Editor
+
+#### 4.0.2 - 2026-04-13
+
+* Fix: Interactions apply only to the first matching element instead of all instances on the page - Atomic Editor
+
+#### 4.0.1 - 2026-04-01
+
+* Fix: Exposed text properties appear empty in existing components - Atomic Editor ([#35357](https://github.com/elementor/elementor/issues/35357))
+* Fix: Cannot publish existing components with overridable properties - Atomic Editor
+* Fix: Unexpected characters appear when deleting attribute values using backspace - Atomic Editor
+
+#### 4.0.0 - 2026-03-30
+
+* New: Introducing Atomic Forms using composable Atomic elements - create flexible form layouts by combining individual field elements - Atomic Editor
+* New: Introducing Interactions with new triggers and custom effects for dynamic experiences - create animations based on user scroll and user behavior - Atomic Editor
+* Tweak: Component creation is available for Pro users - Atomic Editor
+* Tweak: Added the ability to detach Components into editable layouts - Atomic Editor
+* Tweak: Added support for custom fonts in typography controls - Atomic Editor
+* Fix: Unable to paste content into the Custom CSS field - Atomic Editor
+* Fix: Error when assigning a dynamic custom field to a component's inner element in Components - Atomic Editor
+
+#### 3.35.1 - 2026-02-11
+
+* Fix: Enqueue script errors when `WP_DEBUG` is enabled ([#34617](https://github.com/elementor/elementor/issues/34617))
+* Fix: General UI issues in Editor screens in WordPress Admin
+
+#### 3.35.0 - 2026-02-02
+
+* Tweak: Extended the color picker to support ACF fields - Editor V4
+* Tweak: Enabled size variables with custom units across relevant controls - Editor V4
+* Tweak: Enabled size variables in border radius controls - Editor V4
+
+#### 3.34.4 - 2026-01-29
+
+* Fix: Shortcodes overflow the screen on Saved Templates screen in WordPress Admin
+* Fix: Avoid Multiple Popups control does not work in Popups
+
+#### 3.34.3 - 2026-01-26
+
+* Fix: Theme Builder WordPress view does not work as expected
+* Fix: Submissions menu appears even when the setting is disabled
+
+#### 3.34.2 - 2026-01-22
+
+* Tweak: Updated notification behavior in Elementor menu in WordPress admin
+
+#### 3.34.1 - 2026-01-20
+
+* Tweak: Unified the Elementor interface into a single place to manage, optimize, and configure Elementor capabilities in WordPress admin
+
+#### 3.34.0 - 2025-12-22
+
+* New: Added support for Display Conditions for Atomic Elements - Editor V4
+* Tweak: Enabled media queries for the Desktop breakpoint only in Custom CSS - Editor V4
+* Tweak: Added support for ACF field in Dynamic Tags - Editor V4
+* Tweak: Added support for Google Calendar in Contact URL Dynamic Tag - Editor V4
+* Tweak: Added support for Tel link in Contact URL Dynamic Tag - Editor V4
+* Tweak: Added support for ACF Image field in Dynamic Tags - Editor V4
+* Tweak: Removed icon from the accessibility tree in Flip Box widget
+* Tweak: Applied CSS logical properties in text-align controls and improved RTL rendering in the Editor
+* Fix: Website Template library displayed in English instead of the translated language
+* Fix: Custom CSS field breaks when using certain characters - Editor V4
+
+#### 3.33.2 - 2025-12-03
+
+* Fix: Incorrect status shown for Custom Code, Fonts, and Icons after importing a Website Template
+* Fix: Display Conditions window appears empty in the editor
+
+#### 3.33.1 - 2025-11-11
+
+* Fix: Styles not loading correctly in Custom Fonts and Custom Icons admin screens ([#33396](https://github.com/elementor/elementor/issues/33396))
+
+#### 3.33.0 - 2025-11-10
+
+* New: Introducing Custom CSS for element-level styling with full isolation and responsive control - Editor V4
+* New: Introducing media save to cloud in Website Templates, enabling users to store media assets directly in the cloud for easier access and management.
+* Tweak: Added support for Post Excerpt dynamic tag - Editor V4
+* Tweak: Added support for Internal URL dynamic tag - Editor V4
+* Tweak: Added support for Post Terms dynamic tag - Editor V4
+* Tweak: Added support for Shortcode dynamic tag - Editor V4
+* Tweak: Added support for Popup dynamic tag - Editor V4
+* Tweak: Added support for Off-Canvas dynamic tag - Editor V4
+* Tweak: Added support for Lightbox dynamic tag - Editor V4
+* Tweak: Added support for Add To Cart dynamic tag - Editor V4
+* Tweak: Added support for ACF URL dynamic tag - Editor V4
+* Tweak: Added support for Archive Title dynamic tag - Editor V4
+* Tweak: Added support for the Email Contact URL dynamic tag - Editor V4
+* Tweak: Added support for reduced-motion preferences in Flip Box widget
+* Tweak: Updated minimum supported versions for Chrome, Firefox, and Safari
+* Tweak: Updated Notes button location in the Editor Top Bar
+
+#### 3.32.3 - 2025-10-21
+
+* Fix: Website Template fails to apply when Custom Code or Custom Icons are included
+
+#### 3.32.2 - 2025-09-29
+
+* Fix: Exported taxonomies are not displayed correctly on the summary page in Website Templates export
+* Fix: Certain taxonomies are not exported as expected in Website Templates export
+
+#### 3.32.1 - 2025-09-16
+
+* Fix: Theme Builder fails to load when containers are disabled
+* Fix: Popup and single product templates not imported or exported as expected
+
+#### 3.32.0 - 2025-09-15
+
+* New: Introducing Size Variables to store and reuse numeric values across spacing, typography, layout, and borders - Editor V4
+* New: Introducing granular Transitions with property-level control for advanced micro-animations - Editor V4
+* New: Added granular content selection for Website Templates import and export, including pages, menus, post types, and taxonomies
+* Tweak: Enhanced accessibility of background images in Slides widget with proper aria attributes ([#23543](https://github.com/elementor/elementor/issues/23543), [#31063](https://github.com/elementor/elementor/issues/31063))
+* Tweak: Added REST API support for the Custom Code feature
+* Tweak: Moved Background control from Content tab to Style tab in Flip Box widget
+* Tweak: Removed SVG icons from the accessibility tree in Share Buttons widget
+* Tweak: Removed dropdown indicator icons from the accessibility tree in WordPress Menu widget
+* Fix: PHP 8.4 deprecation notices when running with `WP_DEBUG` enabled
+* Fix: Reduced-motion preferences are not applied to Animated Headline widget
+* Fix: Reduced-motion preferences are not applied in Motion Effects
+* Fix: Added required PHP and WordPress versions to the plugin header
+
+#### 3.31.3 - 2025-09-08
+
+* Security Fix: Improved code security enforcement in WordPress Menu widget
+
+#### 3.31.2 - 2025-08-10
+
+* Tweak: Improved release version functionality
+
+#### 3.31.1 - 2025-08-06
+
+* Tweak: Updated `form-data` package version
+
+#### 3.31.0 - 2025-08-05
+
+* New: Introducing Attributes - add custom HTML attributes to elements for advanced control - Editor V4
+* Tweak: Optimized Custom Code styles by removing redundant RTL file
+* Tweak: Improved performance by loading ribbon styles only when used in Call to Action and Price Table widgets
+* Tweak: Improved semantic markup structure for header and footer documents
+* Tweak: Reorganized design controls in Animated Headline widget
+* Tweak: Reorganized design controls in Blockquote widget
+* Tweak: Reorganized design controls in Countdown widget
+* Tweak: Replaced SASS mixins and functions with native CSS logical properties
+* Fix: Empty headers are rendered in Table of Contents widget ([#28167](https://github.com/elementor/elementor/issues/28167))
+* Fix: `TypeError` bug in Menu widget
+
+#### 3.30.1 - 2025-07-22
+
+* Security Fix: Improved content sanitization in multiple widgets
+* Fix: UI issue in Hotspot widget when Optimized Markup experiment is enabled
+* Fix: Taxonomy filter not working in the Editor when Optimized Markup experiment is enabled
+
+#### 3.30.0 - 2025-07-01
+
+* New: Introduced Full Website Templates in the Cloud - export, manage, and reuse full site kits across all your websites from one place
+* Tweak: Activated "Optimized Markup" feature on new sites
+* Tweak: Activated "Menu" feature on new sites
+* Tweak: Improved error handling for Theme Builder display conditions
+* Tweak: Added styling controls to Post Excerpt widget
+* Tweak: Improved accessibility with `role` and `aria-label` attributes Post Navigation widget
+* Tweak: Added `aria-label` in Form widget
+* Tweak: Added `aria-label` in Login widget
+* Tweak: Arranged content as lists in Portfolio and Posts widgets
+* Tweak: Added Box Shadow and Text Shadow controls in Countdown widget
+* Tweak: Moved image resolution control to content tab in Price List widget
+* Tweak: Renamed and reorganized style sections in Price List widget
+* Tweak: Added conditional logic to controls in Price Table widget
+* Tweak: Grouped layout controls under list section in Price List widget
+* Tweak: Updated minimum required WordPress version to 6.6
+* Fix: Inline font icons support doesn't work in Post Navigation widget ([#24367](https://github.com/elementor/elementor/issues/24367), [#18343](https://github.com/elementor/elementor/issues/18343))
+* Fix: Page Title condition doesn't work on child pages in Widget Display Conditions
+* Fix: Editor users with "Access to edit content only" are able to delete elements
+* Fix: Links are not crawlable in Video Playlist widget
+* Fix: Uses hardcoded admin fonts in Video Playlist widget
+* Fix: Editor freezes when the Form widget is used with a high PHP upload size limit
+* Fix: Errors occur when Debug mode is enabled in Slides widget
+* Fix: Plugin dependency not enforced in Elementor Pro
+* Fix: Console shows deprecation warning in Global Widgets
+
+#### 3.29.2 - 2025-06-04
+
+* Tweak: Added selectors to Menu widget for compatibility with Optimized Markup experiment
+
+#### 3.29.1 - 2025-05-28
+
+* Security Fix: Improved code security enforcement in Animated Headline widget
+* Security Fix: Improved code security enforcement in Price Table widget
+
+#### 3.29.0 - 2025-05-19
+
+* New: Introduced Cloud Templates - save, manage, and reuse your templates across all your sites from a single cloud library
+* Tweak: Improved accessibility with `role` attributes in Share Buttons widget
+* Tweak: Improved accessibility by grouping content with `role=region` in the Video Playlist widget
+* Fix: Focus color is not applied correctly for accessibility in WordPress Menu widget ([#24239](https://github.com/elementor/elementor/issues/24239))
+* Fix: Common scripts loaded late when using the Theme Builder
+
+#### 3.28.4 - 2025-05-05
+
+* Fix: Empty results appeared on the frontend when using the Taxonomy Filter with the 'Avoid Duplicates' option in Loop Grid widget
+* Fix: Errors occur when Debug mode is enabled and the Optimized Markup experiment is active
+
+#### 3.28.3 - 2025-04-16
+* Tweak: Improved sidebar navigation flow on the Elementor Home screen
+
+#### 3.28.2 - 2025-03-30
+
+* Fix: Default Elementor animation shown for logged-out users when using an "External URL" source in Lottie widget
+
+#### 3.28.1 - 2025-03-23
+
+* Security Fix: Improved code security enforcement in Animated Headline and Form widgets
+
+#### 3.28.0 - 2025-03-17
+
+* Tweak: Ensured File Upload field styles are overridden by global styles in Form widget ([#11651](https://github.com/elementor/elementor/issues/11651), [#17223](https://github.com/elementor/elementor/issues/17223))
+* Tweak: Updated Scroll Snap description to clarify incompatibility with animations and motion effects
+* Tweak: Prevented special characters from being encoded in the email subject field in Form widget
+* Tweak: Loaded module styles within the module instead of registering them in `plugin.php`
+* Tweak: Updated minimum required WordPress version to 6.5
+* Tweak: Improved keyboard accessibility for menus in Editor Top Bar
+* Tweak: Made the edit button accessible in the Template widget
+* Tweak: Optimized Form widget performance by caching field assets `using get_style_depends()` and `get_script_depends()` methods
+* Tweak: Added Text Shadow control in Testimonial Carousel, Call to Action and Animated Headline widgets
+* Fix: Button icon alignment breaks when Inline Font Icons feature is activated ([#16077](https://github.com/elementor/elementor/issues/16077), [#16511](https://github.com/elementor/elementor/issues/16511), [#17692](https://github.com/elementor/elementor/issues/17692), [#17922](https://github.com/elementor/elementor/issues/17922), [#19253](https://github.com/elementor/elementor/issues/19253), [#19370](https://github.com/elementor/elementor/issues/19370), [#21236](https://github.com/elementor/elementor/issues/21236), [#21844](https://github.com/elementor/elementor/issues/21844), [#28080](https://github.com/elementor/elementor/issues/28080))
+* Fix: Dropdown caret color did not follow menu item color when Inline Font Icons feature is activated ([#17500](https://github.com/elementor/elementor/issues/17500), [#18466](https://github.com/elementor/elementor/issues/18466), [#21664](https://github.com/elementor/elementor/issues/21664), [#24929](https://github.com/elementor/elementor/issues/24929), [#28064](https://github.com/elementor/elementor/issues/28064))
+* Fix: Page doesn't scroll up when a coupon error notice appears in Checkout widget
+
+#### 3.27.7 - 2025-03-13
+
+* Security Fix: Improved code security enforcement in Lottie widget
+
+#### 3.27.6 - 2025-03-10
+
+* Security Fix: Improved code security enforcement in Template Condition
+
+#### 3.27.5 - 2025-03-03
+
+* Fix: The `wp_trigger_error` function causes the site to crash instead of triggering a warning when used with ACF text
+
+#### 3.27.4 - 2025-02-16
+
+* Security Fix: Improved code security enforcement in Screenshots module
+* Security Fix: Improved code security enforcement in Query control
+* Fix: ACF `true_false` field causing a fatal error when used as a dynamic tag with third-party plugins ([#30170](https://github.com/elementor/elementor/issues/30170))
+
+#### 3.27.3 - 2025-02-06
+
+* Security Fix: Improved code security enforcement in Stripe Button widget
+
+#### 3.27.2 - 2025-02-03
+
+* Fix: Value type configuration issue causing errors when using ACF
+* Fix: Hide content on responsive breakpoint option is not working on WordPress Menu widget when Optimized Markup experiment is activated
+
+#### 3.27.1 - 2025-01-27
+
+* Tweak: Increased the number of items allowed in Dynamic Tags options in Display Conditions for Elements
+* Security Fix: Improved code security enforcement in Global widget
+* Security Fix: Improved code security enforcement in Lottie widget
+* Security Fix: Improved code security enforcement in Admin settings
+* Fix: Accessible navigation in popups caused unintended scrolling of the page when triggered ([#29175](https://github.com/elementor/elementor/issues/29175))
+* Fix: Empty custom fields are missing in the Dynamic Tags options in Display Conditions for Elements
+
+#### 3.27.0 - 2025-01-20
+
+* Tweak: Removed the `elementor-widget-container` div from the Menu, Loop, Table of Contents, Form, and Hotspot widgets as part of the Optimized Markup experiment to improve HTML structure
+* Tweak: Reduced DOM size by optimizing the submit button markup in Search widget
+* Tweak: Moved style loading to the head instead of the footer to improve CLS
+* Tweak: Enabled conditional loading of Swiper.js based on widget dependencies to reduce unnecessary assets and improve page load times
+* Tweak: Standardized navigation elements like arrows and bullets across all carousel and slider widgets for improved accessibility
+* Tweak: Improved accessibility when the submit button has only an icon and no text in Search widget
+* Tweak: Removed `load_plugin_textdomain()` function from Elementor Pro
+
+#### 3.26.3 - 2025-01-07
+
+* Security Fix: Improved code security enforcement in Search widget
+* Fix: Height issues cause slideshow thumbnails to display incorrectly in Media Carousel ([#29663](https://github.com/elementor/elementor/issues/29663))
+
+#### 3.26.2 - 2024-12-22
+
+* Fix: Menu items are not clickable in various scenarios in Menu widget ([#29191](https://github.com/elementor/elementor/issues/29191))
+
+#### 3.26.1 - 2024-12-17
+
+* Fix: Restore deprecated `Plugin::enqueue_styles()` function to avoid errors with 3rd party plugins
+
+#### 3.26.0 - 2024-12-16
+
+* New: Introducing dynamic content support for Off-canvas in Loop Grid widget templates - enabling seamless display of additional content dynamically ([#29049](https://github.com/elementor/elementor/issues/29049), [#28935](https://github.com/elementor/elementor/issues/28935), [#7106](https://github.com/elementor/elementor/issues/7106))
+* New: AdBlock Detection trigger for Popups - display targeted popups for visitors using ad blockers
+* New: Added Reload Page link action for Dynamic Tags
+* Tweak: Added "Space Between Dots" control to Carousel widgets ([#2526](https://github.com/elementor/elementor/issues/2526), [#3277](https://github.com/elementor/elementor/issues/3277), [#21697](https://github.com/elementor/elementor/issues/21697))
+* Tweak: Replaced hidden `elementor-screen-only` div with `aria-label` attributes
+* Tweak: Removed `elementor-widget-container` div from Elementor widgets as part of the Optimized Markup experiment
+* Tweak: Optimize popup styling by loading it only when necessary
+* Tweak: Updated Gap between slides control to support only PX units in Carousel widget
+* Tweak: Removed the dependency between the Tabs handler and the Menu handler
+* Tweak: Added the ability to set `aria-label` in Carousel widgets
+* Tweak: Added `aria-roledescription=carousel` to carousel wrapper
+* Tweak: Added `aria-roledescription=slide` to slide wrapper
+* Tweak: Optimized carousel widgets markup as part of the Optimized Markup experiment
+* Tweak: Updated minimum required Safari version to 15.5
+* Tweak: Facebook widgets are no longer supported on mobile due to Facebook functionality changes
+* Fix: Motion Effects sticky feature is not working when Scroll Snap is enabled
+* Fix: Custom Image Resolution option is not working in Gallery widget
+* Fix: 'Reading Settings' unexpectedly reduces the number of posts displayed when using the Archive with Pagination setting
+* Fix: Step Form does not scroll to the top when the first field is not an input field in Form widget
+* Fix: Display Condition feature is available without an active Elementor license in Floating Elements
+* Fix: Background options of Flip Box in Loop Grid widget are not working when images are added using ACF Dynamic Tags
+* Fix: Dropdown icon in the Select field of the Form widget is cut off when the Inline Font Icons feature is activated
+* Fix: Incompatibility between Form widget and WPML when using Nested Elements
+* Fix: Performance issues when changing the title name in the Menu widget
+* Fix: Warnings appear when Element Caching is set to Inactive in Carousel widgets
+* Fix: Swiper styling missing from Lightbox inside Gallery widgets
+
+#### 3.25.5 - 2024-12-10
+
+* Security Fix: Improved code security enforcement in Form widget
+* Fix: Accessible navigation in popups caused unintended scrolling of the page when triggered ([#29175](https://github.com/elementor/elementor/issues/29175))
+* Fix: Popup overlay shown for non-logged users even when disabled
+
+#### 3.25.4 - 2024-11-20
+
+* Tweak: Improved Global Widget loading method to enhance performance
+
+#### 3.25.3 - 2024-11-13
+
+* Fix: Nested Elements are activated even when the Container experiment is inactive
+
 #### 3.25.2 - 2024-11-03
 
 * Fix: Styling issues affecting popup layout when using a Dynamic Tag to open the popup

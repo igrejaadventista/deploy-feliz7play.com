@@ -7,11 +7,13 @@ use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Group_Control_Image_Size;
 use Elementor\Group_Control_Text_Shadow;
 use Elementor\Group_Control_Typography;
+use Elementor\Icons_Manager;
+use Elementor\Modules\DynamicTags\Module as TagsModule;
 use Elementor\Repeater;
 use Elementor\Utils;
 use ElementorPro\Base\Base_Widget;
-use Elementor\Modules\DynamicTags\Module as TagsModule;
-use Elementor\Icons_Manager;
+use ElementorPro\Base\Markdown_Utils;
+use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -33,6 +35,10 @@ class Video_Playlist extends Base_Widget {
 
 	protected function is_dynamic_content(): bool {
 		return false;
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
 	/**
@@ -931,7 +937,7 @@ class Video_Playlist extends Base_Widget {
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .e-tabs-items .e-tab-title .e-tab-title-text' => 'color: {{VALUE}};',
-					'{{WRAPPER}} .e-tabs-items .e-tab-title .e-tab-title-text a' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .e-tabs-items .e-tab-title .e-tab-title-text button' => 'color: {{VALUE}};',
 				],
 				'global' => [
 					'default' => Global_Colors::COLOR_TEXT,
@@ -943,7 +949,7 @@ class Video_Playlist extends Base_Widget {
 			Group_Control_Typography::get_type(),
 			[
 				'name' => 'normal_typography',
-				'selector' => '{{WRAPPER}} .e-tabs-items .e-tab-title .e-tab-title-text',
+				'selector' => '{{WRAPPER}} .e-tabs-items .e-tab-title .e-tab-title-text button',
 				'global' => [
 					'default' => Global_Typography::TYPOGRAPHY_TEXT,
 				],
@@ -1008,7 +1014,7 @@ class Video_Playlist extends Base_Widget {
 				'name' => 'normal_icon_top_text_shadow',
 				'fields_options' => [
 					'text_shadow_type' => [
-						'label' => _x( 'Shadow', 'Text Shadow Control', 'elementor-pro' ),
+						'label' => esc_html__( 'Shadow', 'elementor-pro' ),
 					],
 					'text_shadow' => [
 						'selectors' => [
@@ -1063,11 +1069,11 @@ class Video_Playlist extends Base_Widget {
 				'default' => '',
 				'options' => [
 					'' => esc_html__( 'None', 'elementor-pro' ),
-					'solid' => _x( 'Solid', 'Border Control', 'elementor-pro' ),
-					'double' => _x( 'Double', 'Border Control', 'elementor-pro' ),
-					'dotted' => _x( 'Dotted', 'Border Control', 'elementor-pro' ),
-					'dashed' => _x( 'Dashed', 'Border Control', 'elementor-pro' ),
-					'groove' => _x( 'Groove', 'Border Control', 'elementor-pro' ),
+					'solid' => esc_html__( 'Solid', 'elementor-pro' ),
+					'double' => esc_html__( 'Double', 'elementor-pro' ),
+					'dotted' => esc_html__( 'Dotted', 'elementor-pro' ),
+					'dashed' => esc_html__( 'Dashed', 'elementor-pro' ),
+					'groove' => esc_html__( 'Groove', 'elementor-pro' ),
 				],
 				'selectors' => [
 					'{{WRAPPER}} .e-tabs-items-wrapper .e-tab-title' => 'border-style: {{VALUE}};',
@@ -1151,7 +1157,7 @@ class Video_Playlist extends Base_Widget {
 				'default' => '#556068',
 				'selectors' => [
 					'{{WRAPPER}} .e-tabs-items-wrapper .e-tab-title:where( .e-active, :hover ) .e-tab-title-text' => 'color: {{VALUE}};',
-					'{{WRAPPER}} .e-tabs-items-wrapper .e-tab-title:where( .e-active, :hover ) .e-tab-title-text a' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .e-tabs-items-wrapper .e-tab-title:where( .e-active, :hover ) .e-tab-title-text button' => 'color: {{VALUE}};',
 				],
 				'global' => [
 					'default' => Global_Colors::COLOR_TEXT,
@@ -1163,7 +1169,7 @@ class Video_Playlist extends Base_Widget {
 			Group_Control_Typography::get_type(),
 			[
 				'name' => 'active_typography',
-				'selector' => '{{WRAPPER}} .e-tabs-items-wrapper .e-tab-title:where( .e-active, :hover ) .e-tab-title-text',
+				'selector' => '{{WRAPPER}} .e-tabs-items-wrapper .e-tab-title:where( .e-active, :hover ) .e-tab-title-text button',
 				'global' => [
 					'default' => Global_Typography::TYPOGRAPHY_TEXT,
 				],
@@ -1228,7 +1234,7 @@ class Video_Playlist extends Base_Widget {
 				'name' => 'active_icon_top_text_shadow',
 				'fields_options' => [
 					'text_shadow_type' => [
-						'label' => _x( 'Shadow', 'Text Shadow Control', 'elementor-pro' ),
+						'label' => esc_html__( 'Shadow', 'elementor-pro' ),
 					],
 				],
 				'selector' => '{{WRAPPER}} .e-tab-title:where( .e-active, :hover ) i, {{WRAPPER}} .e-tab-title:where( .e-active, :hover ) svg',
@@ -1279,11 +1285,11 @@ class Video_Playlist extends Base_Widget {
 				'default' => '',
 				'options' => [
 					'' => esc_html__( 'None', 'elementor-pro' ),
-					'solid' => _x( 'Solid', 'Border Control', 'elementor-pro' ),
-					'double' => _x( 'Double', 'Border Control', 'elementor-pro' ),
-					'dotted' => _x( 'Dotted', 'Border Control', 'elementor-pro' ),
-					'dashed' => _x( 'Dashed', 'Border Control', 'elementor-pro' ),
-					'groove' => _x( 'Groove', 'Border Control', 'elementor-pro' ),
+					'solid' => esc_html__( 'Solid', 'elementor-pro' ),
+					'double' => esc_html__( 'Double', 'elementor-pro' ),
+					'dotted' => esc_html__( 'Dotted', 'elementor-pro' ),
+					'dashed' => esc_html__( 'Dashed', 'elementor-pro' ),
+					'groove' => esc_html__( 'Groove', 'elementor-pro' ),
 				],
 				'selectors' => [
 					'{{WRAPPER}} .e-tabs-items-wrapper .e-tab-title.e-active' => 'border-style: {{VALUE}};',
@@ -1395,11 +1401,11 @@ class Video_Playlist extends Base_Widget {
 				'default' => 'solid',
 				'options' => [
 					'' => esc_html__( 'None', 'elementor-pro' ),
-					'solid' => _x( 'Solid', 'Border Control', 'elementor-pro' ),
-					'double' => _x( 'Double', 'Border Control', 'elementor-pro' ),
-					'dotted' => _x( 'Dotted', 'Border Control', 'elementor-pro' ),
-					'dashed' => _x( 'Dashed', 'Border Control', 'elementor-pro' ),
-					'groove' => _x( 'Groove', 'Border Control', 'elementor-pro' ),
+					'solid' => esc_html__( 'Solid', 'elementor-pro' ),
+					'double' => esc_html__( 'Double', 'elementor-pro' ),
+					'dotted' => esc_html__( 'Dotted', 'elementor-pro' ),
+					'dashed' => esc_html__( 'Dashed', 'elementor-pro' ),
+					'groove' => esc_html__( 'Groove', 'elementor-pro' ),
 				],
 				'selectors' => [
 					'{{WRAPPER}} .e-tabs-items-wrapper .e-section-title' => 'border-style: {{VALUE}};',
@@ -1740,7 +1746,7 @@ class Video_Playlist extends Base_Widget {
 	}
 
 	private function create_playlist_items_array( $playlist_items ) {
-		$playlist_items_array = array();
+		$playlist_items_array = [];
 		$id_int = substr( $this->get_id_int(), 0, 3 );
 
 		foreach ( $playlist_items as $index => $playlist_item ) {
@@ -1858,11 +1864,11 @@ class Video_Playlist extends Base_Widget {
 		$playlist_object = $this->prepare_video_playlist_data_object();
 		?>
 
-		<div class="e-tabs">
+		<div class="e-tabs" role="region" aria-labelledby="e-playlist-<?php echo esc_attr( $this->get_id() ); ?>">
 			<div class="e-tabs-main-area">
 				<div class="e-tabs-wrapper">
 					<div class="e-tabs-header">
-						<<?php Utils::print_validated_html_tag( $playlist_object->playlist_title_tag ); ?> class="e-tabs-title"><?php
+						<<?php Utils::print_validated_html_tag( $playlist_object->playlist_title_tag ); ?> class="e-tabs-title" id="e-playlist-<?php echo esc_attr( $this->get_id() ); ?>"><?php
 							// PHPCS - the main text of a widget should not be escaped.
 							echo $playlist_object->playlist_name; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						?></<?php Utils::print_validated_html_tag( $playlist_object->playlist_title_tag ); ?>>
@@ -1911,10 +1917,10 @@ class Video_Playlist extends Base_Widget {
 											<span class="icon-watched"><?php Icons_Manager::render_icon( $playlist_object->watched_icon, [ 'aria-hidden' => 'true' ] ); ?></span>
 										<?php endif; ?>
 										<<?php Utils::print_validated_html_tag( $item->video_html_tag ); ?> class="e-tab-title-text">
-											<a tabindex="0"><?php
+											<button type="button"><?php
 												// PHPCS - the main text of a widget should not be escaped.
 												echo $item->video_title; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-											?></a>
+											?></button>
 										</<?php Utils::print_validated_html_tag( $item->video_html_tag ); ?>>
 										<?php if ( $item->video_duration ) : ?>
 											<span class="e-tab-duration"><?php echo esc_html( $item->video_duration ); ?></span>
@@ -1935,9 +1941,8 @@ class Video_Playlist extends Base_Widget {
 							<?php if ( $item->show_overlay_image ) : ?>
 								<div class="elementor-custom-embed-image-overlay elementor-clickable" style="background-image: url('<?php echo esc_url( $playlist_object->image_overlay_image ); ?>');">
 									<?php if ( ! empty( $playlist_object->image_overlay_icon['value'] ) ) : ?>
-										<div class="elementor-custom-embed-play" role="button">
+										<div class="elementor-custom-embed-play" role="button" tabindex="0" aria-label="<?php echo esc_attr__( 'Play Video', 'elementor-pro' ); ?>">
 											<?php Icons_Manager::render_icon( $playlist_object->image_overlay_icon, [ 'aria-hidden' => 'true' ] ); ?>
-											<span class="elementor-screen-only"><?php echo esc_html__( 'Play Video', 'elementor-pro' ); ?></span>
 										</div>
 									<?php endif; ?>
 								</div>
@@ -2203,11 +2208,11 @@ class Video_Playlist extends Base_Widget {
 		var playIconHTML = elementor.helpers.renderIcon( view, playlistObject.playIcon, { 'aria-hidden': true }, 'i' , 'object' );
 		var overlayImagePlayIconHTML = elementor.helpers.renderIcon( view, playlistObject.imageOverlayIcon, { 'aria-hidden': true }, 'i' , 'object' );
 		#>
-		<div class="e-tabs" role="tablist" aria-orientation="vertical">
+		<div class="e-tabs" role="region" aria-labelledby="e-playlist-<?php echo esc_attr( $this->get_id() ); ?>">
 			<div class="e-tabs-main-area">
 				<div class="e-tabs-wrapper">
 					<div class="e-tabs-header">
-						<{{ playlistObject.playlistNameHTMLTag }} class="e-tabs-title">
+						<{{ playlistObject.playlistNameHTMLTag }} class="e-tabs-title" id="e-playlist-<?php echo esc_attr( $this->get_id() ); ?>">
 							{{{ playlistObject.playlistName }}}
 						</{{ playlistObject.playlistNameHTMLTag }}>
 						<div class="e-tabs-header-right-side">
@@ -2243,7 +2248,7 @@ class Video_Playlist extends Base_Widget {
 										<span class="icon-watched">{{{ watchedIconHTML.value }}}</span>
 										<# } #>
 										<{{ item.videoHtmlTag }} class="e-tab-title-text">
-											<a tabindex="0">{{{ item.videoTitle }}}</a>
+											<button type="button">{{{ item.videoTitle }}}</button>
 										</{{ item.videoHtmlTag }}>
 										<# if ( item.videoDuration ) { #>
 										<span class="e-tab-duration">{{{ item.videoDuration }}}</span>
@@ -2257,7 +2262,7 @@ class Video_Playlist extends Base_Widget {
 					</div>
 				</div>
 
-				<div class="e-tabs-content-wrapper">
+				<div class="e-tabs-content-wrapper" role="tablist" aria-orientation="vertical">
 					<# _.each( playlistObject.playlistItems, function( item, index ) { #>
 					<div class="e-tab-title e-tab-mobile-title" role="tab">{{{ item.title }}}</div>
 					<#
@@ -2324,5 +2329,58 @@ class Video_Playlist extends Base_Widget {
 			</div>
 		</div>
 		<?php
+	}
+
+	private function get_playlist_item_url( array $item ): string {
+		$type = $item['type'] ?? '';
+
+		if ( 'section' === $type ) {
+			return '';
+		}
+
+		if ( 'youtube' === $type && ! empty( $item['youtube_url'] ) ) {
+			return $item['youtube_url'];
+		}
+
+		if ( 'vimeo' === $type && ! empty( $item['vimeo_url'] ) ) {
+			return $item['vimeo_url'];
+		}
+
+		if ( 'hosted' === $type ) {
+			if ( 'yes' === ( $item['is_external_url'] ?? '' ) && ! empty( $item['external_url']['url'] ) ) {
+				return $item['external_url']['url'];
+			}
+
+			if ( ! empty( $item['hosted_url']['url'] ) ) {
+				return $item['hosted_url']['url'];
+			}
+		}
+
+		return '';
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$tabs = $settings['tabs'] ?? [];
+		$lines = [];
+
+		foreach ( $tabs as $tab ) {
+			if ( 'section' === ( $tab['type'] ?? '' ) ) {
+				continue;
+			}
+
+			$url = $this->get_playlist_item_url( $tab );
+
+			if ( '' === $url ) {
+				continue;
+			}
+
+			$title = Markdown_Utils::plain_text( $tab['title'] ?? '' );
+			$display = '' !== $title ? $title : $url;
+
+			$lines[] = '- [' . $display . '](' . esc_url( $url ) . ')';
+		}
+
+		return Markdown_Utils::bullet_list( $lines );
 	}
 }

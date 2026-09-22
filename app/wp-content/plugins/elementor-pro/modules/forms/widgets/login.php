@@ -8,6 +8,7 @@ use Elementor\Group_Control_Background;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Typography;
 use ElementorPro\Base\Base_Widget;
+use ElementorPro\Base\Markdown_Utils;
 use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -32,6 +33,10 @@ class Login extends Base_Widget {
 		return [ 'login', 'user', 'form' ];
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
 	/**
 	 * Get style dependencies.
 	 *
@@ -47,6 +52,9 @@ class Login extends Base_Widget {
 	}
 
 	protected function register_controls() {
+		$optimized_markup = Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+		$widget_container_selector = $optimized_markup ? '' : ' .elementor-widget-container';
+
 		$this->start_controls_section(
 			'section_fields_content',
 			[
@@ -771,7 +779,7 @@ class Login extends Base_Widget {
 				'label' => esc_html__( 'Text Color', 'elementor-pro' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .elementor-widget-container .elementor-login__logged-in-message' => 'color: {{VALUE}};',
+					"{{WRAPPER}}{$widget_container_selector} .elementor-login__logged-in-message" => 'color: {{VALUE}};',
 				],
 				'global' => [
 					'default' => Global_Colors::COLOR_TEXT,
@@ -786,7 +794,7 @@ class Login extends Base_Widget {
 			Group_Control_Typography::get_type(),
 			[
 				'name' => 'message_typography',
-				'selector' => '{{WRAPPER}} .elementor-widget-container .elementor-login__logged-in-message',
+				'selector' => "{{WRAPPER}}{$widget_container_selector} .elementor-login__logged-in-message",
 				'global' => [
 					'default' => Global_Typography::TYPOGRAPHY_TEXT,
 				],
@@ -881,8 +889,7 @@ class Login extends Base_Widget {
 		}
 
 		$this->add_render_attribute( 'field-group', 'class', 'elementor-field-required' )
-			 ->add_render_attribute( 'input', 'required', true )
-			 ->add_render_attribute( 'input', 'aria-required', 'true' );
+			 ->add_render_attribute( 'input', 'required', true );
 
 	}
 
@@ -922,15 +929,15 @@ class Login extends Base_Widget {
 
 		$this->form_fields_render_attributes();
 		?>
-		<form class="elementor-login elementor-form" method="post" action="<?php echo esc_url( site_url( 'wp-login.php', 'login_post' ) ); ?>">
+		<form class="elementor-login elementor-form" method="post" action="<?php echo esc_url( site_url( 'wp-login.php', 'login_post' ) ); ?>" aria-label="<?php echo esc_attr__( 'Login form', 'elementor-pro' ); ?>">
 			<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $redirect_url ); ?>">
 			<div <?php $this->print_render_attribute_string( 'wrapper' ); ?>>
 				<div <?php $this->print_render_attribute_string( 'field-group' ); ?>>
-					<label <?php $this->print_render_attribute_string( 'user_label' ); ?>><?php $this->print_unescaped_setting( 'user_label' ); ?></label>
+					<label <?php $this->print_render_attribute_string( 'user_label' ); ?>><?php echo wp_kses_post( $settings['user_label'] ); ?></label>
 					<input <?php $this->print_render_attribute_string( 'user_input' ); ?>>
 				</div>
 				<div <?php $this->print_render_attribute_string( 'field-group' ); ?>>
-					<label <?php $this->print_render_attribute_string( 'password_label' ); ?>><?php $this->print_unescaped_setting( 'password_label' ); ?></label>
+					<label <?php $this->print_render_attribute_string( 'password_label' ); ?>><?php echo wp_kses_post( $settings['password_label'] ); ?></label>
 					<input <?php $this->print_render_attribute_string( 'password_input' ); ?>>
 				</div>
 
@@ -946,7 +953,7 @@ class Login extends Base_Widget {
 				<div <?php $this->print_render_attribute_string( 'submit-group' ); ?>>
 					<button type="submit" <?php $this->print_render_attribute_string( 'button' ); ?>>
 							<?php if ( ! empty( $settings['button_text'] ) ) : ?>
-								<span class="elementor-button-text"><?php $this->print_unescaped_setting( 'button_text' ); ?></span>
+								<span class="elementor-button-text"><?php echo wp_kses_post( $settings['button_text'] ); ?></span>
 							<?php endif; ?>
 					</button>
 				</div>
@@ -990,7 +997,7 @@ class Login extends Base_Widget {
 	 */
 	protected function content_template() {
 		?>
-		<div class="elementor-login elementor-form">
+		<div class="elementor-login elementor-form" aria-label="<?php echo esc_attr__( 'Login form', 'elementor-pro' ); ?>">
 			<div class="elementor-form-fields-wrapper">
 				<#
 				view.addRenderAttribute( 'field-group', 'class', 'elementor-field-group elementor-column elementor-col-100 elementor-field-type-text' );
@@ -1049,11 +1056,11 @@ class Login extends Base_Widget {
 				}
 				#>
 				<div {{{ view.getRenderAttributeString( 'field-group' ) }}}>
-					<label {{{ view.getRenderAttributeString( 'user-label' ) }}}>{{{ settings.user_label }}}</label>
+					<label {{{ view.getRenderAttributeString( 'user-label' ) }}}>{{ settings.user_label }}</label>
 					<input {{{ view.getRenderAttributeString( 'user-input' ) }}}>
 				</div>
 				<div {{{ view.getRenderAttributeString( 'field-group' ) }}}>
-					<label {{{ view.getRenderAttributeString( 'password-label' ) }}}>{{{ settings.password_label }}}</label>
+					<label {{{ view.getRenderAttributeString( 'password-label' ) }}}>{{ settings.password_label }}</label>
 					<input {{{ view.getRenderAttributeString( 'password-input' ) }}}>
 				</div>
 
@@ -1106,5 +1113,39 @@ class Login extends Base_Widget {
 
 	public function get_group_name() {
 		return 'forms';
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$parts = [ '## ' . esc_html__( 'Login Form', 'elementor-pro' ) ];
+		$fields = [];
+
+		$user_label = Markdown_Utils::plain_text( $settings['user_label'] ?? '' );
+
+		if ( '' !== $user_label ) {
+			$fields[] = '- **' . $user_label . '** (text)';
+		}
+
+		$password_label = Markdown_Utils::plain_text( $settings['password_label'] ?? '' );
+
+		if ( '' !== $password_label ) {
+			$fields[] = '- **' . $password_label . '** (password)';
+		}
+
+		if ( 'yes' === ( $settings['show_remember_me'] ?? '' ) ) {
+			$fields[] = '- **' . esc_html__( 'Remember Me', 'elementor-pro' ) . '** (checkbox)';
+		}
+
+		if ( ! empty( $fields ) ) {
+			$parts[] = implode( "\n", $fields );
+		}
+
+		$button = Markdown_Utils::plain_text( $settings['button_text'] ?? '' );
+
+		if ( '' !== $button ) {
+			$parts[] = Markdown_Utils::button( $button );
+		}
+
+		return Markdown_Utils::join_blocks( $parts );
 	}
 }

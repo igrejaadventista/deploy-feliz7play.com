@@ -13,6 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Facebook_Button extends Base_Widget {
 
+	public function show_in_panel(): bool {
+		return false;
+	}
+
 	public function get_name() {
 		return 'facebook-button';
 	}
@@ -27,6 +31,10 @@ class Facebook_Button extends Base_Widget {
 
 	public function get_keywords() {
 		return [ 'facebook', 'social', 'embed', 'button', 'like', 'share', 'recommend', 'follow' ];
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
 	/**

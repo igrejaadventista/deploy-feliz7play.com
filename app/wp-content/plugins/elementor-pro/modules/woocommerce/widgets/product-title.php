@@ -33,13 +33,8 @@ class Product_Title extends Widget_Heading {
 		return [ 'woocommerce', 'shop', 'store', 'title', 'heading', 'product' ];
 	}
 
-	public function get_inline_css_depends() {
-		return [
-			[
-				'name' => 'heading',
-				'is_core_dependency' => true,
-			],
-		];
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
 	protected function register_controls() {
@@ -90,6 +85,22 @@ class Product_Title extends Widget_Heading {
 	}
 
 	public function render_plain_content() {}
+
+	public function render_markdown(): string {
+		$markdown = parent::render_markdown();
+
+		if ( '' !== $markdown ) {
+			return $markdown;
+		}
+
+		$product = wc_get_product( get_the_ID() );
+
+		if ( ! $product ) {
+			return '';
+		}
+
+		return \ElementorPro\Base\Markdown_Utils::heading( $product->get_name(), $this->get_settings_for_display()['header_size'] ?? 'h1' );
+	}
 
 	public function get_group_name() {
 		return 'woocommerce';

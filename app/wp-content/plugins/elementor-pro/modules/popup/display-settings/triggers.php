@@ -3,6 +3,7 @@
 namespace ElementorPro\Modules\Popup\DisplaySettings;
 
 use Elementor\Controls_Manager;
+use ElementorPro\Core\Utils\Hints;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -119,6 +120,21 @@ class Triggers extends Base {
 		$this->end_settings_group();
 
 		$this->start_settings_group( 'exit_intent', esc_html__( 'On Page Exit Intent', 'elementor-pro' ) );
+
+		$this->end_settings_group();
+
+		$this->start_settings_group( 'adblock_detection', esc_html__( 'AdBlock Detection', 'elementor-pro' ) );
+
+		$this->add_settings_group_control(
+			'delay',
+			[
+				'type' => Controls_Manager::NUMBER,
+				'label' => esc_html__( 'Within', 'elementor-pro' ) . ' (sec)',
+				'default' => 0,
+				'min' => 0,
+				'step' => 0.1,
+			]
+		);
 
 		$this->end_settings_group();
 

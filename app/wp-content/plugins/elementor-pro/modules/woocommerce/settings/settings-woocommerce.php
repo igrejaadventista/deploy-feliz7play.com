@@ -802,8 +802,7 @@ class Settings_Woocommerce extends Tab_Base {
 		$this->add_control(
 			'woocommerce_pages_notice',
 			[
-				// TODO: Remove define() with the release of Elementor 3.22
-				'type' => defined( 'Controls_Manager::ALERT' ) ? Controls_Manager::ALERT : 'alert',
+				'type' => Controls_Manager::ALERT,
 				'alert_type' => 'info',
 				'content' => esc_html__( 'Note: Changes you make here will also be reflected in the WooCommerce settings on your WP dashboard', 'elementor-pro' ),
 			]
@@ -845,6 +844,7 @@ class Settings_Woocommerce extends Tab_Base {
 	public function get_notices_promotion_data() {
 		return [
 			'title' => sprintf(
+				/* translators: %s: Line break HTML. */
 				esc_html__( 'Say hello to %s WooCommerce notices!', 'elementor-pro' ),
 				'<br />'
 			),
@@ -861,6 +861,7 @@ class Settings_Woocommerce extends Tab_Base {
 	private function get_pages_promotion_data(): array {
 		return [
 			'title' => sprintf(
+				/* translators: %s: Line break HTML. */
 				esc_html__( 'Say hello to %s WooCommerce pages!', 'elementor-pro' ),
 				'<br />'
 			),

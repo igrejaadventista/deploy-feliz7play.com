@@ -8,15 +8,25 @@ use ElementorPro\License\Admin as License_Admin;
 use ElementorPro\License\API as License_API;
 use ElementorPro\Plugin;
 use ElementorPro\Modules\DisplayConditions\Module as Display_Conditions_Module;
+use Elementor\Modules\AtomicWidgets\Module as AtomicWidgetsModule;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
 class Editor extends App {
-	const EDITOR_V2_PACKAGES = [
-		'editor-documents-extended',
+	const APP_BAR_DEPS_V2 = [
 		'editor-site-navigation-extended',
+		'editor-documents-extended',
+		'license-api',
+	];
+	const EDITOR_V4_PACKAGES = [
+		'editor-controls-extended',
+		'editor-editing-panel-extended',
+		'editor-components-extended',
+		'core-adapter-utils',
+		'editor-templates-extended',
+		'editor-canvas-extended',
 	];
 
 	/**
@@ -40,16 +50,6 @@ class Editor extends App {
 		add_action( 'elementor/editor/before_enqueue_scripts', [ $this, 'enqueue_editor_scripts' ] );
 		add_filter( 'elementor/editor/localize_settings', [ $this, 'localize_settings' ] );
 
-		add_filter( 'elementor/editor/panel/get_pro_details', function( $get_pro_details ) {
-			if ( defined( '\Elementor\Modules\Apps\Module::PAGE_ID' ) ) {
-				$get_pro_details['link'] = admin_url( 'admin.php?page=' . \Elementor\Modules\Apps\Module::PAGE_ID );
-				$get_pro_details['message'] = __( 'Extend Elementor With Add-ons', 'elementor-pro' );
-				$get_pro_details['button_text'] = __( 'Explore Add-ons', 'elementor-pro' );
-			}
-
-			return $get_pro_details;
-		} );
-
 		add_action( 'elementor/editor/v2/scripts/enqueue', function () {
 			$this->enqueue_editor_v2_scripts();
 		} );
@@ -57,6 +57,7 @@ class Editor extends App {
 
 	public function get_init_settings() {
 		$settings = [
+			'version' => ELEMENTOR_PRO_VERSION,
 			'isActive' => License_API::is_license_active(),
 			'urls' => [
 				'modules' => ELEMENTOR_PRO_MODULES_URL,
@@ -85,7 +86,7 @@ class Editor extends App {
 	public function enqueue_editor_styles() {
 		wp_enqueue_style(
 			'elementor-pro',
-			$this->get_css_assets_url( 'editor', null, 'default', true ),
+			$this->get_css_assets_url( 'editor' ),
 			[
 				'elementor-editor',
 			],
@@ -118,17 +119,25 @@ class Editor extends App {
 				return ELEMENTOR_PRO_ASSETS_PATH . "js/packages/{$name}/{$name}.asset.php";
 			} );
 
-		$packages = apply_filters( 'elementor-pro/editor/v2/packages', self::EDITOR_V2_PACKAGES );
+		$packages_to_load = array_merge( self::APP_BAR_DEPS_V2 );
+
+		if ( Plugin::elementor()->experiments->is_feature_active( AtomicWidgetsModule::EXPERIMENT_NAME ) ) {
+			$packages_to_load = array_merge( $packages_to_load, self::EDITOR_V4_PACKAGES );
+		}
+
+		$packages = apply_filters( 'elementor-pro/editor/v2/packages', $packages_to_load );
 
 		foreach ( $packages as $package ) {
 			$assets_config->load( $package );
 		}
 
 		foreach ( $assets_config->all() as $package => $config ) {
+			$deps = $this->filter_version_gated_dependencies( $config['deps'] );
+
 			wp_enqueue_script(
 				$config['handle'],
 				$this->get_js_assets_url( "packages/{$package}/{$package}" ),
-				$config['deps'],
+				$deps,
 				ELEMENTOR_PRO_VERSION,
 				true
 			);
@@ -185,5 +194,52 @@ class Editor extends App {
 
 	protected function get_assets_base_url() {
 		return ELEMENTOR_PRO_URL;
+	}
+
+	/**
+	 * Map of `@elementor/*` package names to the minimum Elementor Core version
+	 * in which the corresponding script handle is registered.
+	 *
+	 * Keys use the original npm package name (`@elementor/<name>`) so it stays
+	 * grep-able against actual `import` statements in the Pro packages. They are
+	 * converted to script handles (`elementor-v2-<name>`) at filter time
+	 *
+	 * NOTE: When adding an entry here, make sure every usage of the package in Pro
+	 * source code is guarded by a runtime version check (see e.g.
+	 * `isCoreWithEmbeddedDocumentsManager()` in `editor-templates-extended`).
+	 */
+	const VERSION_GATED_CORE_PACKAGES = [
+		'@elementor/editor-embedded-documents-manager' => '4.2.0',
+	];
+
+	/**
+	 * Filter out gated dependencies that are not available in the current Elementor version.
+	 *
+	 * @return array The filtered dependencies array.
+	 */
+	private function filter_version_gated_dependencies( array $deps ): array {
+		$gated_handles = [];
+
+		foreach ( self::VERSION_GATED_CORE_PACKAGES as $package => $min_version ) {
+			$gated_handles[ self::package_name_to_script_handle( $package ) ] = $min_version;
+		}
+
+		return array_filter( $deps, function ( $dep ) use ( $gated_handles ) {
+			if ( ! isset( $gated_handles[ $dep ] ) ) {
+				return true;
+			}
+
+			return version_compare( ELEMENTOR_VERSION, $gated_handles[ $dep ], '>=' );
+		} );
+	}
+
+	private static function package_name_to_script_handle( string $package_name ): string {
+		$prefix = '@elementor/';
+
+		if ( 0 !== strpos( $package_name, $prefix ) ) {
+			return $package_name;
+		}
+
+		return 'elementor-v2-' . substr( $package_name, strlen( $prefix ) );
 	}
 }

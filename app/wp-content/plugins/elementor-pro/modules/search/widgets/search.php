@@ -38,6 +38,8 @@ class Search extends Base_Widget {
 	protected $search_term = '';
 	protected $page_number = 1;
 
+	private $breakpoint = null;
+
 	private $element_attribute_ids = [
 		'search_wrapper' => 'search_wrapper',
 		'form' => 'form',
@@ -61,6 +63,16 @@ class Search extends Base_Widget {
 		$this->page_number = $page_number;
 	}
 
+	public function set_breakpoint( ?string $breakpoint ) {
+		if ( empty( $breakpoint ) ) {
+			$this->breakpoint = null;
+
+			return;
+		}
+
+		$this->breakpoint = sanitize_key( $breakpoint );
+	}
+
 	public function get_name() {
 		return 'search';
 	}
@@ -79,6 +91,10 @@ class Search extends Base_Widget {
 
 	public function get_categories() {
 		return [ 'pro-elements' ];
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
 	/**
@@ -108,7 +124,7 @@ class Search extends Base_Widget {
 		$elementor_query = Module_Query::instance();
 		$settings = $this->get_settings_for_display();
 		$query_args = [
-			'posts_per_page' => $settings['number_of_items'] ?? -1,
+			'posts_per_page' => $this->get_posts_per_page_for_breakpoint( $settings ),
 			'paged' => $this->page_number,
 		];
 
@@ -1373,7 +1389,7 @@ class Search extends Base_Widget {
 		$this->add_responsive_control(
 			'submit_border_radius',
 			[
-				'label' => esc_html__( 'Radius', 'elementor-pro' ),
+				'label' => esc_html__( 'Border Radius', 'elementor-pro' ),
 				'type' => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
 				'selectors' => [
@@ -2011,7 +2027,7 @@ class Search extends Base_Widget {
 
 				<label <?php $this->print_render_attribute_string( $attribute_ids['label'] ); ?>>
 					<span <?php $this->print_render_attribute_string( $attribute_ids['label_text'] ); ?>>
-						<?php esc_html_e( 'Search', 'elementor-pro' ); ?>
+						<?php echo esc_html__( 'Search', 'elementor-pro' ); ?>
 					</span>
 					<?php $this->maybe_render_icon( 'icon_search' ); ?>
 				</label>
@@ -2038,9 +2054,11 @@ class Search extends Base_Widget {
 				<button <?php $this->print_render_attribute_string( $attribute_ids['submit_button'] ); ?>>
 					<?php $this->maybe_render_icon( 'icon_submit' ); ?>
 
+					<?php if ( ! empty( $settings['submit_button_text'] ) ) : ?>
 					<span <?php $this->print_render_attribute_string( $attribute_ids['submit_text'] ); ?>>
 						<?php echo esc_html( $settings['submit_button_text'] ); ?>
 					</span>
+					<?php endif; ?>
 				</button>
 				<input <?php $this->print_render_attribute_string( $attribute_ids['widget_props'] ); ?>>
 			</form>
@@ -2123,6 +2141,10 @@ class Search extends Base_Widget {
 			'type' => 'submit',
 		] );
 
+		if ( empty( $settings['submit_button_text'] ) ) {
+			$this->add_render_attribute( $this->element_attribute_ids['submit_button'], 'aria-label', esc_html__( 'Search', 'elementor-pro' ) );
+		}
+
 		$this->add_render_attribute( $this->element_attribute_ids['submit_text'], [
 			'class' => $this->is_submit_button_shown() ? '' : $screen_only_class,
 		] );
@@ -2132,7 +2154,7 @@ class Search extends Base_Widget {
 			'class' => 'e-search-results-container hide-loader',
 			'aria-live' => 'polite',
 			'aria-atomic' => 'true',
-			'aria-label' => 'Results for search',
+			'aria-label' => esc_attr__( 'Results for search', 'elementor-pro' ),
 			'tabindex' => '0',
 		] );
 
@@ -2200,5 +2222,36 @@ class Search extends Base_Widget {
 
 	private function get_property_key_prefix() {
 		return $this->get_query_name() . '_query';
+	}
+
+	private function get_posts_per_page_for_breakpoint( array $settings ): int {
+		$control_key = 'number_of_items';
+		$desktop_value = isset( $settings[ $control_key ] ) ? (int) $settings[ $control_key ] : -1;
+
+		if ( empty( $this->breakpoint ) ) {
+			return $desktop_value;
+		}
+
+		$active_devices = Plugin::elementor()->breakpoints->get_active_devices_list( [
+			'add_desktop' => true,
+			'desktop_first' => false,
+			'reverse' => false,
+		] );
+
+		$device_index = array_search( $this->breakpoint, $active_devices, true );
+
+		if ( false === $device_index ) {
+			return $desktop_value;
+		}
+
+		foreach ( array_slice( $active_devices, $device_index ) as $device ) {
+			$setting_key = 'desktop' === $device ? $control_key : $control_key . '_' . $device;
+
+			if ( isset( $settings[ $setting_key ] ) && is_numeric( $settings[ $setting_key ] ) ) {
+				return (int) $settings[ $setting_key ];
+			}
+		}
+
+		return $desktop_value;
 	}
 }

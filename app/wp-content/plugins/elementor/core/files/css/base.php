@@ -10,6 +10,7 @@ use Elementor\Core\Files\Base as Base_File;
 use Elementor\Core\DynamicTags\Manager;
 use Elementor\Core\DynamicTags\Tag;
 use Elementor\Core\Frontend\Performance;
+use Elementor\Core\Frontend\Widget_Content_Render_Mode;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Plugin;
 use Elementor\Stylesheet;
@@ -201,6 +202,10 @@ abstract class Base extends Base_File {
 	 * @access public
 	 */
 	public function enqueue() {
+		if ( $this->should_skip_enqueue() ) {
+			return;
+		}
+
 		$handle_id = $this->get_file_handle_id();
 
 		if ( isset( self::$printed[ $handle_id ] ) ) {
@@ -233,14 +238,15 @@ abstract class Base extends Base_File {
 
 		if ( self::CSS_STATUS_INLINE === $meta['status'] ) {
 			$dep = $this->get_inline_dependency();
-			// If the dependency has already been printed ( like a template in footer )
-			if ( wp_styles()->query( $dep, 'done' ) ) {
+			$is_dependency_registered = (bool) wp_styles()->query( $dep, 'registered' );
+
+			if ( ! $is_dependency_registered || wp_styles()->query( $dep, 'done' ) ) {
 				printf( '<style id="%1$s">%2$s</style>', $this->get_file_handle_id(), $meta['css'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			} else {
 				wp_add_inline_style( $dep, $meta['css'] );
 			}
 		} elseif ( self::CSS_STATUS_FILE === $meta['status'] ) { // Re-check if it's not empty after CSS update.
-			wp_enqueue_style( $this->get_file_handle_id(), $this->get_url(), $this->get_enqueue_dependencies(), null ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+			wp_enqueue_style( $this->get_file_handle_id(), $this->get_url(), $this->get_registered_enqueue_dependencies(), null );
 		}
 
 		// Handle fonts.
@@ -549,7 +555,7 @@ abstract class Base extends Base_File {
 	 * @param array          $replacements   Replacements.
 	 * @param array          $all_controls   All controls.
 	 */
-	public function add_controls_stack_style_rules( Controls_Stack $controls_stack, array $controls, array $values, array $placeholders, array $replacements, array $all_controls = null ) {
+	public function add_controls_stack_style_rules( Controls_Stack $controls_stack, array $controls, array $values, array $placeholders, array $replacements, ?array $all_controls = null ) {
 		if ( ! $all_controls ) {
 			$all_controls = $controls_stack->get_controls();
 		}
@@ -605,6 +611,29 @@ abstract class Base extends Base_File {
 	 * @return string CSS file handle ID.
 	 */
 	abstract protected function get_file_handle_id();
+
+	protected function should_skip_enqueue(): bool {
+		if ( Widget_Content_Render_Mode::is( Widget_Content_Render_Mode::MARKDOWN ) ) {
+			return true;
+		}
+
+		if ( ! is_admin() ) {
+			return false;
+		}
+
+		$editor = Plugin::$instance->editor;
+
+		return $editor && $editor->is_editor_request();
+	}
+
+	protected function get_registered_enqueue_dependencies(): array {
+		return array_values( array_filter(
+			$this->get_enqueue_dependencies(),
+			static function ( $handle ) {
+				return (bool) wp_styles()->query( $handle, 'registered' );
+			}
+		) );
+	}
 
 	/**
 	 * Render CSS.
@@ -908,7 +937,7 @@ abstract class Base extends Base_File {
 				$default_generic_fonts = Plugin::$instance->kits_manager->get_current_settings( 'default_generic_fonts' );
 
 				if ( $default_generic_fonts ) {
-					$value  .= ", $default_generic_fonts";
+					$value .= ", $default_generic_fonts";
 				}
 			}
 		} else {
@@ -918,7 +947,7 @@ abstract class Base extends Base_File {
 		return $value;
 	}
 
-	final protected function get_active_controls( Controls_Stack $controls_stack, array $controls = null, array $settings = null ) {
+	final protected function get_active_controls( Controls_Stack $controls_stack, ?array $controls = null, ?array $settings = null ) {
 		if ( ! $controls ) {
 			$controls = $controls_stack->get_controls();
 		}
@@ -946,7 +975,7 @@ abstract class Base extends Base_File {
 		return $active_controls;
 	}
 
-	final public function get_style_controls( Controls_Stack $controls_stack, array $controls = null, array $settings = null ) {
+	final public function get_style_controls( Controls_Stack $controls_stack, ?array $controls = null, ?array $settings = null ) {
 		$controls = $this->get_active_controls( $controls_stack, $controls, $settings );
 
 		$style_controls = [];

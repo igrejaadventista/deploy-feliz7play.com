@@ -32,7 +32,7 @@ class Archive extends Condition_Base {
 	}
 
 	public function get_all_label() {
-		return esc_html__( 'All Archives', 'elementor-pro' );
+		return esc_html__( 'All archives', 'elementor-pro' );
 	}
 
 	public function register_sub_conditions() {
@@ -56,6 +56,10 @@ class Archive extends Condition_Base {
 
 		// WooCommerce is handled by `woocommerce` module.
 		if ( $is_archive && class_exists( 'woocommerce' ) && is_woocommerce() ) {
+			$is_archive = false;
+		}
+
+		if ( $is_archive && ( is_404() || Module::is_missing_term_or_author_archive() ) ) {
 			$is_archive = false;
 		}
 

@@ -5,15 +5,16 @@ use Elementor\Controls_Manager;
 use Elementor\Widget_Button;
 use ElementorPro\Base\Base_Widget_Trait;
 use ElementorPro\Core\Utils;
+use ElementorPro\Core\Utils\Hints;
 use ElementorPro\Modules\QueryControl\Module;
 use ElementorPro\Modules\Woocommerce\Traits\Product_Id_Trait;
+use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
 class Add_To_Cart extends Widget_Button {
-
 	use Base_Widget_Trait;
 	use Product_Id_Trait;
 
@@ -35,6 +36,10 @@ class Add_To_Cart extends Widget_Button {
 
 	public function get_keywords() {
 		return [ 'woocommerce', 'shop', 'store', 'cart', 'product', 'button', 'add to cart' ];
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
 	/**
@@ -322,5 +327,30 @@ class Add_To_Cart extends Widget_Button {
 
 	public function get_group_name() {
 		return 'woocommerce';
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$product = $this->get_product( $settings['product_id'] ?? false );
+
+		if ( ! $product ) {
+			return '';
+		}
+
+		$lines = [
+			'- **' . esc_html__( 'Product', 'elementor-pro' ) . ':** ' . $product->get_name(),
+		];
+
+		if ( 'yes' === ( $settings['show_quantity'] ?? '' ) ) {
+			$lines[] = '- **' . esc_html__( 'Quantity', 'elementor-pro' ) . ':** ' . esc_html__( 'Selectable', 'elementor-pro' );
+		} else {
+			$quantity = (int) ( $settings['quantity'] ?? 1 );
+			$lines[] = '- **' . esc_html__( 'Quantity', 'elementor-pro' ) . ':** ' . $quantity;
+		}
+
+		$button_text = \ElementorPro\Base\Markdown_Utils::plain_text( $settings['text'] ?? esc_html__( 'Add to cart', 'elementor-pro' ) );
+		$lines[] = '- **' . esc_html__( 'Button', 'elementor-pro' ) . ':** ' . $button_text;
+
+		return \ElementorPro\Base\Markdown_Utils::bullet_list( $lines );
 	}
 }

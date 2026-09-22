@@ -62,15 +62,18 @@ class Upload extends Field_Base {
 			'file_sizes' => [
 				'name' => 'file_sizes',
 				'label' => esc_html__( 'Max. File Size', 'elementor-pro' ),
-				'type' => Controls_Manager::SELECT,
+				'placeholder' => esc_html__( 'Size in MB', 'elementor-pro' ),
+				'type' => Controls_Manager::NUMBER,
+				'min' => 1,
+				'max' => wp_max_upload_size() / pow( 1024, 2 ),
 				'condition' => [
 					'field_type' => $this->get_type(),
 				],
-				'options' => $this->get_upload_file_size_options(),
-				'description' => esc_html__( 'If you need to increase max upload size please contact your hosting.', 'elementor-pro' ),
+				'description' => esc_html__( 'Size is in MB. If you need to increase max upload size please contact your hosting.', 'elementor-pro' ),
 				'tab' => 'content',
 				'inner_tab' => 'form_fields_content_tab',
 				'tabs_wrapper' => 'form_fields_tabs',
+				'title' => esc_html__( 'Size in MB', 'elementor-pro' ),
 			],
 			'file_types' => [
 				'name' => 'file_types',
@@ -328,7 +331,7 @@ class Upload extends Field_Base {
 		if ( ! empty( $field['max_files'] ) ) {
 			if ( count( $files[ $id ] ) > $field['max_files'] ) {
 				$error_message = sprintf(
-					/* translators: %d: The number of allowed files. */
+					/* translators: %d: Maximum number of allowed files. */
 					_n( 'You can upload only %d file.', 'You can upload up to %d files.', intval( $field['max_files'] ), 'elementor-pro' ),
 					intval( $field['max_files'] )
 				);
@@ -341,7 +344,7 @@ class Upload extends Field_Base {
 		foreach ( $files[ $id ] as $index => $file ) {
 			// not uploaded
 			if ( ! $field['required'] && UPLOAD_ERR_NO_FILE === $file['error'] ) {
-				return;
+				continue;
 			}
 
 			// is the file required and missing?
@@ -469,22 +472,6 @@ class Upload extends Field_Base {
 		return $path;
 	}
 
-	/**
-	 * creates array of upload sizes based on server limits
-	 * to use in the file_sizes control
-	 * @return array
-	 */
-	private function get_upload_file_size_options() {
-		$max_file_size = wp_max_upload_size() / pow( 1024, 2 ); //MB
-
-		$sizes = [];
-
-		for ( $file_size = 1; $file_size <= $max_file_size; $file_size++ ) {
-			$sizes[ $file_size ] = $file_size . 'MB';
-		}
-
-		return $sizes;
-	}
 
 	/**
 	 * process file and move it to uploads directory
@@ -502,8 +489,12 @@ class Upload extends Field_Base {
 				continue;
 			}
 
-			$uploads_dir = $this->get_ensure_upload_dir();
 			$file_extension = pathinfo( $file['name'], PATHINFO_EXTENSION );
+			if ( in_array( strtolower( $file_extension ), $this->get_blacklist_file_ext(), true ) ) {
+				continue;
+			}
+
+			$uploads_dir = $this->get_ensure_upload_dir();
 			$filename = uniqid() . '.' . $file_extension;
 			$filename = wp_unique_filename( $uploads_dir, $filename );
 			$new_file = trailingslashit( $uploads_dir ) . $filename;

@@ -1,142 +1,43 @@
-/******/ (function() { // webpackBootstrap
-/******/ 	"use strict";
-/******/ 	var __webpack_modules__ = ({
+/*! elementor-pro - v4.3.0 - 22-09-2026 */
+this.elementorV2 = this.elementorV2 || {};
+(function(exports, _elementor_editor_app_bar, _elementor_editor_v1_adapters, _elementor_icons, _wordpress_i18n) {
+	Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+	//#endregion
+	//#region packages/packages/pro/editor-notes/src/hooks/use-notes-action-props.ts
+	function useNotesActionProps() {
+		const { isActive, isBlocked } = (0, _elementor_editor_v1_adapters.__privateUseRouteStatus)("notes", { allowedEditModes: ["edit", "preview"] });
+		return {
+			title: (0, _wordpress_i18n.__)("Notes", "elementor-pro"),
+			icon: _elementor_icons.MessageIcon,
+			onClick: () => {
+				var _extendedWindow$eleme;
+				const extendedWindow = window;
+				const eventsManager = extendedWindow === null || extendedWindow === void 0 || (_extendedWindow$eleme = extendedWindow.elementorCommon) === null || _extendedWindow$eleme === void 0 ? void 0 : _extendedWindow$eleme.eventsManager;
+				const config = eventsManager === null || eventsManager === void 0 ? void 0 : eventsManager.config;
+				if (config) eventsManager.dispatchEvent(config.names.topBar.notes, {
+					location: config.locations.topBar,
+					secondaryLocation: config.secondaryLocations.notes,
+					trigger: config.triggers.toggleClick,
+					element: config.elements.buttonIcon
+				});
+				(0, _elementor_editor_v1_adapters.__privateRunCommand)("notes/toggle");
+			},
+			selected: isActive,
+			disabled: isBlocked
+		};
+	}
+	//#endregion
+	//#region packages/packages/pro/editor-notes/src/init.ts
+	function init() {
+		_elementor_editor_app_bar.mainMenu.registerAction({
+			id: "toggle-notes",
+			group: "default",
+			priority: 20,
+			useProps: useNotesActionProps
+		});
+	}
+	//#endregion
+	exports.init = init;
+})(this.elementorV2.editorNotes = this.elementorV2.editorNotes || {}, elementorV2.editorAppBar, elementorV2.editorV1Adapters, elementorV2.icons, wp.i18n);
 
-/***/ "@elementor/editor-app-bar":
-/*!***********************************************!*\
-  !*** external ["elementorV2","editorAppBar"] ***!
-  \***********************************************/
-/***/ (function(module) {
-
-module.exports = window["elementorV2"]["editorAppBar"];
-
-/***/ }),
-
-/***/ "@elementor/editor-v1-adapters":
-/*!***************************************************!*\
-  !*** external ["elementorV2","editorV1Adapters"] ***!
-  \***************************************************/
-/***/ (function(module) {
-
-module.exports = window["elementorV2"]["editorV1Adapters"];
-
-/***/ }),
-
-/***/ "@elementor/icons":
-/*!****************************************!*\
-  !*** external ["elementorV2","icons"] ***!
-  \****************************************/
-/***/ (function(module) {
-
-module.exports = window["elementorV2"]["icons"];
-
-/***/ }),
-
-/***/ "@wordpress/i18n":
-/*!******************************!*\
-  !*** external ["wp","i18n"] ***!
-  \******************************/
-/***/ (function(module) {
-
-module.exports = window["wp"]["i18n"];
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	!function() {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = function(exports) {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	}();
-/******/ 	
-/************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-!function() {
-/*!*************************************************************!*\
-  !*** ./node_modules/@elementor/editor-notes/dist/index.mjs ***!
-  \*************************************************************/
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _elementor_editor_app_bar__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @elementor/editor-app-bar */ "@elementor/editor-app-bar");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _elementor_editor_v1_adapters__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @elementor/editor-v1-adapters */ "@elementor/editor-v1-adapters");
-/* harmony import */ var _elementor_icons__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @elementor/icons */ "@elementor/icons");
-// src/init.ts
-
-
-// src/hooks/use-notes-action-props.ts
-
-
-
-function useNotesActionProps() {
-  const { isActive, isBlocked } = (0,_elementor_editor_v1_adapters__WEBPACK_IMPORTED_MODULE_2__.__privateUseRouteStatus)("notes", {
-    blockOnPreviewMode: false
-  });
-  return {
-    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Notes", "elementor-pro"),
-    icon: _elementor_icons__WEBPACK_IMPORTED_MODULE_3__.MessageIcon,
-    onClick: () => {
-      const extendedWindow = window;
-      const config = extendedWindow?.elementor?.editorEvents?.config;
-      if (config) {
-        extendedWindow.elementor.editorEvents.dispatchEvent(config.names.topBar.notes, {
-          location: config.locations.topBar,
-          secondaryLocation: config.secondaryLocations.notes,
-          trigger: config.triggers.toggleClick,
-          element: config.elements.buttonIcon
-        });
-      }
-      (0,_elementor_editor_v1_adapters__WEBPACK_IMPORTED_MODULE_2__.__privateRunCommand)("notes/toggle");
-    },
-    selected: isActive,
-    disabled: isBlocked
-  };
-}
-
-// src/init.ts
-function init() {
-  _elementor_editor_app_bar__WEBPACK_IMPORTED_MODULE_0__.toolsMenu.registerToggleAction({
-    id: "toggle-notes",
-    priority: 4,
-    useProps: useNotesActionProps
-  });
-}
-
-// src/index.ts
-init();
-//# sourceMappingURL=index.mjs.map
-}();
-(window.elementorV2 = window.elementorV2 || {}).editorNotes = __webpack_exports__;
-/******/ })()
-;
+window.elementorV2.editorNotes?.init?.();

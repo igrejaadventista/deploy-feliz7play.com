@@ -1,7 +1,7 @@
 <?php
 namespace ElementorPro\Modules\DynamicTags\Tags;
 
-use ElementorPro\Modules\DynamicTags\Tags\Base\Tag;
+use ElementorPro\Modules\DynamicTags\Tags\Base\Pro_Tag;
 use ElementorPro\Modules\DynamicTags\Module;
 use Elementor\Controls_Manager;
 use Elementor\Embed;
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-class Lightbox extends Tag {
+class Lightbox extends Pro_Tag {
 
 	public function get_name() {
 		return 'lightbox';
@@ -43,12 +43,15 @@ class Lightbox extends Tag {
 					'video' => [
 						'title' => esc_html__( 'Video', 'elementor-pro' ),
 						'icon' => 'eicon-video-camera',
+						'atomic-icon' => 'BrandYoutubeIcon',
 					],
 					'image' => [
 						'title' => esc_html__( 'Image', 'elementor-pro' ),
 						'icon' => 'eicon-image-bold',
+						'atomic-icon' => 'PhotoIcon',
 					],
 				],
+				'default' => 'video',
 			]
 		);
 
@@ -81,18 +84,47 @@ class Lightbox extends Tag {
 
 	private function get_image_settings( $settings ) {
 		$image_settings = [
-			'url' => $settings['image']['url'],
+			'url' => $this->get_image_url( $settings['image'] ),
 			'type' => 'image',
 		];
 
-		$image_id = $settings['image']['id'];
+		return array_merge( $image_settings, $this->get_image_attributes( $settings['image'] ) );
+	}
 
-		if ( $image_id ) {
-			$lightbox_image_attributes = Plugin::elementor()->images_manager->get_lightbox_image_attributes( $image_id );
-			$image_settings = array_merge( $image_settings, $lightbox_image_attributes );
+	private function get_image_url( array $image_settings ): string {
+		if ( ! empty( $image_settings['url'] ) ) {
+			return $image_settings['url'];
 		}
 
-		return $image_settings;
+		if ( ! empty( $image_settings['src'] ) ) {
+			return $this->get_atomic_image_url( $image_settings );
+		}
+
+		return '';
+	}
+
+	private function get_atomic_image_url( array $image_settings ): string {
+		$default = $image_settings['src']['url'] ?? '';
+
+		if ( ! empty( $image_settings['src']['id'] ) ) {
+			$image_src = wp_get_attachment_image_src( $image_settings['src']['id'], 'full' );
+
+			return ! empty( $image_src[0] ) ? $image_src[0] : $default;
+		}
+
+		return $image_settings['src'];
+	}
+
+	private function get_image_attributes( array $image_settings ): array {
+		if ( ! empty( $image_settings['id'] ) ) {
+			return Plugin::elementor()->images_manager->get_lightbox_image_attributes( $image_settings['id'] );
+		}
+
+		if ( ! empty( $image_settings['src']['id'] ) ) {
+			return Plugin::elementor()->images_manager->get_lightbox_image_attributes( $image_settings['src']['id'] );
+		}
+
+		return [];
 	}
 
 	private function get_video_settings( $settings ) {

@@ -77,7 +77,7 @@ class Utils {
 	}
 
 	public static function get_current_post_id() {
-		if ( isset( Plugin::elementor()->documents ) ) {
+		if ( isset( Plugin::elementor()->documents ) && Plugin::elementor()->documents->get_current() ) {
 			return Plugin::elementor()->documents->get_current()->get_main_id();
 		}
 
@@ -104,7 +104,11 @@ class Utils {
 			$url = get_post_type_archive_link( get_post_type() );
 		}
 
-		return $url;
+		if ( ! is_wp_error( $url ) ) {
+			return $url;
+		}
+
+		return '';
 	}
 
 	public static function get_page_title( $include_context = true ) {
@@ -206,7 +210,9 @@ class Utils {
 			$title = esc_html__( 'Archives', 'elementor-pro' );
 		} elseif ( is_404() ) {
 			$title = esc_html__( 'Page Not Found', 'elementor-pro' );
-		} // End if().
+		} elseif ( is_home() ) {
+			$title = wp_get_document_title();
+		}
 
 		/**
 		 * Page title.
@@ -424,7 +430,16 @@ class Utils {
 
 	public static function create_widget_instance_from_db( $post_id, $widget_id ) {
 		$document = Plugin::elementor()->documents->get( $post_id );
+
+		if ( ! $document ) {
+			return null;
+		}
+
 		$widget_data = \Elementor\Utils::find_element_recursive( $document->get_elements_data(), $widget_id );
+
+		if ( empty( $widget_data ) ) {
+			return null;
+		}
 
 		return Plugin::elementor()->elements_manager->create_element_instance( $widget_data );
 	}
@@ -446,5 +461,30 @@ class Utils {
 			&& ! current_user_can( 'edit_post', $post->ID );
 
 		return $is_private || $not_allowed || $password_required;
+	}
+
+	public static function is_sale_time(): bool {
+		return \Elementor\Utils::is_sale_time();
+	}
+
+	/**
+	 * Resolve a class constant with a fallback for cases where the class is from an external
+	 * dependency (e.g. core) that may be on an older version without that constant.
+	 * Direct access (ClassName::CONSTANT) causes a fatal error when the constant doesn't exist.
+	 *
+	 * @param class-string $class    Fully-qualified class name.
+	 * @param string       $constant Constant name.
+	 * @param string       $fallback Value to return when the constant is not defined.
+	 */
+	public static function get_class_constant( string $class, string $constant, string $fallback ): string {
+		static $reflectors = [];
+
+		if ( ! isset( $reflectors[ $class ] ) ) {
+			$reflectors[ $class ] = new \ReflectionClass( $class );
+		}
+
+		return $reflectors[ $class ]->hasConstant( $constant )
+			? (string) $reflectors[ $class ]->getConstant( $constant )
+			: $fallback;
 	}
 }
