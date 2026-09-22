@@ -3,8 +3,8 @@
 namespace WPMailSMTP\Admin;
 
 use Plugin_Upgrader;
-use WPMailSMTP\Admin\Pages\TestTab;
 use WPMailSMTP\Connect;
+use WPMailSMTP\TestEmail\TestEmail;
 use WPMailSMTP\Helpers\Helpers;
 use WPMailSMTP\Helpers\PluginImportDataRetriever;
 use WPMailSMTP\Options;
@@ -82,7 +82,7 @@ class SetupWizard {
 				isset( $_GET['page'] ) && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				Area::SLUG . '-setup-wizard' === $_GET['page'] && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$this->should_setup_wizard_load() &&
-				current_user_can( wp_mail_smtp()->get_capability_manage_options() )
+				current_user_can( wp_mail_smtp()->get_capability_manage_global_options() )
 			)
 		) {
 			return;
@@ -113,6 +113,11 @@ class SetupWizard {
 	public function maybe_redirect_after_activation() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		if ( wp_doing_ajax() || wp_doing_cron() ) {
+			return;
+		}
+
+		// Only users who can activate plugins should be redirected.
+		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return;
 		}
 
@@ -160,7 +165,7 @@ class SetupWizard {
 			return;
 		}
 
-		add_submenu_page( '', '', '', wp_mail_smtp()->get_capability_manage_options(), Area::SLUG . '-setup-wizard', '' );
+		add_submenu_page( '', '', '', wp_mail_smtp()->get_capability_manage_global_options(), Area::SLUG . '-setup-wizard', '' );
 	}
 
 	/**
@@ -229,15 +234,19 @@ class SetupWizard {
 				'other_smtp_plugins' => $this->detect_other_smtp_plugins(),
 				'mailer_options'     => $this->prepare_mailer_options(),
 				'defined_constants'  => $this->prepare_defined_constants(),
-				'upgrade_link'       => wp_mail_smtp()->get_upgrade_link( 'setup-wizard' ),
+				'upgrade_link'       => wp_mail_smtp()->get_upgrade_link( [ 'medium' => 'setup-wizard' ] ),
 				'versions'           => $this->prepare_versions_data(),
 				'public_url'         => wp_mail_smtp()->assets_url . '/vue/',
 				'current_user_email' => wp_get_current_user()->user_email,
 				'completed_time'     => self::get_stats()['completed_time'],
+				'sendlayer'          => [
+					'connect_nonce' => wp_create_nonce( 'wp-mail-smtp-sendlayer-connect' ),
+					'return_url'    => self::get_site_url() . '#/step/configure_mailer/sendlayer',
+				],
 				'education'          => [
 					'upgrade_text'   => esc_html__( 'We\'re sorry, the %mailer% mailer is not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features.', 'wp-mail-smtp' ),
 					'upgrade_button' => esc_html__( 'Upgrade to Pro', 'wp-mail-smtp' ),
-					'upgrade_url'    => add_query_arg( 'discount', 'SMTPLITEUPGRADE', wp_mail_smtp()->get_upgrade_link( '' ) ),
+					'upgrade_url'    => add_query_arg( 'discount', 'SMTPLITEUPGRADE', wp_mail_smtp()->get_upgrade_link( [ 'medium' => 'setup-wizard' ] ) ),
 					'upgrade_bonus'  => sprintf(
 						wp_kses( /* Translators: %s - discount value $50 */
 							__( '<strong>Bonus:</strong> WP Mail SMTP users get <span class="highlight">%s off</span> regular price,<br>applied at checkout.', 'wp-mail-smtp' ),
@@ -548,7 +557,7 @@ class SetupWizard {
 
 		check_ajax_referer( 'wpms-admin-nonce', 'nonce' );
 
-		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_options() ) ) {
+		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_global_options() ) ) {
 			wp_send_json_error( esc_html__( 'You don\'t have permission to change options for this WP site!', 'wp-mail-smtp' ) );
 		}
 
@@ -566,7 +575,7 @@ class SetupWizard {
 
 		check_ajax_referer( 'wpms-admin-nonce', 'nonce' );
 
-		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_options() ) ) {
+		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_global_options() ) ) {
 			wp_send_json_error( esc_html__( 'You don\'t have permission to change options for this WP site!', 'wp-mail-smtp' ) );
 		}
 
@@ -588,7 +597,7 @@ class SetupWizard {
 
 		check_ajax_referer( 'wpms-admin-nonce', 'nonce' );
 
-		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_options() ) ) {
+		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_global_options() ) ) {
 			wp_send_json_error();
 		}
 
@@ -630,7 +639,7 @@ class SetupWizard {
 
 		check_ajax_referer( 'wpms-admin-nonce', 'nonce' );
 
-		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_options() ) ) {
+		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_global_options() ) ) {
 			wp_send_json_error( esc_html__( 'You don\'t have permission to change options for this WP site!', 'wp-mail-smtp' ) );
 		}
 
@@ -730,7 +739,7 @@ class SetupWizard {
 
 		check_ajax_referer( 'wpms-admin-nonce', 'nonce' );
 
-		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_options() ) ) {
+		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_global_options() ) ) {
 			wp_send_json_error();
 		}
 
@@ -773,7 +782,7 @@ class SetupWizard {
 
 		check_ajax_referer( 'wpms-admin-nonce', 'nonce' );
 
-		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_options() ) ) {
+		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_global_options() ) ) {
 			wp_send_json_error();
 		}
 
@@ -807,7 +816,7 @@ class SetupWizard {
 
 		check_ajax_referer( 'wpms-admin-nonce', 'nonce' );
 
-		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_options() ) ) {
+		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_global_options() ) ) {
 			wp_send_json_error();
 		}
 
@@ -1001,6 +1010,10 @@ class SetupWizard {
 
 		check_ajax_referer( 'wpms-admin-nonce', 'nonce' );
 
+		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_global_options() ) ) {
+			wp_send_json_error( esc_html__( 'You don\'t have the permission to perform this action.', 'wp-mail-smtp' ) );
+		}
+
 		$plugins = $this->get_partner_plugins();
 
 		$contact_form_plugin_already_installed = false;
@@ -1108,6 +1121,10 @@ class SetupWizard {
 
 		check_ajax_referer( 'wpms-admin-nonce', 'nonce' );
 
+		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_global_options() ) ) {
+			wp_send_json_error( esc_html__( 'You don\'t have the permission to perform this action.', 'wp-mail-smtp' ) );
+		}
+
 		$email = ! empty( $_POST['email'] ) ? filter_var( wp_unslash( $_POST['email'] ), FILTER_VALIDATE_EMAIL ) : '';
 
 		if ( empty( $email ) ) {
@@ -1204,23 +1221,26 @@ class SetupWizard {
 
 		check_ajax_referer( 'wpms-admin-nonce', 'nonce' );
 
-		$options = Options::init();
-		$mailer  = $options->get( 'mail', 'mailer' );
-		$email   = $options->get( 'mail', 'from_email' );
-		$domain  = '';
+		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_global_options() ) ) {
+			wp_send_json_error( esc_html__( 'You don\'t have the permission to perform this action.', 'wp-mail-smtp' ) );
+		}
 
-		// Send the test mail.
-		$result = wp_mail(
-			$email,
-			'WP Mail SMTP Automatic Email Test',
-			TestTab::get_email_message_text(),
-			array(
-				'X-Mailer-Type:WPMailSMTP/Admin/SetupWizard/Test',
-			)
-		);
+		$options    = Options::init();
+		$mailer     = $options->get( 'mail', 'mailer' );
+		$from_email = $options->get( 'mail', 'from_email' );
+		$domain     = '';
 
-		if ( ! $result ) {
-			$this->update_completed_stat( false );
+		// Send the test mail. Domain check runs below with its own (warnings-tolerated)
+		// threshold, so we opt out of TestEmail's stricter no_issues() check.
+		$test_email = ( new TestEmail() )
+			->with_context( TestEmail::CONTEXT_SETUP_WIZARD )
+			->as_html( false )
+			->with_domain_check( false );
+
+		$test_email->send( $this->get_test_email_recipient() );
+
+		if ( ! $test_email->is_successful() ) {
+			$this->update_completed_stat( false, $mailer );
 
 			( new UsageTracking() )->send_failed_setup_wizard_usage_tracking_data();
 
@@ -1233,19 +1253,55 @@ class SetupWizard {
 		}
 
 		// Perform the domain checker API test.
-		$domain_checker = new DomainChecker( $mailer, $email, $domain );
+		$domain_checker = new DomainChecker( $mailer, $from_email, $domain );
 
 		if ( $domain_checker->has_errors() ) {
-			$this->update_completed_stat( false );
+			$this->update_completed_stat( false, $mailer );
 
 			( new UsageTracking() )->send_failed_setup_wizard_usage_tracking_data( $domain_checker );
 
 			wp_send_json_error();
 		}
 
-		$this->update_completed_stat( true );
+		$this->update_completed_stat( true, $mailer );
 
 		wp_send_json_success();
+	}
+
+	/**
+	 * Get the test email recipient.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @return string
+	 */
+	private function get_test_email_recipient() {
+
+		$options    = Options::init();
+		$mailer     = $options->get( 'mail', 'mailer' );
+		$from_email = $options->get( 'mail', 'from_email' );
+
+		/*
+		 * Some mailers in a test mode allows to send emails only to the registered
+		 * From email address, so we need to cover this case.
+		 */
+		$to_email = $from_email;
+
+		$mailer_specific_constant_name = 'WPMS_SETUP_WIZARD_TEST_' . strtoupper( $mailer ) . '_EMAIL_RECIPIENT';
+
+		if (
+			defined( $mailer_specific_constant_name ) &&
+			is_email( constant( $mailer_specific_constant_name ) )
+		) {
+			$to_email = constant( $mailer_specific_constant_name );
+		} elseif (
+			defined( 'WPMS_SETUP_WIZARD_TEST_EMAIL_RECIPIENT' ) &&
+			is_email( WPMS_SETUP_WIZARD_TEST_EMAIL_RECIPIENT )
+		) {
+			$to_email = WPMS_SETUP_WIZARD_TEST_EMAIL_RECIPIENT;
+		}
+
+		return $to_email;
 	}
 
 	/**
@@ -1256,6 +1312,10 @@ class SetupWizard {
 	public function send_feedback() {
 
 		check_ajax_referer( 'wpms-admin-nonce', 'nonce' );
+
+		if ( ! current_user_can( wp_mail_smtp()->get_capability_manage_global_options() ) ) {
+			wp_send_json_error();
+		}
 
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$data = ! empty( $_POST['data'] ) ? json_decode( wp_unslash( $_POST['data'] ), true ) : [];
@@ -1338,9 +1398,10 @@ class SetupWizard {
 
 	/**
 	 * Get the Setup Wizard stats.
-	 * - launched_time  -> when the Setup Wizard was last launched.
-	 * - completed_time -> when the Setup Wizard was last completed.
-	 * - was_successful -> if the Setup Wizard was completed successfully.
+	 * - launched_time     -> when the Setup Wizard was last launched.
+	 * - completed_time    -> when the Setup Wizard was last completed.
+	 * - was_successful    -> if the Setup Wizard was completed successfully.
+	 * - mailer            -> mailer slug configured in the Setup Wizard on its last completion attempt.
 	 *
 	 * @since 3.1.0
 	 *
@@ -1352,6 +1413,7 @@ class SetupWizard {
 			'launched_time'  => 0,
 			'completed_time' => 0,
 			'was_successful' => false,
+			'mailer'         => '',
 		];
 
 		return get_option( self::STATS_OPTION_KEY, $defaults );
@@ -1374,14 +1436,16 @@ class SetupWizard {
 	 *
 	 * @since 3.1.0
 	 *
-	 * @param bool $was_successful If the Setup Wizard was completed successfully.
+	 * @param bool   $was_successful If the Setup Wizard was completed successfully.
+	 * @param string $mailer         Mailer slug configured in the Setup Wizard.
 	 */
-	private function update_completed_stat( $was_successful ) {
+	private function update_completed_stat( $was_successful, $mailer = '' ) {
 
 		self::update_stats(
 			[
 				'completed_time' => time(),
 				'was_successful' => $was_successful,
+				'mailer'         => $mailer,
 			]
 		);
 	}
@@ -1431,6 +1495,7 @@ class SetupWizard {
 			'WPMS_ZOHO_DOMAIN'                   => [ 'zoho', 'domain' ],
 			'WPMS_ZOHO_CLIENT_ID'                => [ 'zoho', 'client_id' ],
 			'WPMS_ZOHO_CLIENT_SECRET'            => [ 'zoho', 'client_secret' ],
+			'WPMS_RESEND_API_KEY'                => [ 'resend', 'api_key' ],
 			'WPMS_SMTP_HOST'                     => [ 'smtp', 'host' ],
 			'WPMS_SMTP_PORT'                     => [ 'smtp', 'port' ],
 			'WPMS_SSL'                           => [ 'smtp', 'encryption' ],

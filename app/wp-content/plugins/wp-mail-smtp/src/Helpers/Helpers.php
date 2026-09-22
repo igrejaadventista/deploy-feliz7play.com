@@ -31,8 +31,12 @@ class Helpers {
 				'mailgun',
 				'postmark',
 				'sparkpost',
+				'elasticemail',
 				'smtp2go',
 				'mailjet',
+				'mailersend',
+				'mandrill',
+				'resend',
 			],
 			true
 		);
@@ -108,6 +112,38 @@ class Helpers {
 		}
 
 		return mb_strlen( $str, '8bit' );
+	}
+
+	/**
+	 * Format a variable for debug-style output as an inline <code> block.
+	 *
+	 * Bools and empty values are rendered via var_dump (which shows the type);
+	 * everything else via print_r. Line breaks are stripped so the output fits
+	 * on a single rendered line.
+	 *
+	 * @since 4.9.0
+	 *
+	 * @param mixed $var Variable to format.
+	 *
+	 * @return string
+	 */
+	public static function pvar( $var = '' ) {
+
+		ob_start();
+
+		echo '<code>';
+
+		if ( is_bool( $var ) || empty( $var ) ) {
+			var_dump( $var );
+		} else {
+			print_r( $var );
+		}
+
+		echo '</code>';
+
+		$output = ob_get_clean();
+
+		return str_replace( [ "\r\n", "\r", "\n" ], '', $output );
 	}
 
 	/**

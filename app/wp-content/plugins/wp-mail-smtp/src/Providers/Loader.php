@@ -2,8 +2,8 @@
 
 namespace WPMailSMTP\Providers;
 
+use WPMailSMTP\Admin\DebugEvents\DebugEvents;
 use WPMailSMTP\ConnectionInterface;
-use WPMailSMTP\Debug;
 use WPMailSMTP\MailCatcherInterface;
 use WPMailSMTP\Options;
 
@@ -22,27 +22,34 @@ class Loader {
 	 * @since 1.7.0 Added AmazonSES/Outlook as indication of the Pro mailers.
 	 * @since 4.1.0 Added SMTP2GO.
 	 * @since 4.2.0 Added Mailjet.
+	 * @since 4.3.0 Added Elastic Email.
+	 * @since 4.5.0 Added MailerSend.
+	 * @since 4.6.0 Added Mandrill.
 	 *
 	 * @var array
 	 */
 	protected $providers = [
-		'mail'        => 'WPMailSMTP\Providers\Mail\\',
-		'sendlayer'   => 'WPMailSMTP\Providers\Sendlayer\\',
-		'smtpcom'     => 'WPMailSMTP\Providers\SMTPcom\\',
-		'sendinblue'  => 'WPMailSMTP\Providers\Sendinblue\\',
-		'amazonses'   => 'WPMailSMTP\Providers\AmazonSES\\',
-		'gmail'       => 'WPMailSMTP\Providers\Gmail\\',
-		'mailgun'     => 'WPMailSMTP\Providers\Mailgun\\',
-		'mailjet'     => 'WPMailSMTP\Providers\Mailjet\\',
-		'outlook'     => 'WPMailSMTP\Providers\Outlook\\',
-		'pepipostapi' => 'WPMailSMTP\Providers\PepipostAPI\\',
-		'postmark'    => 'WPMailSMTP\Providers\Postmark\\',
-		'sendgrid'    => 'WPMailSMTP\Providers\Sendgrid\\',
-		'smtp2go'     => 'WPMailSMTP\Providers\SMTP2GO\\',
-		'sparkpost'   => 'WPMailSMTP\Providers\SparkPost\\',
-		'zoho'        => 'WPMailSMTP\Providers\Zoho\\',
-		'smtp'        => 'WPMailSMTP\Providers\SMTP\\',
-		'pepipost'    => 'WPMailSMTP\Providers\Pepipost\\',
+		'mail'         => 'WPMailSMTP\Providers\Mail\\',
+		'sendlayer'    => 'WPMailSMTP\Providers\Sendlayer\\',
+		'smtpcom'      => 'WPMailSMTP\Providers\SMTPcom\\',
+		'sendinblue'   => 'WPMailSMTP\Providers\Sendinblue\\',
+		'amazonses'    => 'WPMailSMTP\Providers\AmazonSES\\',
+		'elasticemail' => 'WPMailSMTP\Providers\ElasticEmail\\',
+		'gmail'        => 'WPMailSMTP\Providers\Gmail\\',
+		'mailgun'      => 'WPMailSMTP\Providers\Mailgun\\',
+		'mailjet'      => 'WPMailSMTP\Providers\Mailjet\\',
+		'mailersend'   => 'WPMailSMTP\Providers\MailerSend\\',
+		'mandrill'     => 'WPMailSMTP\Providers\Mandrill\\',
+		'outlook'      => 'WPMailSMTP\Providers\Outlook\\',
+		'pepipostapi'  => 'WPMailSMTP\Providers\PepipostAPI\\',
+		'postmark'     => 'WPMailSMTP\Providers\Postmark\\',
+		'resend'       => 'WPMailSMTP\Providers\Resend\\',
+		'sendgrid'     => 'WPMailSMTP\Providers\Sendgrid\\',
+		'smtp2go'      => 'WPMailSMTP\Providers\SMTP2GO\\',
+		'sparkpost'    => 'WPMailSMTP\Providers\SparkPost\\',
+		'zoho'         => 'WPMailSMTP\Providers\Zoho\\',
+		'smtp'         => 'WPMailSMTP\Providers\SMTP\\',
+		'pepipost'     => 'WPMailSMTP\Providers\Pepipost\\',
 	];
 
 	/**
@@ -197,7 +204,7 @@ class Loader {
 				$entity = new $class( ...$args );
 			}
 		} catch ( \Exception $e ) {
-			Debug::set( "There was a problem while retrieving {$request} for {$provider}: {$e->getMessage()}" );
+			DebugEvents::add( "There was a problem while retrieving {$request} for {$provider}: {$e->getMessage()}" );
 			$entity = null;
 		}
 

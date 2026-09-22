@@ -372,6 +372,28 @@ class Mailer extends MailerAbstract {
 	}
 
 	/**
+	 * Get the error code from the Postmark API response.
+	 *
+	 * @since 4.8.0
+	 *
+	 * @return string
+	 */
+	public function get_response_error_code() {
+
+		if ( ! empty( $this->response ) ) {
+			$body = wp_remote_retrieve_body( $this->response );
+
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName
+			if ( ! empty( $body->ErrorCode ) ) {
+				// phpcs:ignore WordPress.NamingConventions.ValidVariableName
+				return $body->ErrorCode;
+			}
+		}
+
+		return parent::get_response_error_code();
+	}
+
+	/**
 	 * Get a Postmark-specific response with a helpful error.
 	 *
 	 * @since 3.1.0
@@ -462,22 +484,5 @@ class Mailer extends MailerAbstract {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Sanitize email header values.
-	 *
-	 * @param string $name  Name of the header.
-	 * @param string $value Value of the header.
-	 *
-	 * @since 3.11.1
-	 */
-	public function sanitize_header_value( $name, $value ) {
-
-		if ( strtolower( $name ) === 'message-id' ) {
-			return $value;
-		}
-
-		return parent::sanitize_header_value( $name, $value );
 	}
 }

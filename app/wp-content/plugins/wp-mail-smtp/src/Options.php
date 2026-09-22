@@ -28,7 +28,7 @@ class Options {
 	 * @var array Map of all the default options of the plugin.
 	 */
 	private static $map = [
-		'mail'                  => [
+		'mail'                     => [
 			'from_name',
 			'from_email',
 			'mailer',
@@ -36,7 +36,7 @@ class Options {
 			'from_name_force',
 			'from_email_force',
 		],
-		'smtp'                  => [
+		'smtp'                     => [
 			'host',
 			'port',
 			'encryption',
@@ -45,64 +45,78 @@ class Options {
 			'user',
 			'pass',
 		],
-		'gmail'                 => [
+		'gmail'                    => [
 			'one_click_setup_enabled',
 			'client_id',
 			'client_secret',
 		],
-		'outlook'               => [
+		'outlook'                  => [
+			'one_click_setup_enabled',
 			'client_id',
 			'client_secret',
 		],
-		'zoho'                  => [
+		'zoho'                     => [
 			'domain',
 			'client_id',
 			'client_secret',
 		],
-		'amazonses'             => [
+		'amazonses'                => [
 			'client_id',
 			'client_secret',
 			'region',
 		],
-		'mailgun'               => [
+		'mailgun'                  => [
 			'api_key',
 			'domain',
 			'region',
 		],
-		'mailjet'               => [
+		'mailjet'                  => [
 			'api_key',
 			'secret_key',
 		],
-		'sendgrid'              => [
+		'mailersend'               => [
+			'api_key',
+			'has_pro_plan',
+		],
+		'mandrill'                 => [
+			'api_key',
+		],
+		'sendgrid'                 => [
 			'api_key',
 			'domain',
 		],
-		'sparkpost'             => [
+		'sparkpost'                => [
 			'api_key',
 			'region',
 		],
-		'postmark'              => [
+		'postmark'                 => [
 			'server_api_token',
 			'message_stream',
 		],
-		'smtpcom'               => [
+		'smtpcom'                  => [
 			'api_key',
 			'channel',
 		],
-		'sendinblue'            => [
+		'sendinblue'               => [
 			'api_key',
 			'domain',
 		],
-		'sendlayer'             => [
+		'sendlayer'                => [
 			'api_key',
 		],
-		'smtp2go'               => [
+		'elasticemail'             => [
 			'api_key',
 		],
-		'pepipostapi'           => [
+		'smtp2go'                  => [
 			'api_key',
 		],
-		'pepipost'              => [
+		'resend'                   => [
+			'api_key',
+		],
+		'pepipostapi'              => [
+			'api_key',
+		],
+		'pepipost'                 => [
 			'host',
 			'port',
 			'encryption',
@@ -110,30 +124,38 @@ class Options {
 			'user',
 			'pass',
 		],
-		'license'               => [
+		'license'                  => [
 			'key',
 		],
-		'alert_email'           => [
+		'alert_email'              => [
 			'enabled',
 			'connections',
 		],
-		'alert_slack_webhook'   => [
+		'alert_slack_webhook'      => [
 			'enabled',
 			'connections',
 		],
-		'alert_discord_webhook' => [
+		'alert_discord_webhook'    => [
 			'enabled',
 			'connections',
 		],
-		'alert_twilio_sms'      => [
+		'alert_twilio_sms'         => [
 			'enabled',
 			'connections',
 		],
-		'alert_custom_webhook'  => [
+		'alert_custom_webhook'     => [
 			'enabled',
 			'connections',
 		],
-		'alert_events'          => [
+		'alert_push_notifications' => [
+			'enabled',
+			'connections',
+		],
+		'alert_whatsapp'           => [
+			'enabled',
+			'connections',
+		],
+		'alert_events'             => [
 			'email_hard_bounced',
 		],
 	];
@@ -153,11 +175,15 @@ class Options {
 		'gmail',
 		'mailgun',
 		'mailjet',
+		'mailersend',
+		'mandrill',
 		'outlook',
 		'postmark',
+		'resend',
 		'sendgrid',
 		'sparkpost',
 		'zoho',
+		'elasticemail',
 		'smtp2go',
 		'smtp',
 		'pepipost',
@@ -251,7 +277,7 @@ class Options {
 				'from_email'       => get_option( 'admin_email' ),
 				'from_name'        => get_bloginfo( 'name' ),
 				'mailer'           => 'mail',
-				'return_path'      => false,
+				'return_path'      => true,
 				'from_email_force' => true,
 				'from_name_force'  => false,
 			],
@@ -500,31 +526,32 @@ class Options {
 
 		$return = null;
 
+		// phpcs:disable WPForms.Formatting.Switch.AddEmptyLineBefore, WPForms.Formatting.Switch.RemoveEmptyLineBefore
 		switch ( $group ) {
 			case 'mail':
 				switch ( $key ) {
 					case 'from_name':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_MAIL_FROM_NAME : $value;
 						break;
 					case 'from_email':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_MAIL_FROM : $value;
 						break;
 					case 'mailer':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_MAILER : $value;
 						break;
 					case 'return_path':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SET_RETURN_PATH : $value;
 						break;
 					case 'from_name_force':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_MAIL_FROM_NAME_FORCE : $value;
 						break;
 					case 'from_email_force':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_MAIL_FROM_FORCE : $value;
 						break;
 				}
@@ -534,31 +561,31 @@ class Options {
 			case 'smtp':
 				switch ( $key ) {
 					case 'host':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SMTP_HOST : $value;
 						break;
 					case 'port':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SMTP_PORT : $value;
 						break;
 					case 'encryption':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? ( WPMS_SSL === '' ? 'none' : WPMS_SSL ) : $value;
 						break;
 					case 'auth':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? (bool) WPMS_SMTP_AUTH : $value;
 						break;
 					case 'autotls':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? (bool) WPMS_SMTP_AUTOTLS : $value;
 						break;
 					case 'user':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SMTP_USER : $value;
 						break;
 					case 'pass':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SMTP_PASS : $value;
 						break;
 				}
@@ -578,11 +605,11 @@ class Options {
 			case 'gmail':
 				switch ( $key ) {
 					case 'client_id':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_GMAIL_CLIENT_ID : $value;
 						break;
 					case 'client_secret':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_GMAIL_CLIENT_SECRET : $value;
 						break;
 				}
@@ -592,11 +619,11 @@ class Options {
 			case 'outlook':
 				switch ( $key ) {
 					case 'client_id':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_OUTLOOK_CLIENT_ID : $value;
 						break;
 					case 'client_secret':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_OUTLOOK_CLIENT_SECRET : $value;
 						break;
 				}
@@ -624,15 +651,15 @@ class Options {
 			case 'amazonses':
 				switch ( $key ) {
 					case 'client_id':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_AMAZONSES_CLIENT_ID : $value;
 						break;
 					case 'client_secret':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_AMAZONSES_CLIENT_SECRET : $value;
 						break;
 					case 'region':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_AMAZONSES_REGION : $value;
 						break;
 				}
@@ -642,15 +669,15 @@ class Options {
 			case 'mailgun':
 				switch ( $key ) {
 					case 'api_key':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_MAILGUN_API_KEY : $value;
 						break;
 					case 'domain':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_MAILGUN_DOMAIN : $value;
 						break;
 					case 'region':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_MAILGUN_REGION : $value;
 						break;
 				}
@@ -660,11 +687,11 @@ class Options {
 			case 'mailjet':
 				switch ( $key ) {
 					case 'api_key':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_MAILJET_API_KEY : $value;
 						break;
 					case 'secret_key':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_MAILJET_SECRET_KEY : $value;
 						break;
 				}
@@ -674,11 +701,11 @@ class Options {
 			case 'sendgrid':
 				switch ( $key ) {
 					case 'api_key':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SENDGRID_API_KEY : $value;
 						break;
 					case 'domain':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SENDGRID_DOMAIN : $value;
 						break;
 				}
@@ -716,11 +743,11 @@ class Options {
 			case 'smtpcom':
 				switch ( $key ) {
 					case 'api_key':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SMTPCOM_API_KEY : $value;
 						break;
 					case 'channel':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SMTPCOM_CHANNEL : $value;
 						break;
 				}
@@ -730,12 +757,21 @@ class Options {
 			case 'sendinblue':
 				switch ( $key ) {
 					case 'api_key':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SENDINBLUE_API_KEY : $value;
 						break;
 					case 'domain':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SENDINBLUE_DOMAIN : $value;
+						break;
+				}
+
+				break;
+
+			case 'elasticemail':
+				switch ( $key ) {
+					case 'api_key':
+						$return = $this->is_const_defined( $group, $key ) ? WPMS_ELASTICEMAIL_API_KEY : $value;
 						break;
 				}
 
@@ -744,8 +780,18 @@ class Options {
 			case 'smtp2go':
 				switch ( $key ) {
 					case 'api_key':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SMTP2GO_API_KEY : $value;
+						break;
+				}
+
+				break;
+
+			case 'resend':
+				switch ( $key ) {
+					case 'api_key':
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
+						$return = $this->is_const_defined( $group, $key ) ? WPMS_RESEND_API_KEY : $value;
 						break;
 				}
 
@@ -754,10 +800,12 @@ class Options {
 			case 'pepipostapi':
 				switch ( $key ) {
 					case 'api_key':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_PEPIPOST_API_KEY : $value;
 						break;
 				}
+
+				break;
 
 			case 'alert_email':
 				switch ( $key ) {
@@ -827,7 +875,7 @@ class Options {
 			case 'license':
 				switch ( $key ) {
 					case 'key':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_LICENSE_KEY : $value;
 						break;
 				}
@@ -837,7 +885,7 @@ class Options {
 			case 'general':
 				switch ( $key ) {
 					case 'do_not_send':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_DO_NOT_SEND : $value;
 						break;
 
@@ -861,8 +909,49 @@ class Options {
 			case 'debug_events':
 				switch ( $key ) {
 					case 'retention_period':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? intval( WPMS_DEBUG_EVENTS_RETENTION_PERIOD ) : $value;
+						break;
+				}
+
+				break;
+
+			case 'mailersend':
+				switch ( $key ) {
+					case 'api_key':
+						$return = $this->is_const_defined( $group, $key ) ? WPMS_MAILERSEND_API_KEY : $value;
+						break;
+
+					case 'has_pro_plan':
+						$return = $this->is_const_defined( $group, $key ) ? $this->parse_boolean( WPMS_MAILERSEND_HAS_PRO_PLAN ) : $value;
+						break;
+				}
+				break;
+
+			case 'mandrill':
+				if ( $key === 'api_key' ) {
+					/** No inspection comment @noinspection PhpUndefinedConstantInspection */
+					$return = $this->is_const_defined( $group, $key ) ? WPMS_MANDRILL_API_KEY : $value;
+				}
+
+				break;
+
+			case 'alert_whatsapp':
+				switch ( $key ) {
+					case 'connections':
+						if ( $this->is_const_defined( $group, $key ) ) {
+							$return = [
+								[
+									'access_token'         => WPMS_ALERT_WHATSAPP_ACCESS_TOKEN,
+									'whatsapp_business_id' => WPMS_ALERT_WHATSAPP_BUSINESS_ID,
+									'phone_number_id'      => WPMS_ALERT_WHATSAPP_PHONE_NUMBER_ID,
+									'to_phone_number'      => WPMS_ALERT_WHATSAPP_TO_PHONE_NUMBER,
+									'template_language'    => WPMS_ALERT_WHATSAPP_TEMPLATE_LANGUAGE,
+								],
+							];
+						} else {
+							$return = $value;
+						}
 						break;
 				}
 
@@ -872,6 +961,8 @@ class Options {
 				// Always return the default value if nothing from above matches the request.
 				$return = $value;
 		}
+
+		// phpcs:enable WPForms.Formatting.Switch.AddEmptyLineBefore, WPForms.Formatting.Switch.RemoveEmptyLineBefore
 
 		return apply_filters( 'wp_mail_smtp_options_get_const_value', $return, $group, $key, $value );
 	}
@@ -918,6 +1009,7 @@ class Options {
 		$key    = sanitize_key( $key );
 		$return = false;
 
+		// phpcs:disable WPForms.Formatting.Switch.AddEmptyLineBefore, WPForms.Formatting.Switch.RemoveEmptyLineBefore
 		switch ( $group ) {
 			case 'mail':
 				switch ( $key ) {
@@ -1120,10 +1212,28 @@ class Options {
 
 				break;
 
+			case 'elasticemail':
+				switch ( $key ) {
+					case 'api_key':
+						$return = defined( 'WPMS_ELASTICEMAIL_API_KEY' ) && WPMS_ELASTICEMAIL_API_KEY;
+						break;
+				}
+
+				break;
+
 			case 'smtp2go':
 				switch ( $key ) {
 					case 'api_key':
 						$return = defined( 'WPMS_SMTP2GO_API_KEY' ) && WPMS_SMTP2GO_API_KEY;
+						break;
+				}
+
+				break;
+
+			case 'resend':
+				switch ( $key ) {
+					case 'api_key':
+						$return = defined( 'WPMS_RESEND_API_KEY' ) && WPMS_RESEND_API_KEY;
 						break;
 				}
 
@@ -1195,6 +1305,19 @@ class Options {
 
 				break;
 
+			case 'alert_whatsapp':
+				switch ( $key ) {
+					case 'connections':
+						$return = defined( 'WPMS_ALERT_WHATSAPP_ACCESS_TOKEN' ) && WPMS_ALERT_WHATSAPP_ACCESS_TOKEN &&
+						          defined( 'WPMS_ALERT_WHATSAPP_BUSINESS_ID' ) && WPMS_ALERT_WHATSAPP_BUSINESS_ID &&
+						          defined( 'WPMS_ALERT_WHATSAPP_PHONE_NUMBER_ID' ) && WPMS_ALERT_WHATSAPP_PHONE_NUMBER_ID &&
+						          defined( 'WPMS_ALERT_WHATSAPP_TO_PHONE_NUMBER' ) && WPMS_ALERT_WHATSAPP_TO_PHONE_NUMBER &&
+						          defined( 'WPMS_ALERT_WHATSAPP_TEMPLATE_LANGUAGE' ) && WPMS_ALERT_WHATSAPP_TEMPLATE_LANGUAGE;
+						break;
+				}
+
+				break;
+
 			case 'license':
 				switch ( $key ) {
 					case 'key':
@@ -1207,7 +1330,7 @@ class Options {
 			case 'general':
 				switch ( $key ) {
 					case 'do_not_send':
-						/** @noinspection PhpUndefinedConstantInspection */
+						/** No inspection comment @noinspection PhpUndefinedConstantInspection */
 						$return = defined( 'WPMS_DO_NOT_SEND' ) && WPMS_DO_NOT_SEND;
 						break;
 
@@ -1222,7 +1345,7 @@ class Options {
 
 				break;
 
-			case 'debug_events';
+			case 'debug_events':
 				switch ( $key ) {
 					case 'retention_period':
 						$return = defined( 'WPMS_DEBUG_EVENTS_RETENTION_PERIOD' );
@@ -1230,7 +1353,31 @@ class Options {
 				}
 
 				break;
+
+			case 'mailersend':
+				switch ( $key ) {
+					case 'api_key':
+						$return = defined( 'WPMS_MAILERSEND_API_KEY' ) && WPMS_MAILERSEND_API_KEY;
+						break;
+
+					case 'has_pro_plan':
+						$return = defined( 'WPMS_MAILERSEND_HAS_PRO_PLAN' );
+						break;
+				}
+				break;
+
+			case 'mandrill': // phpcs:ignore PSR2.ControlStructures.SwitchDeclaration.BodyOnNextLineCASE
+
+				switch ( $key ) {
+					case 'api_key':
+						$return = defined( 'WPMS_MANDRILL_API_KEY' ) && WPMS_MANDRILL_API_KEY;
+						break;
+				}
+
+				break;
 		}
+
+		// phpcs:enable WPForms.Formatting.Switch.AddEmptyLineBefore, WPForms.Formatting.Switch.RemoveEmptyLineBefore
 
 		return apply_filters( 'wp_mail_smtp_options_is_const_defined', $return, $group, $key );
 	}
@@ -1414,7 +1561,7 @@ class Options {
 						}
 						break;
 
-					case 'api_key': // mailgun/sendgrid/sendinblue/pepipostapi/smtpcom/sparkpost/sendlayer/smtp2go/mailjet.
+					case 'api_key': // mailgun/sendgrid/sendinblue/pepipostapi/smtpcom/sparkpost/sendlayer/smtp2go/mailjet/elasticemail/resend.
 					case 'secret_key': // mailjet.
 					case 'domain': // mailgun/zoho/sendgrid/sendinblue.
 					case 'client_id': // gmail/outlook/amazonses/zoho.
@@ -1424,6 +1571,19 @@ class Options {
 					case 'server_api_token': // postmark.
 					case 'message_stream': // postmark.
 						$options[ $mailer ][ $option_name ] = $this->is_const_defined( $mailer, $option_name ) ? '' : sanitize_text_field( $option_value );
+						break;
+
+					case 'has_pro_plan': // mailersend.
+						$options[ $mailer ][ $option_name ] = $this->is_const_defined( $mailer, $option_name ) ? false : (bool) $option_value;
+						break;
+
+					case 'quick_connect': // sendlayer.
+					case 'is_shared_domain': // sendlayer.
+						$options[ $mailer ][ $option_name ] = (bool) $option_value;
+						break;
+
+					case 'sender_domain': // sendlayer.
+						$options[ $mailer ][ $option_name ] = sanitize_text_field( $option_value );
 						break;
 
 					case 'access_token': // gmail/outlook/zoho, is an array.
@@ -1493,8 +1653,6 @@ class Options {
 	 * @since      1.0.0
 	 *
 	 * @return bool
-	 * @deprecated 2.4.0
-	 *
 	 */
 	public function is_pepipost_active() {
 
@@ -1534,6 +1692,7 @@ class Options {
 	 * @return bool
 	 */
 	public function is_mailer_smtp() {
+
 		return apply_filters( 'wp_mail_smtp_options_is_mailer_smtp', in_array( $this->get( 'mail', 'mailer' ), [ 'pepipost', 'smtp' ], true ) );
 	}
 
