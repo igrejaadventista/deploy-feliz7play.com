@@ -19,7 +19,6 @@ namespace DeliciousBrains\WP_Offload_Media\Gcp\Google\Cloud\Core\Upload;
 
 use DeliciousBrains\WP_Offload_Media\Gcp\Google\Cloud\Core\Exception\GoogleException;
 use DeliciousBrains\WP_Offload_Media\Gcp\Google\Cloud\Core\Exception\ServiceException;
-use DeliciousBrains\WP_Offload_Media\Gcp\Google\Cloud\Core\Exception\UploadException;
 use DeliciousBrains\WP_Offload_Media\Gcp\Google\Cloud\Core\JsonTrait;
 use DeliciousBrains\WP_Offload_Media\Gcp\Google\Cloud\Core\RequestWrapper;
 use DeliciousBrains\WP_Offload_Media\Gcp\GuzzleHttp\Promise\PromiseInterface;
@@ -47,8 +46,8 @@ class ResumableUploader extends AbstractUploader
     protected $resumeUri;
     /**
      * Classes extending ResumableUploader may provide request headers to be
-     * included in {@see Google\Cloud\Core\Upload\ResumableUploader::upload()}
-     * and {@see Google\Cloud\Core\Upload\ResumableUploader::createResumeUri{}}.
+     * included in {@see \Google\Cloud\Core\Upload\ResumableUploader::upload()}
+     * and {@see \Google\Cloud\Core\Upload\ResumableUploader::createResumeUri{}}.
      *
      * @var array
      */
@@ -123,7 +122,7 @@ class ResumableUploader extends AbstractUploader
      * Triggers the upload process.
      *
      * Errors are of form [`google.rpc.Status`](https://cloud.google.com/apis/design/errors#error_model),
-     * and may be obtained via {@see Google\Cloud\Core\Exception\ServiceException::getMetadata()}.
+     * and may be obtained via {@see \Google\Cloud\Core\Exception\ServiceException::getMetadata()}.
      *
      * @return array
      * @throws ServiceException
@@ -138,7 +137,14 @@ class ResumableUploader extends AbstractUploader
             $data = new LimitStream($this->data, $this->chunkSize ?: -1, $rangeStart);
             $currStreamLimitSize = $data->getSize();
             $rangeEnd = $rangeStart + ($currStreamLimitSize - 1);
-            $headers = $this->headers + ['Content-Length' => $currStreamLimitSize, 'Content-Type' => $this->contentType, 'Content-Range' => "bytes {$rangeStart}-{$rangeEnd}/{$size}"];
+            $headers = $this->headers + ['Content-Length' => (string) $currStreamLimitSize, 'Content-Type' => $this->contentType, 'Content-Range' => "bytes {$rangeStart}-{$rangeEnd}/{$size}"];
+            $customHeaders = $this->requestOptions['restOptions']['headers'] ?? [];
+            // Check if this chunk is the final one
+            $isFinalChunk = $size !== '*' && (int) ($rangeEnd + 1) === (int) $size;
+            if (!$isFinalChunk) {
+                unset($customHeaders['X-Goog-Hash']);
+            }
+            $headers = \array_merge($headers, $customHeaders);
             $request = new Request('PUT', $resumeUri, $headers, $data);
             try {
                 $response = $this->requestWrapper->send($request, $this->requestOptions);
@@ -185,7 +191,7 @@ class ResumableUploader extends AbstractUploader
      */
     protected function createResumeUri()
     {
-        $headers = $this->headers + ['X-Upload-Content-Type' => $this->contentType, 'X-Upload-Content-Length' => $this->data->getSize(), 'Content-Type' => 'application/json'];
+        $headers = $this->headers + ['X-Upload-Content-Type' => $this->contentType, 'X-Upload-Content-Length' => (string) $this->data->getSize(), 'Content-Type' => 'application/json'];
         $body = $this->jsonEncode($this->metadata);
         $request = new Request('POST', $this->uri, $headers, $body);
         $response = $this->requestWrapper->send($request, $this->requestOptions);
@@ -198,19 +204,20 @@ class ResumableUploader extends AbstractUploader
      */
     protected function getStatusResponse()
     {
-        $request = new Request('PUT', $this->resumeUri, ['Content-Range' => 'bytes */*']);
+        $request = new Request('PUT', $this->resumeUri, ['Content-Range' => 'bytes */' . $this->data->getSize()]);
         return $this->requestWrapper->send($request, $this->requestOptions);
     }
     /**
      * Gets the starting range for the upload.
      *
      * @param string $rangeHeader
-     * @return int|null
+     * @return int
      */
     protected function getRangeStart($rangeHeader)
     {
         if (!$rangeHeader) {
-            return null;
+            // assume no bytes are uploaded if no range header is present
+            return 0;
         }
         return (int) \explode('-', $rangeHeader)[1] + 1;
     }

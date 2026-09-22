@@ -17,44 +17,42 @@
  */
 namespace DeliciousBrains\WP_Offload_Media\Gcp\Google\Auth\HttpHandler;
 
+use DeliciousBrains\WP_Offload_Media\Gcp\Google\Auth\ApplicationDefaultCredentials;
 use DeliciousBrains\WP_Offload_Media\Gcp\GuzzleHttp\BodySummarizer;
 use DeliciousBrains\WP_Offload_Media\Gcp\GuzzleHttp\Client;
 use DeliciousBrains\WP_Offload_Media\Gcp\GuzzleHttp\ClientInterface;
 use DeliciousBrains\WP_Offload_Media\Gcp\GuzzleHttp\HandlerStack;
 use DeliciousBrains\WP_Offload_Media\Gcp\GuzzleHttp\Middleware;
+use DeliciousBrains\WP_Offload_Media\Gcp\Psr\Log\LoggerInterface;
 class HttpHandlerFactory
 {
     /**
      * Builds out a default http handler for the installed version of guzzle.
      *
-     * @param ClientInterface $client
+     * @param ClientInterface|null $client
+     * @param null|false|LoggerInterface $logger
      * @return Guzzle6HttpHandler|Guzzle7HttpHandler
      * @throws \Exception
      */
-    public static function build(ClientInterface $client = null)
+    public static function build(?ClientInterface $client = null, null|false|LoggerInterface $logger = null)
     {
         if (\is_null($client)) {
-            $stack = null;
+            $config = [];
             if (\class_exists(BodySummarizer::class)) {
                 // double the # of characters before truncation by default
                 $bodySummarizer = new BodySummarizer(240);
                 $stack = HandlerStack::create();
                 $stack->remove('http_errors');
                 $stack->unshift(Middleware::httpErrors($bodySummarizer), 'http_errors');
+                $config['handler'] = $stack;
             }
-            $client = new Client(['handler' => $stack]);
+            $client = new Client($config);
         }
-        $version = null;
-        if (\defined('DeliciousBrains\\WP_Offload_Media\\Gcp\\GuzzleHttp\\ClientInterface::MAJOR_VERSION')) {
-            $version = ClientInterface::MAJOR_VERSION;
-        } elseif (\defined('DeliciousBrains\\WP_Offload_Media\\Gcp\\GuzzleHttp\\ClientInterface::VERSION')) {
-            $version = (int) \substr(ClientInterface::VERSION, 0, 1);
-        }
-        switch ($version) {
-            case 6:
-                return new Guzzle6HttpHandler($client);
+        $logger = $logger === \false ? null : $logger ?? ApplicationDefaultCredentials::getDefaultLogger();
+        switch (ClientInterface::MAJOR_VERSION) {
             case 7:
-                return new Guzzle7HttpHandler($client);
+            case 8:
+                return new Guzzle7HttpHandler($client, $logger);
             default:
                 throw new \Exception('Version not supported');
         }

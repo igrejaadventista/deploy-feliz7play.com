@@ -56,7 +56,7 @@ class ExponentialBackoff
      *        Ex: One might want to change headers on every retry, this function can
      *        be used to achieve such a functionality.
      */
-    public function __construct($retries = null, callable $retryFunction = null, callable $retryListener = null)
+    public function __construct($retries = null, ?callable $retryFunction = null, ?callable $retryListener = null)
     {
         $this->retries = $retries !== null ? (int) $retries : 3;
         $this->retryFunction = $retryFunction;
@@ -117,7 +117,7 @@ class ExponentialBackoff
     }
     /**
      * If not set, defaults to using
-     * {@see Google\Cloud\Core\ExponentialBackoff::calculateDelay()}.
+     * {@see \Google\Cloud\Core\ExponentialBackoff::calculateDelay()}.
      *
      * @param callable $calcDelayFunction
      * @return void

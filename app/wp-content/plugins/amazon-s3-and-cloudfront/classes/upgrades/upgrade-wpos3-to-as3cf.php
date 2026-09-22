@@ -15,25 +15,28 @@ class Upgrade_WPOS3_To_AS3CF extends Upgrade {
 	/**
 	 * @var int
 	 */
-	protected $upgrade_id = 7;
+	protected int $upgrade_id = 7;
 
 	/**
 	 * @var string
 	 */
-	protected $upgrade_name = 'wpos3_to_as3cf';
+	protected string $upgrade_name = 'wpos3_to_as3cf';
 
 	/**
 	 * @var string 'metadata', 'attachment'
 	 */
-	protected $upgrade_type = 'metadata';
+	protected string $upgrade_type = 'metadata';
 
 	/**
 	 * Get running update text.
 	 *
 	 * @return string
 	 */
-	protected function get_running_update_text() {
-		return __( 'and updating the metadata to use key names compatible with the current version.', 'amazon-s3-and-cloudfront' );
+	protected function get_running_update_text(): string {
+		return __(
+			'and updating the metadata to use key names compatible with the current version.',
+			'amazon-s3-and-cloudfront'
+		);
 	}
 
 	/**
@@ -43,14 +46,19 @@ class Upgrade_WPOS3_To_AS3CF extends Upgrade {
 	 *
 	 * @return bool
 	 */
-	protected function upgrade_item( $item ) {
+	protected function upgrade_item( mixed $item ): bool {
 		global $wpdb;
 
 		$old = $item->the_value;
 		$new = substr_replace( $old, 'as3cf_', 0, strlen( 'wpos3_' ) );
 
 		try {
-			$result = $wpdb->update( $wpdb->{$item->the_table}, array( $item->the_field => $new ), array( $item->the_field => $old ) );
+			// phpcs:ignore WordPress.DB -- safe query, must not be cached
+			$result = $wpdb->update(
+				$wpdb->{$item->the_table},
+				array( $item->the_field => $new ),
+				array( $item->the_field => $old )
+			);
 		} catch ( Exception $e ) {
 			AS3CF_Error::log( 'Error updating ' . $item->the_table . ' records with key ' . $old . ' to use key ' . $new . ': ' . $e->getMessage() );
 			$this->error_count++;
@@ -77,7 +85,7 @@ class Upgrade_WPOS3_To_AS3CF extends Upgrade {
 	 *
 	 * @return array
 	 */
-	protected function get_items_to_process( $prefix, $limit, $offset = false ) {
+	protected function get_items_to_process( string $prefix, int $limit, $offset = false ): array {
 		global $wpdb;
 
 		$sql = "SELECT DISTINCT 'postmeta' AS the_table, 'meta_key' AS the_field, pm.`meta_key` AS the_value
@@ -99,9 +107,10 @@ class Upgrade_WPOS3_To_AS3CF extends Upgrade {
 		}
 
 		if ( $limit && $limit > 0 ) {
-			$sql .= sprintf( ' LIMIT %d', (int) $limit );
+			$sql .= sprintf( ' LIMIT %d', $limit );
 		}
 
+		// phpcs:ignore WordPress.DB, PluginCheck.Security.DirectDB.UnescapedDBParameter -- safe query, must not be cached
 		return $wpdb->get_results( $sql, OBJECT );
 	}
 }

@@ -25,7 +25,7 @@ Jump To:
 1. **Sign up for AWS** – Before you begin, you need to
    sign up for an AWS account and retrieve your [AWS credentials][docs-signup].
 2. **Minimum requirements** – To run the SDK, your system will need to meet the
-   [minimum requirements][docs-requirements], including having **PHP >= 7.2.5**.
+   [minimum requirements][docs-requirements], including having **PHP >= 8.1**.
    We highly recommend having it compiled with the cURL extension and cURL
    7.16.2+ compiled with a TLS backend (e.g., NSS or OpenSSL).
 3. **Install the SDK** – Using [Composer] is the recommended way to install the
@@ -42,7 +42,7 @@ Jump To:
    is to read the [User Guide][docs-guide]. The
    [Getting Started Guide][docs-quickstart] will help you become familiar with
    the basic concepts.
-5. **Beta: Removing unused services** — To date, there are over 300 AWS services available for use with this SDK.
+5. **Removing unused services** — To date, there are over 400 AWS services available for use with this SDK.
    You will likely not need them all. If you use Composer and would like to learn more about this feature,
     please read the [linked documentation][docs-script-composer].
 

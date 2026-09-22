@@ -1,11 +1,11 @@
 === WP Offload Media Lite for Amazon S3, DigitalOcean Spaces, and Google Cloud Storage ===
 Contributors: wpengine, deliciousbrains, ianmjones, eriktorsner, kevinwhoffman, tysonreeder, dalewilliams, lewisia32, mattshaw, aaemnnosttv, a5hleyrich, polevaultweb, bradt, joetan
 Tags: uploads, amazon, s3, amazon s3, digitalocean, digitalocean spaces, google cloud storage, gcs, mirror, admin, media, cdn, cloudfront
-Requires at least: 5.5
-Tested up to: 6.6
-Requires PHP: 7.2
-Stable tag: 3.2.8
-License: GPLv3
+Requires at least: 5.9
+Tested up to: 7.1
+Requires PHP: 8.1
+Stable tag: 3.4.3
+License: GPLv2
 
 Copies files to Amazon S3, DigitalOcean Spaces or Google Cloud Storage as they are uploaded to the Media Library. Optionally configure Amazon CloudFront or another CDN for faster delivery.
 
@@ -67,6 +67,9 @@ If you upgrade to the pro version of [WP Offload Media](https://deliciousbrains.
 
 == Upgrade Notice ==
 
+= 3.4.0 =
+This is a major upgrade that updates the format of information stored about offloaded Media Library items. Once upgraded you will not be able to downgrade without restoring data from a backup.
+
 = 2.6 =
 This is a major upgrade that updates the format of information stored about offloaded Media Library items. Once upgraded you will not be able to downgrade without restoring data from a backup.
 This version requires PHP 5.6+
@@ -84,6 +87,89 @@ This is a major change, which ensures S3 URLs are no longer saved in post conten
 This version requires PHP 5.3.3+ and the Amazon Web Services plugin
 
 == Changelog ==
+
+= WP Offload Media Lite 3.4.3 - 2026-09-21 =
+* Bug fix: A non-numeric attachment ID passed to wp_get_attachment_image_src() by a theme or plugin no longer results in a fatal error
+* Bug fix: Attachment metadata carrying an image size entry without a filename no longer results in a fatal error
+* Bug fix: Uploading a file no longer loads the whole offloaded file list for the candidate uploads directory into memory
+* Bug fix: A text file uploaded with the same name as an existing one now properly gets a unique name when using the Remove Local Media option
+* Bug fix: Media Library items that have duplicate original_image metadata entries but not file paths are no longer offloaded as duplicates
+* Bug fix: Offload metadata objects added to an external cache no longer persist indefinitely
+* Bug fix: A database using the ANSI_QUOTES SQL mode no longer causes unknown column errors or missed provider to local URL rewrites
+
+= WP Offload Media Lite 3.4.2 - 2026-09-07 =
+* Bug fix: A null attachment ID passed to get_attached_file() by another plugin no longer results in a fatal error
+* Bug fix: Upgrading while using PHP 8.5 on a multisite no longer raises a fatal error in the cron job in some cases
+
+= WP Offload Media Lite 3.4.1 - 2026-09-04 =
+* Bug fix: Rejecting non-string content in AS3CF_Filter::process_content() no longer results in a fatal error
+
+= WP Offload Media Lite 3.4.0 - 2026-09-03 =
+* [Release Summary Blog Post](https://deliciousbrains.com/wp-offload-media-3-4-released/?utm_campaign=changelogs&utm_source=wordpress.org&utm_medium=free%2Bplugin%2Blisting)
+* New: For improved performance, a new custom table stores information about each offloaded file
+* New: WordPress 7.1 compatible
+* New: AWS PHP SDK has been updated to v3.392.1
+* New: Google Cloud Storage SDK has been updated to v2.5.1
+* New: PHP and JS dependencies have been updated
+* Improvement: amazonS3_cache postmeta records replaced with as3cf_url_cache_local and as3cf_url_cache_remote records
+* Improvement: Unlike amazonS3_cache records, as3cf_url_cache_* records self-heal when content has URLs added or removed
+* Improvement: A full postmeta table scan of amazonS3_cache records is no longer performed when a Media Library item is deleted
+* Bug fix: WP 7.1's client side generated thumbnails are now properly removed from local after offload if using Remove Local Media option
+* Bug fix: WP 7.1's new source_image, animated_video, and animated_video_poster fields for Media Library metadata properly handled
+* Bug fix: WP 7.1's changes to customizer cropped image metadata now handled to properly offload item and remove downloaded original as appropriate
+* Bug fix: The URL for a background image applied to a template part’s group block is now properly rewritten on the frontend
+* Bug fix: Missing custom tables are now created even if settings say they should already exist, e.g. if site partially migrated
+* Bug fix: Implicitly marking parameter $limit as nullable is deprecated message no longer emitted to debug log during upgrades with PHP 8.5
+* Bug fix: URLs containing some specific CJK characters are now properly rewritten when the PHP build strips certain control characters
+* Bug fix: WP_Filesystem init failure is properly reported while removing local media
+
+= WP Offload Media Lite 3.3.1 - 2026-04-15 =
+* New: Google Cloud Storage SDK has been updated to v1.49.2
+* New: PHP and JS dependencies have been updated
+* New: WordPress 7.0 compatible
+* Improvement: The current bucket's location is no longer checked when the region is defined as a constant
+* Removed: The StackPath (no longer in business) delivery provider has been marked as deprecated and can no longer be selected in the UI
+* Bug fix: Editing a footer template with an existing offloaded and removed from local image block now properly shows the image
+* Bug fix: Returning to the site editor with an offloaded and removed from local background image applied to a group block now properly shows the image
+* Bug fix: The Customizer now correctly shows just added and cropped remote only header images
+* Bug fix: The original remote only image downloaded during a Customizer header image crop is now properly re-removed from the server
+* Bug fix: Checking settings after manually changing a bucket's ACL enablement status no longer results in delivery status validation problems
+* Bug fix: Offload and remove from local triggered from outside the admin context no longer sometimes results in a fatal error
+
+= WP Offload Media Lite 3.3.0 - 2026-02-03 =
+* [Release Summary Blog Post](https://deliciousbrains.com/wp-offload-media-3-3-released-modern-standards-global-regions-and-enhanced-stability/?utm_campaign=changelogs&utm_source=wordpress.org&utm_medium=free%2Bplugin%2Blisting)
+* New: Amazon S3 regions Asia Pacific (Taipei) and Asia Pacific (New Zealand) are now selectable
+* New: Google Cloud Storage regions North America (Querétaro) and Europe (Stockholm) are now selectable
+* New: DigitalOcean Spaces region Atlanta (ATL1) is now selectable
+* New: WordPress 6.9 compatible
+* New: Requires WordPress 5.9+
+* New: PHP 8.4 compatible
+* New: PHP 8.5 compatible
+* New: Requires PHP 8.1+
+* New: AWS PHP SDK has been updated to v3.360.1
+* New: PHP and JS dependencies have been updated
+* Improvement: The filesize attachment metadata value is no longer removed when the item is downloaded
+* Bug fix: The legacy file size upgrade routine no longer throws an error if attachment metadata is missing
+* Bug fix: Deleting an item via the Media Library's grid mode now works when Rank Math SEO is installed
+* Bug fix: The plugin now protects against an invalid value being passed to the core `the_post` action
+
+= WP Offload Media Lite 3.2.12 - Unreleased =
+* Pro only release
+
+= WP Offload Media Lite 3.2.11 - 2025-01-22 =
+* New: Amazon S3 regions Asia Pacific (Thailand) and Mexico (Central) are now selectable
+
+= WP Offload Media Lite 3.2.10 - 2024-12-12 =
+* New: DigitalOcean regions Toronto (TOR1) and London (LON1) are now selectable
+* New: Google Cloud Storage regions Africa (Johannesburg), Dual-Region (Belgium/London), Dual-Region (London/Frankfurt) and Dual-Region (Frankfurt/Zürich) are now selectable
+* New: Google Cloud Storage SDK has been updated to v1.39.0 (requires PHP 7.4+)
+* Bug fix: Speed of adding new media is no longer affected by the number of records in the postmeta table
+
+= WP Offload Media Lite 3.2.9 - 2024-10-04 =
+* Security: The plugin can now serve updates from WP Engine servers, however this update mechanism is not included when installed directly from WordPress.org
+* New: Amazon S3 region Asia Pacific (Malaysia) is now selectable
+* New: AWS PHP SDK has been updated to v3.319.4
+* New: PHP and JS dependencies have been updated
 
 = WP Offload Media Lite 3.2.8 - 2024-07-11 =
 * Delivery status indicator is now more accurate when Amazon S3 Object Ownership is configured in combination with a delivery provider other than Amazon CloudFront

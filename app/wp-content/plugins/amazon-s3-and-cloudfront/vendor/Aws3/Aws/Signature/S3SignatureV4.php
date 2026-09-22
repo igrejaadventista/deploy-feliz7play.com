@@ -44,11 +44,11 @@ class S3SignatureV4 extends SignatureV4
      * Instantiates a separate sigv4a signing config.  All services except S3
      * use double encoding.  All services except S3 require path normalization.
      */
-    protected function signWithV4a(CredentialsInterface $credentials, RequestInterface $request, $signingService, SigningConfigAWS $signingConfig = null)
+    protected function signWithV4a(CredentialsInterface $credentials, RequestInterface $request, $signingService, ?SigningConfigAWS $signingConfig = null)
     {
         $this->verifyCRTLoaded();
         $credentials_provider = $this->createCRTStaticCredentialsProvider($credentials);
-        $signingConfig = new SigningConfigAWS(['algorithm' => SigningAlgorithm::SIGv4_ASYMMETRIC, 'signature_type' => SignatureType::HTTP_REQUEST_HEADERS, 'credentials_provider' => $credentials_provider, 'signed_body_value' => $this->getPayload($request), 'region' => "*", 'should_normalize_uri_path' => \false, 'use_double_uri_encode' => \false, 'service' => $signingService, 'date' => \time()]);
+        $signingConfig = new SigningConfigAWS(['algorithm' => SigningAlgorithm::SIGv4_ASYMMETRIC, 'signature_type' => SignatureType::HTTP_REQUEST_HEADERS, 'credentials_provider' => $credentials_provider, 'signed_body_value' => $this->getPayload($request), 'region' => $this->region, 'should_normalize_uri_path' => \false, 'use_double_uri_encode' => \false, 'service' => $signingService, 'date' => \time()]);
         return parent::signWithV4a($credentials, $request, $signingService, $signingConfig);
     }
     /**

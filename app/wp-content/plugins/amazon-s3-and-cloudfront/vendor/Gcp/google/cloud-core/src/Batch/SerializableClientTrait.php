@@ -45,7 +45,7 @@ trait SerializableClientTrait
      *           responsible for serializing closures used in the
      *           `$clientConfig`. This is especially important when using the
      *           batch daemon. **Defaults to**
-     *           {@see Google\Cloud\Core\Batch\OpisClosureSerializer} if the
+     *           {@see \Google\Cloud\Core\Batch\OpisClosureSerializer} if the
      *           `opis/closure` library is installed.
      *     @type array $clientConfig A config used to construct the client upon
      *           which requests will be made.
@@ -83,6 +83,9 @@ trait SerializableClientTrait
      */
     private function getDefaultClosureSerializer()
     {
+        if (\function_exists('DeliciousBrains\\WP_Offload_Media\\Gcp\\Opis\\Closure\\serialize')) {
+            return new OpisClosureSerializerV4();
+        }
         if (\class_exists(SerializableClosure::class)) {
             return new OpisClosureSerializer();
         }

@@ -16,14 +16,18 @@ class RestXmlParser extends AbstractRestParser
      * @param Service   $api    Service description
      * @param XmlParser $parser XML body parser
      */
-    public function __construct(Service $api, XmlParser $parser = null)
+    public function __construct(Service $api, ?XmlParser $parser = null)
     {
         parent::__construct($api);
         $this->parser = $parser ?: new XmlParser();
     }
     protected function payload(ResponseInterface $response, StructureShape $member, array &$result)
     {
-        $result += $this->parseMemberFromStream($response->getBody(), $member, $response);
+        $body = $response->getBody();
+        if ($body->isSeekable()) {
+            $body->rewind();
+        }
+        $result += $this->parseMemberFromStream($body, $member, $response);
     }
     public function parseMemberFromStream(StreamInterface $stream, StructureShape $member, $response)
     {

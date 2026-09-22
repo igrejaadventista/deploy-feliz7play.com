@@ -17,16 +17,10 @@ scenarios including serving website content, storing data for archival and disas
 
 To begin, install the preferred dependency manager for PHP, [Composer](https://getcomposer.org/).
 
-Now to install just this component:
+Now install this component:
 
 ```sh
 $ composer require google/cloud-storage
-```
-
-Or to install the entire suite of components at once:
-
-```sh
-$ composer require google/cloud
 ```
 
 ### Authentication
@@ -76,6 +70,11 @@ $storage->registerStreamWrapper();
 
 $contents = file_get_contents('gs://my_bucket/file_backup.txt');
 ```
+
+### Debugging
+
+Please see our [Debugging guide](https://github.com/googleapis/google-cloud-php/blob/main/DEBUG.md)
+for more information about the debugging tools.
 
 ### Version
 

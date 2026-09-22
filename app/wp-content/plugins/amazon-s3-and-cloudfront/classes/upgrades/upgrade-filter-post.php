@@ -20,37 +20,38 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	/**
 	 * @var int Time limit in seconds.
 	 */
-	protected $time_limit = 10;
+	protected int $time_limit = 10;
 
 	/**
 	 * @var int Batch size limit for this request session.
 	 */
-	protected $size_limit = 50;
+	protected int $size_limit = 50;
 
 	/**
 	 * @var string 'metadata', 'attachment'
 	 */
-	protected $upgrade_type = 'posts';
+	protected string $upgrade_type = 'posts';
 
 	/**
 	 * @var string
 	 */
-	protected $column_name;
+	protected string $column_name;
 
 	/**
 	 * @var int The last post ID used for the bottom range of the item upgrade.
 	 */
-	protected $last_post_id;
+	protected int $last_post_id;
 
 	/**
-	 * Get highest post ID.
+	 * Get the highest post ID.
 	 *
 	 * @return int
 	 */
-	protected function get_highest_post_id() {
+	protected function get_highest_post_id(): int {
 		global $wpdb;
 
-		return (int) $wpdb->get_var( "SELECT MAX(ID) FROM {$wpdb->posts}" );
+		// phpcs:ignore WordPress.DB -- safe query, must not be cached
+		return (int) $wpdb->get_var( "SELECT MAX(ID) FROM $wpdb->posts" );
 	}
 
 	/**
@@ -62,7 +63,7 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 *
 	 * @return array
 	 */
-	protected function get_items_to_process( $prefix, $limit, $offset = false ) {
+	protected function get_items_to_process( string $prefix, int $limit, $offset = false ): array {
 		global $wpdb;
 
 		$sql = "SELECT posts.ID FROM `{$prefix}posts` AS posts
@@ -72,15 +73,16 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 		        AND postmeta.meta_key = 'amazonS3_info'";
 
 		if ( ! empty( $offset ) ) {
-			$sql .= " AND posts.ID < '{$offset}'";
+			$sql .= " AND posts.ID < '$offset'";
 		}
 
 		$sql .= " ORDER BY posts.ID DESC";
 
 		if ( $limit && $limit > 0 ) {
-			$sql .= sprintf( ' LIMIT %d', (int) $limit );
+			$sql .= sprintf( ' LIMIT %d', $limit );
 		}
 
+		// phpcs:ignore WordPress.DB, PluginCheck.Security.DirectDB.UnescapedDBParameter -- safe query, must not be cached
 		return $wpdb->get_results( $sql );
 	}
 
@@ -89,7 +91,7 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 *
 	 * @param int $blog_id
 	 */
-	protected function switch_to_blog( $blog_id ) {
+	protected function switch_to_blog( int $blog_id ): void {
 		parent::switch_to_blog( $blog_id );
 		$this->last_post_id = $this->load_last_post_id();
 	}
@@ -97,15 +99,15 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	/**
 	 * Mark the current blog upgrade as complete.
 	 */
-	protected function blog_upgrade_completed() {
+	protected function blog_upgrade_completed(): void {
 		parent::blog_upgrade_completed();
-		$this->last_post_id = null;
+		$this->last_post_id = 0;
 	}
 
 	/**
 	 * Prepare the session to be persisted.
 	 */
-	protected function close_session() {
+	protected function close_session(): void {
 		parent::close_session();
 		$this->session['last_post_id'] = $this->last_post_id;
 	}
@@ -119,7 +121,7 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 * @throws Batch_Limits_Exceeded_Exception
 	 * @throws Too_Many_Errors_Exception
 	 */
-	protected function upgrade_item( $item ) {
+	protected function upgrade_item( mixed $item ): bool {
 		$limit            = apply_filters( 'as3cf_update_' . $this->upgrade_name . '_sql_limit', 100000 );
 		$where_highest_id = $this->last_post_id;
 		$where_lowest_id  = max( $where_highest_id - $limit, 0 );
@@ -145,7 +147,7 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 *
 	 * @param mixed $item
 	 */
-	protected function item_upgrade_completed( $item ) {
+	protected function item_upgrade_completed( mixed $item ): void {
 		parent::item_upgrade_completed( $item );
 		$this->last_item = $item->ID;
 	}
@@ -157,7 +159,11 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 * @param int $where_lowest_id
 	 * @param int $where_highest_id
 	 */
-	protected function find_and_replace_attachment_urls( $attachment_id, $where_lowest_id, $where_highest_id ) {
+	protected function find_and_replace_attachment_urls(
+		int $attachment_id,
+		int $where_lowest_id,
+		int $where_highest_id
+	): void {
 		$meta       = wp_get_attachment_metadata( $attachment_id, true );
 		$backups    = get_post_meta( $attachment_id, '_wp_attachment_backup_sizes', true );
 		$file_path  = get_attached_file( $attachment_id, true );
@@ -190,28 +196,57 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 *
 	 * @return array
 	 */
-	protected function get_find_and_replace_urls( $file_path, $old_url, $new_url, $meta, $backups = '' ) {
+	protected function get_find_and_replace_urls(
+		string $file_path,
+		string $old_url,
+		string $new_url,
+		array $meta,
+		array|string $backups = ''
+	): array {
 		$url_pairs     = array();
 		$file_name     = wp_basename( $file_path );
 		$old_file_name = wp_basename( $old_url );
 		$new_file_name = wp_basename( $new_url );
 
 		// Full size image
-		$url_pairs[] = $this->add_url_pair( $file_path, $file_name, $old_url, $old_file_name, $new_url, $new_file_name );
+		$url_pairs[] = $this->add_url_pair(
+			$file_path,
+			$file_name,
+			$old_url,
+			$old_file_name,
+			$new_url,
+			$new_file_name
+		);
 
 		if ( isset( $meta['thumb'] ) && $meta['thumb'] ) {
 			// Replace URLs for legacy thumbnail of image
-			$url_pairs[] = $this->add_url_pair( $file_path, $file_name, $old_url, $old_file_name, $new_url, $new_file_name, $meta['thumb'] );
+			$url_pairs[] = $this->add_url_pair(
+				$file_path,
+				$file_name,
+				$old_url,
+				$old_file_name,
+				$new_url,
+				$new_file_name,
+				$meta['thumb']
+			);
 		}
 
 		if ( ! empty( $meta['sizes'] ) ) {
 			// Replace URLs for intermediate sizes of image
-			foreach ( $meta['sizes'] as $key => $size ) {
+			foreach ( $meta['sizes'] as $size ) {
 				if ( ! isset( $size['file'] ) ) {
 					continue;
 				}
 
-				$url_pairs[] = $this->add_url_pair( $file_path, $file_name, $old_url, $old_file_name, $new_url, $new_file_name, $size['file'] );
+				$url_pairs[] = $this->add_url_pair(
+					$file_path,
+					$file_name,
+					$old_url,
+					$old_file_name,
+					$new_url,
+					$new_file_name,
+					$size['file']
+				);
 			}
 		}
 
@@ -222,7 +257,15 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 					continue;
 				}
 
-				$url_pairs[] = $this->add_url_pair( $file_path, $file_name, $old_url, $old_file_name, $new_url, $new_file_name, $backup['file'] );
+				$url_pairs[] = $this->add_url_pair(
+					$file_path,
+					$file_name,
+					$old_url,
+					$old_file_name,
+					$new_url,
+					$new_file_name,
+					$backup['file']
+				);
 			}
 		}
 
@@ -235,7 +278,14 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 			$url_pairs[ $key ]['new_url'] = AS3CF_Utils::remove_scheme( $url_pair['new_url'] );
 		}
 
-		return apply_filters( 'as3cf_update_' . $this->upgrade_name . '_url_pairs', $url_pairs, $file_path, $old_url, $new_url, $meta );
+		return apply_filters(
+			'as3cf_update_' . $this->upgrade_name . '_url_pairs',
+			$url_pairs,
+			$file_path,
+			$old_url,
+			$new_url,
+			$meta
+		);
 	}
 
 	/**
@@ -247,11 +297,19 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 * @param string      $old_file_name
 	 * @param string      $new_url
 	 * @param string      $new_file_name
-	 * @param string|bool $size_file_name
+	 * @param bool|string $size_file_name
 	 *
 	 * @return array
 	 */
-	protected function add_url_pair( $file_path, $file_name, $old_url, $old_file_name, $new_url, $new_file_name, $size_file_name = false ) {
+	protected function add_url_pair(
+		string $file_path,
+		string $file_name,
+		string $old_url,
+		string $old_file_name,
+		string $new_url,
+		string $new_file_name,
+		bool|string $size_file_name = false
+	): array {
 		if ( ! $size_file_name ) {
 			return array(
 				'old_path' => $file_path,
@@ -274,7 +332,7 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 *
 	 * @return array
 	 */
-	protected function maybe_add_encoded_url_pairs( $url_pairs ) {
+	protected function maybe_add_encoded_url_pairs( array $url_pairs ): array {
 		foreach ( $url_pairs as $url_pair ) {
 			$file_name         = wp_basename( $url_pair['old_url'] );
 			$encoded_file_name = AS3CF_Utils::encode_filename_in_path( $file_name );
@@ -295,9 +353,10 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 * @param int   $where_lowest_id
 	 * @param int   $where_highest_id
 	 */
-	protected function process_pair_replacement( $url_pairs, $where_lowest_id, $where_highest_id ) {
+	protected function process_pair_replacement( array $url_pairs, int $where_lowest_id, int $where_highest_id ): void {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB, PluginCheck.Security.DirectDB.UnescapedDBParameter -- safe query, must not be cached
 		$posts = $wpdb->get_results( $this->generate_select_sql( $url_pairs, $where_lowest_id, $where_highest_id ) );
 
 		if ( empty( $posts ) ) {
@@ -311,6 +370,7 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 
 		foreach ( $url_pairs as $url_pairs_chunk ) {
 			foreach ( $ids as $ids_chunk ) {
+				// phpcs:ignore WordPress.DB, PluginCheck.Security.DirectDB.UnescapedDBParameter -- safe query, must not be cached
 				$wpdb->query( $this->generate_update_sql( $url_pairs_chunk, $ids_chunk ) );
 			}
 		}
@@ -325,7 +385,7 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 *
 	 * @return string
 	 */
-	protected function generate_select_sql( $url_pairs, $where_lowest_id, $where_highest_id ) {
+	protected function generate_select_sql( array $url_pairs, int $where_lowest_id, int $where_highest_id ): string {
 		global $wpdb;
 
 		$paths = array();
@@ -343,10 +403,10 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 				$sql .= " OR ";
 			}
 
-			$sql .= "{$this->column_name} LIKE '%{$path}%'";
+			$sql .= "$this->column_name LIKE '%$path%'";
 		}
 
-		return "SELECT ID FROM {$wpdb->posts} WHERE ID > {$where_lowest_id} AND ID <= {$where_highest_id} AND ({$sql})";
+		return "SELECT ID FROM $wpdb->posts WHERE ID > $where_lowest_id AND ID <= $where_highest_id AND ($sql)";
 	}
 
 	/**
@@ -357,7 +417,7 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 *
 	 * @return string
 	 */
-	protected function generate_update_sql( $url_pairs, $ids ) {
+	protected function generate_update_sql( array $url_pairs, array $ids ): string {
 		global $wpdb;
 
 		$ids = implode( ',', $ids );
@@ -371,14 +431,14 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 
 			if ( empty( $sql ) ) {
 				// First replace statement
-				$sql = "REPLACE({$this->column_name}, '{$pair['old_url']}', '{$pair['new_url']}')";
+				$sql = "REPLACE($this->column_name, '{$pair['old_url']}', '{$pair['new_url']}')";
 			} else {
 				// Nested replace statement
-				$sql = "REPLACE({$sql}, '{$pair['old_url']}', '{$pair['new_url']}')";
+				$sql = "REPLACE($sql, '{$pair['old_url']}', '{$pair['new_url']}')";
 			}
 		}
 
-		return "UPDATE {$wpdb->posts} SET `{$this->column_name}` = {$sql} WHERE `ID` IN({$ids})";
+		return "UPDATE $wpdb->posts SET `$this->column_name` = $sql WHERE `ID` IN($ids)";
 	}
 
 	/**
@@ -386,8 +446,15 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 *
 	 * @return string
 	 */
-	protected function get_paused_message() {
-		return sprintf( __( '<strong>Paused Upgrade</strong><br>The find &amp; replace to update URLs has been paused. %s', 'amazon-s3-and-cloudfront' ), $this->get_generic_message() );
+	protected function get_paused_message(): string {
+		return sprintf(
+		/* translators: %s is an error message. */
+			__(
+				'<strong>Paused Upgrade</strong><br>The find &amp; replace to update URLs has been paused. %s',
+				'amazon-s3-and-cloudfront'
+			),
+			$this->get_generic_message()
+		);
 	}
 
 	/**
@@ -395,41 +462,48 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 *
 	 * @return string
 	 */
-	protected function get_generic_message() {
+	protected function get_generic_message(): string {
 		$link_text = __( 'See our documentation', 'amazon-s3-and-cloudfront' );
 		$url       = $this->as3cf->dbrains_url( '/wp-offload-media/doc/content-filtering-upgrade', array(
 			'utm_campaign' => 'support+docs',
 		) );
 		$link      = AS3CF_Utils::dbrains_link( $url, $link_text );
 
-		return sprintf( __( '%s for details on why we&#8217;re doing this, why it runs slowly, and how to make it run faster.', 'amazon-s3-and-cloudfront' ), $link );
+		return sprintf(
+		/* translators: %s is a documentation link. */
+			__(
+				'%s for details on why we&#8217;re doing this, why it runs slowly, and how to make it run faster.',
+				'amazon-s3-and-cloudfront'
+			),
+			$link
+		);
 	}
 
 	/**
 	 * Load the last blog ID from the session.
 	 *
 	 * If the ID is found using the standard session key, use that.
-	 * Otherwise if it is an older session, derive the ID from the blogs in the session.
+	 * Otherwise, if it is an older session, derive the ID from the blogs in the session.
 	 *
-	 * @return bool|int|mixed
+	 * @return int|null
 	 */
-	protected function load_last_blog_id() {
+	protected function load_last_blog_id(): ?int {
 		if ( $blog_id = parent::load_last_blog_id() ) {
 			return $blog_id;
 		}
 
-		$blog_ids = $this->load_processesed_blog_ids();
+		$blog_ids = $this->load_processed_blog_ids();
 
 		return end( $blog_ids );
 	}
 
 	/**
-	 * Get all of the processed blog IDs from the session.
+	 * Get all the processed blog IDs from the session.
 	 *
 	 * @return array
 	 */
-	protected function load_processesed_blog_ids() {
-		if ( $ids = parent::load_processesed_blog_ids() ) {
+	protected function load_processed_blog_ids(): array {
+		if ( $ids = parent::load_processed_blog_ids() ) {
 			return $ids;
 		}
 
@@ -448,7 +522,7 @@ abstract class Upgrade_Filter_Post extends Upgrade {
 	 *
 	 * @return int Post ID.
 	 */
-	protected function load_last_post_id() {
+	protected function load_last_post_id(): int {
 		if ( isset( $this->session['last_post_id'] ) ) {
 			return (int) $this->session['last_post_id'];
 		}

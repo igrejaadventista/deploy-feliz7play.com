@@ -4,6 +4,7 @@ namespace DeliciousBrains\WP_Offload_Media\Integrations;
 
 use AS3CF_Error;
 use AS3CF_Utils;
+use DeliciousBrains\WP_Offload_Media\Items\File;
 use DeliciousBrains\WP_Offload_Media\Items\Item;
 use DeliciousBrains\WP_Offload_Media\Items\Media_Library_Item;
 use DeliciousBrains\WP_Offload_Media\Items\Remove_Provider_Handler;
@@ -11,6 +12,11 @@ use DeliciousBrains\WP_Offload_Media\Items\Upload_Handler;
 use Exception;
 use WP_Error;
 use WP_Post;
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 class Media_Library extends Integration {
 	/**
@@ -54,7 +60,17 @@ class Media_Library extends Integration {
 	 */
 	public function setup() {
 		// Filter from WordPress media library handling, plugin needs to be set up
+		add_filter(
+			'pre_wp_unique_filename_file_list',
+			array( $this, 'filter_pre_wp_unique_filename_file_list' ),
+			10,
+			3
+		);
+
+		// While the pre_wp_unique_filename_file_list filter should supply the source_paths needed by wp_unique_file
+		// in most cases, in some scenarios it will not, so we need to fall back to iteratively testing the proposed filename.
 		add_filter( 'wp_unique_filename', array( $this, 'wp_unique_filename' ), 10, 3 );
+
 		add_filter( 'wp_update_attachment_metadata', array( $this, 'wp_update_attachment_metadata' ), 110, 2 );
 		add_filter( 'pre_delete_attachment', array( $this, 'pre_delete_attachment' ), 20 );
 		add_filter( 'delete_attachment', array( $this, 'delete_attachment' ), 20 );
@@ -68,34 +84,92 @@ class Media_Library extends Integration {
 		add_action( 'add_meta_boxes', array( $this, 'attachment_provider_meta_box' ) );
 
 		// AJAX
-		add_action( 'wp_ajax_as3cf_get_attachment_provider_details', array( $this, 'ajax_get_attachment_provider_details' ) );
+		add_action(
+			'wp_ajax_as3cf_get_attachment_provider_details',
+			array( $this, 'ajax_get_attachment_provider_details' )
+		);
 
 		// Rewriting URLs, doesn't depend on plugin being set up
-		add_filter( 'wp_get_attachment_url', array( $this, 'wp_get_attachment_url' ), 99, 2 );
-		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'wp_get_attachment_image_attributes' ), 99, 3 );
-		add_filter( 'get_image_tag', array( $this, 'maybe_encode_get_image_tag' ), 99, 6 );
-		add_filter( 'wp_get_attachment_image_src', array( $this, 'maybe_encode_wp_get_attachment_image_src' ), 99, 4 );
-		add_filter( 'wp_prepare_attachment_for_js', array( $this, 'maybe_encode_wp_prepare_attachment_for_js' ), 99, 3 );
-		add_filter( 'image_get_intermediate_size', array( $this, 'maybe_encode_image_get_intermediate_size' ), 99, 3 );
+		if ( $this->as3cf->get_setting( 'serve-from-s3' ) ) {
+			add_filter( 'image_downsize', array( $this, 'filter_image_downsize' ), 99, 3 );
+			add_filter( 'wp_get_attachment_url', array( $this, 'wp_get_attachment_url' ), 99, 2 );
+			add_filter(
+				'wp_get_attachment_image_attributes',
+				array( $this, 'wp_get_attachment_image_attributes' ),
+				99,
+				3
+			);
+			add_filter( 'get_image_tag', array( $this, 'maybe_encode_get_image_tag' ), 99, 6 );
+			add_filter(
+				'wp_get_attachment_image_src',
+				array( $this, 'maybe_encode_wp_get_attachment_image_src' ),
+				99,
+				4
+			);
+			add_filter(
+				'wp_prepare_attachment_for_js',
+				array( $this, 'maybe_encode_wp_prepare_attachment_for_js' ),
+				99,
+				3
+			);
+			add_filter(
+				'image_get_intermediate_size',
+				array( $this, 'maybe_encode_image_get_intermediate_size' ),
+				99,
+				3
+			);
+			add_filter( 'wp_audio_shortcode', array( $this, 'wp_media_shortcode' ), 100, 5 );
+			add_filter( 'wp_video_shortcode', array( $this, 'wp_media_shortcode' ), 100, 5 );
+
+			// Srcset handling
+			add_filter( 'wp_image_file_matches_image_meta', array( $this, 'image_file_matches_image_meta' ), 10, 4 );
+		}
+
+		// Often needed by admin functions, e.g. image optimizers etc.
 		add_filter( 'get_attached_file', array( $this, 'get_attached_file' ), 10, 2 );
 		add_filter( 'wp_get_original_image_path', array( $this, 'get_attached_file' ), 10, 2 );
-		add_filter( 'wp_audio_shortcode', array( $this, 'wp_media_shortcode' ), 100, 5 );
-		add_filter( 'wp_video_shortcode', array( $this, 'wp_media_shortcode' ), 100, 5 );
-
-		// Srcset handling
-		add_filter( 'wp_image_file_matches_image_meta', array( $this, 'image_file_matches_image_meta' ), 10, 4 );
 
 		// Internal filters and actions
-		add_filter( 'as3cf_get_provider_url_for_item_source', array( $this, 'filter_get_provider_url_for_item_source' ), 10, 3 );
-		add_filter( 'as3cf_get_local_url_for_item_source', array( $this, 'filter_get_local_url_for_item_source' ), 10, 3 );
-		add_filter( 'as3cf_get_size_string_from_url_for_item_source', array( $this, 'get_size_string_from_url_for_item_source' ), 10, 3 );
+		add_filter(
+			'as3cf_get_provider_url_for_item_source',
+			array( $this, 'filter_get_provider_url_for_item_source' ),
+			10,
+			3
+		);
+		add_filter(
+			'as3cf_get_local_url_for_item_source',
+			array( $this, 'filter_get_local_url_for_item_source' ),
+			10,
+			3
+		);
+		add_filter(
+			'as3cf_get_size_string_from_url_for_item_source',
+			array( $this, 'get_size_string_from_url_for_item_source' ),
+			10,
+			3
+		);
 		add_filter( 'as3cf_get_item_secure_url', array( $this, 'get_item_secure_url' ), 10, 5 );
 		add_filter( 'as3cf_get_item_url', array( $this, 'get_item_url' ), 10, 5 );
 		add_filter( 'as3cf_remove_local_files', array( $this, 'filter_remove_local_files' ), 10, 3 );
-		add_filter( 'as3cf_remove_source_files_from_provider', array( $this, 'filter_remove_source_files_from_provider' ), 10, 3 );
+		add_filter(
+			'as3cf_remove_source_files_from_provider',
+			array( $this, 'filter_remove_source_files_from_provider' ),
+			10,
+			3
+		);
 		add_action( 'as3cf_post_upload_item', array( $this, 'post_upload_item' ), 10, 1 );
-		add_filter( 'as3cf_pre_handle_item_' . Upload_Handler::get_item_handler_key_name(), array( $this, 'pre_handle_item_upload' ), 10, 3 );
-		add_filter( 'as3cf_upload_object_key_as_private', array( $this, 'filter_upload_object_key_as_private' ), 10, 3 );
+		add_filter(
+			'as3cf_pre_handle_item_' . Upload_Handler::get_item_handler_key_name(),
+			array( $this, 'pre_handle_item_upload' ),
+			10,
+			3
+		);
+		add_filter(
+			'as3cf_upload_object_key_as_private',
+			array( $this, 'filter_upload_object_key_as_private' ),
+			10,
+			3
+		);
 		add_action( 'as3cf_pre_upload_object', array( $this, 'action_pre_upload_object' ), 10, 2 );
 
 		if ( self::wp_check_filetype_broken() ) {
@@ -143,7 +217,6 @@ class Media_Library extends Integration {
 			function_exists( 'wp_get_missing_image_subsizes' ) &&
 			wp_attachment_is_image( $post_id )
 		) {
-
 			/**
 			 * Plugin compat may require that we wait for wp_generate_attachment_metadata
 			 * to be run before proceeding with uploading. I.e. Regenerate Thumbnails requires this.
@@ -155,8 +228,18 @@ class Media_Library extends Integration {
 			}
 
 			// There is no unified way of checking whether subsizes are expected, so we have to duplicate WordPress code here.
-			$new_sizes = wp_get_registered_image_subsizes();
-			$new_sizes = apply_filters( 'intermediate_image_sizes_advanced', $new_sizes, $data, $post_id );
+			$registered_sizes = wp_get_registered_image_subsizes();
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- missing WP API function
+			$new_sizes = apply_filters( 'intermediate_image_sizes_advanced', $registered_sizes, $data, $post_id );
+
+			// Client side thumbnail generation disables the 'intermediate_image_sizes_advanced' filter until done.
+			// Therefore, we may need to revert to just checking against registered sizes to determine whether
+			// we should wait to offload.
+			// Client side generation seems to do a final update that skips this entire block due to not including
+			// the required functions, so we'll eventually catch up.
+			if ( ( empty( $new_sizes ) || ! is_array( $new_sizes ) ) && ! empty( $registered_sizes ) ) {
+				$new_sizes = $registered_sizes;
+			}
 
 			// If an image has been rotated, remove original image from metadata so that
 			// `wp_get_missing_image_subsizes()` doesn't use non-rotated image for
@@ -179,7 +262,7 @@ class Media_Library extends Integration {
 					$single &&
 					'post' === $meta_type
 				) {
-					// For some reason the filter is expected return an array of values
+					// For some reason the filter is expected to return an array of values
 					// as if not doing a single record.
 					return array( $data );
 				}
@@ -258,7 +341,11 @@ class Media_Library extends Integration {
 
 		// Or didn't we get anything at all?
 		if ( empty( $as3cf_item ) ) {
-			$message = sprintf( __( "Can't create item from media library item %d", 'amazon-s3-and-cloudfront' ), $post_id );
+			$message = sprintf(
+			/* translators: %d is an integer unique ID. */
+				__( "Can't create item from media library item %d", 'amazon-s3-and-cloudfront' ),
+				$post_id
+			);
 			AS3CF_Error::Log( $message );
 
 			return $data;
@@ -345,14 +432,95 @@ class Media_Library extends Integration {
 	}
 
 	/**
+	 * Filters the file list used for calculating a unique filename for a newly added file.
+	 *
+	 * Returning an array from the filter will effectively short-circuit retrieval
+	 * from the filesystem and return the passed value instead.
+	 *
+	 * @handles pre_wp_unique_filename_file_list
+	 *
+	 * @param array|null $files    The list of files to use for filename comparisons.
+	 *                             Default null (to retrieve the list from the filesystem).
+	 * @param string     $dir      The directory for the new file.
+	 * @param string     $filename The proposed filename for the new file.
+	 */
+	public function filter_pre_wp_unique_filename_file_list( $files, $dir, $filename ) {
+		if ( ! $this->as3cf->is_plugin_setup( true ) ) {
+			return $files;
+		}
+
+		$upload_dir = wp_upload_dir();
+
+		// Quick sanity check, but should already have been done before filter called.
+		if ( ! str_contains( $dir, $upload_dir['basedir'] ) ) {
+			return $files;
+		}
+
+		// Get list of offloaded files in dir, but only if we're not going to grab a huge amount of file names.
+		$relative_dir = substr( $dir, strlen( $upload_dir['basedir'] ) );
+
+		/**
+		 * Limit how many source paths are allowed to be returned for analysis during unique name check.
+		 *
+		 * If the limit would be exceeded, we'll not override the filesystem scan,
+		 * merge it with potentially removed from local source paths,
+		 * and rely on the later wp_unique_filename filter to iteratively test uniqueness.
+		 *
+		 * @param int    $limit        Default 10,000, min 0 (abort), max PHP_INT_MAX (good luck with that).
+		 * @param string $relative_dir The path relative to the uploads directory being checked.
+		 * @param string $filename     The proposed filename for the new file.
+		 *
+		 * @return int
+		 */
+		$offloaded_files_count_limit = max(
+			0,
+			min(
+				PHP_INT_MAX,
+				(int) apply_filters( 'as3cf_get_source_paths_for_dir_count_limit', 10000, $relative_dir, $filename )
+			)
+		);
+
+		$offloaded_files_count = File::get_source_paths_for_dir_count( $relative_dir, $filename );
+
+		// Nothing matches, or there's too many to check at once, bail.
+		if ( 0 === $offloaded_files_count || $offloaded_files_count > $offloaded_files_count_limit ) {
+			return $files;
+		}
+
+		$offloaded_files = File::get_source_paths_for_dir( $relative_dir, $filename );
+
+		if ( ! empty( $offloaded_files ) ) {
+			$offloaded_files = array_map( 'wp_basename', $offloaded_files );
+		}
+
+		// By implementing this filter, we're stopping the usual directory scan, so we need to do it.
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- mimicking WordPress
+		$scanned_files = @scandir( $dir );
+
+		if ( empty( $scanned_files ) || ! is_array( $scanned_files ) ) {
+			$scanned_files = array();
+		}
+
+		if ( empty( $files ) || ! is_array( $files ) ) {
+			$files = array();
+		}
+
+		return array_unique( array_merge( $files, $scanned_files, $offloaded_files ) );
+	}
+
+	/**
 	 * Filters the result when generating a unique file name.
+	 *
+	 * @handles wp_unique_filename
 	 *
 	 * @param string $filename Unique file name.
 	 * @param string $ext      File extension, eg. ".png".
 	 * @param string $dir      Directory path.
 	 *
 	 * @return string
-	 * @since 4.5.0
+	 * @throws Exception
+	 *
+	 * @since   4.5.0
 	 */
 	public function wp_unique_filename( $filename, $ext, $dir ) {
 		// Get Post ID if uploaded in post screen.
@@ -365,14 +533,15 @@ class Media_Library extends Integration {
 	 * Create unique names for file to be uploaded to AWS.
 	 * This only applies when the remove local file option is enabled.
 	 *
-	 * @param string $filename Unique file name.
-	 * @param string $ext      File extension, eg. ".png".
-	 * @param string $dir      Directory path.
-	 * @param int    $post_id  Attachment's parent Post ID.
+	 * @param string   $filename Unique file name.
+	 * @param string   $ext      File extension, eg. ".png".
+	 * @param string   $dir      Directory path.
+	 * @param int|null $post_id  Attachment's parent Post ID.
 	 *
 	 * @return string
+	 * @throws Exception
 	 */
-	public function filter_unique_filename( $filename, $ext, $dir, $post_id = null ) {
+	public function filter_unique_filename( string $filename, string $ext, string $dir, ?int $post_id = null ): string {
 		if ( ! $this->as3cf->is_plugin_setup( true ) ) {
 			return $filename;
 		}
@@ -462,6 +631,10 @@ class Media_Library extends Integration {
 	/**
 	 * Update an existing item's expected objects from attachment's new metadata.
 	 *
+	 * At present this method does not alter the source path prefix, it is expected
+	 * that only the file name has changed, e.g. now using edited file name.
+	 * This may change in the future.
+	 *
 	 * @param Media_Library_Item $as3cf_item
 	 * @param array              $metadata
 	 */
@@ -470,9 +643,11 @@ class Media_Library extends Integration {
 			return;
 		}
 
-		$files             = AS3CF_Utils::get_attachment_file_paths( $as3cf_item->source_id(), false, $metadata );
-		$existing_basename = wp_basename( $as3cf_item->path() );
-		$existing_objects  = $as3cf_item->objects();
+		$files                  = AS3CF_Utils::get_attachment_file_paths( $as3cf_item->source_id(), false, $metadata );
+		$sizes                  = array_keys( $files );
+		$existing_basename      = wp_basename( $as3cf_item->path() );
+		$existing_orig_basename = wp_basename( $as3cf_item->original_path() );
+		$existing_objects       = $as3cf_item->objects();
 
 		if ( ! isset( $this->replaced_object_keys[ $as3cf_item->source_id() ] ) ) {
 			$this->replaced_object_keys[ $as3cf_item->source_id() ] = array();
@@ -487,7 +662,18 @@ class Media_Library extends Integration {
 
 			if ( Item::primary_object_key() === $object_key && $existing_basename !== $new_filename ) {
 				$as3cf_item->set_path( str_replace( $existing_basename, $new_filename, $as3cf_item->path() ) );
-				$as3cf_item->set_source_path( str_replace( $existing_basename, $new_filename, $as3cf_item->source_path() ) );
+				$as3cf_item->set_source_path(
+					str_replace( $existing_basename, $new_filename, $as3cf_item->source_path() )
+				);
+			}
+
+			if ( Item::original_image_object_key() === $object_key && $existing_orig_basename !== $new_filename ) {
+				$as3cf_item->set_original_path(
+					str_replace( $existing_orig_basename, $new_filename, $as3cf_item->original_path() )
+				);
+				$as3cf_item->set_original_source_path(
+					str_replace( $existing_orig_basename, $new_filename, $as3cf_item->original_source_path() )
+				);
 			}
 
 			$existing_objects[ $object_key ] = array(
@@ -496,9 +682,16 @@ class Media_Library extends Integration {
 			);
 		}
 
-		$extra_info            = $as3cf_item->extra_info();
-		$extra_info['objects'] = $existing_objects;
-		$as3cf_item->set_extra_info( $extra_info );
+		// Keep original path and source path up to date if not different to primary.
+		if (
+			in_array( Item::primary_object_key(), $sizes ) &&
+			! in_array( Item::original_image_object_key(), $sizes )
+		) {
+			$as3cf_item->set_original_path( $as3cf_item->path() );
+			$as3cf_item->set_original_source_path( $as3cf_item->source_path() );
+		}
+
+		$as3cf_item->set_objects( $existing_objects );
 	}
 
 	/**
@@ -624,7 +817,92 @@ class Media_Library extends Integration {
 	}
 
 	/**
-	 * Get attachment url
+	 * Filters whether to preempt the output of image_downsize().
+	 *
+	 * Returning a truthy value from the filter will effectively short-circuit
+	 * down-sizing the image, returning that value instead.
+	 *
+	 * We need to substitute in a good URL if attachment offloaded, particularly
+	 * for sizes as image_downsize just swaps in filename on full size's URL,
+	 * which may be private when size isn't, and have private path prefix.
+	 *
+	 * @handles image_downsize
+	 *
+	 * @param bool|array   $downsize Whether to short-circuit the image downsize.
+	 * @param int          $id       Attachment ID for image.
+	 * @param string|int[] $size     Requested image size. Can be any registered image size name, or
+	 *                               an array of width and height values in pixels (in that order).
+	 *
+	 * @return bool|array
+	 */
+	public function filter_image_downsize( $downsize, $id, $size ) {
+		$width           = 0;
+		$height          = 0;
+		$is_intermediate = false;
+
+		$metadata = wp_get_attachment_metadata( $id );
+
+		if ( empty( $metadata ) || ! is_array( $metadata ) || ! isset( $metadata['sizes'] ) || ! is_array( $metadata['sizes'] ) ) {
+			return $downsize;
+		}
+
+		// If width/height given instead of size name, find size name.
+		if ( ! empty( $size ) && is_array( $size ) ) {
+			if ( ! isset( $size[0] ) || ! isset( $size[1] ) || ! is_int( $size[0] ) && ! is_int( $size[1] ) ) {
+				return $downsize;
+			}
+
+			foreach ( $metadata['sizes'] as $size_name => $size_details ) {
+				if ( ! empty( $size_name ) && ! empty( $size_details['width'] ) && ! empty( $size_details['height'] ) && $size_details['width'] === $size[0] && $size_details['height'] === $size[1] ) {
+					$width           = $size_details['width'];
+					$height          = $size_details['height'];
+					$size            = trim( $size_name );
+					$is_intermediate = true;
+					break;
+				}
+			}
+		}
+
+		// If size name given, find details.
+		if ( ! $is_intermediate && ! empty( $size ) && is_string( $size ) ) {
+			foreach ( $metadata['sizes'] as $size_name => $size_details ) {
+				if ( ! empty( $size_name ) && trim( $size_name ) === trim( $size ) && ! empty( $size_details['width'] ) && ! empty( $size_details['height'] ) ) {
+					$width           = $size_details['width'];
+					$height          = $size_details['height'];
+					$size            = trim( $size_name );
+					$is_intermediate = true;
+					break;
+				}
+			}
+		}
+
+		// Still no good intermediate size details, try and fall back to full size.
+		if ( empty( $size ) || ! is_string( $size ) || empty( $width ) || empty( $height ) ) {
+			$width  = empty( $metadata['width'] ) ? 0 : $metadata['width'];
+			$height = empty( $metadata['height'] ) ? 0 : $metadata['height'];
+
+			if ( empty( $width ) || empty( $height ) ) {
+				return $downsize;
+			}
+
+			// Even though we're using full image URL, the returned sizes may need to be adjusted.
+			list( $width, $height ) = image_constrain_size_for_editor( $width, $height, $size );
+
+			$size            = null;
+			$is_intermediate = false;
+		}
+
+		$url = as3cf_get_attachment_url( $id, $size );
+
+		if ( empty( $url ) ) {
+			return $downsize;
+		}
+
+		return array( $url, $width, $height, $is_intermediate );
+	}
+
+	/**
+	 * Get attachment url.
 	 *
 	 * @param string $url
 	 * @param int    $post_id
@@ -632,11 +910,8 @@ class Media_Library extends Integration {
 	 * @return bool|mixed|WP_Error
 	 */
 	public function wp_get_attachment_url( $url, $post_id ) {
-		if ( $this->as3cf->plugin_compat->is_customizer_crop_action() ) {
-			return $url;
-		}
-
 		$as3cf_item = Media_Library_Item::get_by_source_id( $post_id );
+
 		if ( empty( $as3cf_item ) || ! $as3cf_item->served_by_provider() ) {
 			return $url;
 		}
@@ -649,6 +924,7 @@ class Media_Library extends Integration {
 		}
 
 		// Old naming convention, will be deprecated soon
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- backwards compatibility
 		$new_url = apply_filters( 'wps3_get_attachment_url', $new_url, $post_id, $this );
 
 		/**
@@ -773,13 +1049,19 @@ class Media_Library extends Integration {
 	 * Maybe encode URLs for images that represent an attachment
 	 *
 	 * @param array|bool   $image
-	 * @param int          $attachment_id
+	 * @param mixed        $attachment_id
 	 * @param string|array $size
 	 * @param bool         $icon
 	 *
-	 * @return array
+	 * @return array|bool
 	 */
 	public function maybe_encode_wp_get_attachment_image_src( $image, $attachment_id, $size, $icon ) {
+		// Core applies this filter with whatever the caller passed it, which is
+		// not always an attachment id. It has already resolved the image by now.
+		if ( ! is_numeric( $attachment_id ) || $attachment_id < 1 ) {
+			return $image;
+		}
+
 		$as3cf_item = Media_Library_Item::get_by_source_id( $attachment_id );
 		if ( ! $as3cf_item || ! $as3cf_item->served_by_provider() ) {
 			return $image;
@@ -862,7 +1144,13 @@ class Media_Library extends Integration {
 	 *
 	 * @return string|WP_Error
 	 */
-	protected function maybe_sign_intermediate_size( $url, $attachment_id, $size, $as3cf_item = false, $force_rewrite = false ) {
+	protected function maybe_sign_intermediate_size(
+		$url,
+		$attachment_id,
+		$size,
+		$as3cf_item = false,
+		$force_rewrite = false
+	) {
 		if ( ! $as3cf_item ) {
 			$as3cf_item = Media_Library_Item::get_by_source_id( $attachment_id );
 		}
@@ -886,13 +1174,18 @@ class Media_Library extends Integration {
 	 * @handles wp_get_original_image_path
 	 *
 	 * @param string $file
-	 * @param int    $attachment_id
+	 * @param mixed  $attachment_id
 	 *
 	 * @return string
 	 */
 	public function get_attached_file( $file, $attachment_id ) {
 		// During the deletion of an attachment, stream wrapper URLs should not be returned.
 		if ( $this->deleting_attachment ) {
+			return $file;
+		}
+
+		// Some plugins call get_attached_file() without a usable attachment ID.
+		if ( ! is_numeric( $attachment_id ) || $attachment_id < 1 ) {
 			return $file;
 		}
 
@@ -972,7 +1265,14 @@ class Media_Library extends Integration {
 	public function get_media_action_strings( $string = null ) {
 		$not_verified_value = __( 'No', 'amazon-s3-and-cloudfront' );
 		$not_verified_value .= '&nbsp;';
-		$not_verified_value .= $this->as3cf->more_info_link( '/wp-offload-media/doc/add-metadata-tool/', 'os3+attachment+metabox', 'analyze-and-repair', 'More Info', '(', ')' );
+		$not_verified_value .= $this->as3cf->more_info_link(
+			'/wp-offload-media/doc/add-metadata-tool/',
+			'os3+attachment+metabox',
+			'analyze-and-repair',
+			'More Info',
+			'(',
+			')'
+		);
 
 		/**
 		 * Returns all strings used to render meta boxes on the WordPress Media Library edit page
@@ -987,7 +1287,11 @@ class Media_Library extends Integration {
 			'region'        => _x( 'Region', 'Location of bucket', 'amazon-s3-and-cloudfront' ),
 			'acl'           => _x( 'Access', 'Access control list of the file in bucket', 'amazon-s3-and-cloudfront' ),
 			'url'           => __( 'URL', 'amazon-s3-and-cloudfront' ),
-			'is_verified'   => _x( 'Verified', 'Whether or not metadata has been verified', 'amazon-s3-and-cloudfront' ),
+			'is_verified'   => _x(
+				'Verified',
+				'Whether or not metadata has been verified',
+				'amazon-s3-and-cloudfront'
+			),
 			'not_verified'  => $not_verified_value,
 		) );
 
@@ -996,46 +1300,6 @@ class Media_Library extends Integration {
 		}
 
 		return $strings;
-	}
-
-	/**
-	 * Remove 'filesize' from attachment's metadata if appropriate, also our total filesize record.
-	 *
-	 * @param int   $post_id         Attachment's post_id.
-	 * @param array $data            Attachment's metadata.
-	 * @param bool  $update_metadata Update the metadata record now? Defaults to true.
-	 *
-	 * @return array Attachment's cleaned up metadata.
-	 */
-	public function maybe_cleanup_filesize_metadata( $post_id, $data, $update_metadata = true ) {
-		if ( ! is_int( $post_id ) || empty( $post_id ) || empty( $data ) || ! is_array( $data ) ) {
-			return $data;
-		}
-
-		/*
-		 * Audio and video have a filesize added to metadata by default, but images and anything else don't.
-		 * Note: Could have used `wp_generate_attachment_metadata` here to test whether default metadata has 'filesize',
-		 * but it not only has side effects it also does a lot of work considering it's not a huge deal for this entry to hang around.
-		 */
-		if (
-			empty( $data['mime_type'] ) ||
-			0 === strpos( $data['mime_type'], 'image/' ) ||
-			! ( 0 === strpos( $data['mime_type'], 'audio/' ) || 0 === strpos( $data['mime_type'], 'video/' ) )
-		) {
-			unset( $data['filesize'] );
-		}
-
-		if ( $update_metadata ) {
-			if ( empty( $data ) ) {
-				delete_post_meta( $post_id, '_wp_attachment_metadata' );
-			} else {
-				update_post_meta( $post_id, '_wp_attachment_metadata', $data );
-			}
-		}
-
-		delete_post_meta( $post_id, 'as3cf_filesize_total' );
-
-		return $data;
 	}
 
 	/**
@@ -1088,7 +1352,10 @@ class Media_Library extends Integration {
 	 * @return string|false
 	 */
 	public function filter_get_local_url_for_item_source( $url, $item_source, $size ) {
-		if ( Media_Library_Item::source_type() !== $item_source['source_type'] ) {
+		if (
+			Item::is_empty_item_source( $item_source ) ||
+			Media_Library_Item::source_type() !== $item_source['source_type']
+		) {
 			return $url;
 		}
 
@@ -1112,7 +1379,10 @@ class Media_Library extends Integration {
 	 * @return string|false
 	 */
 	public function filter_get_provider_url_for_item_source( $url, $item_source, $size ) {
-		if ( Media_Library_Item::source_type() !== $item_source['source_type'] ) {
+		if (
+			Item::is_empty_item_source( $item_source ) ||
+			Media_Library_Item::source_type() !== $item_source['source_type']
+		) {
 			return $url;
 		}
 
@@ -1131,7 +1401,7 @@ class Media_Library extends Integration {
 	}
 
 	/**
-	 * Get the size from a URL for media library item types
+	 * Get the size from a URL for media library item types.
 	 *
 	 * @handles as3cf_get_size_string_from_url_for_item_source
 	 *
@@ -1142,21 +1412,23 @@ class Media_Library extends Integration {
 	 * @return string
 	 */
 	public function get_size_string_from_url_for_item_source( $size, $url, $item_source ) {
-		if ( Media_Library_Item::source_type() !== $item_source['source_type'] ) {
+		if (
+			Item::is_empty_item_source( $item_source ) ||
+			Media_Library_Item::source_type() !== $item_source['source_type']
+		) {
 			return $size;
 		}
 
-		$meta = get_post_meta( $item_source['id'], '_wp_attachment_metadata', true );
+		$sizes = AS3CF_Utils::get_attachment_file_paths( $item_source['id'], false );
 
-		if ( empty( $meta['sizes'] ) ) {
-			// No alternative sizes available, return
+		if ( empty( $sizes ) ) {
 			return $size;
 		}
 
 		$basename = AS3CF_Utils::encode_filename_in_path( wp_basename( $this->as3cf->maybe_remove_query_string( $url ) ) );
 
-		foreach ( $meta['sizes'] as $size_name => $file ) {
-			if ( $basename === AS3CF_Utils::encode_filename_in_path( $file['file'] ) ) {
+		foreach ( $sizes as $size_name => $file ) {
+			if ( $basename === AS3CF_Utils::encode_filename_in_path( wp_basename( $file ) ) ) {
 				return $size_name;
 			}
 		}
@@ -1330,7 +1602,14 @@ class Media_Library extends Integration {
 		 *
 		 * @deprecated 2.6.0 Please use filter "as3cf_get_item_secure_url" instead.
 		 */
-		return apply_filters( 'as3cf_get_attachment_secure_url', $url, $as3cf_item, $item_source['id'], $timestamp, $headers );
+		return apply_filters(
+			'as3cf_get_attachment_secure_url',
+			$url,
+			$as3cf_item,
+			$item_source['id'],
+			$timestamp,
+			$headers
+		);
 	}
 
 	/**
@@ -1419,7 +1698,12 @@ class Media_Library extends Integration {
 		 *
 		 * @deprecated 2.6.0 Please use filter "as3cf_remove_local_files" instead.
 		 */
-		return apply_filters( 'as3cf_upload_attachment_local_files_to_remove', $files_to_remove, $item_source['id'], $as3cf_item->full_source_path( Item::primary_object_key() ) );
+		return apply_filters(
+			'as3cf_upload_attachment_local_files_to_remove',
+			$files_to_remove,
+			$item_source['id'],
+			$as3cf_item->full_source_path( Item::primary_object_key() )
+		);
 	}
 
 	/**
@@ -1508,7 +1792,14 @@ class Media_Library extends Integration {
 			$file_type = wp_check_filetype_and_ext( $as3cf_item->source_path(), $file_name );
 
 			// Old naming convention, will be removed soon.
-			$acl = apply_filters( 'wps3_upload_acl', $acl, $file_type['type'], $metadata, $as3cf_item->source_id(), $this->as3cf );
+			$acl = apply_filters(
+				'wps3_upload_acl', // phpcs:ignore WordPress.NamingConventions -- backwards compatibility
+				$acl,
+				$file_type['type'],
+				$metadata,
+				$as3cf_item->source_id(),
+				$this->as3cf
+			);
 
 			/**
 			 * Determine canned ACL for an item's original (full size) file about to be uploaded to provider.
@@ -1570,7 +1861,13 @@ class Media_Library extends Integration {
 		 *
 		 * @deprecated 2.6.0 Please use action "as3cf_pre_upload_object" instead.
 		 */
-		do_action( 'as3cf_upload_attachment_pre_remove', $as3cf_item->source_id(), $as3cf_item, $as3cf_item->normalized_path_dir(), $args );
+		do_action(
+			'as3cf_upload_attachment_pre_remove',
+			$as3cf_item->source_id(),
+			$as3cf_item,
+			$as3cf_item->normalized_path_dir(),
+			$args
+		);
 	}
 
 	/**

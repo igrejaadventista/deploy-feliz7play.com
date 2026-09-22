@@ -1,0 +1,576 @@
+# Translation of Plugins - Metricool &#8211; Social media and site statistics - Stable (latest release) in Portuguese (Brazil)
+# This file is distributed under the same license as the Plugins - Metricool &#8211; Social media and site statistics - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2026-08-25 11:35:11+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: GlotPress/4.1.0\n"
+"Language: pt_BR\n"
+"Project-Id-Version: Plugins - Metricool &#8211; Social media and site statistics - Stable (latest release)\n"
+
+#. translators: %1$s is the field name, %2$s is the minimum size
+#: app/Support/Validation/Rules/MinRule.php:22
+#: trunk/app/Support/Validation/Rules/MinRule.php:22
+msgid "%1$s must be at least %2$s."
+msgstr "%1$s deve ter pelo menos %2$s."
+
+#. translators: %1$s and %2$s are field names
+#: app/Support/Validation/Rules/MatchesRule.php:22
+#: trunk/app/Support/Validation/Rules/MatchesRule.php:22
+msgid "%1$s must match %2$s."
+msgstr "%1$s deve corresponder a %2$s."
+
+#. translators: %1$s is the field name, %2$s is the maximum size
+#: app/Support/Validation/Rules/MaxRule.php:22
+#: trunk/app/Support/Validation/Rules/MaxRule.php:22
+msgid "%1$s must not be greater than %2$s."
+msgstr "%1$s não deve ser maior que %2$s."
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/InRule.php:19
+#: trunk/app/Support/Validation/Rules/InRule.php:19
+msgid "%s is invalid."
+msgstr "%s é inválido."
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/RequiredRule.php:20
+#: trunk/app/Support/Validation/Rules/RequiredRule.php:20
+msgid "%s is required."
+msgstr "%s é obrigatório."
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/NumericRule.php:18
+#: trunk/app/Support/Validation/Rules/NumericRule.php:18
+msgid "%s must be a number."
+msgstr "%s deve ser um número."
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/StringRule.php:18
+#: trunk/app/Support/Validation/Rules/StringRule.php:18
+msgid "%s must be a string."
+msgstr "%s deve ser uma string."
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/EmailRule.php:20
+#: trunk/app/Support/Validation/Rules/EmailRule.php:20
+msgid "%s must be a valid email address."
+msgstr "%s deve ser um endereço de e-mail válido."
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/UrlRule.php:18
+#: trunk/app/Support/Validation/Rules/UrlRule.php:18
+msgid "%s must be a valid URL."
+msgstr "%s deve ser uma URL válida."
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/AcceptedRule.php:18
+#: trunk/app/Support/Validation/Rules/AcceptedRule.php:18
+msgid "%s must be accepted."
+msgstr "%s deve ser aceito."
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/ArrayRule.php:18
+#: trunk/app/Support/Validation/Rules/ArrayRule.php:18
+msgid "%s must be an array."
+msgstr "%s deve ser um array."
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/IntegerRule.php:18
+#: trunk/app/Support/Validation/Rules/IntegerRule.php:18
+msgid "%s must be an integer."
+msgstr "%s deve ser um número inteiro."
+
+#. translators: %s is the field name
+#: app/Support/Validation/Rules/BooleanRule.php:18
+#: trunk/app/Support/Validation/Rules/BooleanRule.php:18
+msgid "%s must be true or false."
+msgstr "%s deve ser verdadeiro ou falso."
+
+#: app/Features/Onboarding/OnboardingController.php:131
+#: trunk/app/Features/Onboarding/OnboardingController.php:131
+msgid "You don’t have sufficient permissions to connect this brand. Please pick another brand or sign in with a different account."
+msgstr "Você não tem permissões suficientes para conectar esta marca. Escolha outra marca ou acesse com uma conta diferente."
+
+#. Plugin Name of the plugin
+#: metricool.php
+msgid "Metricool - Social media and site statistics"
+msgstr "Metricool - Mídias sociais e estatísticas do site"
+
+#. Plugin URI of the plugin
+#: metricool.php
+msgid "https://metricool.com/"
+msgstr "https://metricool.com/"
+
+#. Description of the plugin
+#: metricool.php
+msgid "Site metrics and social media analytics for Instagram, Facebook, YouTube, LinkedIn, X Twitter. The single best tool for Social Media Managers!"
+msgstr "Métricas do site e análises de mídias sociais para Instagram, Facebook, YouTube, LinkedIn, X Twitter. A melhor ferramenta única para gerentes de mídias sociais!"
+
+#. Author of the plugin
+#: metricool.php
+msgid "Really Simple Plugins"
+msgstr "Really Simple Plugins"
+
+#. Author URI of the plugin
+#: metricool.php
+msgid "https://really-simple-plugins.com"
+msgstr "https://really-simple-plugins.com"
+
+#: app/Controllers/AdminController.php:56
+#: trunk/app/Controllers/AdminController.php:56
+#: react/build/assets/BQ9nIB57.js:1 react/build/assets/CxqXJQAD.js:1
+#: trunk/react/build/assets/BQ9nIB57.js:1
+#: trunk/react/build/assets/CxqXJQAD.js:1
+msgid "Settings"
+msgstr "Configurações"
+
+#: app/Controllers/AdminController.php:60
+#: trunk/app/Controllers/AdminController.php:60
+msgid "Support"
+msgstr "Suporte"
+
+#: app/Controllers/DashboardController.php:89
+#: app/Controllers/DashboardController.php:90
+#: app/Controllers/SharePostController.php:130
+#: app/Controllers/SharePostController.php:182
+#: trunk/app/Controllers/DashboardController.php:89
+#: trunk/app/Controllers/DashboardController.php:90
+#: trunk/app/Controllers/SharePostController.php:130
+#: trunk/app/Controllers/SharePostController.php:182
+msgid "Metricool"
+msgstr "Metricool"
+
+#: app/Controllers/SharePostController.php:118
+#: trunk/app/Controllers/SharePostController.php:118
+msgid "Invalid nonce."
+msgstr "Nonce inválido."
+
+#: app/Controllers/SharePostController.php:197
+#: trunk/app/Controllers/SharePostController.php:197
+msgid "Sharing is only possible for published posts."
+msgstr "O compartilhamento só é possível para posts publicados."
+
+#: app/Controllers/SharePostController.php:220
+#: trunk/app/Controllers/SharePostController.php:220
+msgid "Share"
+msgstr "Compartilhar"
+
+#: app/Features/AdminNotices/Notices/ReviewNotice.php:78
+#: trunk/app/Features/AdminNotices/Notices/ReviewNotice.php:78
+msgid "Leave a review"
+msgstr "Deixe uma avaliação"
+
+#: app/Features/AdminNotices/Notices/ReviewNotice.php:131
+#: trunk/app/Features/AdminNotices/Notices/ReviewNotice.php:131
+msgid "statistics"
+msgstr "estatísticas"
+
+#: app/Features/AdminNotices/Notices/ReviewNotice.php:135
+#: trunk/app/Features/AdminNotices/Notices/ReviewNotice.php:135
+msgid "sessions"
+msgstr "sessões"
+
+#. translators: %s is replaced by either "x sessions" or "statistics", %2$ and
+#. %3$ are replaced with opening and closing a tag containing hyperlink
+#: app/Features/AdminNotices/Notices/ReviewNotice.php:140
+#: trunk/app/Features/AdminNotices/Notices/ReviewNotice.php:140
+msgid "Hi, Metricool has tracked %1$s on your site for the last 30 days. If you have a moment, please consider leaving a review on wordpress.org to spread the word. We greatly appreciate it! If you have any questions or feedback, leave us a %2$smessage%3$s."
+msgstr "Olá, a Metricool rastreou %1$s em seu site nos últimos 30 dias. Se tiver um momento, considere deixar uma avaliação no wordpress.org para divulgar. Agradecemos muito! Se tiver alguma dúvida ou comentário, deixe-nos uma %2$smensagem%3$s."
+
+#: app/Features/AdminNotices/Notices/UpgradeNotice.php:57
+#: trunk/app/Features/AdminNotices/Notices/UpgradeNotice.php:57
+msgid "Sign in now!"
+msgstr "Acesse agora!"
+
+#: app/Features/Notifications/Notices/ExampleConnectionsWarning.php:27
+#: app/Features/Notifications/Notices/ExampleConnectionsWarning.php:35
+#: trunk/app/Features/Notifications/Notices/ExampleConnectionsWarning.php:27
+#: trunk/app/Features/Notifications/Notices/ExampleConnectionsWarning.php:35
+msgid "This notice is a warning."
+msgstr "Este aviso é um alerta."
+
+#: app/Features/Notifications/Notices/ExampleConnectionsWarning.php:60
+#: app/Features/Notifications/Notices/FirstConnectionNotice.php:60
+#: app/Features/TaskManagement/Tasks/FirstConnectionTask.php:37
+#: app/Features/TaskManagement/Tasks/LinkedInTask.php:45
+#: app/Features/TaskManagement/Tasks/TwitterTask.php:45
+#: trunk/app/Features/Notifications/Notices/ExampleConnectionsWarning.php:60
+#: trunk/app/Features/Notifications/Notices/FirstConnectionNotice.php:60
+#: trunk/app/Features/TaskManagement/Tasks/FirstConnectionTask.php:37
+#: trunk/app/Features/TaskManagement/Tasks/LinkedInTask.php:45
+#: trunk/app/Features/TaskManagement/Tasks/TwitterTask.php:45
+msgid "Connect"
+msgstr "Conectar"
+
+#: app/Features/Notifications/Notices/ExampleInactiveNotice.php:17
+#: app/Features/Notifications/Notices/ExampleInactiveNotice.php:25
+#: trunk/app/Features/Notifications/Notices/ExampleInactiveNotice.php:17
+#: trunk/app/Features/Notifications/Notices/ExampleInactiveNotice.php:25
+msgid "This is an inactive notice."
+msgstr "Este é um aviso inativo."
+
+#: app/Features/Notifications/Notices/ExampleNotice.php:17
+#: app/Features/Notifications/Notices/ExampleNotice.php:25
+#: trunk/app/Features/Notifications/Notices/ExampleNotice.php:17
+#: trunk/app/Features/Notifications/Notices/ExampleNotice.php:25
+msgid "This is a notice without a route."
+msgstr "Este é um aviso sem rota."
+
+#: app/Features/Notifications/Notices/ExampleNotice.php:51
+#: app/Features/Notifications/Notices/ExamplePremiumNotice.php:52
+#: app/Features/Notifications/Notices/ExamplePremiumWarning.php:52
+#: trunk/app/Features/Notifications/Notices/ExampleNotice.php:51
+#: trunk/app/Features/Notifications/Notices/ExamplePremiumNotice.php:52
+#: trunk/app/Features/Notifications/Notices/ExamplePremiumWarning.php:52
+msgid "Example text"
+msgstr "Texto de exemplo"
+
+#: app/Features/Notifications/Notices/ExamplePremiumNotice.php:18
+#: app/Features/Notifications/Notices/ExamplePremiumNotice.php:26
+#: trunk/app/Features/Notifications/Notices/ExamplePremiumNotice.php:18
+#: trunk/app/Features/Notifications/Notices/ExamplePremiumNotice.php:26
+msgid "This is an premium notice."
+msgstr "Este é um aviso premium."
+
+#: app/Features/Notifications/Notices/ExamplePremiumWarning.php:18
+#: app/Features/Notifications/Notices/ExamplePremiumWarning.php:26
+#: trunk/app/Features/Notifications/Notices/ExamplePremiumWarning.php:18
+#: trunk/app/Features/Notifications/Notices/ExamplePremiumWarning.php:26
+msgid "This is an premium warning."
+msgstr "Este é um alerta premium."
+
+#: app/Features/Notifications/Notices/ExampleWarning.php:17
+#: app/Features/Notifications/Notices/ExampleWarning.php:25
+#: trunk/app/Features/Notifications/Notices/ExampleWarning.php:17
+#: trunk/app/Features/Notifications/Notices/ExampleWarning.php:25
+msgid "This is a warning without a route."
+msgstr "Este é um alerta sem rota."
+
+#: app/Features/Notifications/Notices/FirstConnectionNotice.php:27
+#: trunk/app/Features/Notifications/Notices/FirstConnectionNotice.php:27
+msgid "Get the most out of Metricool"
+msgstr "Aproveite ao máximo a Metricool"
+
+#: app/Features/Notifications/Notices/FirstConnectionNotice.php:35
+#: trunk/app/Features/Notifications/Notices/FirstConnectionNotice.php:35
+msgid "Connect your first social account to Metricool to start scheduling and tracking your content."
+msgstr "Conecte sua primeira conta social à Metricool para começar a agendar e rastrear seu conteúdo."
+
+#: app/Exceptions/ValidationException.php:20
+#: trunk/app/Exceptions/ValidationException.php:20
+msgid "Validation failed."
+msgstr "Falha na validação."
+
+#. translators: %1$s is opening link and %2$s is closing link
+#: app/Features/Onboarding/OnboardingController.php:138
+#: app/Features/Onboarding/Services/CreateAccountService.php:48
+#: trunk/app/Features/Onboarding/OnboardingController.php:138
+#: trunk/app/Features/Onboarding/Services/CreateAccountService.php:48
+msgid "Something went wrong. Please try again or %1$sleave a support message%2$s."
+msgstr "Algo deu errado. Tente novamente ou %1$sdeixe uma mensagem para o suporte%2$s."
+
+#: app/Features/Onboarding/OnboardingController.php:153
+#: trunk/app/Features/Onboarding/OnboardingController.php:153
+msgid "HTTPS is required to be able to authorize this website."
+msgstr "HTTPS é obrigatório para autorizar este site."
+
+#: app/Features/Onboarding/Services/CreateAccountService.php:55
+#: trunk/app/Features/Onboarding/Services/CreateAccountService.php:55
+msgid "Password is not valid."
+msgstr "A senha não é válida."
+
+#: app/Features/TaskManagement/TaskManagementEndpoints.php:75
+#: trunk/app/Features/TaskManagement/TaskManagementEndpoints.php:75
+msgid "Task not found"
+msgstr "Tarefa não encontrada"
+
+#: app/Features/TaskManagement/TaskManagementEndpoints.php:82
+#: trunk/app/Features/TaskManagement/TaskManagementEndpoints.php:82
+msgid "This task cannot be dismissed because it is required"
+msgstr "Esta tarefa não pode ser dispensada porque é obrigatória"
+
+#: app/Features/TaskManagement/TaskManagementEndpoints.php:85
+#: trunk/app/Features/TaskManagement/TaskManagementEndpoints.php:85
+msgid "Task dismissed successfully"
+msgstr "Tarefa dispensada com sucesso"
+
+#: app/Features/TaskManagement/Tasks/AbstractTask.php:152
+#: trunk/app/Features/TaskManagement/Tasks/AbstractTask.php:152
+msgid "Premium"
+msgstr "Premium"
+
+#: app/Features/TaskManagement/Tasks/AbstractTask.php:156
+#: trunk/app/Features/TaskManagement/Tasks/AbstractTask.php:156
+msgid "Special feature"
+msgstr "Recurso especial"
+
+#: app/Features/TaskManagement/Tasks/AbstractTask.php:159
+#: trunk/app/Features/TaskManagement/Tasks/AbstractTask.php:159
+msgid "Open"
+msgstr "Aberto"
+
+#: app/Features/TaskManagement/Tasks/AbstractTask.php:167
+#: trunk/app/Features/TaskManagement/Tasks/AbstractTask.php:167
+msgid "Urgent"
+msgstr "Urgente"
+
+#: app/Features/TaskManagement/Tasks/AbstractTask.php:175
+#: trunk/app/Features/TaskManagement/Tasks/AbstractTask.php:175
+msgid "Completed"
+msgstr "Concluído"
+
+#: app/Features/TaskManagement/Tasks/AbstractTask.php:183
+#: trunk/app/Features/TaskManagement/Tasks/AbstractTask.php:183
+msgid "Dismissed"
+msgstr "Dispensado"
+
+#: app/Features/TaskManagement/Tasks/FirstConnectionTask.php:28
+#: trunk/app/Features/TaskManagement/Tasks/FirstConnectionTask.php:28
+msgid "Get the most out of Metricool by linking your Social accounts"
+msgstr "Aproveite ao máximo a Metricool conectando suas contas sociais"
+
+#: app/Features/TaskManagement/Tasks/HistoricalDataTask.php:36
+#: trunk/app/Features/TaskManagement/Tasks/HistoricalDataTask.php:36
+msgid "Gain access to analytics with unlimited historical data."
+msgstr "Obtenha acesso a análises com dados históricos ilimitados."
+
+#: app/Features/TaskManagement/Tasks/HistoricalDataTask.php:45
+#: trunk/app/Features/TaskManagement/Tasks/HistoricalDataTask.php:45
+#: react/build/assets/BlatK_BK.js:1 react/build/assets/BQ9nIB57.js:1
+#: trunk/react/build/assets/BlatK_BK.js:1
+#: trunk/react/build/assets/BQ9nIB57.js:1
+msgid "Upgrade"
+msgstr "Faça upgrade"
+
+#: app/Features/TaskManagement/Tasks/LinkedInTask.php:36
+#: trunk/app/Features/TaskManagement/Tasks/LinkedInTask.php:36
+msgid "Connect your LinkedIn account"
+msgstr "Conecte sua conta do LinkedIn"
+
+#: app/Features/TaskManagement/Tasks/SchedulePostTask.php:16
+#: trunk/app/Features/TaskManagement/Tasks/SchedulePostTask.php:16
+msgid "Schedule a post to promote your site!"
+msgstr "Agende um post para promover seu site!"
+
+#: app/Features/TaskManagement/Tasks/SchedulePostTask.php:25
+#: trunk/app/Features/TaskManagement/Tasks/SchedulePostTask.php:25
+msgid "Schedule a post"
+msgstr "Agendar um post"
+
+#: app/Features/TaskManagement/Tasks/TwitterTask.php:36
+#: trunk/app/Features/TaskManagement/Tasks/TwitterTask.php:36
+msgid "Connect your Twitter account"
+msgstr "Conecte sua conta do Twitter"
+
+#: app/Features/TaskManagement/Tasks/UnableToTrackTrafficTask.php:27
+#: trunk/app/Features/TaskManagement/Tasks/UnableToTrackTrafficTask.php:27
+msgid "Unable to track traffic on your site"
+msgstr "Não foi possível rastrear o tráfego no seu site"
+
+#: app/Features/TaskManagement/Tasks/UnableToTrackTrafficTask.php:44
+#: trunk/app/Features/TaskManagement/Tasks/UnableToTrackTrafficTask.php:44
+msgid "Validate connection"
+msgstr "Validar conexão"
+
+#: app/Features/UserSettings/UserSettingsEndpoint.php:78
+#: trunk/app/Features/UserSettings/UserSettingsEndpoint.php:78
+msgid "Failed to retrieve settings"
+msgstr "Falha ao recuperar as configurações"
+
+#: app/Features/UserSettings/UserSettingsEndpoint.php:93
+#: trunk/app/Features/UserSettings/UserSettingsEndpoint.php:93
+msgid "Validation failed"
+msgstr "Falha na validação"
+
+#: app/Features/UserSettings/UserSettingsEndpoint.php:97
+#: trunk/app/Features/UserSettings/UserSettingsEndpoint.php:97
+msgid "An unknown error occurred. Failed to update the settings!"
+msgstr "Ocorreu um erro desconhecido. Falha ao atualizar as configurações!"
+
+#: app/Features/UserSettings/UserSettingsService.php:135
+#: trunk/app/Features/UserSettings/UserSettingsService.php:135
+msgid "Something went wrong while submitting the settings!"
+msgstr "Algo deu errado ao enviar as configurações!"
+
+#: app/Features/UserSettings/Rules/FirstDayOfWeekRule.php:18
+#: trunk/app/Features/UserSettings/Rules/FirstDayOfWeekRule.php:18
+msgid "Please enter a valid day of the week (1 or 7)"
+msgstr "Digite um dia da semana válido (1 ou 7)"
+
+#. translators: %s is the invalid language code submitted by the user.
+#: app/Features/UserSettings/Rules/SupportedLanguageRule.php:33
+#: trunk/app/Features/UserSettings/Rules/SupportedLanguageRule.php:33
+msgid "%s is not a supported language"
+msgstr "%s não é um idioma compatível"
+
+#. translators: %s is the invalid timezone submitted by the user.
+#: app/Features/UserSettings/Rules/TimezoneRule.php:23
+#: trunk/app/Features/UserSettings/Rules/TimezoneRule.php:23
+msgid "%s is not a valid timezone"
+msgstr "%s não é um fuso horário válido"
+
+#: app/Http/Endpoints/AnalyticsEndpoint.php:73
+#: app/Http/Endpoints/DistributionEndpoint.php:85
+#: trunk/app/Http/Endpoints/AnalyticsEndpoint.php:73
+#: trunk/app/Http/Endpoints/DistributionEndpoint.php:85
+msgid "Failed to load Analytics data"
+msgstr "Falha ao carregar dados de análises"
+
+#: app/Http/Endpoints/AnalyticsEndpoint.php:93
+#: app/Http/Endpoints/RealtimeEndpoint.php:101
+#: trunk/app/Http/Endpoints/AnalyticsEndpoint.php:93
+#: trunk/app/Http/Endpoints/RealtimeEndpoint.php:101
+msgid "Page views"
+msgstr "Visualizações de página"
+
+#: app/Http/Endpoints/AnalyticsEndpoint.php:97
+#: trunk/app/Http/Endpoints/AnalyticsEndpoint.php:97
+#: react/build/assets/BlatK_BK.js:1 trunk/react/build/assets/BlatK_BK.js:1
+msgid "Visits"
+msgstr "Visitas"
+
+#: app/Http/Endpoints/AnalyticsEndpoint.php:101
+#: app/Http/Endpoints/RealtimeEndpoint.php:103
+#: app/Http/Endpoints/Responses/Statistics/CountriesResponse.php:22
+#: trunk/app/Http/Endpoints/AnalyticsEndpoint.php:101
+#: trunk/app/Http/Endpoints/RealtimeEndpoint.php:103
+#: trunk/app/Http/Endpoints/Responses/Statistics/CountriesResponse.php:22
+#: react/build/assets/BlatK_BK.js:1 react/build/assets/Dc4ANLcp.js:3
+#: trunk/react/build/assets/BlatK_BK.js:1
+#: trunk/react/build/assets/Dc4ANLcp.js:3
+msgid "Visitors"
+msgstr "Visitantes"
+
+#: app/Http/Endpoints/AnalyticsEndpoint.php:105
+#: trunk/app/Http/Endpoints/AnalyticsEndpoint.php:105
+#: react/build/assets/BlatK_BK.js:1 trunk/react/build/assets/BlatK_BK.js:1
+msgid "Posts"
+msgstr "Posts"
+
+#: app/Http/Endpoints/AnalyticsEndpoint.php:109
+#: trunk/app/Http/Endpoints/AnalyticsEndpoint.php:109
+#: react/build/assets/BlatK_BK.js:1 trunk/react/build/assets/BlatK_BK.js:1
+msgid "Comments"
+msgstr "Comentários"
+
+#: app/Http/Endpoints/ConnectedBrandsEndpoint.php:64
+#: app/Http/Endpoints/ConnectedNetworksEndpoint.php:69
+#: trunk/app/Http/Endpoints/ConnectedBrandsEndpoint.php:64
+#: trunk/app/Http/Endpoints/ConnectedNetworksEndpoint.php:69
+msgid "Failed to load brands data"
+msgstr "Falha ao carregar dados de marcas"
+
+#: app/Http/Endpoints/CredentialsEndpoint.php:77
+#: trunk/app/Http/Endpoints/CredentialsEndpoint.php:77
+msgid "Something went wrong."
+msgstr "Algo deu errado."
+
+#: app/Http/Endpoints/OtherPluginsEndpoints.php:86
+#: trunk/app/Http/Endpoints/OtherPluginsEndpoints.php:86
+msgid "Plugin not found"
+msgstr "Plugin não encontrado"
+
+#: app/Http/Endpoints/OtherPluginsEndpoints.php:95
+#: trunk/app/Http/Endpoints/OtherPluginsEndpoints.php:95
+msgid "An error occurred while performing the action."
+msgstr "Ocorreu um erro ao executar a ação."
+
+#: app/Http/Endpoints/RealtimeEndpoint.php:73
+#: trunk/app/Http/Endpoints/RealtimeEndpoint.php:73
+msgid "Failed to load Realtime data"
+msgstr "Falha ao carregar dados em tempo real"
+
+#: app/Http/Endpoints/Responses/Statistics/CountriesResponse.php:21
+#: trunk/app/Http/Endpoints/Responses/Statistics/CountriesResponse.php:21
+#: react/build/assets/Dc4ANLcp.js:3 trunk/react/build/assets/Dc4ANLcp.js:3
+msgid "Country"
+msgstr "País"
+
+#: app/Http/Endpoints/Responses/Statistics/CountriesResponse.php:23
+#: trunk/app/Http/Endpoints/Responses/Statistics/CountriesResponse.php:23
+msgid "Percentage"
+msgstr "Porcentagem"
+
+#: config/languages.php:9 trunk/config/languages.php:9
+msgid "English"
+msgstr "Inglês"
+
+#: config/languages.php:13 trunk/config/languages.php:13
+msgid "Spanish"
+msgstr "Espanhol"
+
+#: config/languages.php:17 trunk/config/languages.php:17
+msgid "French"
+msgstr "Francês"
+
+#: config/languages.php:21 trunk/config/languages.php:21
+msgid "Portuguese (Portugal)"
+msgstr "Português (Portugal)"
+
+#: config/languages.php:25 trunk/config/languages.php:25
+msgid "Portuguese (Brazil)"
+msgstr "Português (Brasil)"
+
+#: config/languages.php:29 trunk/config/languages.php:29
+msgid "Deutsch"
+msgstr "Alemão"
+
+#: config/languages.php:33 trunk/config/languages.php:33
+msgid "Italian"
+msgstr "Italiano"
+
+#: config/languages.php:37 trunk/config/languages.php:37
+msgid "Danish"
+msgstr "Dinamarquês"
+
+#: config/languages.php:41 trunk/config/languages.php:41
+msgid "Dutch"
+msgstr "Holandês"
+
+#: app/Http/Middleware/IsMetricoolAuthenticated.php:29
+#: trunk/app/Http/Middleware/IsMetricoolAuthenticated.php:29
+msgid "Unauthorized. Please log-in into the Metricool plugin."
+msgstr "Não autorizado. Acesse o plugin Metricool."
+
+#: app/Http/Middleware/IsWordPressAdminRequest.php:21
+#: trunk/app/Http/Middleware/IsWordPressAdminRequest.php:21
+msgid "Unauthorized. Please log in into the WordPress admin."
+msgstr "Não autorizado. Acesse o administrador do WordPress."
+
+#: config/plugins.php:17 trunk/config/plugins.php:17
+msgid "Lightweight plugin. Heavyweight security features."
+msgstr "Plugin leve. Recursos de segurança robustos."
+
+#: config/plugins.php:26 trunk/config/plugins.php:26
+msgid "Online Booking System"
+msgstr "Sistema de reservas on-line"
+
+#: config/plugins.php:38 trunk/config/plugins.php:38
+msgid "Consent Management as it should be"
+msgstr "Gerenciamento de consentimento como deve ser"
+
+#: config/plugins.php:49 trunk/config/plugins.php:49
+msgid "Terms & Conditions"
+msgstr "Termos e condições"
+
+#: trunk/views/admin/notices/layout.php:33 views/admin/notices/layout.php:33
+msgid "Dismiss"
+msgstr "Dispensar"
+
+#: trunk/views/admin/notices/layout.php:49 views/admin/notices/layout.php:49
+msgid "Remind me later"
+msgstr "Lembre-me mais tarde"
+
+#: trunk/views/admin/notices/upgrade-notice.php:15
+#: views/admin/notices/upgrade-notice.php:15
+msgid "You have just upgraded to the new Metricool plugin"
+msgstr "Você acabou de atualizar para o novo plugin Metricool"
+
+#. translators: 1: opening <strong> tag, 2: closing </strong> tag.
+#: trunk/views/admin/notices/upgrade-notice.php:21
+#: views/admin/notices/upgrade-notice.php:21
+msgid "Please %1$ssign in%2$s to discover all new functionality"
+msgstr "%1$sAcesse%2$s para descobrir todas as novas funcionalidades"

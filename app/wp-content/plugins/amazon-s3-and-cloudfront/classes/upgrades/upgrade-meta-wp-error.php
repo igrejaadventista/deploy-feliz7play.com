@@ -29,25 +29,28 @@ class Upgrade_Meta_WP_Error extends Upgrade {
 	/**
 	 * @var int
 	 */
-	protected $upgrade_id = 3;
+	protected int $upgrade_id = 3;
 
 	/**
 	 * @var string
 	 */
-	protected $upgrade_name = 'meta_error';
+	protected string $upgrade_name = 'meta_error';
 
 	/**
 	 * @var string 'metadata', 'attachment'
 	 */
-	protected $upgrade_type = 'attachments';
+	protected string $upgrade_type = 'attachments';
 
 	/**
 	 * Get running update text.
 	 *
 	 * @return string
 	 */
-	protected function get_running_update_text() {
-		return __( 'and rebuilding the metadata for attachments that may have been corrupted.', 'amazon-s3-and-cloudfront' );
+	protected function get_running_update_text(): string {
+		return __(
+			'and rebuilding the metadata for attachments that may have been corrupted.',
+			'amazon-s3-and-cloudfront'
+		);
 	}
 
 	/**
@@ -57,7 +60,7 @@ class Upgrade_Meta_WP_Error extends Upgrade {
 	 *
 	 * @return bool
 	 */
-	protected function upgrade_item( $item ) {
+	protected function upgrade_item( mixed $item ): bool {
 		$provider_object = AS3CF_Utils::maybe_fix_serialized_string( $item->provider_object );
 		$fixed           = $item->provider_object !== $provider_object;
 
@@ -72,7 +75,14 @@ class Upgrade_Meta_WP_Error extends Upgrade {
 
 		if ( $fixed ) {
 			if ( update_post_meta( $item->ID, 'amazonS3_info', $provider_object ) ) {
-				$msg = sprintf( __( 'Fixed legacy amazonS3_info metadata when rebuilding corrupted attachment metadata, please check bucket and path for attachment ID %1$s', 'amazon-s3-and-cloudfront' ), $item->ID );
+				$msg = sprintf(
+				/* translators: %s is a unique ID string. */
+					__(
+						'Fixed legacy amazonS3_info metadata when rebuilding corrupted attachment metadata, please check bucket and path for attachment ID %1$s',
+						'amazon-s3-and-cloudfront'
+					),
+					$item->ID
+				);
 				AS3CF_Error::log( $msg );
 			} else {
 				AS3CF_Error::log( 'Failed to fix broken serialized legacy offload metadata for attachment ' . $item->ID . ': ' . $item->provider_object );
@@ -85,8 +95,8 @@ class Upgrade_Meta_WP_Error extends Upgrade {
 		$file = get_attached_file( $item->ID, true );
 
 		if ( ! file_exists( $file ) ) {
-			// Copy back the file to the server if doesn't exist so we can successfully
-			// regenerate the attachment metadata
+			// Copy back the file to the server if it doesn't exist so we can successfully
+			// regenerate the attachment metadata.
 			try {
 				$args = array(
 					'Bucket' => $provider_object['bucket'],
@@ -95,7 +105,17 @@ class Upgrade_Meta_WP_Error extends Upgrade {
 				);
 				$this->as3cf->get_provider_client( $provider_object['region'], true )->get_object( $args );
 			} catch ( Exception $e ) {
-				AS3CF_Error::log( sprintf( __( 'There was an error attempting to download the file %s from the bucket: %s', 'amazon-s3-and-cloudfront' ), $provider_object['key'], $e->getMessage() ) );
+				AS3CF_Error::log(
+					sprintf(
+					/* translators: %1$s is a file path, %2$s is an error message. */
+						__(
+							'There was an error attempting to download the file %1$s from the bucket: %2$s',
+							'amazon-s3-and-cloudfront'
+						),
+						$provider_object['key'],
+						$e->getMessage()
+					)
+				);
 
 				return false;
 			}
@@ -116,12 +136,12 @@ class Upgrade_Meta_WP_Error extends Upgrade {
 	 *
 	 * @return int
 	 */
-	protected function count_items_to_process() {
+	protected function count_items_to_process(): int {
 		return (int) $this->get_attachments_with_error_metadata( $this->blog_prefix, true );
 	}
 
 	/**
-	 * Get all attachments that don't have region in their S3 meta data for a blog
+	 * Get all attachments that don't have region in their S3 metadata for a blog
 	 *
 	 * @param string     $prefix
 	 * @param int        $limit
@@ -129,22 +149,24 @@ class Upgrade_Meta_WP_Error extends Upgrade {
 	 *
 	 * @return array
 	 */
-	protected function get_items_to_process( $prefix, $limit, $offset = false ) {
-		$attachments = $this->get_attachments_with_error_metadata( $prefix, false, $limit );
-
-		return $attachments;
+	protected function get_items_to_process( string $prefix, int $limit, $offset = false ): array {
+		return $this->get_attachments_with_error_metadata( $prefix, false, $limit );
 	}
 
 	/**
 	 * Get S3 attachments that have had their _wp_attachment_metadata corrupted
 	 *
-	 * @param string     $prefix
-	 * @param bool|false $count
-	 * @param null|int   $limit
+	 * @param string   $prefix
+	 * @param bool     $count
+	 * @param int|null $limit
 	 *
 	 * @return array|int
 	 */
-	protected function get_attachments_with_error_metadata( $prefix, $count = false, $limit = null ) {
+	protected function get_attachments_with_error_metadata(
+		string $prefix,
+		bool $count = false,
+		?int $limit = null
+	): array|int {
 		global $wpdb;
 
 		$sql = "FROM `{$prefix}postmeta` pm1
@@ -157,15 +179,17 @@ class Upgrade_Meta_WP_Error extends Upgrade {
 		if ( $count ) {
 			$sql = 'SELECT COUNT(*)' . $sql;
 
+			// phpcs:ignore WordPress.DB,PluginCheck.Security.DirectDB.UnescapedDBParameter -- safe query, must not be cached
 			return $wpdb->get_var( $sql );
 		}
 
 		$sql = "SELECT pm1.`post_id` as `ID`, pm1.`meta_value` AS 'provider_object'" . $sql;
 
 		if ( $limit && $limit > 0 ) {
-			$sql .= sprintf( ' LIMIT %d', (int) $limit );
+			$sql .= sprintf( ' LIMIT %d', $limit );
 		}
 
+		// phpcs:ignore WordPress.DB,PluginCheck.Security.DirectDB.UnescapedDBParameter -- safe query, must not be cached
 		return $wpdb->get_results( $sql, OBJECT );
 	}
 }

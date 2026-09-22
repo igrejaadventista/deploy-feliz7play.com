@@ -3,6 +3,7 @@
 namespace DeliciousBrains\WP_Offload_Media\Items;
 
 use AS3CF_Error;
+use WP_Error;
 
 class Remove_Local_Handler extends Item_Handler {
 	/**
@@ -15,28 +16,28 @@ class Remove_Local_Handler extends Item_Handler {
 	 *
 	 * @var array
 	 */
-	private $remove_blocked = array();
+	private array $remove_blocked = array();
 
 	/**
 	 * Keep track of size of individual files we've already attempted to remove.
 	 *
 	 * @var array
 	 */
-	private $removed_size = array();
+	private array $removed_size = array();
 
 	/**
 	 * If remove the primary file, we want to update the 'filesize'.
 	 *
-	 * @var int
+	 * @var array
 	 */
-	private $removed_primary_size = array();
+	private array $removed_primary_size = array();
 
 	/**
 	 * The default options that should be used if none supplied.
 	 *
 	 * @return array
 	 */
-	public static function default_options() {
+	public static function default_options(): array {
 		return array(
 			'verify_exists_on_provider' => false,
 			'provider_keys'             => array(),
@@ -52,7 +53,7 @@ class Remove_Local_Handler extends Item_Handler {
 	 *
 	 * @return Manifest
 	 */
-	protected function pre_handle( Item $as3cf_item, array $options ) {
+	protected function pre_handle( Item $as3cf_item, array $options ): Manifest {
 		$manifest        = new Manifest();
 		$source_id       = $as3cf_item->source_id();
 		$primary_file    = '';
@@ -98,13 +99,21 @@ class Remove_Local_Handler extends Item_Handler {
 		 * @param Item  $as3cf_item      The Item object
 		 * @param array $item_source     Item source descriptor array
 		 */
-		$filtered_files_to_remove = apply_filters( 'as3cf_remove_local_files', $files_to_remove, $as3cf_item, $as3cf_item->get_item_source_array() );
+		$filtered_files_to_remove = apply_filters(
+			'as3cf_remove_local_files',
+			$files_to_remove,
+			$as3cf_item,
+			$as3cf_item->get_item_source_array()
+		);
 
 		// Ensure fileset is unique and does not contain files already blocked.
 		$filtered_files_to_remove = array_unique( array_diff( $filtered_files_to_remove, $this->remove_blocked ) );
 
 		// If filter removes files from list, block attempts to remove them in later calls.
-		$this->remove_blocked = array_merge( $this->remove_blocked, array_diff( $files_to_remove, $filtered_files_to_remove ) );
+		$this->remove_blocked = array_merge(
+			$this->remove_blocked,
+			array_diff( $files_to_remove, $filtered_files_to_remove )
+		);
 
 		foreach ( $filtered_files_to_remove as $file ) {
 			// Filter may have added some files to check for existence.
@@ -142,25 +151,47 @@ class Remove_Local_Handler extends Item_Handler {
 	 * @param Manifest $manifest
 	 * @param array    $options
 	 *
-	 * @return bool
+	 * @return bool|WP_Error
 	 */
-	protected function handle_item( Item $as3cf_item, Manifest $manifest, array $options ) {
+	protected function handle_item( Item $as3cf_item, Manifest $manifest, array $options ): bool|WP_Error {
+		global $wp_filesystem;
+
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
+		if ( ! WP_Filesystem() ) {
+			return $this->return_handler_error(
+				__( 'Could not initialize WP_Filesystem.', 'amazon-s3-and-cloudfront' )
+			);
+		}
+
 		foreach ( $manifest->objects as &$file_to_remove ) {
 			$file = $file_to_remove['file'];
 
 			$file_to_remove['remove_result'] = array( 'status' => self::STATUS_OK );
 
-			//phpcs:ignore
-			if ( ! @unlink( $file ) ) {
+			if ( ! $wp_filesystem->delete( $file ) ) {
 				$this->remove_blocked[] = $file;
 
 				$file_to_remove['remove_result']['status']  = self::STATUS_FAILED;
 				$file_to_remove['remove_result']['message'] = "Error removing local file at $file";
 
-				if ( ! file_exists( $file ) ) {
-					$file_to_remove['remove_result']['message'] = "Error removing local file. Couldn't find the file at $file";
-				} elseif ( ! is_writable( $file ) ) {
-					$file_to_remove['remove_result']['message'] = "Error removing local file. Ownership or permissions are mis-configured for $file";
+				if ( ! $wp_filesystem->exists( $file ) ) {
+					$file_to_remove['remove_result']['message'] = sprintf(
+					/* translators: %s is a file path. */
+						__( "Error removing local file. Couldn't find the file at %s", 'amazon-s3-and-cloudfront' ),
+						$file
+					);
+				} elseif ( ! $wp_filesystem->is_writable( $file ) ) {
+					$file_to_remove['remove_result']['message'] = sprintf(
+					/* translators: %s is a file path. */
+						__(
+							"Error removing local file. Ownership or permissions are mis-configured for %s",
+							'amazon-s3-and-cloudfront'
+						),
+						$file
+					);
 				}
 			}
 		}
@@ -177,7 +208,7 @@ class Remove_Local_Handler extends Item_Handler {
 	 *
 	 * @return bool
 	 */
-	protected function post_handle( Item $as3cf_item, Manifest $manifest, array $options ) {
+	protected function post_handle( Item $as3cf_item, Manifest $manifest, array $options ): bool {
 		if ( empty( $manifest->objects ) ) {
 			return true;
 		}
@@ -202,7 +233,10 @@ class Remove_Local_Handler extends Item_Handler {
 			}
 		}
 
-		$as3cf_item->update_filesize_after_remove_local( $this->removed_primary_size[ $as3cf_item->source_id() ], $this->removed_size[ $as3cf_item->source_id() ] );
+		$as3cf_item->update_filesize_after_remove_local(
+			$this->removed_primary_size[ $as3cf_item->source_id() ],
+			$this->removed_size[ $as3cf_item->source_id() ]
+		);
 
 		return true;
 	}

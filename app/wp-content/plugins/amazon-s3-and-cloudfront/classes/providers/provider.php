@@ -5,12 +5,24 @@ namespace DeliciousBrains\WP_Offload_Media\Providers;
 use Amazon_S3_And_CloudFront;
 use AS3CF_Plugin_Base;
 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 abstract class Provider {
 
 	/**
 	 * @var Amazon_S3_And_CloudFront
 	 */
 	protected $as3cf;
+
+	/**
+	 * Has the provider been deprecated?
+	 *
+	 * @var bool
+	 */
+	protected static bool $is_deprecated = false;
 
 	/**
 	 * Can the displayed provider service name be overridden by the user?
@@ -104,6 +116,28 @@ abstract class Provider {
 	 */
 	public function __construct( AS3CF_Plugin_Base $as3cf ) {
 		$this->as3cf = $as3cf;
+
+		add_filter( 'as3cf_get_notices', array( $this, 'maybe_add_deprecation_notice' ), 10, 3 );
+	}
+
+	/**
+	 * Has the provider been deprecated?
+	 *
+	 * @return bool
+	 */
+	public static function is_deprecated(): bool {
+		return static::$is_deprecated;
+	}
+
+	/**
+	 * Returns the full name for the provider type, e.g. "Storage Provider" or "Delivery Provider".
+	 *
+	 * Should be overridden in Storage/Provider subclasses.
+	 *
+	 * @return string
+	 */
+	public static function get_provider_type_name(): string {
+		return __( 'Provider', 'amazon-s3-and-cloudfront' );
 	}
 
 	/**
@@ -153,7 +187,7 @@ abstract class Provider {
 		if ( ! empty( static::$provider_service_name ) ) {
 			$result = static::$provider_service_name;
 		} else {
-			$result = static::$provider_name . ' ' . static::$service_name;
+			$result = static::get_provider_name() . ' ' . static::get_service_name();
 		}
 
 		if ( false === $override_allowed || false === static::provider_service_name_override_allowed() ) {
@@ -182,7 +216,11 @@ abstract class Provider {
 	 * Note: For accessibility reasons, returned string should differ from `get_provider_service_name`.
 	 */
 	public static function get_icon_desc( $override_allowed = true ) {
-		return sprintf( _x( '%s logo', 'Provider icon\'s alt text', 'amazon-s3-and-cloudfront' ), static::get_provider_service_name( $override_allowed ) );
+		return sprintf(
+		/* translators: %s is a provider service name, e.g. "Amazon S3". */
+			_x( '%s logo', 'Provider icon\'s alt text', 'amazon-s3-and-cloudfront' ),
+			static::get_provider_service_name( $override_allowed )
+		);
 	}
 
 	/**
@@ -222,7 +260,10 @@ abstract class Provider {
 	 * @return string
 	 */
 	public function get_domain() {
-		return apply_filters( 'as3cf_' . static::$provider_key_name . '_' . static::$service_key_name . '_domain', $this->default_domain );
+		return apply_filters(
+			'as3cf_' . static::get_provider_key_name() . '_' . static::get_service_key_name() . '_domain',
+			$this->default_domain
+		);
 	}
 
 	/**
@@ -233,15 +274,28 @@ abstract class Provider {
 	 * @param string $region
 	 *
 	 * @return string
+	 *
+	 * phpcs:disable PEAR.Functions.FunctionCallSignature.Indent
+	 * phpcs:disable Universal.WhiteSpace.PrecisionAlignment.Found
+	 * phpcs:disable Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed
 	 */
 	public function get_console_url( string $bucket = '', string $prefix = '', string $region = '' ): string {
 		if ( '' !== $prefix ) {
-			$prefix = $this->get_console_url_prefix_param() . apply_filters( 'as3cf_' . static::$provider_key_name . '_' . static::$service_key_name . '_console_url_prefix_value', $prefix );
+			$prefix = $this->get_console_url_prefix_param() . apply_filters(
+					'as3cf_' . static::get_provider_key_name() . '_' . static::get_service_key_name() . '_console_url_prefix_value',
+					$prefix
+				);
 		}
 
-		$suffix = apply_filters( 'as3cf_' . static::$provider_key_name . '_' . static::$service_key_name . '_console_url_suffix_param', $this->get_console_url_suffix_param( $bucket, $prefix, $region ) );
+		$suffix = apply_filters(
+			'as3cf_' . static::get_provider_key_name() . '_' . static::get_service_key_name() . '_console_url_suffix_param',
+			$this->get_console_url_suffix_param( $bucket, $prefix, $region )
+		);
 
-		return apply_filters( 'as3cf_' . static::$provider_key_name . '_' . static::$service_key_name . '_console_url', $this->console_url ) . $bucket . $prefix . $suffix;
+		return apply_filters(
+			       'as3cf_' . static::get_provider_key_name() . '_' . static::get_service_key_name() . '_console_url',
+			       $this->console_url
+		       ) . $bucket . $prefix . $suffix;
 	}
 
 	/**
@@ -250,7 +304,10 @@ abstract class Provider {
 	 * @return string
 	 */
 	public function get_console_url_prefix_param(): string {
-		return apply_filters( 'as3cf_' . static::$provider_key_name . '_' . static::$service_key_name . '_console_url_prefix_param', $this->console_url_prefix_param );
+		return apply_filters(
+			'as3cf_' . static::get_provider_key_name() . '_' . static::get_service_key_name() . '_console_url_prefix_param',
+			$this->console_url_prefix_param
+		);
 	}
 
 	/**
@@ -384,6 +441,58 @@ abstract class Provider {
 	}
 
 	/**
+	 * Maybe add a notice to the notices being displayed on settings page.
+	 *
+	 * @handles as3cf_get_notices
+	 *
+	 * @param array       $notices
+	 * @param string|bool $tab      Only interested in notices for a particular tab?
+	 * @param bool        $all_tabs Only interested in notices that are not restricted to any tab?
+	 *
+	 * @return array
+	 */
+	public function maybe_add_deprecation_notice( array $notices, $tab, bool $all_tabs ): array {
+		if ( ! static::is_deprecated() ) {
+			return $notices;
+		}
+
+		// Only add notice when filter fires for cross tab notices, e.g. REST-API.
+		if ( ! empty( $tab ) || $all_tabs !== true ) {
+			return $notices;
+		}
+
+		$heading = sprintf(
+		/* translators: %1$s is a provider service name, %2$s is provider type. */
+			__( '%1$s %2$s Deprecated', 'amazon-s3-and-cloudfront' ),
+			static::get_provider_service_name(),
+			static::get_provider_type_name()
+		);
+
+		$message = sprintf(
+		/* translators: %1$s is a provider service name, %2$s is provider type. */
+			__(
+				'The <strong>%1$s</strong> %2$s has been deprecated and will be removed in a future major release. Please switch to a different %2$s.',
+				'amazon-s3-and-cloudfront'
+			),
+			static::get_provider_service_name(),
+			static::get_provider_type_name()
+		);
+
+		$args = array(
+			'type'                  => 'warning',
+			'dismissible'           => false,
+			'only_show_in_settings' => true,
+			'custom_id'             => 'as3cf_deprecation_notice_' . static::get_provider_key_name(),
+			'heading'               => $heading,
+		);
+
+		$notice    = $this->as3cf->notices->build_notice( $message, $args );
+		$notices[] = $notice;
+
+		return $notices;
+	}
+
+	/**
 	 * Get the suffix param to append to the link to the provider's console.
 	 *
 	 * @param string $bucket
@@ -392,5 +501,9 @@ abstract class Provider {
 	 *
 	 * @return string
 	 */
-	abstract protected function get_console_url_suffix_param( string $bucket = '', string $prefix = '', string $region = '' ): string;
+	abstract protected function get_console_url_suffix_param(
+		string $bucket = '',
+		string $prefix = '',
+		string $region = ''
+	): string;
 }

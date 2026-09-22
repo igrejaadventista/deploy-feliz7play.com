@@ -2,6 +2,7 @@
 
 namespace DeliciousBrains\WP_Offload_Media\Aws3\Aws\Api\ErrorParser;
 
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Api\Parser\AbstractParser;
 use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Api\Parser\JsonParser;
 use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Api\Service;
 use DeliciousBrains\WP_Offload_Media\Aws3\Aws\CommandInterface;
@@ -13,13 +14,14 @@ class JsonRpcErrorParser extends AbstractErrorParser
 {
     use JsonParserTrait;
     private $parser;
-    public function __construct(Service $api = null, JsonParser $parser = null)
+    public function __construct(?Service $api = null, ?JsonParser $parser = null)
     {
         parent::__construct($api);
         $this->parser = $parser ?: new JsonParser();
     }
-    public function __invoke(ResponseInterface $response, CommandInterface $command = null)
+    public function __invoke(ResponseInterface $response, ?CommandInterface $command = null)
     {
+        $response = AbstractParser::getResponseWithCachingStream($response);
         $data = $this->genericHandler($response);
         // Make the casing consistent across services.
         if ($data['parsed']) {
@@ -30,7 +32,7 @@ class JsonRpcErrorParser extends AbstractErrorParser
                 $parts = \explode('#', $data['parsed']['__type']);
                 $data['code'] = isset($parts[1]) ? $parts[1] : $parts[0];
             }
-            $data['message'] = isset($data['parsed']['message']) ? $data['parsed']['message'] : null;
+            $data['message'] = $data['parsed']['message'] ?? null;
         }
         $this->populateShape($data, $response, $command);
         return $data;

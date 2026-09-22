@@ -19,7 +19,11 @@ namespace DeliciousBrains\WP_Offload_Media\Gcp\Google\Cloud\Storage;
 
 use DeliciousBrains\WP_Offload_Media\Gcp\Google\Cloud\Core\Iterator\ItemIteratorTrait;
 /**
- * Iterates over a set of {@see Google\Cloud\Storage\StorageObject} items.
+ * ObjectIterator
+ *
+ * Iterates over a set of {@see StorageObject} items.
+ *
+ * @implements \Iterator<int, StorageObject>
  */
 class ObjectIterator implements \Iterator
 {

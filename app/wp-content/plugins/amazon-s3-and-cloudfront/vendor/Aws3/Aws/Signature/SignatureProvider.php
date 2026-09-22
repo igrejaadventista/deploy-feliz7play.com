@@ -41,7 +41,7 @@ use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Token\BearerTokenAuthorization;
  */
 class SignatureProvider
 {
-    private static $s3v4SignedServices = ['s3' => \true, 's3control' => \true, 's3-object-lambda' => \true, 's3express' => \true];
+    private static $s3v4SignedServices = ['s3' => \true, 's3control' => \true, 's3-outposts' => \true, 's3-object-lambda' => \true, 's3express' => \true];
     /**
      * Resolves and signature provider and ensures a non-null return value.
      *
@@ -56,7 +56,7 @@ class SignatureProvider
     public static function resolve(callable $provider, $version, $service, $region)
     {
         $result = $provider($version, $service, $region);
-        if ($result instanceof SignatureInterface || $result instanceof BearerTokenAuthorization) {
+        if ($result instanceof SignatureInterface || $result instanceof BearerTokenAuthorization || $result instanceof DpopSignature) {
             return $result;
         }
         throw new UnresolvedSignatureException("Unable to resolve a signature for {$version}/{$service}/{$region}.\n" . "Valid signature versions include v4 and anonymous.");
@@ -117,6 +117,8 @@ class SignatureProvider
                     return new BearerTokenAuthorization();
                 case 'anonymous':
                     return new AnonymousSignature();
+                case 'dpop':
+                    return new DpopSignature($service);
                 default:
                     return null;
             }

@@ -2,10 +2,18 @@
 
 namespace DeliciousBrains\WP_Offload_Media\Aws3\Aws\Sts;
 
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Arn\ArnParser;
 use DeliciousBrains\WP_Offload_Media\Aws3\Aws\AwsClient;
 use DeliciousBrains\WP_Offload_Media\Aws3\Aws\CacheInterface;
 use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Credentials\Credentials;
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\HandlerList;
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Middleware;
 use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Result;
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Retry\ConfigurationInterface as RetryConfigurationInterface;
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Retry\ConfigurationProvider as RetryConfigurationProvider;
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Retry\V3\OptIn as NewRetriesOptIn;
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Retry\V3\RetryMiddleware as RetryV3Middleware;
+use DeliciousBrains\WP_Offload_Media\Aws3\Aws\RetryMiddleware;
 use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Sts\RegionalEndpoints\ConfigurationProvider;
 /**
  * This client is used to interact with the **AWS Security Token Service (AWS STS)**.
@@ -16,16 +24,22 @@ use DeliciousBrains\WP_Offload_Media\Aws3\Aws\Sts\RegionalEndpoints\Configuratio
  * @method \GuzzleHttp\Promise\Promise assumeRoleWithSAMLAsync(array $args = [])
  * @method \Aws\Result assumeRoleWithWebIdentity(array $args = [])
  * @method \GuzzleHttp\Promise\Promise assumeRoleWithWebIdentityAsync(array $args = [])
+ * @method \Aws\Result assumeRoot(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise assumeRootAsync(array $args = [])
  * @method \Aws\Result decodeAuthorizationMessage(array $args = [])
  * @method \GuzzleHttp\Promise\Promise decodeAuthorizationMessageAsync(array $args = [])
  * @method \Aws\Result getAccessKeyInfo(array $args = [])
  * @method \GuzzleHttp\Promise\Promise getAccessKeyInfoAsync(array $args = [])
  * @method \Aws\Result getCallerIdentity(array $args = [])
  * @method \GuzzleHttp\Promise\Promise getCallerIdentityAsync(array $args = [])
+ * @method \Aws\Result getDelegatedAccessToken(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise getDelegatedAccessTokenAsync(array $args = [])
  * @method \Aws\Result getFederationToken(array $args = [])
  * @method \GuzzleHttp\Promise\Promise getFederationTokenAsync(array $args = [])
  * @method \Aws\Result getSessionToken(array $args = [])
  * @method \GuzzleHttp\Promise\Promise getSessionTokenAsync(array $args = [])
+ * @method \Aws\Result getWebIdentityToken(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise getWebIdentityTokenAsync(array $args = [])
  */
 class StsClient extends AwsClient
 {
@@ -56,6 +70,34 @@ class StsClient extends AwsClient
         $this->addBuiltIns($args);
         parent::__construct($args);
     }
+    public static function getArguments()
+    {
+        $args = parent::getArguments();
+        // Off-path STS keeps the default ClientResolver retry handling. The
+        // override below adds IDPCommunicationError as a transient error and
+        // is only registered when the AWS_NEW_RETRIES_2026 flag is on.
+        if (NewRetriesOptIn::isEnabled()) {
+            $args['retries']['fn'] = [__CLASS__, '_applyRetryConfig'];
+        }
+        return $args;
+    }
+    /**
+     * @internal Only invoked when AWS_NEW_RETRIES_2026=true. The off-path
+     *           uses the default ClientResolver::_apply_retries.
+     */
+    public static function _applyRetryConfig($value, array &$args, HandlerList $list) : void
+    {
+        if (!$value) {
+            return;
+        }
+        $config = RetryConfigurationProvider::unwrap($value);
+        if ($config->getMode() === 'legacy') {
+            $decider = RetryMiddleware::createDefaultDecider($config->getMaxAttempts() - 1);
+            $list->appendSign(Middleware::retry($decider, null, $args['stats']['retries']), 'retry');
+            return;
+        }
+        $list->appendSign(RetryV3Middleware::wrap($config, ['collect_stats' => $args['stats']['retries'], 'service' => $args['service'], 'transient_error_codes' => ['IDPCommunicationError']]), 'retry');
+    }
     /**
      * Creates credentials from the result of an STS operations
      *
@@ -64,13 +106,22 @@ class StsClient extends AwsClient
      * @return Credentials
      * @throws \InvalidArgumentException if the result contains no credentials
      */
-    public function createCredentials(Result $result)
+    public function createCredentials(Result $result, $source = null)
     {
         if (!$result->hasKey('Credentials')) {
             throw new \InvalidArgumentException('Result contains no credentials');
         }
-        $c = $result['Credentials'];
-        return new Credentials($c['AccessKeyId'], $c['SecretAccessKey'], isset($c['SessionToken']) ? $c['SessionToken'] : null, isset($c['Expiration']) && $c['Expiration'] instanceof \DateTimeInterface ? (int) $c['Expiration']->format('U') : null);
+        $accountId = null;
+        if ($result->hasKey('AssumedRoleUser')) {
+            $parsedArn = ArnParser::parse($result->get('AssumedRoleUser')['Arn']);
+            $accountId = $parsedArn->getAccountId();
+        } elseif ($result->hasKey('FederatedUser')) {
+            $parsedArn = ArnParser::parse($result->get('FederatedUser')['Arn']);
+            $accountId = $parsedArn->getAccountId();
+        }
+        $credentials = $result['Credentials'];
+        $expiration = isset($credentials['Expiration']) && $credentials['Expiration'] instanceof \DateTimeInterface ? (int) $credentials['Expiration']->format('U') : null;
+        return new Credentials($credentials['AccessKeyId'], $credentials['SecretAccessKey'], isset($credentials['SessionToken']) ? $credentials['SessionToken'] : null, $expiration, $accountId, $source);
     }
     /**
      * Adds service-specific client built-in value

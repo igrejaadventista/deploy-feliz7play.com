@@ -35,7 +35,7 @@ class Retry
      *
      * @param BatchRunner $runner [optional] **Defaults to** a new BatchRunner.
      */
-    public function __construct(BatchRunner $runner = null)
+    public function __construct(?BatchRunner $runner = null)
     {
         $this->runner = $runner ?: new BatchRunner();
         $this->initFailureFile();
@@ -55,6 +55,11 @@ class Retry
                 continue;
             }
             while ($line = \fgets($fp)) {
+                $jsonDecodedValue = \json_decode($line);
+                // Check if data json_encoded after serialization
+                if ($jsonDecodedValue !== null || $jsonDecodedValue !== \false) {
+                    $line = $jsonDecodedValue;
+                }
                 $a = \unserialize($line);
                 $idNum = \key($a);
                 $job = $this->runner->getJobFromIdNum($idNum);

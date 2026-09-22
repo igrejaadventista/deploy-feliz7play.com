@@ -3,6 +3,8 @@
 namespace DeliciousBrains\WP_Offload_Media\Upgrades;
 
 use AS3CF_Utils;
+use DeliciousBrains\WP_Offload_Media\Upgrades\Exceptions\Batch_Limits_Exceeded_Exception;
+use DeliciousBrains\WP_Offload_Media\Upgrades\Exceptions\Too_Many_Errors_Exception;
 
 /**
  * Upgrade_Content_Replace_URLs Class
@@ -17,24 +19,24 @@ class Upgrade_Content_Replace_URLs extends Upgrade_Filter_Post {
 	/**
 	 * @var int
 	 */
-	protected $upgrade_id = 4;
+	protected int $upgrade_id = 4;
 
 	/**
 	 * @var string
 	 */
-	protected $upgrade_name = 'replace_provider_urls';
+	protected string $upgrade_name = 'replace_provider_urls';
 
 	/**
 	 * @var string
 	 */
-	protected $column_name = 'post_content';
+	protected string $column_name = 'post_content';
 
 	/**
 	 * Get running update text.
 	 *
 	 * @return string
 	 */
-	protected function get_running_update_text() {
+	protected function get_running_update_text(): string {
 		return __( 'and ensuring that only the local URL exists in post content.', 'amazon-s3-and-cloudfront' );
 	}
 
@@ -43,16 +45,27 @@ class Upgrade_Content_Replace_URLs extends Upgrade_Filter_Post {
 	 *
 	 * @return string
 	 */
-	protected function get_running_message() {
-		return sprintf( __( '<strong>Running Content Upgrade%1$s</strong><br>A find &amp; replace is running in the background to update URLs in your post content. %2$s', 'amazon-s3-and-cloudfront' ), $this->get_progress_text(), $this->get_generic_message() );
+	protected function get_running_message(): string {
+		return sprintf(
+		/* translators: %1$s is formatted progress info, %2$s is a documentation link. */
+			__(
+				'<strong>Running Content Upgrade%1$s</strong><br>A find &amp; replace is running in the background to update URLs in your post content. %2$s',
+				'amazon-s3-and-cloudfront'
+			),
+			$this->get_progress_text(),
+			$this->get_generic_message()
+		);
 	}
 
 	/**
 	 * Switch to a new blog for processing.
 	 *
 	 * @return bool
+	 *
+	 * @throws Batch_Limits_Exceeded_Exception
+	 * @throws Too_Many_Errors_Exception
 	 */
-	protected function upgrade_blog() {
+	protected function upgrade_blog(): bool {
 		$this->upgrade_theme_mods();
 
 		return parent::upgrade_blog();
@@ -61,10 +74,11 @@ class Upgrade_Content_Replace_URLs extends Upgrade_Filter_Post {
 	/**
 	 * Upgrade theme mods. Ensures background and header images have local URLs saved to the database.
 	 */
-	protected function upgrade_theme_mods() {
+	protected function upgrade_theme_mods(): void {
 		global $wpdb;
 
-		$mods = $wpdb->get_results( "SELECT * FROM `{$wpdb->options}` WHERE option_name LIKE 'theme_mods_%'" );
+		// phpcs:ignore WordPress.DB -- safe query, must not be cached
+		$mods = $wpdb->get_results( "SELECT * FROM `$wpdb->options` WHERE option_name LIKE 'theme_mods_%'" );
 
 		foreach ( $mods as $mod ) {
 			$value = AS3CF_Utils::maybe_unserialize( $mod->option_value );
@@ -84,7 +98,8 @@ class Upgrade_Content_Replace_URLs extends Upgrade_Filter_Post {
 			$value = maybe_serialize( $value );
 
 			if ( $value !== $mod->option_value ) {
-				$wpdb->query( "UPDATE `{$wpdb->options}` SET option_value = '{$value}' WHERE option_id = '{$mod->option_id}'" );
+				// phpcs:ignore WordPress.DB,PluginCheck.Security.DirectDB.UnescapedDBParameter -- safe query, must not be cached
+				$wpdb->query( "UPDATE `$wpdb->options` SET option_value = '$value' WHERE option_id = '$mod->option_id'" );
 			}
 		}
 	}
