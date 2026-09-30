@@ -21,16 +21,16 @@
 
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', $_ENV['WP_DB_NAME']);
+define( 'DB_NAME', 'hostinger_v3' );
 
 /** MySQL database username */
-define( 'DB_USER', $_ENV['WP_DB_USER']);
+define( 'DB_USER', 'root');
 
 /** MySQL database password */
-define( 'DB_PASSWORD', $_ENV['WP_DB_PASSWORD']);
+define( 'DB_PASSWORD', 'root');
 
 /** MySQL hostname */
-define( 'DB_HOST', $_ENV['WP_DB_HOST'] . ':3306');
+define( 'DB_HOST', 'localhost');
 
 /** Database charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8' );
@@ -118,17 +118,19 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
 define('FORCE_SSL_ADMIN', true);
 
 
+define('AS3CF_AWS_ACCESS_KEY_ID', $_ENV['WP_S3_ACCESS_KEY']);
+define('AS3CF_AWS_SECRET_ACCESS_KEY', $_ENV['WP_S3_SECRET_KEY']);
+
 define('AS3CF_SETTINGS', serialize(array(
-	'provider' => 'aws',
-	'region' => 'us-east-1',
-	'access-key-id' => $_ENV['WP_S3_ACCESS_KEY'],
-	'secret-access-key' => $_ENV['WP_S3_SECRET_KEY'],
-	'bucket' => $_ENV['WP_S3_BUCKET'],
+    'provider'               => 'aws',
+    'region'                 => 'us-east-1',
+    'bucket'                 => $_ENV['WP_S3_BUCKET'],
+    'copy-to-s3'             => true,
+    'serve-from-s3'          => true,
     'enable-delivery-domain' => true,
-    'delivery-domain' => $_ENV['WP_S3_BUCKET'],
+    'force-https'            => true,
     'signed-urls-object-prefix' => 'feliz7play',
-    'force-https' => true,
-    'remove-local-file' => true,
+    'remove-local-file' => false,
 )));
 
 /* That's all, stop editing! Happy publishing. */
