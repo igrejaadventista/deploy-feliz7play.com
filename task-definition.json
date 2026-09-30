@@ -33,7 +33,7 @@
       "workingDirectory": null,
       "secrets": null,
       "dockerSecurityOptions": null,
-      "memory": 1024,
+      "memory": 2048,
       "memoryReservation": null,
       "volumesFrom": [],
       "stopTimeout": null,

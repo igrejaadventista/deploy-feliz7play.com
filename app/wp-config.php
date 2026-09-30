@@ -122,9 +122,9 @@ define('AS3CF_SETTINGS', serialize(array(
     'copy-to-s3'             => true,
     'serve-from-s3'          => true,
     'enable-delivery-domain' => true,
+    'delivery-domain'        => $_ENV['WP_S3_BUCKET'],
     'force-https'            => true,
-    'signed-urls-object-prefix' => 'feliz7play',
-    'remove-local-file' => false,
+    'remove-local-file'      => false,
 )));
 
 /* That's all, stop editing! Happy publishing. */
